@@ -1,6 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:islamic_online_learning/components/dlg.dart';
 
 extension StateExt<T extends StatefulWidget> on State<T> {
   void toast(String message, {Key? textKey}) {
@@ -9,24 +8,6 @@ extension StateExt<T extends StatefulWidget> on State<T> {
         content: Text(message, key: textKey),
         duration: const Duration(milliseconds: 250),
       ),
-    );
-  }
-
-  void simpleDialog(String message, [String action = 'Ok']) {
-    showDialog<void>(
-      context: context,
-      builder: (_) {
-        return SimpleDlg(message: message, action: action);
-      },
-    );
-  }
-
-  void dialog(Widget child) {
-    showDialog<void>(
-      context: context,
-      builder: (_) {
-        return Dlg(child: child);
-      },
     );
   }
 }
