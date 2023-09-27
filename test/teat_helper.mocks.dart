@@ -3,16 +3,18 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i6;
+import 'dart:async' as _i5;
 
-import 'package:dartz/dartz.dart' as _i2;
+import 'package:dartz/dartz.dart' as _i3;
 import 'package:firebase_core/firebase_core.dart' as _i4;
-import 'package:firebase_database/firebase_database.dart' as _i3;
-import 'package:islamic_online_learning/core/failure.dart' as _i7;
+import 'package:firebase_database/firebase_database.dart' as _i2;
+import 'package:firebase_database_platform_interface/firebase_database_platform_interface.dart'
+    as _i6;
+import 'package:islamic_online_learning/core/failure.dart' as _i8;
 import 'package:islamic_online_learning/features/main/data/Model/course_model.dart'
-    as _i8;
+    as _i9;
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart'
-    as _i5;
+    as _i7;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -26,8 +28,9 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeEither_0<L, R> extends _i1.SmartFake implements _i2.Either<L, R> {
-  _FakeEither_0(
+class _FakeDatabaseReference_0 extends _i1.SmartFake
+    implements _i2.DatabaseReference {
+  _FakeDatabaseReference_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -36,9 +39,9 @@ class _FakeEither_0<L, R> extends _i1.SmartFake implements _i2.Either<L, R> {
         );
 }
 
-class _FakeDatabaseReference_1 extends _i1.SmartFake
-    implements _i3.DatabaseReference {
-  _FakeDatabaseReference_1(
+class _FakeTransactionResult_1 extends _i1.SmartFake
+    implements _i2.TransactionResult {
+  _FakeTransactionResult_1(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -47,8 +50,8 @@ class _FakeDatabaseReference_1 extends _i1.SmartFake
         );
 }
 
-class _FakeDataSnapshot_2 extends _i1.SmartFake implements _i3.DataSnapshot {
-  _FakeDataSnapshot_2(
+class _FakeOnDisconnect_2 extends _i1.SmartFake implements _i2.OnDisconnect {
+  _FakeOnDisconnect_2(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -57,26 +60,460 @@ class _FakeDataSnapshot_2 extends _i1.SmartFake implements _i3.DataSnapshot {
         );
 }
 
-class _FakeFirebaseApp_3 extends _i1.SmartFake implements _i4.FirebaseApp {
-  _FakeFirebaseApp_3(
+class _FakeDataSnapshot_3 extends _i1.SmartFake implements _i2.DataSnapshot {
+  _FakeDataSnapshot_3(
     Object parent,
     Invocation parentInvocation,
   ) : super(
           parent,
           parentInvocation,
         );
+}
+
+class _FakeDatabaseEvent_4 extends _i1.SmartFake implements _i2.DatabaseEvent {
+  _FakeDatabaseEvent_4(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeQuery_5 extends _i1.SmartFake implements _i2.Query {
+  _FakeQuery_5(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeEither_6<L, R> extends _i1.SmartFake implements _i3.Either<L, R> {
+  _FakeEither_6(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeFirebaseApp_7 extends _i1.SmartFake implements _i4.FirebaseApp {
+  _FakeFirebaseApp_7(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+/// A class which mocks [DatabaseReference].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockDatabaseReference extends _i1.Mock implements _i2.DatabaseReference {
+  MockDatabaseReference() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i2.DatabaseReference get root => (super.noSuchMethod(
+        Invocation.getter(#root),
+        returnValue: _FakeDatabaseReference_0(
+          this,
+          Invocation.getter(#root),
+        ),
+      ) as _i2.DatabaseReference);
+  @override
+  _i2.DatabaseReference get ref => (super.noSuchMethod(
+        Invocation.getter(#ref),
+        returnValue: _FakeDatabaseReference_0(
+          this,
+          Invocation.getter(#ref),
+        ),
+      ) as _i2.DatabaseReference);
+  @override
+  String get path => (super.noSuchMethod(
+        Invocation.getter(#path),
+        returnValue: '',
+      ) as String);
+  @override
+  _i5.Stream<_i2.DatabaseEvent> get onChildAdded => (super.noSuchMethod(
+        Invocation.getter(#onChildAdded),
+        returnValue: _i5.Stream<_i2.DatabaseEvent>.empty(),
+      ) as _i5.Stream<_i2.DatabaseEvent>);
+  @override
+  _i5.Stream<_i2.DatabaseEvent> get onChildRemoved => (super.noSuchMethod(
+        Invocation.getter(#onChildRemoved),
+        returnValue: _i5.Stream<_i2.DatabaseEvent>.empty(),
+      ) as _i5.Stream<_i2.DatabaseEvent>);
+  @override
+  _i5.Stream<_i2.DatabaseEvent> get onChildChanged => (super.noSuchMethod(
+        Invocation.getter(#onChildChanged),
+        returnValue: _i5.Stream<_i2.DatabaseEvent>.empty(),
+      ) as _i5.Stream<_i2.DatabaseEvent>);
+  @override
+  _i5.Stream<_i2.DatabaseEvent> get onChildMoved => (super.noSuchMethod(
+        Invocation.getter(#onChildMoved),
+        returnValue: _i5.Stream<_i2.DatabaseEvent>.empty(),
+      ) as _i5.Stream<_i2.DatabaseEvent>);
+  @override
+  _i5.Stream<_i2.DatabaseEvent> get onValue => (super.noSuchMethod(
+        Invocation.getter(#onValue),
+        returnValue: _i5.Stream<_i2.DatabaseEvent>.empty(),
+      ) as _i5.Stream<_i2.DatabaseEvent>);
+  @override
+  _i2.DatabaseReference child(String? path) => (super.noSuchMethod(
+        Invocation.method(
+          #child,
+          [path],
+        ),
+        returnValue: _FakeDatabaseReference_0(
+          this,
+          Invocation.method(
+            #child,
+            [path],
+          ),
+        ),
+      ) as _i2.DatabaseReference);
+  @override
+  _i2.DatabaseReference push() => (super.noSuchMethod(
+        Invocation.method(
+          #push,
+          [],
+        ),
+        returnValue: _FakeDatabaseReference_0(
+          this,
+          Invocation.method(
+            #push,
+            [],
+          ),
+        ),
+      ) as _i2.DatabaseReference);
+  @override
+  _i5.Future<void> set(Object? value) => (super.noSuchMethod(
+        Invocation.method(
+          #set,
+          [value],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+  @override
+  _i5.Future<void> setWithPriority(
+    Object? value,
+    Object? priority,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #setWithPriority,
+          [
+            value,
+            priority,
+          ],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+  @override
+  _i5.Future<void> update(Map<String, Object?>? value) => (super.noSuchMethod(
+        Invocation.method(
+          #update,
+          [value],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+  @override
+  _i5.Future<void> setPriority(Object? priority) => (super.noSuchMethod(
+        Invocation.method(
+          #setPriority,
+          [priority],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+  @override
+  _i5.Future<void> remove() => (super.noSuchMethod(
+        Invocation.method(
+          #remove,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+  @override
+  _i5.Future<_i2.TransactionResult> runTransaction(
+    _i6.TransactionHandler? transactionHandler, {
+    bool? applyLocally = true,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #runTransaction,
+          [transactionHandler],
+          {#applyLocally: applyLocally},
+        ),
+        returnValue:
+            _i5.Future<_i2.TransactionResult>.value(_FakeTransactionResult_1(
+          this,
+          Invocation.method(
+            #runTransaction,
+            [transactionHandler],
+            {#applyLocally: applyLocally},
+          ),
+        )),
+      ) as _i5.Future<_i2.TransactionResult>);
+  @override
+  _i2.OnDisconnect onDisconnect() => (super.noSuchMethod(
+        Invocation.method(
+          #onDisconnect,
+          [],
+        ),
+        returnValue: _FakeOnDisconnect_2(
+          this,
+          Invocation.method(
+            #onDisconnect,
+            [],
+          ),
+        ),
+      ) as _i2.OnDisconnect);
+  @override
+  _i5.Future<_i2.DataSnapshot> get() => (super.noSuchMethod(
+        Invocation.method(
+          #get,
+          [],
+        ),
+        returnValue: _i5.Future<_i2.DataSnapshot>.value(_FakeDataSnapshot_3(
+          this,
+          Invocation.method(
+            #get,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i2.DataSnapshot>);
+  @override
+  _i5.Future<_i2.DatabaseEvent> once(
+          [_i6.DatabaseEventType? eventType = _i6.DatabaseEventType.value]) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #once,
+          [eventType],
+        ),
+        returnValue: _i5.Future<_i2.DatabaseEvent>.value(_FakeDatabaseEvent_4(
+          this,
+          Invocation.method(
+            #once,
+            [eventType],
+          ),
+        )),
+      ) as _i5.Future<_i2.DatabaseEvent>);
+  @override
+  _i2.Query startAt(
+    Object? value, {
+    String? key,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #startAt,
+          [value],
+          {#key: key},
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #startAt,
+            [value],
+            {#key: key},
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query startAfter(
+    Object? value, {
+    String? key,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #startAfter,
+          [value],
+          {#key: key},
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #startAfter,
+            [value],
+            {#key: key},
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query endAt(
+    Object? value, {
+    String? key,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #endAt,
+          [value],
+          {#key: key},
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #endAt,
+            [value],
+            {#key: key},
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query endBefore(
+    Object? value, {
+    String? key,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #endBefore,
+          [value],
+          {#key: key},
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #endBefore,
+            [value],
+            {#key: key},
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query equalTo(
+    Object? value, {
+    String? key,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #equalTo,
+          [value],
+          {#key: key},
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #equalTo,
+            [value],
+            {#key: key},
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query limitToFirst(int? limit) => (super.noSuchMethod(
+        Invocation.method(
+          #limitToFirst,
+          [limit],
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #limitToFirst,
+            [limit],
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query limitToLast(int? limit) => (super.noSuchMethod(
+        Invocation.method(
+          #limitToLast,
+          [limit],
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #limitToLast,
+            [limit],
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query orderByChild(String? path) => (super.noSuchMethod(
+        Invocation.method(
+          #orderByChild,
+          [path],
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #orderByChild,
+            [path],
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query orderByKey() => (super.noSuchMethod(
+        Invocation.method(
+          #orderByKey,
+          [],
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #orderByKey,
+            [],
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query orderByValue() => (super.noSuchMethod(
+        Invocation.method(
+          #orderByValue,
+          [],
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #orderByValue,
+            [],
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i2.Query orderByPriority() => (super.noSuchMethod(
+        Invocation.method(
+          #orderByPriority,
+          [],
+        ),
+        returnValue: _FakeQuery_5(
+          this,
+          Invocation.method(
+            #orderByPriority,
+            [],
+          ),
+        ),
+      ) as _i2.Query);
+  @override
+  _i5.Future<void> keepSynced(bool? value) => (super.noSuchMethod(
+        Invocation.method(
+          #keepSynced,
+          [value],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 }
 
 /// A class which mocks [MainRepo].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockMainRepo extends _i1.Mock implements _i5.MainRepo {
+class MockMainRepo extends _i1.Mock implements _i7.MainRepo {
   MockMainRepo() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i6.Future<_i2.Either<_i7.Failure, List<_i8.CourseModel>>> getCourses(
+  _i5.Future<_i3.Either<_i8.Failure, List<_i9.CourseModel>>> getCourses(
           int? page) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -84,43 +521,43 @@ class MockMainRepo extends _i1.Mock implements _i5.MainRepo {
           [page],
         ),
         returnValue:
-            _i6.Future<_i2.Either<_i7.Failure, List<_i8.CourseModel>>>.value(
-                _FakeEither_0<_i7.Failure, List<_i8.CourseModel>>(
+            _i5.Future<_i3.Either<_i8.Failure, List<_i9.CourseModel>>>.value(
+                _FakeEither_6<_i8.Failure, List<_i9.CourseModel>>(
           this,
           Invocation.method(
             #getCourses,
             [page],
           ),
         )),
-      ) as _i6.Future<_i2.Either<_i7.Failure, List<_i8.CourseModel>>>);
+      ) as _i5.Future<_i3.Either<_i8.Failure, List<_i9.CourseModel>>>);
 }
 
 /// A class which mocks [DataSnapshot].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockDataSnapshot extends _i1.Mock implements _i3.DataSnapshot {
+class MockDataSnapshot extends _i1.Mock implements _i2.DataSnapshot {
   MockDataSnapshot() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i3.DatabaseReference get ref => (super.noSuchMethod(
+  _i2.DatabaseReference get ref => (super.noSuchMethod(
         Invocation.getter(#ref),
-        returnValue: _FakeDatabaseReference_1(
+        returnValue: _FakeDatabaseReference_0(
           this,
           Invocation.getter(#ref),
         ),
-      ) as _i3.DatabaseReference);
+      ) as _i2.DatabaseReference);
   @override
   bool get exists => (super.noSuchMethod(
         Invocation.getter(#exists),
         returnValue: false,
       ) as bool);
   @override
-  Iterable<_i3.DataSnapshot> get children => (super.noSuchMethod(
+  Iterable<_i2.DataSnapshot> get children => (super.noSuchMethod(
         Invocation.getter(#children),
-        returnValue: <_i3.DataSnapshot>[],
-      ) as Iterable<_i3.DataSnapshot>);
+        returnValue: <_i2.DataSnapshot>[],
+      ) as Iterable<_i2.DataSnapshot>);
   @override
   bool hasChild(String? path) => (super.noSuchMethod(
         Invocation.method(
@@ -130,25 +567,25 @@ class MockDataSnapshot extends _i1.Mock implements _i3.DataSnapshot {
         returnValue: false,
       ) as bool);
   @override
-  _i3.DataSnapshot child(String? path) => (super.noSuchMethod(
+  _i2.DataSnapshot child(String? path) => (super.noSuchMethod(
         Invocation.method(
           #child,
           [path],
         ),
-        returnValue: _FakeDataSnapshot_2(
+        returnValue: _FakeDataSnapshot_3(
           this,
           Invocation.method(
             #child,
             [path],
           ),
         ),
-      ) as _i3.DataSnapshot);
+      ) as _i2.DataSnapshot);
 }
 
 /// A class which mocks [FirebaseDatabase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MFirebaseDatabase extends _i1.Mock implements _i3.FirebaseDatabase {
+class MFirebaseDatabase extends _i1.Mock implements _i2.FirebaseDatabase {
   MFirebaseDatabase() {
     _i1.throwOnMissingStub(this);
   }
@@ -156,7 +593,7 @@ class MFirebaseDatabase extends _i1.Mock implements _i3.FirebaseDatabase {
   @override
   _i4.FirebaseApp get app => (super.noSuchMethod(
         Invocation.getter(#app),
-        returnValue: _FakeFirebaseApp_3(
+        returnValue: _FakeFirebaseApp_7(
           this,
           Invocation.getter(#app),
         ),
@@ -198,47 +635,47 @@ class MFirebaseDatabase extends _i1.Mock implements _i3.FirebaseDatabase {
         returnValueForMissingStub: null,
       );
   @override
-  _i3.DatabaseReference reference() => (super.noSuchMethod(
+  _i2.DatabaseReference reference() => (super.noSuchMethod(
         Invocation.method(
           #reference,
           [],
         ),
-        returnValue: _FakeDatabaseReference_1(
+        returnValue: _FakeDatabaseReference_0(
           this,
           Invocation.method(
             #reference,
             [],
           ),
         ),
-      ) as _i3.DatabaseReference);
+      ) as _i2.DatabaseReference);
   @override
-  _i3.DatabaseReference ref([String? path]) => (super.noSuchMethod(
+  _i2.DatabaseReference ref([String? path]) => (super.noSuchMethod(
         Invocation.method(
           #ref,
           [path],
         ),
-        returnValue: _FakeDatabaseReference_1(
+        returnValue: _FakeDatabaseReference_0(
           this,
           Invocation.method(
             #ref,
             [path],
           ),
         ),
-      ) as _i3.DatabaseReference);
+      ) as _i2.DatabaseReference);
   @override
-  _i3.DatabaseReference refFromURL(String? url) => (super.noSuchMethod(
+  _i2.DatabaseReference refFromURL(String? url) => (super.noSuchMethod(
         Invocation.method(
           #refFromURL,
           [url],
         ),
-        returnValue: _FakeDatabaseReference_1(
+        returnValue: _FakeDatabaseReference_0(
           this,
           Invocation.method(
             #refFromURL,
             [url],
           ),
         ),
-      ) as _i3.DatabaseReference);
+      ) as _i2.DatabaseReference);
   @override
   void setPersistenceEnabled(bool? enabled) => super.noSuchMethod(
         Invocation.method(
@@ -264,30 +701,30 @@ class MFirebaseDatabase extends _i1.Mock implements _i3.FirebaseDatabase {
         returnValueForMissingStub: null,
       );
   @override
-  _i6.Future<void> goOnline() => (super.noSuchMethod(
+  _i5.Future<void> goOnline() => (super.noSuchMethod(
         Invocation.method(
           #goOnline,
           [],
         ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
   @override
-  _i6.Future<void> goOffline() => (super.noSuchMethod(
+  _i5.Future<void> goOffline() => (super.noSuchMethod(
         Invocation.method(
           #goOffline,
           [],
         ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
   @override
-  _i6.Future<void> purgeOutstandingWrites() => (super.noSuchMethod(
+  _i5.Future<void> purgeOutstandingWrites() => (super.noSuchMethod(
         Invocation.method(
           #purgeOutstandingWrites,
           [],
         ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 }

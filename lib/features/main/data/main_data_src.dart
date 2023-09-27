@@ -12,10 +12,11 @@ class IMainDataSrc extends MainDataSrc {
   IMainDataSrc(this.firebaseDatabase);
   @override
   Future<List<CourseModel>> getCourses(int page) async {
-    final ds = await firebaseDatabase.ref().child("Courses").get();
+    
+    final ds = await firebaseDatabase.ref('Courses').get();
     List<CourseModel> courses = [];
-    for (var d in ds.children) {
-      courses.add(CourseModel.fromMap(d.value as Map));
+    for (var d in (ds.value as Map).values) {
+      courses.add(CourseModel.fromMap(d as Map));
     }
     return courses;
   }

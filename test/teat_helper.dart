@@ -4,7 +4,7 @@ import 'package:mockito/annotations.dart';
 
 @GenerateMocks([
   // FirebaseAuth,
-  // DatabaseReference,
+  DatabaseReference,
   MainRepo,
   DataSnapshot,
 ], customMocks: [
