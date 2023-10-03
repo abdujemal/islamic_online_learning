@@ -1,19 +1,19 @@
 import 'dart:async';
-import 'dart:io';
-
-
-import 'package:audioplayers/audioplayers.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
 
 const defaultPlayerCount = 4;
 
 typedef OnError = void Function(Exception exception);
 
-void main() {
-  runApp(const Main());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+  await Firebase.initializeApp();
+  runApp(const ProviderScope(child: Main()));
 }
 
 class Main extends StatelessWidget {
@@ -21,218 +21,218 @@ class Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  const MaterialApp(
-      home: HomePage(),
+    return const MaterialApp(
+      home: MainPage(),
     );
   }
 }
 
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+// class HomePage extends StatefulWidget {
+//   const HomePage({super.key});
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
+//   @override
+//   State<HomePage> createState() => _HomePageState();
+// }
 
-class _HomePageState extends State<HomePage> {
+// class _HomePageState extends State<HomePage> {
 
-  double position = 0;
+//   double position = 0;
 
-  AudioPlayer player = AudioPlayer();
+//   AudioPlayer player = AudioPlayer();
   
-  StreamSubscription<Duration>? _durationSubscription;
+//   StreamSubscription<Duration>? _durationSubscription;
   
-  Duration? _duration;
+//   Duration? _duration;
   
-  StreamSubscription<Duration>? _positionSubscription;
+//   StreamSubscription<Duration>? _positionSubscription;
   
-  Duration? _position;
+//   Duration? _position;
   
-  StreamSubscription<void>? _playerCompleteSubscription;
+//   StreamSubscription<void>? _playerCompleteSubscription;
   
-  PlayerState? _playerState;
+//   PlayerState? _playerState;
 
-  String? filePath; 
+//   String? filePath; 
   
-  StreamSubscription<PlayerState>? _playerStateChangeSubscription;
+//   StreamSubscription<PlayerState>? _playerStateChangeSubscription;
   
-  bool isLoading = false;
+//   bool isLoading = false;
 
-  bool get _isPlaying => _playerState == PlayerState.playing;
+//   bool get _isPlaying => _playerState == PlayerState.playing;
 
-  bool get _isPaused => _playerState == PlayerState.paused;
+//   bool get _isPaused => _playerState == PlayerState.paused;
 
-  String get _durationText => _duration?.toString().split('.').first ?? '';
+//   String get _durationText => _duration?.toString().split('.').first ?? '';
 
-  String get _positionText => _position?.toString().split('.').first ?? '';
+//   String get _positionText => _position?.toString().split('.').first ?? '';
 
 
-  @override
-  initState(){
-    super.initState();
+//   @override
+//   initState(){
+//     super.initState();
 
-    initStream();
-  }
+//     initStream();
+//   }
 
-  @override
-  dispose(){
-    super.dispose();
-   _durationSubscription!.cancel();
-   _positionSubscription!.cancel();
-   _playerCompleteSubscription!.cancel();
-   _playerStateChangeSubscription!.cancel();        
-  }
+//   @override
+//   dispose(){
+//     super.dispose();
+//    _durationSubscription!.cancel();
+//    _positionSubscription!.cancel();
+//    _playerCompleteSubscription!.cancel();
+//    _playerStateChangeSubscription!.cancel();        
+//   }
 
-  initStream(){
-    _durationSubscription = player.onDurationChanged.listen((duration) {
+//   initStream(){
+//     _durationSubscription = player.onDurationChanged.listen((duration) {
       
-      setState(() => _duration = duration);
-    });
+//       setState(() => _duration = duration);
+//     });
 
-    _positionSubscription = player.onPositionChanged.listen(
-      (p){ 
-        setState(() => _position = p);
-        // print(_position);
-        },
-    );
+//     _positionSubscription = player.onPositionChanged.listen(
+//       (p){ 
+//         setState(() => _position = p);
+//         // print(_position);
+//         },
+//     );
 
-    _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
-      setState(() {
-        _playerState = PlayerState.stopped;
-        _position = Duration.zero;
-      });
-    });
+//     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
+//       setState(() {
+//         _playerState = PlayerState.stopped;
+//         _position = Duration.zero;
+//       });
+//     });
 
-    _playerStateChangeSubscription =
-        player.onPlayerStateChanged.listen((state) {
-      setState(() {
-        _playerState = state;
-      });
-    });
-  }
+//     _playerStateChangeSubscription =
+//         player.onPlayerStateChanged.listen((state) {
+//       setState(() {
+//         _playerState = state;
+//       });
+//     });
+//   }
 
-  Future<void> _play() async {
-    if(_playerState != PlayerState.paused){
-      if(filePath != null) {
-            print("playing");
-            await player.play(DeviceFileSource(filePath!));
-          }
-    }else{
-      final position = _position;
-      if (position != null && position.inMilliseconds > 0) {
-        await player.seek(position);
-      }
-      await player.resume();
-      setState(() => _playerState = PlayerState.playing);
-    }
-  }
+//   Future<void> _play() async {
+//     if(_playerState != PlayerState.paused){
+//       if(filePath != null) {
+//             print("playing");
+//             await player.play(DeviceFileSource(filePath!));
+//           }
+//     }else{
+//       final position = _position;
+//       if (position != null && position.inMilliseconds > 0) {
+//         await player.seek(position);
+//       }
+//       await player.resume();
+//       setState(() => _playerState = PlayerState.playing);
+//     }
+//   }
 
-  Future<void> _pause() async {
-    await player.pause();
-    setState(() => _playerState = PlayerState.paused);
-  }
+//   Future<void> _pause() async {
+//     await player.pause();
+//     setState(() => _playerState = PlayerState.paused);
+//   }
 
-  Future<void> _stop() async {
-    await player.stop();
-    setState(() {
-      _playerState = PlayerState.stopped;
-      _position = Duration.zero;
-    });
-  }
+//   Future<void> _stop() async {
+//     await player.stop();
+//     setState(() {
+//       _playerState = PlayerState.stopped;
+//       _position = Duration.zero;
+//     });
+//   }
 
 
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Audio Player"),),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.download,), 
-        onPressed: () async {
-          String fileId = "CQACAgQAAxkBAAMKZJbbdVQWy4V-EkWCprVERnh4pdQAAiQQAAIJtpFTXam6M-zq1WQvBA";
-          await download(fileId, "Audio/File1.mp3");
-          if(filePath != null) {
-            print("playing");
-            await player.play(DeviceFileSource(filePath!));
-          }
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text("Audio Player"),),
+//       floatingActionButton: FloatingActionButton(
+//         child: const Icon(Icons.download,), 
+//         onPressed: () async {
+//           String fileId = "CQACAgQAAxkBAAMKZJbbdVQWy4V-EkWCprVERnh4pdQAAiQQAAIJtpFTXam6M-zq1WQvBA";
+//           await download(fileId, "Audio/File1.mp3");
+//           if(filePath != null) {
+//             print("playing");
+//             await player.play(DeviceFileSource(filePath!));
+//           }
 
-        },
-      ),
-      body: Center(
-        child: Column(children: [
-          Text(_position != null
-              ? '$_positionText / $_durationText'
-              : _duration != null
-                  ? _durationText
-                  : '',
-          style: const TextStyle(fontSize: 16.0),),
-           Slider(value: (_position != null &&
-                  _duration != null &&
-                  _position!.inMilliseconds > 0 &&
-                  _position!.inMilliseconds < _duration!.inMilliseconds)
-              ? _position!.inMilliseconds / _duration!.inMilliseconds
-              : 0.0, onChanged: (v){
-                final duration = _duration;
-            if (duration == null) {
-              return;
-            }
-            final position = v * duration.inMilliseconds;
-            player.seek(Duration(milliseconds: position.round()));
-              },),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                onPressed: (){
-                  if(_isPlaying){
-                    _pause();
-                  }else{
-                    _play();
-                  }
-                }, 
-                icon: _isPlaying ? 
-                  const Icon(Icons.pause) : 
-                  const Icon(Icons.play_arrow),
-               ),
-              IconButton(
-                onPressed: (){
-                  _stop();
-                }, 
-                icon: const Icon(Icons.stop),
-              )
-            ],
-          )
-        ],),
-      ),
-    );
-  }
+//         },
+//       ),
+//       body: Center(
+//         child: Column(children: [
+//           Text(_position != null
+//               ? '$_positionText / $_durationText'
+//               : _duration != null
+//                   ? _durationText
+//                   : '',
+//           style: const TextStyle(fontSize: 16.0),),
+//            Slider(value: (_position != null &&
+//                   _duration != null &&
+//                   _position!.inMilliseconds > 0 &&
+//                   _position!.inMilliseconds < _duration!.inMilliseconds)
+//               ? _position!.inMilliseconds / _duration!.inMilliseconds
+//               : 0.0, onChanged: (v){
+//                 final duration = _duration;
+//             if (duration == null) {
+//               return;
+//             }
+//             final position = v * duration.inMilliseconds;
+//             player.seek(Duration(milliseconds: position.round()));
+//               },),
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               IconButton(
+//                 onPressed: (){
+//                   if(_isPlaying){
+//                     _pause();
+//                   }else{
+//                     _play();
+//                   }
+//                 }, 
+//                 icon: _isPlaying ? 
+//                   const Icon(Icons.pause) : 
+//                   const Icon(Icons.play_arrow),
+//                ),
+//               IconButton(
+//                 onPressed: (){
+//                   _stop();
+//                 }, 
+//                 icon: const Icon(Icons.stop),
+//               )
+//             ],
+//           )
+//         ],),
+//       ),
+//     );
+//   }
   
-  Future<String?> download(String fileId, String name) async {
-    try{
-      setState(() {
-      isLoading = true;
+//   Future<String?> download(String fileId, String name) async {
+//     try{
+//       setState(() {
+//       isLoading = true;
         
-      });
-      Directory? dir = await getExternalStorageDirectory();
+//       });
+//       Directory? dir = await getExternalStorageDirectory();
 
-      const String botToken = "6152316528:AAH3NEDElz5ApQz_8Qb1Xw9YJXaeTOOCoZ4";
-      filePath = "${dir!.path}/$name";
-      final dio = Dio();
-      final fileUrl = 'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
-      final response = await dio.get(fileUrl);
-      final fileData = response.data['result'];
-      final fileDownloadUrl = 'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
-      await dio.download(fileDownloadUrl, filePath);
-      isLoading = false;
-      return filePath;
-    }catch(e){
-      isLoading = false;
-      print(e.toString());
-      return null;
-    }
-  }
-}
+//       const String botToken = "6152316528:AAH3NEDElz5ApQz_8Qb1Xw9YJXaeTOOCoZ4";
+//       filePath = "${dir!.path}/$name";
+//       final dio = Dio();
+//       final fileUrl = 'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
+//       final response = await dio.get(fileUrl);
+//       final fileData = response.data['result'];
+//       final fileDownloadUrl = 'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
+//       await dio.download(fileDownloadUrl, filePath);
+//       isLoading = false;
+//       return filePath;
+//     }catch(e){
+//       isLoading = false;
+//       print(e.toString());
+//       return null;
+//     }
+//   }
+// }
 
 
 // class _ExampleApp extends StatefulWidget {
