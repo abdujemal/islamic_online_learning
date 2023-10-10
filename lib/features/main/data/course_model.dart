@@ -18,8 +18,10 @@ class CourseModel extends CourseEntity {
   final bool isDownloaded;
   final int audioMin;
   final int pdfPage;
+  final String image;
 
   const CourseModel({
+    required this.image,
     required this.isDownloaded,
     required this.lastViewed,
     required this.isFav,
@@ -49,6 +51,7 @@ class CourseModel extends CourseEntity {
           isDownloaded: isDownloaded,
           audioMin: audioMin,
           pdfPage: pdfPage,
+          image: image,
         );
 
   Map<String, dynamic> toMap() {
@@ -62,6 +65,7 @@ class CourseModel extends CourseEntity {
       'pdfId': pdfId,
       'title': title,
       'ustaz': ustaz,
+      "image": image,
       'lastViewed': lastViewed,
       'isFav': isFav ? 1 : 0,
       'isDownloaded': isDownloaded ? 1 : 0,
@@ -85,7 +89,8 @@ class CourseModel extends CourseEntity {
       isFav: map['isFav'] ?? false,
       isDownloaded: map['isDownloaded'] ?? false,
       audioMin: map['audioMin'] ?? 0,
-      pdfPage: map['pdfPage'] ?? 1,
+      pdfPage: map['pdfPage'] ?? 1, 
+      image: map['image'],
     );
   }
 }

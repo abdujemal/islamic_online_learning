@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'main_list_state.dart';
+part of 'category_list_state.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,15 +15,13 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
-mixin _$MainListState {
+mixin _$CategoryListState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)
-        loaded,
-    required TResult Function(List<CourseModel> courses) empty,
+    required TResult Function(List<String> categories) loaded,
+    required TResult Function(List<String> courses) empty,
     required TResult Function(Failure error) error,
   }) =>
       throw _privateConstructorUsedError;
@@ -31,10 +29,8 @@ mixin _$MainListState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult? Function(List<CourseModel> courses)? empty,
+    TResult? Function(List<String> categories)? loaded,
+    TResult? Function(List<String> courses)? empty,
     TResult? Function(Failure error)? error,
   }) =>
       throw _privateConstructorUsedError;
@@ -42,10 +38,8 @@ mixin _$MainListState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult Function(List<CourseModel> courses)? empty,
+    TResult Function(List<String> categories)? loaded,
+    TResult Function(List<String> courses)? empty,
     TResult Function(Failure error)? error,
     required TResult orElse(),
   }) =>
@@ -81,16 +75,16 @@ mixin _$MainListState {
 }
 
 /// @nodoc
-abstract class $MainListStateCopyWith<$Res> {
-  factory $MainListStateCopyWith(
-          MainListState value, $Res Function(MainListState) then) =
-      _$MainListStateCopyWithImpl<$Res, MainListState>;
+abstract class $CategoryListStateCopyWith<$Res> {
+  factory $CategoryListStateCopyWith(
+          CategoryListState value, $Res Function(CategoryListState) then) =
+      _$CategoryListStateCopyWithImpl<$Res, CategoryListState>;
 }
 
 /// @nodoc
-class _$MainListStateCopyWithImpl<$Res, $Val extends MainListState>
-    implements $MainListStateCopyWith<$Res> {
-  _$MainListStateCopyWithImpl(this._value, this._then);
+class _$CategoryListStateCopyWithImpl<$Res, $Val extends CategoryListState>
+    implements $CategoryListStateCopyWith<$Res> {
+  _$CategoryListStateCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -107,7 +101,7 @@ abstract class _$$_InitialCopyWith<$Res> {
 
 /// @nodoc
 class __$$_InitialCopyWithImpl<$Res>
-    extends _$MainListStateCopyWithImpl<$Res, _$_Initial>
+    extends _$CategoryListStateCopyWithImpl<$Res, _$_Initial>
     implements _$$_InitialCopyWith<$Res> {
   __$$_InitialCopyWithImpl(_$_Initial _value, $Res Function(_$_Initial) _then)
       : super(_value, _then);
@@ -120,7 +114,7 @@ class _$_Initial implements _Initial {
 
   @override
   String toString() {
-    return 'MainListState.initial()';
+    return 'CategoryListState.initial()';
   }
 
   @override
@@ -137,10 +131,8 @@ class _$_Initial implements _Initial {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)
-        loaded,
-    required TResult Function(List<CourseModel> courses) empty,
+    required TResult Function(List<String> categories) loaded,
+    required TResult Function(List<String> courses) empty,
     required TResult Function(Failure error) error,
   }) {
     return initial();
@@ -151,10 +143,8 @@ class _$_Initial implements _Initial {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult? Function(List<CourseModel> courses)? empty,
+    TResult? Function(List<String> categories)? loaded,
+    TResult? Function(List<String> courses)? empty,
     TResult? Function(Failure error)? error,
   }) {
     return initial?.call();
@@ -165,10 +155,8 @@ class _$_Initial implements _Initial {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult Function(List<CourseModel> courses)? empty,
+    TResult Function(List<String> categories)? loaded,
+    TResult Function(List<String> courses)? empty,
     TResult Function(Failure error)? error,
     required TResult orElse(),
   }) {
@@ -219,7 +207,7 @@ class _$_Initial implements _Initial {
   }
 }
 
-abstract class _Initial implements MainListState {
+abstract class _Initial implements CategoryListState {
   const factory _Initial() = _$_Initial;
 }
 
@@ -232,7 +220,7 @@ abstract class _$$_LoadingCopyWith<$Res> {
 
 /// @nodoc
 class __$$_LoadingCopyWithImpl<$Res>
-    extends _$MainListStateCopyWithImpl<$Res, _$_Loading>
+    extends _$CategoryListStateCopyWithImpl<$Res, _$_Loading>
     implements _$$_LoadingCopyWith<$Res> {
   __$$_LoadingCopyWithImpl(_$_Loading _value, $Res Function(_$_Loading) _then)
       : super(_value, _then);
@@ -245,7 +233,7 @@ class _$_Loading implements _Loading {
 
   @override
   String toString() {
-    return 'MainListState.loading()';
+    return 'CategoryListState.loading()';
   }
 
   @override
@@ -262,10 +250,8 @@ class _$_Loading implements _Loading {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)
-        loaded,
-    required TResult Function(List<CourseModel> courses) empty,
+    required TResult Function(List<String> categories) loaded,
+    required TResult Function(List<String> courses) empty,
     required TResult Function(Failure error) error,
   }) {
     return loading();
@@ -276,10 +262,8 @@ class _$_Loading implements _Loading {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult? Function(List<CourseModel> courses)? empty,
+    TResult? Function(List<String> categories)? loaded,
+    TResult? Function(List<String> courses)? empty,
     TResult? Function(Failure error)? error,
   }) {
     return loading?.call();
@@ -290,10 +274,8 @@ class _$_Loading implements _Loading {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult Function(List<CourseModel> courses)? empty,
+    TResult Function(List<String> categories)? loaded,
+    TResult Function(List<String> courses)? empty,
     TResult Function(Failure error)? error,
     required TResult orElse(),
   }) {
@@ -344,7 +326,7 @@ class _$_Loading implements _Loading {
   }
 }
 
-abstract class _Loading implements MainListState {
+abstract class _Loading implements CategoryListState {
   const factory _Loading() = _$_Loading;
 }
 
@@ -353,12 +335,12 @@ abstract class _$$_LoadedCopyWith<$Res> {
   factory _$$_LoadedCopyWith(_$_Loaded value, $Res Function(_$_Loaded) then) =
       __$$_LoadedCopyWithImpl<$Res>;
   @useResult
-  $Res call({List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore});
+  $Res call({List<String> categories});
 }
 
 /// @nodoc
 class __$$_LoadedCopyWithImpl<$Res>
-    extends _$MainListStateCopyWithImpl<$Res, _$_Loaded>
+    extends _$CategoryListStateCopyWithImpl<$Res, _$_Loaded>
     implements _$$_LoadedCopyWith<$Res> {
   __$$_LoadedCopyWithImpl(_$_Loaded _value, $Res Function(_$_Loaded) _then)
       : super(_value, _then);
@@ -366,23 +348,13 @@ class __$$_LoadedCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? courses = null,
-    Object? noMoreToLoad = null,
-    Object? isLoadingMore = null,
+    Object? categories = null,
   }) {
     return _then(_$_Loaded(
-      courses: null == courses
-          ? _value._courses
-          : courses // ignore: cast_nullable_to_non_nullable
-              as List<CourseModel>,
-      noMoreToLoad: null == noMoreToLoad
-          ? _value.noMoreToLoad
-          : noMoreToLoad // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isLoadingMore: null == isLoadingMore
-          ? _value.isLoadingMore
-          : isLoadingMore // ignore: cast_nullable_to_non_nullable
-              as bool,
+      categories: null == categories
+          ? _value._categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -390,28 +362,20 @@ class __$$_LoadedCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Loaded implements _Loaded {
-  const _$_Loaded(
-      {required final List<CourseModel> courses,
-      required this.noMoreToLoad,
-      required this.isLoadingMore})
-      : _courses = courses;
+  const _$_Loaded({required final List<String> categories})
+      : _categories = categories;
 
-  final List<CourseModel> _courses;
+  final List<String> _categories;
   @override
-  List<CourseModel> get courses {
-    if (_courses is EqualUnmodifiableListView) return _courses;
+  List<String> get categories {
+    if (_categories is EqualUnmodifiableListView) return _categories;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_courses);
+    return EqualUnmodifiableListView(_categories);
   }
 
   @override
-  final bool noMoreToLoad;
-  @override
-  final bool isLoadingMore;
-
-  @override
   String toString() {
-    return 'MainListState.loaded(courses: $courses, noMoreToLoad: $noMoreToLoad, isLoadingMore: $isLoadingMore)';
+    return 'CategoryListState.loaded(categories: $categories)';
   }
 
   @override
@@ -419,19 +383,13 @@ class _$_Loaded implements _Loaded {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_Loaded &&
-            const DeepCollectionEquality().equals(other._courses, _courses) &&
-            (identical(other.noMoreToLoad, noMoreToLoad) ||
-                other.noMoreToLoad == noMoreToLoad) &&
-            (identical(other.isLoadingMore, isLoadingMore) ||
-                other.isLoadingMore == isLoadingMore));
+            const DeepCollectionEquality()
+                .equals(other._categories, _categories));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_courses),
-      noMoreToLoad,
-      isLoadingMore);
+      runtimeType, const DeepCollectionEquality().hash(_categories));
 
   @JsonKey(ignore: true)
   @override
@@ -444,13 +402,11 @@ class _$_Loaded implements _Loaded {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)
-        loaded,
-    required TResult Function(List<CourseModel> courses) empty,
+    required TResult Function(List<String> categories) loaded,
+    required TResult Function(List<String> courses) empty,
     required TResult Function(Failure error) error,
   }) {
-    return loaded(courses, noMoreToLoad, isLoadingMore);
+    return loaded(categories);
   }
 
   @override
@@ -458,13 +414,11 @@ class _$_Loaded implements _Loaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult? Function(List<CourseModel> courses)? empty,
+    TResult? Function(List<String> categories)? loaded,
+    TResult? Function(List<String> courses)? empty,
     TResult? Function(Failure error)? error,
   }) {
-    return loaded?.call(courses, noMoreToLoad, isLoadingMore);
+    return loaded?.call(categories);
   }
 
   @override
@@ -472,15 +426,13 @@ class _$_Loaded implements _Loaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult Function(List<CourseModel> courses)? empty,
+    TResult Function(List<String> categories)? loaded,
+    TResult Function(List<String> courses)? empty,
     TResult Function(Failure error)? error,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(courses, noMoreToLoad, isLoadingMore);
+      return loaded(categories);
     }
     return orElse();
   }
@@ -526,15 +478,10 @@ class _$_Loaded implements _Loaded {
   }
 }
 
-abstract class _Loaded implements MainListState {
-  const factory _Loaded(
-      {required final List<CourseModel> courses,
-      required final bool noMoreToLoad,
-      required final bool isLoadingMore}) = _$_Loaded;
+abstract class _Loaded implements CategoryListState {
+  const factory _Loaded({required final List<String> categories}) = _$_Loaded;
 
-  List<CourseModel> get courses;
-  bool get noMoreToLoad;
-  bool get isLoadingMore;
+  List<String> get categories;
   @JsonKey(ignore: true)
   _$$_LoadedCopyWith<_$_Loaded> get copyWith =>
       throw _privateConstructorUsedError;
@@ -545,12 +492,12 @@ abstract class _$$_EmptyCopyWith<$Res> {
   factory _$$_EmptyCopyWith(_$_Empty value, $Res Function(_$_Empty) then) =
       __$$_EmptyCopyWithImpl<$Res>;
   @useResult
-  $Res call({List<CourseModel> courses});
+  $Res call({List<String> courses});
 }
 
 /// @nodoc
 class __$$_EmptyCopyWithImpl<$Res>
-    extends _$MainListStateCopyWithImpl<$Res, _$_Empty>
+    extends _$CategoryListStateCopyWithImpl<$Res, _$_Empty>
     implements _$$_EmptyCopyWith<$Res> {
   __$$_EmptyCopyWithImpl(_$_Empty _value, $Res Function(_$_Empty) _then)
       : super(_value, _then);
@@ -564,7 +511,7 @@ class __$$_EmptyCopyWithImpl<$Res>
       courses: null == courses
           ? _value._courses
           : courses // ignore: cast_nullable_to_non_nullable
-              as List<CourseModel>,
+              as List<String>,
     ));
   }
 }
@@ -572,12 +519,11 @@ class __$$_EmptyCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Empty implements _Empty {
-  const _$_Empty({required final List<CourseModel> courses})
-      : _courses = courses;
+  const _$_Empty({required final List<String> courses}) : _courses = courses;
 
-  final List<CourseModel> _courses;
+  final List<String> _courses;
   @override
-  List<CourseModel> get courses {
+  List<String> get courses {
     if (_courses is EqualUnmodifiableListView) return _courses;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_courses);
@@ -585,7 +531,7 @@ class _$_Empty implements _Empty {
 
   @override
   String toString() {
-    return 'MainListState.empty(courses: $courses)';
+    return 'CategoryListState.empty(courses: $courses)';
   }
 
   @override
@@ -611,10 +557,8 @@ class _$_Empty implements _Empty {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)
-        loaded,
-    required TResult Function(List<CourseModel> courses) empty,
+    required TResult Function(List<String> categories) loaded,
+    required TResult Function(List<String> courses) empty,
     required TResult Function(Failure error) error,
   }) {
     return empty(courses);
@@ -625,10 +569,8 @@ class _$_Empty implements _Empty {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult? Function(List<CourseModel> courses)? empty,
+    TResult? Function(List<String> categories)? loaded,
+    TResult? Function(List<String> courses)? empty,
     TResult? Function(Failure error)? error,
   }) {
     return empty?.call(courses);
@@ -639,10 +581,8 @@ class _$_Empty implements _Empty {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult Function(List<CourseModel> courses)? empty,
+    TResult Function(List<String> categories)? loaded,
+    TResult Function(List<String> courses)? empty,
     TResult Function(Failure error)? error,
     required TResult orElse(),
   }) {
@@ -693,10 +633,10 @@ class _$_Empty implements _Empty {
   }
 }
 
-abstract class _Empty implements MainListState {
-  const factory _Empty({required final List<CourseModel> courses}) = _$_Empty;
+abstract class _Empty implements CategoryListState {
+  const factory _Empty({required final List<String> courses}) = _$_Empty;
 
-  List<CourseModel> get courses;
+  List<String> get courses;
   @JsonKey(ignore: true)
   _$$_EmptyCopyWith<_$_Empty> get copyWith =>
       throw _privateConstructorUsedError;
@@ -712,7 +652,7 @@ abstract class _$$_ErrorCopyWith<$Res> {
 
 /// @nodoc
 class __$$_ErrorCopyWithImpl<$Res>
-    extends _$MainListStateCopyWithImpl<$Res, _$_Error>
+    extends _$CategoryListStateCopyWithImpl<$Res, _$_Error>
     implements _$$_ErrorCopyWith<$Res> {
   __$$_ErrorCopyWithImpl(_$_Error _value, $Res Function(_$_Error) _then)
       : super(_value, _then);
@@ -741,7 +681,7 @@ class _$_Error implements _Error {
 
   @override
   String toString() {
-    return 'MainListState.error(error: $error)';
+    return 'CategoryListState.error(error: $error)';
   }
 
   @override
@@ -766,10 +706,8 @@ class _$_Error implements _Error {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)
-        loaded,
-    required TResult Function(List<CourseModel> courses) empty,
+    required TResult Function(List<String> categories) loaded,
+    required TResult Function(List<String> courses) empty,
     required TResult Function(Failure error) error,
   }) {
     return error(this.error);
@@ -780,10 +718,8 @@ class _$_Error implements _Error {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult? Function(List<CourseModel> courses)? empty,
+    TResult? Function(List<String> categories)? loaded,
+    TResult? Function(List<String> courses)? empty,
     TResult? Function(Failure error)? error,
   }) {
     return error?.call(this.error);
@@ -794,10 +730,8 @@ class _$_Error implements _Error {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(
-            List<CourseModel> courses, bool noMoreToLoad, bool isLoadingMore)?
-        loaded,
-    TResult Function(List<CourseModel> courses)? empty,
+    TResult Function(List<String> categories)? loaded,
+    TResult Function(List<String> courses)? empty,
     TResult Function(Failure error)? error,
     required TResult orElse(),
   }) {
@@ -848,7 +782,7 @@ class _$_Error implements _Error {
   }
 }
 
-abstract class _Error implements MainListState {
+abstract class _Error implements CategoryListState {
   const factory _Error({required final Failure error}) = _$_Error;
 
   Failure get error;

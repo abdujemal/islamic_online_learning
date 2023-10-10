@@ -1,0 +1,91 @@
+{
+  "project_info": {
+    "project_number": "289944837560",
+    "firebase_url": "https://completed-full-lectures-default-rtdb.firebaseio.com",
+    "project_id": "completed-full-lectures",
+    "storage_bucket": "completed-full-lectures.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289944837560:android:b64fc8b263d01445be834d",
+        "android_client_info": {
+          "package_name": "com.aj.islamic_online_learning"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "289944837560-u6l4jla2ah18o0tkms7lf8ooahljsf8k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiA2vITeod4WsEGK_pO1bWQPl_Vwa5vAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "289944837560-u6l4jla2ah18o0tkms7lf8ooahljsf8k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "289944837560-3nkucggcju4jdrqkh1sokks2mg2t02pv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.aj.islamiclearnings"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289944837560:android:5f4b61ccd61e26a3be834d",
+        "android_client_info": {
+          "package_name": "com.example.ders_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "289944837560-b86sj8atgv2pno4g49vbn5q2ar32n60u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ders_admin",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "289944837560-u6l4jla2ah18o0tkms7lf8ooahljsf8k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiA2vITeod4WsEGK_pO1bWQPl_Vwa5vAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "289944837560-u6l4jla2ah18o0tkms7lf8ooahljsf8k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "289944837560-3nkucggcju4jdrqkh1sokks2mg2t02pv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.aj.islamiclearnings"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

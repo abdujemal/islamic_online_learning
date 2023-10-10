@@ -11,20 +11,52 @@ class MainListNotifier extends StateNotifier<MainListState> {
 
   List<CourseModel> courses = [];
 
-  Future<void> getCourses(int page, bool isNew) async {
-    state = const MainListState.loading();
+  int itreationCounter = 0;
 
-    final res = await mainRepo.getCourses(page);
-    res.fold((l) {
-      state = MainListState.error(error: l);
-    }, (r) {
+  Future<void> getCourses({bool isNew = true}) async {
+    if (itreationCounter == 0) {
       if (isNew) {
-        courses = r;
-        state = MainListState.loaded(courses: courses);
+        state = const MainListState.loading();
       } else {
-        courses = [...r, ...courses];
-        state = MainListState.loaded(courses: courses);
+        state = MainListState.loaded(
+          courses: courses,
+          noMoreToLoad: false,
+          isLoadingMore: true,
+        );
       }
-    });
+      itreationCounter = 1;
+      final res = await mainRepo.getCourses(isNew);
+      itreationCounter = 0;
+      // print(itreationCounter);
+
+      res.fold((l) {
+        state = MainListState.error(error: l);
+      }, (r) {
+        if (isNew && r.isEmpty) {
+          state = MainListState.empty(courses: r);
+          return;
+        } else if (isNew) {
+          courses = r;
+          state = MainListState.loaded(
+            courses: courses,
+            noMoreToLoad: false,
+            isLoadingMore: false,
+          );
+        } else {
+          print(r.length);
+          courses = [...r, ...courses];
+          courses.sort((a, b) => b.courseId.compareTo(a.courseId));
+          state = MainListState.loaded(
+            courses: courses,
+            noMoreToLoad: r.isEmpty,
+            isLoadingMore: false,
+          );
+        }
+      });
+    }
+  }
+
+  searchCourses(String qwery){
+    
   }
 }

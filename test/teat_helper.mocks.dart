@@ -119,11 +119,11 @@ class MockMainDataSrc extends _i1.Mock implements _i5.MainDataSrc {
   }
 
   @override
-  _i6.Future<List<_i7.CourseModel>> getCourses(int? page) =>
+  _i6.Future<List<_i7.CourseModel>> getCourses(bool? isNew) =>
       (super.noSuchMethod(
         Invocation.method(
           #getCourses,
-          [page],
+          [isNew],
         ),
         returnValue:
             _i6.Future<List<_i7.CourseModel>>.value(<_i7.CourseModel>[]),
@@ -172,6 +172,16 @@ class MockMainDataSrc extends _i1.Mock implements _i5.MainDataSrc {
         ),
         returnValue: _i6.Future<List<String>>.value(<String>[]),
       ) as _i6.Future<List<String>>);
+  @override
+  _i6.Future<List<_i7.CourseModel>> searchCourses(String? query) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #searchCourses,
+          [query],
+        ),
+        returnValue:
+            _i6.Future<List<_i7.CourseModel>>.value(<_i7.CourseModel>[]),
+      ) as _i6.Future<List<_i7.CourseModel>>);
 }
 
 /// A class which mocks [DatabaseReference].
@@ -578,11 +588,11 @@ class MockMainRepo extends _i1.Mock implements _i8.MainRepo {
 
   @override
   _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>> getCourses(
-          int? page) =>
+          bool? isNew) =>
       (super.noSuchMethod(
         Invocation.method(
           #getCourses,
-          [page],
+          [isNew],
         ),
         returnValue:
             _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>.value(
@@ -590,10 +600,93 @@ class MockMainRepo extends _i1.Mock implements _i8.MainRepo {
           this,
           Invocation.method(
             #getCourses,
-            [page],
+            [isNew],
           ),
         )),
       ) as _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>);
+  @override
+  _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>
+      getCoursesHistory() => (super.noSuchMethod(
+            Invocation.method(
+              #getCoursesHistory,
+              [],
+            ),
+            returnValue: _i6
+                .Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>.value(
+                _FakeEither_6<_i9.Failure, List<_i7.CourseModel>>(
+              this,
+              Invocation.method(
+                #getCoursesHistory,
+                [],
+              ),
+            )),
+          ) as _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>);
+  @override
+  _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>
+      getFavoriteCourses() => (super.noSuchMethod(
+            Invocation.method(
+              #getFavoriteCourses,
+              [],
+            ),
+            returnValue: _i6
+                .Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>.value(
+                _FakeEither_6<_i9.Failure, List<_i7.CourseModel>>(
+              this,
+              Invocation.method(
+                #getFavoriteCourses,
+                [],
+              ),
+            )),
+          ) as _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>);
+  @override
+  _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>
+      getDownloadedCourses() => (super.noSuchMethod(
+            Invocation.method(
+              #getDownloadedCourses,
+              [],
+            ),
+            returnValue: _i6
+                .Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>.value(
+                _FakeEither_6<_i9.Failure, List<_i7.CourseModel>>(
+              this,
+              Invocation.method(
+                #getDownloadedCourses,
+                [],
+              ),
+            )),
+          ) as _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>);
+  @override
+  _i6.Future<_i3.Either<_i9.Failure, List<String>>> getUstazs() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getUstazs,
+          [],
+        ),
+        returnValue: _i6.Future<_i3.Either<_i9.Failure, List<String>>>.value(
+            _FakeEither_6<_i9.Failure, List<String>>(
+          this,
+          Invocation.method(
+            #getUstazs,
+            [],
+          ),
+        )),
+      ) as _i6.Future<_i3.Either<_i9.Failure, List<String>>>);
+  @override
+  _i6.Future<_i3.Either<_i9.Failure, List<String>>> getCategories() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getCategories,
+          [],
+        ),
+        returnValue: _i6.Future<_i3.Either<_i9.Failure, List<String>>>.value(
+            _FakeEither_6<_i9.Failure, List<String>>(
+          this,
+          Invocation.method(
+            #getCategories,
+            [],
+          ),
+        )),
+      ) as _i6.Future<_i3.Either<_i9.Failure, List<String>>>);
 }
 
 /// A class which mocks [Query].

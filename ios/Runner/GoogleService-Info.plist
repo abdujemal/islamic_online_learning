@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>289944837560-kpqp9rkknp0htkogmfieqj1sn8iljh01.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.289944837560-kpqp9rkknp0htkogmfieqj1sn8iljh01</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>289944837560-8jcd9g6vo9g97p9vdufcle0o8d1pvrvl.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDror_NjHs9wHrBMvmLnh-gh6Rd6E8P2Ys</string>
+	<key>GCM_SENDER_ID</key>
+	<string>289944837560</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.aj.islamicOnlineLearning</string>
+	<key>PROJECT_ID</key>
+	<string>completed-full-lectures</string>
+	<key>STORAGE_BUCKET</key>
+	<string>completed-full-lectures.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:289944837560:ios:1b1a411859d5125dbe834d</string>
+	<key>DATABASE_URL</key>
+	<string>https://completed-full-lectures-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

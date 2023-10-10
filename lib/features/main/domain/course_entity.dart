@@ -15,8 +15,10 @@ class CourseEntity extends Equatable {
   final bool isDownloaded;
   final int audioMin;
   final int pdfPage;
+  final String image;
 
   const CourseEntity({
+    required this.image,
     required this.courseId,
     required this.isDownloaded,
     required this.lastViewed,
@@ -49,5 +51,6 @@ class CourseEntity extends Equatable {
         isDownloaded,
         audioMin,
         pdfPage,
+        image,
       ];
 }

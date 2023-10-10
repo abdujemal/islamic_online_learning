@@ -91,7 +91,7 @@ void main() {
       when(mockSnapshot.value).thenAnswer((realInvocation) => rawData);
 
       // act
-      final result = await mainDataSrc.getCourses(page);
+      final result = await mainDataSrc.getCourses(true);
 
       // assert
       expect(result, equals(courses));

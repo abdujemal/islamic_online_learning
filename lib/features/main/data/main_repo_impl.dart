@@ -11,12 +11,54 @@ class IMainRepo extends MainRepo {
   IMainRepo(this.mainDataSrc);
 
   @override
-  FutureEither<List<CourseModel>> getCourses(int page) async {
+  FutureEither<List<CourseModel>> getCourses(bool isNew) async {
     try {
-      final res = await mainDataSrc.getCourses(page);
+      final res = await mainDataSrc.getCourses(isNew);
       return right(res);
-    } on Exception catch (e) {
+    } catch (e) {
+      print(e.toString());
       return left(Failure(messege: e.toString()));
     }
   }
+
+  @override
+  FutureEither<List<String>> getUstazs() async {
+    try {
+      final res = await mainDataSrc.getUstazs();
+      return right(res);
+    } catch (e) {
+      print(e.toString());
+      return left(Failure(messege: e.toString()));
+    }
+  }
+  
+  @override
+  FutureEither<List<String>> getCategories() async {
+    try {
+      final res = await mainDataSrc.getCategories();
+      return right(res);
+    } catch (e) {
+      print(e.toString());
+      return left(Failure(messege: e.toString()));
+    }
+  }
+  
+  @override
+  FutureEither<List<CourseModel>> getCoursesHistory() {
+    // TODO: implement getCoursesHistory
+    throw UnimplementedError();
+  }
+  
+  @override
+  FutureEither<List<CourseModel>> getDownloadedCourses() {
+    // TODO: implement getDownloadedCourses
+    throw UnimplementedError();
+  }
+  
+  @override
+  FutureEither<List<CourseModel>> getFavoriteCourses() {
+    // TODO: implement getFavoriteCourses
+    throw UnimplementedError();
+  }
+  
 }

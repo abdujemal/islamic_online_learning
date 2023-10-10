@@ -1,33 +1,63 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'course_model.dart';
 
 abstract class MainDataSrc {
-  Future<List<CourseModel>> getCourses(int page, );
+  Future<List<CourseModel>> getCourses(
+    bool isNew,
+  );
   Future<List<CourseModel>> getCoursesHistory();
   Future<List<CourseModel>> getFavoriteCourses();
   Future<List<CourseModel>> getDownloadedCourses();
   Future<List<String>> getUstazs();
   Future<List<String>> getCategories();
+  Future<List<CourseModel>> searchCourses(String query);
 }
 
 class IMainDataSrc extends MainDataSrc {
   final FirebaseDatabase firebaseDatabase;
-  IMainDataSrc(this.firebaseDatabase);
+  final FirebaseFirestore firebaseFirestore;
+  IMainDataSrc(this.firebaseDatabase, this.firebaseFirestore);
+
+  DocumentSnapshot? lastCourse;
 
   @override
-  Future<List<CourseModel>> getCourses(int page) async {
-    final ds = await firebaseDatabase
-        .ref(FirebaseConst.courses)
-        .startAt(page * numOfDoc)
-        .limitToFirst(numOfDoc)
-        .get();
-    List<CourseModel> courses = [];
-    for (var d in (ds.value as Map).entries) {
-      courses.add(CourseModel.fromMap(d.value as Map, d.key as String));
+  Future<List<CourseModel>> getCourses(bool isNew) async {
+    final ds = isNew
+        ? await firebaseFirestore
+            .collection(FirebaseConst.courses)
+            .orderBy('courseId', descending: true)
+            .limit(numOfDoc)
+            .get()
+        : await firebaseFirestore
+            .collection(FirebaseConst.courses)
+            .orderBy('courseId', descending: true)
+            .startAfterDocument(lastCourse!)
+            .limit(numOfDoc)
+            .get();
+
+    if (ds.docs.isNotEmpty) {
+      lastCourse = ds.docs[ds.docs.length - 1];
     }
+
+    List<CourseModel> courses = [];
+    if (ds.docs.isNotEmpty) {
+      for (var d in ds.docs) {
+        courses.add(CourseModel.fromMap(d.data(), d.id));
+      }
+    }
+
+    // courses.sort((a, b) => b.courseId.compareTo(a.courseId));
+
     return courses;
+  }
+
+  @override
+  Future<List<CourseModel>> searchCourses(String query) async {
+    // final ds = await firebaseFirestore.collection(FirebaseConst.courses).orderBy(title).get();
+    throw UnimplementedError();
   }
 
   @override
@@ -50,10 +80,10 @@ class IMainDataSrc extends MainDataSrc {
 
   @override
   Future<List<String>> getCategories() async {
-    final ds = await firebaseDatabase.ref(FirebaseConst.category).get();
+    final ds = await firebaseFirestore.collection(FirebaseConst.category).get();
     List<String> categories = [];
-    for (var d in (ds.value as Map).values) {
-      categories.add(d['name']);
+    for (var d in ds.docs) {
+      categories.add(d.data()['name']);
     }
     return categories;
   }
@@ -64,6 +94,10 @@ class IMainDataSrc extends MainDataSrc {
     List<String> ustazs = [];
     for (var d in (ds.value as Map).values) {
       ustazs.add(d['name']);
+      firebaseFirestore
+          .collection(FirebaseConst.ustaz)
+          .doc(d['name'])
+          .set({'name': d['name']});
     }
     return ustazs;
   }
