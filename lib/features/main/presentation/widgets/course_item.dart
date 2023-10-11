@@ -85,6 +85,25 @@ class CourseItem extends StatelessWidget {
                   child: Text(courseModel.ustaz),
                 ),
               ),
+              if (courseModel.category != "")
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                      right: 10,
+                      left: 5,
+                    ),
+                    height: 20,
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(5),
+                          bottomRight: Radius.circular(15),
+                        ),
+                        color: Colors.amber),
+                    child: Text(courseModel.category),
+                  ),
+                ),
             ],
           ),
         ),

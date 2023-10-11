@@ -13,7 +13,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
 
   int itreationCounter = 0;
 
-  Future<void> getCourses({bool isNew = true}) async {
+  Future<void> getCourses({bool isNew = true, String? key, String? val}) async {
     if (itreationCounter == 0) {
       if (isNew) {
         state = const MainListState.loading();
@@ -25,7 +25,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
         );
       }
       itreationCounter = 1;
-      final res = await mainRepo.getCourses(isNew);
+      final res = await mainRepo.getCourses(isNew, key, val);
       itreationCounter = 0;
       // print(itreationCounter);
 
@@ -56,7 +56,5 @@ class MainListNotifier extends StateNotifier<MainListState> {
     }
   }
 
-  searchCourses(String qwery){
-    
-  }
+  searchCourses(String qwery) {}
 }

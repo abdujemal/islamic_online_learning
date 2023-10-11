@@ -11,9 +11,13 @@ class IMainRepo extends MainRepo {
   IMainRepo(this.mainDataSrc);
 
   @override
-  FutureEither<List<CourseModel>> getCourses(bool isNew) async {
+  FutureEither<List<CourseModel>> getCourses(
+    bool isNew,
+    String? key,
+    String? val,
+  ) async {
     try {
-      final res = await mainDataSrc.getCourses(isNew);
+      final res = await mainDataSrc.getCourses(isNew, key, val);
       return right(res);
     } catch (e) {
       print(e.toString());
@@ -31,7 +35,7 @@ class IMainRepo extends MainRepo {
       return left(Failure(messege: e.toString()));
     }
   }
-  
+
   @override
   FutureEither<List<String>> getCategories() async {
     try {
@@ -42,23 +46,22 @@ class IMainRepo extends MainRepo {
       return left(Failure(messege: e.toString()));
     }
   }
-  
+
   @override
   FutureEither<List<CourseModel>> getCoursesHistory() {
     // TODO: implement getCoursesHistory
     throw UnimplementedError();
   }
-  
+
   @override
   FutureEither<List<CourseModel>> getDownloadedCourses() {
     // TODO: implement getDownloadedCourses
     throw UnimplementedError();
   }
-  
+
   @override
   FutureEither<List<CourseModel>> getFavoriteCourses() {
     // TODO: implement getFavoriteCourses
     throw UnimplementedError();
   }
-  
 }

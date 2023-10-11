@@ -6,7 +6,7 @@ class UstazListNotifier extends StateNotifier<UstazListState> {
   final MainRepo mainRepo;
   UstazListNotifier(this.mainRepo) : super(const UstazListState.initial());
 
-   Future<void> getUstaz() async {
+  Future<void> getUstaz() async {
     state = const UstazListState.loading();
 
     final res = await mainRepo.getUstazs();
@@ -16,6 +16,7 @@ class UstazListNotifier extends StateNotifier<UstazListState> {
         state = UstazListState.error(error: l);
       },
       (r) {
+        print("loaded");
         if (r.isEmpty) {
           state = UstazListState.empty(ustazs: r);
           return;

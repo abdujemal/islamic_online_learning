@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: must_call_super
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/filtered_courses.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_notifier.dart';
 
-import '../../../../core/widgets/list_title.dart';
 import '../state/category_list_notifier.dart';
 import '../state/main_list_notifier.dart';
 import '../state/provider.dart';
@@ -21,9 +21,9 @@ class Home extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<Home>
     with AutomaticKeepAliveClientMixin {
-  late MainListNotifier mainNotifier;
   late CategoryListNotifier categoryNotifier;
   late UstazListNotifier ustazListNotifier;
+  late MainListNotifier mainNotifier;
 
   ScrollController scrollController = ScrollController();
 
@@ -32,9 +32,9 @@ class _HomeState extends ConsumerState<Home>
   @override
   initState() {
     super.initState();
-    mainNotifier = ref.read(mainNotifierProvider.notifier);
     categoryNotifier = ref.read(categoryNotifierProvider.notifier);
     ustazListNotifier = ref.read(ustazNotifierProvider.notifier);
+    mainNotifier = ref.read(mainNotifierProvider.notifier);
 
     scrollController.addListener(_scrollListener);
 
@@ -48,11 +48,7 @@ class _HomeState extends ConsumerState<Home>
   Future<void> _scrollListener() async {
     if (scrollController.position.pixels ==
         scrollController.position.maxScrollExtent) {
-      // if (countIteration != 1) {
       await mainNotifier.getCourses(isNew: false);
-
-      // countIteration = 1;
-      // }
     }
   }
 

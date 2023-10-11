@@ -7,10 +7,12 @@ import 'course_model.dart';
 abstract class MainDataSrc {
   Future<List<CourseModel>> getCourses(
     bool isNew,
+    String? key,
+    String? val,
   );
-  Future<List<CourseModel>> getCoursesHistory();
   Future<List<CourseModel>> getFavoriteCourses();
   Future<List<CourseModel>> getDownloadedCourses();
+  Future<void> saveTheCourse(CourseModel courseModel, bool isFav);
   Future<List<String>> getUstazs();
   Future<List<String>> getCategories();
   Future<List<CourseModel>> searchCourses(String query);
@@ -24,19 +26,42 @@ class IMainDataSrc extends MainDataSrc {
   DocumentSnapshot? lastCourse;
 
   @override
-  Future<List<CourseModel>> getCourses(bool isNew) async {
-    final ds = isNew
-        ? await firebaseFirestore
-            .collection(FirebaseConst.courses)
-            .orderBy('courseId', descending: true)
-            .limit(numOfDoc)
-            .get()
-        : await firebaseFirestore
-            .collection(FirebaseConst.courses)
-            .orderBy('courseId', descending: true)
-            .startAfterDocument(lastCourse!)
-            .limit(numOfDoc)
-            .get();
+  Future<List<CourseModel>> getCourses(
+    bool isNew,
+    String? key,
+    String? val,
+  ) async {
+    QuerySnapshot ds;
+
+    if (key == null) {
+      ds = isNew
+          ? await firebaseFirestore
+              .collection(FirebaseConst.courses)
+              .orderBy('courseId', descending: true)
+              .limit(numOfDoc)
+              .get()
+          : await firebaseFirestore
+              .collection(FirebaseConst.courses)
+              .orderBy('courseId', descending: true)
+              .startAfterDocument(lastCourse!)
+              .limit(numOfDoc)
+              .get();
+    } else {
+      ds = isNew
+          ? await firebaseFirestore
+              .collection(FirebaseConst.courses)
+              .where(key, isEqualTo: val)
+              .orderBy('courseId', descending: true)
+              .limit(numOfDoc)
+              .get()
+          : await firebaseFirestore
+              .collection(FirebaseConst.courses)
+              .where(key, isEqualTo: val)
+              .orderBy('courseId', descending: true)
+              .startAfterDocument(lastCourse!)
+              .limit(numOfDoc)
+              .get();
+    }
 
     if (ds.docs.isNotEmpty) {
       lastCourse = ds.docs[ds.docs.length - 1];
@@ -45,7 +70,7 @@ class IMainDataSrc extends MainDataSrc {
     List<CourseModel> courses = [];
     if (ds.docs.isNotEmpty) {
       for (var d in ds.docs) {
-        courses.add(CourseModel.fromMap(d.data(), d.id));
+        courses.add(CourseModel.fromMap(d.data()! as Map, d.id));
       }
     }
 
@@ -90,15 +115,17 @@ class IMainDataSrc extends MainDataSrc {
 
   @override
   Future<List<String>> getUstazs() async {
-    final ds = await firebaseDatabase.ref(FirebaseConst.ustaz).get();
+    final ds = await firebaseFirestore.collection(FirebaseConst.ustaz).get();
     List<String> ustazs = [];
-    for (var d in (ds.value as Map).values) {
+    for (var d in ds.docs) {
       ustazs.add(d['name']);
-      firebaseFirestore
-          .collection(FirebaseConst.ustaz)
-          .doc(d['name'])
-          .set({'name': d['name']});
     }
     return ustazs;
+  }
+  
+  @override
+  Future<void> saveTheCourse(CourseModel courseModel, bool isFav) {
+    // TODO: implement saveTheCourse
+    throw UnimplementedError();
   }
 }
