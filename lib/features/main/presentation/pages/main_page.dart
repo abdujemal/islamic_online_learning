@@ -60,12 +60,12 @@ class _MainPageState extends ConsumerState<MainPage>
           ),
           textInputAction: TextInputAction.search,
           searchDecoration: const InputDecoration(
-            hintText: 'ፈልግ...',
+            hintText: 'ፈልግ...' ,
             alignLabelWithHint: true,
             fillColor: Colors.white,
             focusColor: Colors.white,
             hintStyle: TextStyle(
-              color: Colors.black45,
+              color: Colors.white70,
             ),
             border: InputBorder.none,
           ),

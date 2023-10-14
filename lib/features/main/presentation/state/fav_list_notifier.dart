@@ -8,7 +8,7 @@ class FavListNotifier extends StateNotifier<FavListState> {
   final MainRepo mainRepo;
   FavListNotifier(this.mainRepo) : super(const FavListState.initial());
 
-  getCourses() async {
+  getCourse() async {
     state = const FavListState.loading();
 
     final res = await mainRepo.getFavoriteCourses();
@@ -37,7 +37,7 @@ class FavListNotifier extends StateNotifier<FavListState> {
         },
         (r) {
           toast("በተሳካ  ሁኔታ ጠፍትዋ", ToastType.success);
-          getCourses();
+          getCourse();
         },
       );
     } else {

@@ -28,7 +28,7 @@ class _FavState extends ConsumerState<Fav>
     favListNotifier = ref.read(favNotifierProvider.notifier);
 
     Future.delayed(const Duration(seconds: 1)).then((value) {
-      favListNotifier.getCourses();
+      favListNotifier.getCourse();
     });
   }
 
@@ -44,7 +44,7 @@ class _FavState extends ConsumerState<Fav>
             ),
             loaded: (_) => RefreshIndicator(
               onRefresh: () async {
-                await ref.read(favNotifierProvider.notifier).getCourses();
+                await ref.read(favNotifierProvider.notifier).getCourse();
               },
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -55,17 +55,8 @@ class _FavState extends ConsumerState<Fav>
                 },
               ),
             ),
-            empty: (_) => Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("ምንም የለም"),
-                IconButton(
-                  onPressed: () {
-                    ref.read(favNotifierProvider.notifier).getCourses();
-                  },
-                  icon: const Icon(Icons.refresh),
-                ),
-              ],
+            empty: (_) => const Center(
+              child: Text("ምንም የለም"),
             ),
             error: (_) => Center(
               child: Text(_.error.messege),
