@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 const int numOfDoc = 10;
 
@@ -17,6 +18,20 @@ const primaryColor = MaterialColor(
     900: Color(0xFF0F3D2B),
   },
 );
+
+void toast(String message, ToastType toastType, {bool isLong = false}) {
+  Fluttertoast.showToast(
+    msg: message,
+    toastLength: isLong ? Toast.LENGTH_SHORT : Toast.LENGTH_SHORT,
+    gravity: ToastGravity.BOTTOM,
+    timeInSecForIosWeb: 1,
+    backgroundColor: toastType == ToastType.error ? Colors.red : Colors.green,
+    textColor: Colors.white,
+    fontSize: 16.0,
+  );
+}
+
+enum ToastType { success, error }
 
 const whiteColor = Colors.white;
 

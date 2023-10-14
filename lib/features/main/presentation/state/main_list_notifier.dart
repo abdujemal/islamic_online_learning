@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/data/course_model.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_state.dart';
@@ -56,5 +57,42 @@ class MainListNotifier extends StateNotifier<MainListState> {
     }
   }
 
-  searchCourses(String qwery) {}
+  searchCourses(String qwery, int? noOfElt) async {
+    state = const MainListState.loading();
+
+    final res = await mainRepo.searchCourses(qwery, noOfElt);
+
+    res.fold(
+      (l) {
+        state = MainListState.error(error: l);
+      },
+      (r) {
+        if (r.isEmpty) {
+          state = MainListState.empty(courses: r);
+        } else {
+          state = MainListState.loaded(
+            courses: r,
+            isLoadingMore: false,
+            noMoreToLoad: false,
+          );
+        }
+      },
+    );
+  }
+
+  Future<int?> saveCourse(CourseModel courseModel, bool isFav) async {
+    final res = await mainRepo.saveCourse(courseModel.copyWith(isFav: isFav));
+
+    res.fold(
+      (l) {
+        toast(l.messege, ToastType.error);
+      },
+      (r) {
+        toast(isFav ? "Added to favourite" : "Saved successfully",
+            ToastType.error);
+        return r;
+      },
+    );
+    return null;
+  }
 }

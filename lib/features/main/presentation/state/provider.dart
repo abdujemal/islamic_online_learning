@@ -5,14 +5,18 @@ import 'package:islamic_online_learning/features/main/data/main_data_src.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/category_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/category_list_state.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/fav_list_state.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_state.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_state.dart';
 
 import '../../data/main_repo_impl.dart';
+import 'fav_list_notifier.dart';
 
 final menuIndexProvider = StateProvider<int>((ref) => 0);
+
+final queryProvider = StateProvider<String>((ref) => "");
 
 final firebaseDatabaseProvider =
     Provider<FirebaseDatabase>((ref) => FirebaseDatabase.instance);
@@ -32,6 +36,11 @@ final mainRepoProvider = Provider<MainRepo>((ref) {
 final mainNotifierProvider =
     StateNotifierProvider<MainListNotifier, MainListState>((ref) {
   return MainListNotifier(ref.read(mainRepoProvider));
+});
+
+final favNotifierProvider =
+    StateNotifierProvider<FavListNotifier, FavListState>((ref) {
+  return FavListNotifier(ref.read(mainRepoProvider));
 });
 
 final categoryNotifierProvider =

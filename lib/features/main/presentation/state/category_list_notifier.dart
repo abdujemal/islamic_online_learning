@@ -22,6 +22,7 @@ class CategoryListNotifier extends StateNotifier<CategoryListState> {
           return;
         }
         state = CategoryListState.loaded(categories: r);
+        
       },
     );
   }

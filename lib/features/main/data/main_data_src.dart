@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/database_helper.dart';
 import 'course_model.dart';
 
 abstract class MainDataSrc {
@@ -12,10 +13,11 @@ abstract class MainDataSrc {
   );
   Future<List<CourseModel>> getFavoriteCourses();
   Future<List<CourseModel>> getDownloadedCourses();
-  Future<void> saveTheCourse(CourseModel courseModel, bool isFav);
+  Future<int> saveTheCourse(CourseModel courseModel);
   Future<List<String>> getUstazs();
   Future<List<String>> getCategories();
-  Future<List<CourseModel>> searchCourses(String query);
+  Future<List<CourseModel>> searchCourses(String query, int? numOfelt);
+  Future<void> deleteCourse(int id);
 }
 
 class IMainDataSrc extends MainDataSrc {
@@ -31,7 +33,7 @@ class IMainDataSrc extends MainDataSrc {
     String? key,
     String? val,
   ) async {
-    QuerySnapshot ds;
+    late QuerySnapshot ds;
 
     if (key == null) {
       ds = isNew
@@ -67,40 +69,62 @@ class IMainDataSrc extends MainDataSrc {
       lastCourse = ds.docs[ds.docs.length - 1];
     }
 
+    List<CourseModel> favCourses = await getFavoriteCourses();
+
     List<CourseModel> courses = [];
     if (ds.docs.isNotEmpty) {
       for (var d in ds.docs) {
-        courses.add(CourseModel.fromMap(d.data()! as Map, d.id));
+        bool isFav = false;
+        int? id;
+        for (var fav in favCourses) {
+          if (fav.courseId == d.id) {
+            isFav = true;
+            id = fav.id;
+          }
+        }
+        courses.add(
+          CourseModel.fromMap(d.data() as Map, d.id).copyWith(
+            isFav: isFav,
+            id: id,
+          ),
+        );
       }
     }
 
     // courses.sort((a, b) => b.courseId.compareTo(a.courseId));
 
+    print(courses.toString());
     return courses;
   }
 
   @override
-  Future<List<CourseModel>> searchCourses(String query) async {
-    // final ds = await firebaseFirestore.collection(FirebaseConst.courses).orderBy(title).get();
-    throw UnimplementedError();
+  Future<List<CourseModel>> searchCourses(String query, int? numOfelt) async {
+    final ds = await firebaseFirestore
+        .collection(FirebaseConst.courses)
+        .orderBy('title')
+        .startAfter([query])
+        .limit(numOfelt ?? numOfDoc)
+        .get();
+
+    List<CourseModel> courses = [];
+    if (ds.docs.isNotEmpty) {
+      for (var d in ds.docs) {
+        courses.add(CourseModel.fromMap(d.data(), d.id));
+      }
+    }
+    return courses;
   }
 
   @override
-  Future<List<CourseModel>> getCoursesHistory() {
-    // TODO: implement getCoursesHistory
-    throw UnimplementedError();
+  Future<List<CourseModel>> getDownloadedCourses() async {
+    List<CourseModel> res = await DatabaseHelper().getDownloadedCourses();
+    return res;
   }
 
   @override
-  Future<List<CourseModel>> getDownloadedCourses() {
-    // TODO: implement getDownloadedCourses
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<CourseModel>> getFavoriteCourses() {
-    // TODO: implement getFavoriteCourses
-    throw UnimplementedError();
+  Future<List<CourseModel>> getFavoriteCourses() async {
+    List<CourseModel> res = await DatabaseHelper().getFavCourses();
+    return res;
   }
 
   @override
@@ -122,10 +146,18 @@ class IMainDataSrc extends MainDataSrc {
     }
     return ustazs;
   }
-  
+
   @override
-  Future<void> saveTheCourse(CourseModel courseModel, bool isFav) {
-    // TODO: implement saveTheCourse
-    throw UnimplementedError();
+  Future<int> saveTheCourse(CourseModel courseModel) async {
+    if (await DatabaseHelper().isCourseAvailable(courseModel.courseId)) {
+      return await DatabaseHelper().updateCourse(courseModel);
+    } else {
+      return await DatabaseHelper().insertCourse(courseModel);
+    }
+  }
+
+  @override
+  Future<void> deleteCourse(int id) async {
+    await DatabaseHelper().deleteCourse(id);
   }
 }

@@ -119,20 +119,19 @@ class MockMainDataSrc extends _i1.Mock implements _i5.MainDataSrc {
   }
 
   @override
-  _i6.Future<List<_i7.CourseModel>> getCourses(bool? isNew) =>
+  _i6.Future<List<_i7.CourseModel>> getCourses(
+    bool? isNew,
+    String? key,
+    String? val,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
           #getCourses,
-          [isNew],
-        ),
-        returnValue:
-            _i6.Future<List<_i7.CourseModel>>.value(<_i7.CourseModel>[]),
-      ) as _i6.Future<List<_i7.CourseModel>>);
-  @override
-  _i6.Future<List<_i7.CourseModel>> getCoursesHistory() => (super.noSuchMethod(
-        Invocation.method(
-          #getCoursesHistory,
-          [],
+          [
+            isNew,
+            key,
+            val,
+          ],
         ),
         returnValue:
             _i6.Future<List<_i7.CourseModel>>.value(<_i7.CourseModel>[]),
@@ -157,6 +156,16 @@ class MockMainDataSrc extends _i1.Mock implements _i5.MainDataSrc {
             _i6.Future<List<_i7.CourseModel>>.value(<_i7.CourseModel>[]),
       ) as _i6.Future<List<_i7.CourseModel>>);
   @override
+  _i6.Future<void> saveTheCourse(_i7.CourseModel? courseModel) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #saveTheCourse,
+          [courseModel],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+  @override
   _i6.Future<List<String>> getUstazs() => (super.noSuchMethod(
         Invocation.method(
           #getUstazs,
@@ -173,15 +182,30 @@ class MockMainDataSrc extends _i1.Mock implements _i5.MainDataSrc {
         returnValue: _i6.Future<List<String>>.value(<String>[]),
       ) as _i6.Future<List<String>>);
   @override
-  _i6.Future<List<_i7.CourseModel>> searchCourses(String? query) =>
+  _i6.Future<List<_i7.CourseModel>> searchCourses(
+    String? query,
+    int? numOfelt,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
           #searchCourses,
-          [query],
+          [
+            query,
+            numOfelt,
+          ],
         ),
         returnValue:
             _i6.Future<List<_i7.CourseModel>>.value(<_i7.CourseModel>[]),
       ) as _i6.Future<List<_i7.CourseModel>>);
+  @override
+  _i6.Future<void> deleteCourse(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteCourse,
+          [id],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 }
 
 /// A class which mocks [DatabaseReference].
@@ -588,11 +612,18 @@ class MockMainRepo extends _i1.Mock implements _i8.MainRepo {
 
   @override
   _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>> getCourses(
-          bool? isNew) =>
+    bool? isNew,
+    String? key,
+    String? val,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
           #getCourses,
-          [isNew],
+          [
+            isNew,
+            key,
+            val,
+          ],
         ),
         returnValue:
             _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>.value(
@@ -600,7 +631,11 @@ class MockMainRepo extends _i1.Mock implements _i8.MainRepo {
           this,
           Invocation.method(
             #getCourses,
-            [isNew],
+            [
+              isNew,
+              key,
+              val,
+            ],
           ),
         )),
       ) as _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>);
@@ -687,6 +722,65 @@ class MockMainRepo extends _i1.Mock implements _i8.MainRepo {
           ),
         )),
       ) as _i6.Future<_i3.Either<_i9.Failure, List<String>>>);
+  @override
+  _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>> searchCourses(
+    String? query,
+    int? numOfElt,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #searchCourses,
+          [
+            query,
+            numOfElt,
+          ],
+        ),
+        returnValue:
+            _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>.value(
+                _FakeEither_6<_i9.Failure, List<_i7.CourseModel>>(
+          this,
+          Invocation.method(
+            #searchCourses,
+            [
+              query,
+              numOfElt,
+            ],
+          ),
+        )),
+      ) as _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>);
+  @override
+  _i6.Future<_i3.Either<_i9.Failure, void>> saveCourse(
+          _i7.CourseModel? courseModel) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #saveCourse,
+          [courseModel],
+        ),
+        returnValue: _i6.Future<_i3.Either<_i9.Failure, void>>.value(
+            _FakeEither_6<_i9.Failure, void>(
+          this,
+          Invocation.method(
+            #saveCourse,
+            [courseModel],
+          ),
+        )),
+      ) as _i6.Future<_i3.Either<_i9.Failure, void>>);
+  @override
+  _i6.Future<_i3.Either<_i9.Failure, void>> deleteCourse(int? id) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #deleteCourse,
+          [id],
+        ),
+        returnValue: _i6.Future<_i3.Either<_i9.Failure, void>>.value(
+            _FakeEither_6<_i9.Failure, void>(
+          this,
+          Invocation.method(
+            #deleteCourse,
+            [id],
+          ),
+        )),
+      ) as _i6.Future<_i3.Either<_i9.Failure, void>>);
 }
 
 /// A class which mocks [Query].

@@ -1,3 +1,5 @@
+// ignore_for_file: void_checks, avoid_print
+
 import 'package:dartz/dartz.dart';
 
 import '../../../core/failure.dart';
@@ -60,8 +62,44 @@ class IMainRepo extends MainRepo {
   }
 
   @override
-  FutureEither<List<CourseModel>> getFavoriteCourses() {
-    // TODO: implement getFavoriteCourses
-    throw UnimplementedError();
+  FutureEither<List<CourseModel>> getFavoriteCourses() async {
+    try {
+      final res = await mainDataSrc.getFavoriteCourses();
+      return right(res);
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
+  }
+
+  @override
+  FutureEither<List<CourseModel>> searchCourses(
+      String query, int? numOfElt) async {
+    try {
+      final res = await mainDataSrc.searchCourses(query, numOfElt);
+      return right(res);
+    } catch (e) {
+      print(e.toString());
+      return left(Failure(messege: e.toString()));
+    }
+  }
+
+  @override
+  FutureEither<int> saveCourse(CourseModel courseModel) async {
+    try {
+      final id = await mainDataSrc.saveTheCourse(courseModel);
+      return right(id);
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
+  }
+
+  @override
+  FutureEither<void> deleteCourse(int id) async {
+    try {
+      await mainDataSrc.deleteCourse(id);
+      return right("");
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
   }
 }

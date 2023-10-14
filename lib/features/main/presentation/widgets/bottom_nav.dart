@@ -5,7 +5,8 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class BottomNav extends ConsumerStatefulWidget {
-  const BottomNav({super.key});
+  final TabController tabController;
+  const BottomNav(this.tabController, {super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _BottomNavState();
@@ -43,7 +44,8 @@ class _BottomNavState extends ConsumerState<BottomNav> {
           icons.length,
           (index) => InkWell(
             onTap: () {
-              ref.watch(menuIndexProvider.notifier).update((state) => index);
+              widget.tabController.animateTo(index);
+              ref.read(menuIndexProvider.notifier).update((state) => index);
             },
             child: Ink(
               child: Icon(

@@ -57,7 +57,7 @@ class CourseModel extends CourseEntity {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'courseId': id,
+      'courseId': courseId,
       'author': author,
       'category': category,
       'courseIds': courseIds,
@@ -86,11 +86,47 @@ class CourseModel extends CourseEntity {
       title: map['title'] as String,
       ustaz: map['ustaz'] as String,
       lastViewed: map['lastViewed'] ?? "",
-      isFav: map['isFav'] ?? false,
-      isDownloaded: map['isDownloaded'] ?? false,
+      isFav: map['isFav'] == 1,
+      isDownloaded: map['isDownloaded'] == 1,
       audioMin: map['audioMin'] ?? 0,
-      pdfPage: map['pdfPage'] ?? 1, 
+      pdfPage: map['pdfPage'] ?? 1,
       image: map['image'],
+    );
+  }
+
+  CourseModel copyWith({
+    String? courseId,
+    String? author,
+    int? id,
+    String? category,
+    String? courseIds,
+    int? noOfRecord,
+    String? pdfId,
+    String? title,
+    String? ustaz,
+    String? lastViewed,
+    bool? isFav,
+    bool? isDownloaded,
+    int? audioMin,
+    int? pdfPage,
+    String? image,
+  }) {
+    return CourseModel(
+      courseId: courseId ?? this.courseId,
+      author: author ?? this.author,
+      id: id ?? this.id,
+      category: category ?? this.category,
+      courseIds: courseIds ?? this.courseIds,
+      noOfRecord: noOfRecord ?? this.noOfRecord,
+      pdfId: pdfId ?? this.pdfId,
+      title: title ?? this.title,
+      ustaz: ustaz ?? this.ustaz,
+      lastViewed: lastViewed ?? this.lastViewed,
+      isFav: isFav ?? this.isFav,
+      isDownloaded: isDownloaded ?? this.isDownloaded,
+      audioMin: audioMin ?? this.audioMin,
+      pdfPage: pdfPage ?? this.pdfPage,
+      image: image ?? this.image,
     );
   }
 }

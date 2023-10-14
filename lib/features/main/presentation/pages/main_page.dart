@@ -15,14 +15,30 @@ class MainPage extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _MainPageState();
 }
 
-class _MainPageState extends ConsumerState<MainPage> {
+class _MainPageState extends ConsumerState<MainPage>
+    with TickerProviderStateMixin {
   List<Widget> tabs = [
     const Home(),
-    const Download(),
     const Fav(),
+    const Download(),
   ];
 
   final TextEditingController _searchController = TextEditingController();
+
+  late TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    tabController = TabController(length: 3, vsync: this);
+
+    tabController.addListener(_handleTabChange);
+  }
+
+  void _handleTabChange() {
+    ref.read(menuIndexProvider.notifier).update((state) => tabController.index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,24 +60,25 @@ class _MainPageState extends ConsumerState<MainPage> {
           ),
           textInputAction: TextInputAction.search,
           searchDecoration: const InputDecoration(
-            hintText: 'Search',
+            hintText: 'ፈልግ...',
             alignLabelWithHint: true,
             fillColor: Colors.white,
             focusColor: Colors.white,
-            hintStyle: TextStyle(color: Colors.white70),
+            hintStyle: TextStyle(
+              color: Colors.black45,
+            ),
             border: InputBorder.none,
           ),
           onChanged: (value) {
-            debugPrint('value on Change');
-            setState(() {
-              // searchText = value;
-            });
+            ref.read(queryProvider.notifier).update((state) => value);
+            if (ref.watch(menuIndexProvider) != 0) {
+              ref.read(menuIndexProvider.notifier).update((state) => 0);
+              tabController.animateTo(0);
+            }
+            ref.read(mainNotifierProvider.notifier).searchCourses(value, 20);
           },
           onFieldSubmitted: (value) {
-            debugPrint('value on Field Submitted');
-            setState(() {
-              // searchText = value;
-            });
+            ref.read(mainNotifierProvider.notifier).searchCourses(value, 20);
           },
         ),
         actions: [
@@ -73,11 +90,11 @@ class _MainPageState extends ConsumerState<MainPage> {
           )
         ],
       ),
-      bottomNavigationBar: const BottomNav(),
-      body: Consumer(builder: (context, ref, _) {
-        final index = ref.watch(menuIndexProvider);
-        return tabs[index];
-      }),
+      bottomNavigationBar: BottomNav(tabController),
+      body: TabBarView(
+        controller: tabController,
+        children: tabs,
+      ),
     );
   }
 }

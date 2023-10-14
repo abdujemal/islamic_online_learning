@@ -1,16 +1,41 @@
-import 'package:flutter/material.dart';
-import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+// ignore_for_file: must_be_immutable
 
-class CourseItem extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/pages/course_detail.dart';
+import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+
+class CourseItem extends ConsumerStatefulWidget {
   final CourseModel courseModel;
   const CourseItem(this.courseModel, {super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _CourseItemState();
+}
+
+class _CourseItemState extends ConsumerState<CourseItem> {
+  bool isFav = false;
+  int? id;
+
+  @override
+  void initState() {
+    super.initState();
+    isFav = widget.courseModel.isFav;
+    id = widget.courseModel.id;
+  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        print("object");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CourseDetail(widget.courseModel),
+          ),
+        );
       },
       child: Ink(
         child: Padding(
@@ -30,7 +55,7 @@ class CourseItem extends StatelessWidget {
                       width: 80,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(courseModel.image),
+                          image: NetworkImage(widget.courseModel.image),
                           fit: BoxFit.fill,
                         ),
                         borderRadius: BorderRadius.circular(15),
@@ -45,7 +70,7 @@ class CourseItem extends StatelessWidget {
                           top: 10,
                         ),
                         child: Text(
-                          courseModel.title,
+                          widget.courseModel.title,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -57,9 +82,41 @@ class CourseItem extends StatelessWidget {
                     const SizedBox(
                       width: 20,
                     ),
-                    const Icon(
-                      Icons.bookmark_border_outlined,
-                      size: 30,
+                    GestureDetector(
+                      onTap: () async {
+                        if (isFav) {
+                          if (widget.courseModel.isDownloaded) {
+                            await ref
+                                .read(mainNotifierProvider.notifier)
+                                .saveCourse(widget.courseModel, false);
+                          } else {
+                            ref
+                                .read(favNotifierProvider.notifier)
+                                .deleteCourse(id);
+                          }
+                          setState(() {
+                            isFav = false;
+                          });
+                        } else {
+                          await ref
+                              .read(mainNotifierProvider.notifier)
+                              .saveCourse(widget.courseModel, true);
+
+                          setState(() {
+                            isFav = true;
+                          });
+                        }
+                      },
+                      child: isFav
+                          ? const Icon(
+                              Icons.bookmark,
+                              size: 30,
+                              color: Colors.amber,
+                            )
+                          : const Icon(
+                              Icons.bookmark_border_outlined,
+                              size: 30,
+                            ),
                     ),
                     const SizedBox(
                       width: 5,
@@ -82,10 +139,10 @@ class CourseItem extends StatelessWidget {
                         topRight: Radius.circular(15),
                       ),
                       color: Colors.amber),
-                  child: Text(courseModel.ustaz),
+                  child: Text(widget.courseModel.ustaz),
                 ),
               ),
-              if (courseModel.category != "")
+              if (widget.courseModel.category != "")
                 Positioned(
                   bottom: 0,
                   right: 0,
@@ -101,7 +158,7 @@ class CourseItem extends StatelessWidget {
                           bottomRight: Radius.circular(15),
                         ),
                         color: Colors.amber),
-                    child: Text(courseModel.category),
+                    child: Text(widget.courseModel.category),
                   ),
                 ),
             ],

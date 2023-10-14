@@ -26,7 +26,7 @@ class DatabaseHelper {
   Future<Database> initializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
     String path =
-        '${directory.path}/Islamic Online Learning/db/islamicOnlineLearnging.db';
+        '${directory.path}/Islamic Online Learning/db/islamicOnlineLearnings.db';
 
     var notesDatabase =
         await openDatabase(path, version: 1, onCreate: _createDb);
@@ -44,21 +44,34 @@ class DatabaseHelper {
   //creating database
   void _createDb(Database db, int newVersion) async {
     await db.execute('CREATE TABLE ${DatabaseConst.savedCourses}('
-        'id: INTEGER PRIMARY KEY AUTOINCREMENT,'
+        'id INTEGER PRIMARY KEY AUTOINCREMENT,'
         'courseId TEXT,'
-        'author: TEXT,'
-        'category: TEXT,'
-        'courseIds: TEXT,'
-        'noOfRecord: TEXT,'
-        'pdfId: TEXT,'
-        'title: TEXT,'
-        'ustaz: TEXT,'
-        'lastViewed: TEXT,'
-        'isFav: INTEGER,'
-        'isDownloaded: INTEGER,'
-        'audioMin: INTEGER,'
-        'pdfPage: INTEGER,'
+        'author TEXT,'
+        'category TEXT,'
+        'courseIds TEXT,'
+        'noOfRecord INTEGER,'
+        'pdfId TEXT,'
+        'title TEXT,'
+        'ustaz TEXT,'
+        'image TEXT,'
+        'lastViewed TEXT,'
+        'isFav INTEGER,'
+        'isDownloaded INTEGER,'
+        'audioMin INTEGER,'
+        'pdfPage INTEGER'
         ')');
+  }
+
+  //check
+  Future<bool> isCourseAvailable(String courseId) async {
+    Database? db = await database;
+    try {
+      var result = await db!.query(DatabaseConst.savedCourses,
+          where: 'courseId = ?', whereArgs: [courseId]);
+      return result.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
   }
 
   //geting data
@@ -94,9 +107,10 @@ class DatabaseHelper {
 
     var result = await db!.query(DatabaseConst.savedCourses,
         orderBy: 'lastViewed ASC', where: 'isFav = ?', whereArgs: [1]);
+    print(result);
     List<CourseModel> tasks = [];
     for (var taskDb in result) {
-      tasks.add(CourseModel.fromMap(taskDb, taskDb['id'] as String));
+      tasks.add(CourseModel.fromMap(taskDb, taskDb['courseId'] as String));
     }
     return tasks;
   }
@@ -111,7 +125,7 @@ class DatabaseHelper {
   }
 
   //update data
-  Future<int> updateTask(CourseModel courseModel) async {
+  Future<int> updateCourse(CourseModel courseModel) async {
     var db = await database;
     var result = await db!.update(
         DatabaseConst.savedCourses, courseModel.toMap(),
