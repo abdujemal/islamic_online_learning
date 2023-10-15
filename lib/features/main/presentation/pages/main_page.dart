@@ -8,6 +8,9 @@ import 'package:islamic_online_learning/features/main/presentation/pages/home.da
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
+import '../../../../core/Audio Feature/audio_providers.dart';
+import '../../../../core/Audio Feature/current_audio_view.dart';
+
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
@@ -42,6 +45,7 @@ class _MainPageState extends ConsumerState<MainPage>
 
   @override
   Widget build(BuildContext context) {
+    final currentAudio = ref.watch(currentAudioProvider);
     return Scaffold(
       appBar: AppBar(
         title: AnimatedSearchBar(
@@ -60,7 +64,7 @@ class _MainPageState extends ConsumerState<MainPage>
           ),
           textInputAction: TextInputAction.search,
           searchDecoration: const InputDecoration(
-            hintText: 'ፈልግ...' ,
+            hintText: 'ፈልግ...',
             alignLabelWithHint: true,
             fillColor: Colors.white,
             focusColor: Colors.white,
@@ -80,6 +84,15 @@ class _MainPageState extends ConsumerState<MainPage>
           onFieldSubmitted: (value) {
             ref.read(mainNotifierProvider.notifier).searchCourses(value, 20);
           },
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size(
+            MediaQuery.of(context).size.width,
+            currentAudio != null ? 60 : 0,
+          ),
+          child: currentAudio != null
+              ? CurrentAudioView(currentAudio)
+              : const SizedBox(),
         ),
         actions: [
           IconButton(

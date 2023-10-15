@@ -228,7 +228,7 @@ class _HomeState extends ConsumerState<Home>
                     const Text("ምንም የለም"),
                     IconButton(
                       onPressed: () {
-                        ref.read(favNotifierProvider.notifier).getCourses();
+                        ref.read(favNotifierProvider.notifier).getCourse();
                       },
                       icon: const Icon(Icons.refresh),
                     )

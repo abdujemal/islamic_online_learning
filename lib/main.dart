@@ -178,7 +178,7 @@ class _HomePageState extends State<HomePage> {
         onPressed: () async {
           String fileId =
               "CQACAgQAAxkBAAMKZJbbdVQWy4V-EkWCprVERnh4pdQAAiQQAAIJtpFTXam6M-zq1WQvBA";
-          await download(fileId, "Audio/File1.mp3");
+          await downloadAudio(fileId, "Audio/File1.mp3");
           if (filePath != null) {
             print("playing");
             await player.play(DeviceFileSource(filePath!));
@@ -241,31 +241,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<String?> download(String fileId, String name) async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      Directory? dir = await getExternalStorageDirectory();
-
-      const String botToken = "6152316528:AAH3NEDElz5ApQz_8Qb1Xw9YJXaeTOOCoZ4";
-      filePath = "${dir!.path}/$name";
-      final dio = Dio();
-      final fileUrl =
-          'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
-      final response = await dio.get(fileUrl);
-      final fileData = response.data['result'];
-      final fileDownloadUrl =
-          'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
-      await dio.download(fileDownloadUrl, filePath);
-      isLoading = false;
-      return filePath;
-    } catch (e) {
-      isLoading = false;
-      print(e.toString());
-      return null;
-    }
-  }
+  
 }
 
 
