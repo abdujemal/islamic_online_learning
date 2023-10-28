@@ -16,7 +16,7 @@ class _BottomNavState extends ConsumerState<BottomNav> {
   List<IconData> icons = [
     Icons.menu_book,
     Icons.bookmark,
-    Icons.download,
+    Icons.play_circle,
   ];
 
   @override

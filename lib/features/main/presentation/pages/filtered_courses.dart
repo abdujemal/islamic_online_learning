@@ -48,48 +48,54 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.value),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: ref.watch(mainNotifierProvider).map(
-              initial: (_) => const SizedBox(),
-              loading: (_) => ListView.builder(
-                itemCount: 10,
-                itemBuilder: (index, context) => const CourseShimmer(),
-              ),
-              loaded: (_) => RefreshIndicator(
-                onRefresh: () async {
-                  mainNotifier.getCourses(
-                      isNew: true, key: widget.keey, val: widget.value);
-                },
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 0),
-                  controller: scrollController,
-                  itemCount: _.courses.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index <= _.courses.length - 1) {
-                      return CourseItem(_.courses[index]);
-                    } else if (_.isLoadingMore) {
-                      return const CourseShimmer();
-                    } else if (_.noMoreToLoad) {
-                      return const TheEnd();
-                    } else {
-                      return const SizedBox();
-                    }
+    return WillPopScope(
+      onWillPop: () async {
+        mainNotifier.getCourses(isNew: true);
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.value),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: ref.watch(mainNotifierProvider).map(
+                initial: (_) => const SizedBox(),
+                loading: (_) => ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (index, context) => const CourseShimmer(),
+                ),
+                loaded: (_) => RefreshIndicator(
+                  onRefresh: () async {
+                    mainNotifier.getCourses(
+                        isNew: true, key: widget.keey, val: widget.value);
                   },
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 0),
+                    controller: scrollController,
+                    itemCount: _.courses.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index <= _.courses.length - 1) {
+                        return CourseItem(_.courses[index]);
+                      } else if (_.isLoadingMore) {
+                        return const CourseShimmer();
+                      } else if (_.noMoreToLoad) {
+                        return const TheEnd();
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
+                ),
+                empty: (_) => const Center(
+                  child: Text("No Courses"),
+                ),
+                error: (_) => Center(
+                  child: Text(_.error.messege),
                 ),
               ),
-              empty: (_) => const Center(
-                child: Text("No Courses"),
-              ),
-              error: (_) => Center(
-                child: Text(_.error.messege),
-              ),
-            ),
+        ),
       ),
     );
   }

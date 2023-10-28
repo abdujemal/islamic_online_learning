@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
 class CourseEntity extends Equatable {
@@ -12,27 +13,31 @@ class CourseEntity extends Equatable {
   final String ustaz;
   final String lastViewed;
   final bool isFav;
-  final bool isDownloaded;
-  final int audioMin;
+  final bool isStarted;
+  final bool isFinished;
+  final int pausedAtAudioNum;
+  final int pausedAtAudioMin;
   final int pdfPage;
   final String image;
 
   const CourseEntity({
-    required this.image,
-    required this.courseId,
-    required this.isDownloaded,
-    required this.lastViewed,
-    required this.isFav,
     required this.id,
     required this.author,
     required this.category,
     required this.courseIds,
+    required this.courseId,
     required this.noOfRecord,
     required this.pdfId,
     required this.title,
     required this.ustaz,
-    required this.audioMin,
+    required this.lastViewed,
+    required this.isFav,
+    required this.isStarted,
+    required this.isFinished,
+    required this.pausedAtAudioNum,
+    required this.pausedAtAudioMin,
     required this.pdfPage,
+    required this.image,
   });
 
   @override
@@ -48,8 +53,10 @@ class CourseEntity extends Equatable {
         ustaz,
         lastViewed,
         isFav,
-        isDownloaded,
-        audioMin,
+        isStarted,
+        isFinished,
+        pausedAtAudioMin,
+        pausedAtAudioNum,
         pdfPage,
         image,
       ];

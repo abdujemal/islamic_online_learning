@@ -33,7 +33,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => CourseDetail(widget.courseModel),
+            builder: (_) => CourseDetail(courseModel: widget.courseModel),
           ),
         );
       },
@@ -85,7 +85,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                     GestureDetector(
                       onTap: () async {
                         if (isFav) {
-                          if (widget.courseModel.isDownloaded) {
+                          if (widget.courseModel.isStarted) {
                             await ref
                                 .read(mainNotifierProvider.notifier)
                                 .saveCourse(widget.courseModel, false);

@@ -8,7 +8,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'features/main/presentation/pages/main_page.dart';
 import 'firebase_options.dart';
@@ -38,17 +37,20 @@ class Main extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: primaryColor,
         appBarTheme: const AppBarTheme(
-            backgroundColor: whiteColor,
-            titleTextStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-            actionsIconTheme: IconThemeData(
-              color: primaryColor,
-            ),
-            elevation: 2,
-            iconTheme: IconThemeData(color: Colors.black)),
+          backgroundColor: whiteColor,
+          titleTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          actionsIconTheme: IconThemeData(
+            color: primaryColor,
+          ),
+          elevation: 2,
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ),
+        ),
       ),
       home: const MainPage(),
     );
@@ -178,7 +180,7 @@ class _HomePageState extends State<HomePage> {
         onPressed: () async {
           String fileId =
               "CQACAgQAAxkBAAMKZJbbdVQWy4V-EkWCprVERnh4pdQAAiQQAAIJtpFTXam6M-zq1WQvBA";
-          await downloadAudio(fileId, "Audio/File1.mp3");
+          // await downloadAudio(fileId, "Audio/File1.mp3");
           if (filePath != null) {
             print("playing");
             await player.play(DeviceFileSource(filePath!));
@@ -240,8 +242,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  
 }
 
 

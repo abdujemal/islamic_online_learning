@@ -15,27 +15,31 @@ class CourseModel extends CourseEntity {
   final String ustaz;
   final String lastViewed;
   final bool isFav;
-  final bool isDownloaded;
-  final int audioMin;
+  final bool isStarted;
+  final bool isFinished;
+  final int pausedAtAudioNum;
+  final int pausedAtAudioMin;
   final int pdfPage;
   final String image;
 
   const CourseModel({
-    required this.image,
-    required this.isDownloaded,
-    required this.lastViewed,
-    required this.isFav,
-    required this.id,
+    required this.courseId,
     required this.author,
+    required this.id,
     required this.category,
     required this.courseIds,
     required this.noOfRecord,
     required this.pdfId,
     required this.title,
     required this.ustaz,
-    required this.courseId,
-    required this.audioMin,
+    required this.lastViewed,
+    required this.isFav,
+    required this.isStarted,
+    required this.isFinished,
+    required this.pausedAtAudioNum,
+    required this.pausedAtAudioMin,
     required this.pdfPage,
+    required this.image,
   }) : super(
           id: id,
           courseId: courseId,
@@ -48,8 +52,10 @@ class CourseModel extends CourseEntity {
           ustaz: ustaz,
           lastViewed: lastViewed,
           isFav: isFav,
-          isDownloaded: isDownloaded,
-          audioMin: audioMin,
+          isStarted: isStarted,
+          isFinished: isFinished,
+          pausedAtAudioNum: pausedAtAudioNum,
+          pausedAtAudioMin: pausedAtAudioMin,
           pdfPage: pdfPage,
           image: image,
         );
@@ -68,8 +74,10 @@ class CourseModel extends CourseEntity {
       "image": image,
       'lastViewed': lastViewed,
       'isFav': isFav ? 1 : 0,
-      'isDownloaded': isDownloaded ? 1 : 0,
-      'audioMin': audioMin,
+      'isStarted': isStarted ? 1 : 0,
+      'isFinished': isFinished ? 1 : 0,
+      'pausedAtAudioNum': pausedAtAudioNum,
+      'pausedAtAudioMin': pausedAtAudioMin,
       'pdfPage': pdfPage,
     };
   }
@@ -87,8 +95,10 @@ class CourseModel extends CourseEntity {
       ustaz: map['ustaz'] as String,
       lastViewed: map['lastViewed'] ?? "",
       isFav: map['isFav'] == 1,
-      isDownloaded: map['isDownloaded'] == 1,
-      audioMin: map['audioMin'] ?? 0,
+      isStarted: map['isStarted'] == 1,
+      isFinished: map['isFinished'] == 1,
+      pausedAtAudioNum: map['pausedAtAudioNum'] ?? 0,
+      pausedAtAudioMin: map['pausedAtAudioMin'] ?? 0,
       pdfPage: map['pdfPage'] ?? 1,
       image: map['image'],
     );
@@ -106,8 +116,10 @@ class CourseModel extends CourseEntity {
     String? ustaz,
     String? lastViewed,
     bool? isFav,
-    bool? isDownloaded,
-    int? audioMin,
+    bool? isStarted,
+    bool? isFinished,
+    int? pausedAtAudioNum,
+    int? pausedAtAudioMin,
     int? pdfPage,
     String? image,
   }) {
@@ -123,8 +135,10 @@ class CourseModel extends CourseEntity {
       ustaz: ustaz ?? this.ustaz,
       lastViewed: lastViewed ?? this.lastViewed,
       isFav: isFav ?? this.isFav,
-      isDownloaded: isDownloaded ?? this.isDownloaded,
-      audioMin: audioMin ?? this.audioMin,
+      isStarted: isStarted ?? this.isStarted,
+      isFinished: isFinished ?? this.isFinished,
+      pausedAtAudioNum: pausedAtAudioNum ?? this.pausedAtAudioNum,
+      pausedAtAudioMin: pausedAtAudioMin ?? this.pausedAtAudioMin,
       pdfPage: pdfPage ?? this.pdfPage,
       image: image ?? this.image,
     );

@@ -17,21 +17,29 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
   @override
   Widget build(BuildContext context) {
     final currentAudio = widget.audioModel;
+
     return Container(
       color: primaryColor,
       child: ListTile(
+        onTap: (){
+          // Navigator.push(context, MaterialPageRoute(builder: (_)=>PdfPage(path: path, isLocal: isLocal, courseModel: courseModel)))
+        },
         title: Text(
           currentAudio.title,
           overflow: TextOverflow.ellipsis,
         ),
-        subtitle: Text(
-          currentAudio.ustaz,
-          overflow: TextOverflow.ellipsis,
-        ),
+        subtitle: Text(currentAudio.ustaz),
         trailing: IconButton(
           onPressed: () {
             ref.read(audioProvider).stop();
             ref.read(currentAudioProvider.notifier).update((state) => null);
+            // ref.read(endListnersProvider);
+            ref
+                .read(audioPlayerPositionProvider.notifier)
+                .update((state) => Duration.zero);
+            ref
+                .read(audioPlayerDurationProvider.notifier)
+                .update((state) => Duration.zero);
           },
           icon: const Icon(Icons.close),
         ),

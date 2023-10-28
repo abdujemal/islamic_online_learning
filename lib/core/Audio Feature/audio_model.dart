@@ -1,36 +1,38 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
 class AudioModel extends Equatable {
   final String title;
   final String ustaz;
-  final double min;
   final AudioState audioState;
+  final String audioId;
   const AudioModel({
     required this.title,
-    required this.min,
-    required this.audioState,
     required this.ustaz,
+    required this.audioState,
+    required this.audioId,
   });
 
   copyWith({
     String? title,
-    double? min,
     AudioState? audioState,
     String? ustaz,
+    String? audioId,
   }) {
     return AudioModel(
       title: title ?? this.title,
-      min: min ?? this.min,
       audioState: audioState ?? this.audioState,
       ustaz: ustaz ?? this.ustaz,
+      audioId: audioId ?? this.audioId,
     );
   }
 
   @override
   List<Object?> get props => [
         title,
-        min,
+        ustaz,
         audioState,
+        audioId,
       ];
 }
 
