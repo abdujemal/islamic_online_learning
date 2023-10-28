@@ -36,7 +36,7 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
     final filePath = "${dir.path}/$folderName/$fileName";
 
     if (await File(filePath).exists()) {
-      ref.read(downloadProgressProvider.notifier).update((state) => null);
+      // ref.read(downloadProgressProvider.notifier).update((state) => []);
       return File(filePath);
     }
 
@@ -52,18 +52,39 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
       if (totalBytes != -1) {
         double progress = (receivedBytes / totalBytes) * 100;
         if (progress <= 100.0) {
-          ref.read(downloadProgressProvider.notifier).update(
-                (state) => DownloadProgress(
+          ref.read(downloadProgressProvider.notifier).update((state) {
+            if (!state.any((e) => e.filePath == filePath)) {
+              print(state.length);
+              print(filePath);
+              print("adding...");
+              return [
+                ...state,
+                DownloadProgress(
                   progress: progress,
                   filePath: filePath,
                 ),
-              );
-          print('Download progress: ${progress.toStringAsFixed(2)}%');
+              ];
+            }
+            // print("updating");
+            return state
+                .map(
+                  (DownloadProgress e) => e.filePath == filePath
+                      ? e.copyWith(
+                          progress: progress,
+                          filePath: filePath,
+                        )
+                      : e,
+                )
+                .toList();
+          });
+          // print('Download progress: ${progress.toStringAsFixed(2)}%');
         }
       }
     });
 
-    ref.read(downloadProgressProvider.notifier).update((state) => null);
+    ref
+        .read(downloadProgressProvider.notifier)
+        .update((state) => state.where((e) => e.filePath != filePath).toList());
     return File(filePath);
   }
 
@@ -100,21 +121,35 @@ class DownloadProgress {
     required this.progress,
     required this.filePath,
   });
+
+  DownloadProgress copyWith({
+    double? progress,
+    String? filePath,
+  }) {
+    return DownloadProgress(
+      progress: progress ?? this.progress,
+      filePath: filePath ?? this.filePath,
+    );
+  }
 }
 
-final downloadProgressProvider = StateProvider<DownloadProgress?>((ref) {
-  return null;
+final downloadProgressProvider = StateProvider<List<DownloadProgress>>((ref) {
+  return [];
 });
 
 final downloadProgressCheckernProvider =
     Provider.family<DownloadProgress?, String?>((ref, path) {
-  final downloadProgress = ref.watch(downloadProgressProvider);
- 
-  if (downloadProgress == null) {
+  final downloadProgresses = ref.watch(downloadProgressProvider);
+
+  if (downloadProgresses.isEmpty) {
     return null;
-  } else if (downloadProgress.filePath == path) {
-    return downloadProgress;
   } else {
-    return null;
+    final myProgress =
+        downloadProgresses.where((e) => e.filePath == path).toList();
+    if (myProgress.isNotEmpty) {
+      return myProgress[0];
+    } else {
+      return null;
+    }
   }
 });

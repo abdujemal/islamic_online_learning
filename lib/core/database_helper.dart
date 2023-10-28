@@ -26,7 +26,7 @@ class DatabaseHelper {
   Future<Database> initializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
     String path =
-        '${directory.path}/Islamic Online Learning/db/islamicOnlineLearnings.db';
+        '${directory.path}/Islamic Online Learning/db/data.db';
 
     var notesDatabase =
         await openDatabase(path, version: 1, onCreate: _createDb);
@@ -56,8 +56,10 @@ class DatabaseHelper {
         'image TEXT,'
         'lastViewed TEXT,'
         'isFav INTEGER,'
-        'isDownloaded INTEGER,'
-        'audioMin INTEGER,'
+        'isStarted INTEGER,'
+        'isFinished INTEGER,'
+        'pausedAtAudioNum INTEGER,'
+        'pausedAtAudioMin INTEGER,'
         'pdfPage INTEGER'
         ')');
   }
@@ -107,7 +109,7 @@ class DatabaseHelper {
 
     var result = await db!.query(DatabaseConst.savedCourses,
         orderBy: 'lastViewed ASC', where: 'isFav = ?', whereArgs: [1]);
-    print(result);
+   
     List<CourseModel> tasks = [];
     for (var taskDb in result) {
       tasks.add(CourseModel.fromMap(taskDb, taskDb['courseId'] as String));

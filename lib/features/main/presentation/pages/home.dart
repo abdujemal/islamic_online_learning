@@ -223,12 +223,13 @@ class _HomeState extends ConsumerState<Home>
                   ),
                 ),
                 empty: (_) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("ምንም የለም"),
                     IconButton(
-                      onPressed: () {
-                        ref.read(favNotifierProvider.notifier).getCourse();
+                      onPressed: () async {
+                        await mainNotifier.getCourses(isNew: true);
                       },
                       icon: const Icon(Icons.refresh),
                     )

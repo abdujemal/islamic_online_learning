@@ -55,8 +55,18 @@ class _FavState extends ConsumerState<Fav>
                 },
               ),
             ),
-            empty: (_) => const Center(
-              child: Text("ምንም የለም"),
+            empty: (_) => Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("ምንም የለም"),
+                IconButton(
+                  onPressed: () async {
+                    await ref.read(favNotifierProvider.notifier).getCourse();
+                  },
+                  icon: const Icon(Icons.refresh),
+                )
+              ],
             ),
             error: (_) => Center(
               child: Text(_.error.messege),

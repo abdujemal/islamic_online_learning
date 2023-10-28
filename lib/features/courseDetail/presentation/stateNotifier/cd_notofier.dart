@@ -86,7 +86,8 @@ class CDNotifier extends StateNotifier<bool> {
     return isDeleted;
   }
 
-  playOffline(String audioPath, String title, CourseModel courseModel, String audioId) async {
+  playOffline(String audioPath, String title, CourseModel courseModel,
+      String audioId) async {
     ref.read(startListnersProvider);
     ref.read(audioProvider).play(DeviceFileSource(audioPath));
 
@@ -102,17 +103,17 @@ class CDNotifier extends StateNotifier<bool> {
     ref.read(currentCourseProvider.notifier).update((state) => courseModel);
   }
 
-  playOnline(String url, String title, CourseModel courseModel, String audioId) async {
+  Future<void> playOnline(
+      String url, String title, CourseModel courseModel, String audioId) async {
     ref.read(startListnersProvider);
-    ref.read(audioProvider).play(UrlSource(url));
+    await ref.read(audioProvider).play(UrlSource(url));
 
     ref.read(currentAudioProvider.notifier).update(
           (state) => AudioModel(
-            title: title,
-            ustaz: courseModel.ustaz,
-            audioState: AudioState.playing,
-            audioId: audioId
-          ),
+              title: title,
+              ustaz: courseModel.ustaz,
+              audioState: AudioState.playing,
+              audioId: audioId),
         );
 
     ref.read(currentCourseProvider.notifier).update((state) => courseModel);

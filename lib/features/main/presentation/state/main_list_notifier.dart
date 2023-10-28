@@ -88,8 +88,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
         toast(l.messege, ToastType.error);
       },
       (r) {
-        toast(isFav ? "Added to favourite" : "Saved successfully",
-            ToastType.error);
+        toast("በተሳካ ሁኔታ ተመዝግብዋል", ToastType.error);
         return r;
       },
     );

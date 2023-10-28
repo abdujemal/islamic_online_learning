@@ -144,9 +144,9 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                         icon: const Icon(Icons.fast_rewind),
                       ),
                       IconButton(
-                        icon: currentAudio.audioState.isPlaused()
-                            ? const Icon(Icons.play_arrow)
-                            : const Icon(Icons.pause),
+                        icon: currentAudio.audioState.isPlaying()
+                            ? const Icon(Icons.pause)
+                            : const Icon(Icons.play_arrow),
                         onPressed: () async {
                           ref.read(currentAudioProvider.notifier).update(
                                 (state) => state!.copyWith(
@@ -214,8 +214,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                   0, currentAudio.title.split(" ").length - 1)
                               .join(" ");
 
-                          if (afterIndex >
-                              currentAudio.title.split(" ").length) {
+                          if (afterIndex > audioIds.length) {
                             return;
                           }
 
@@ -239,7 +238,9 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                               .read(cdNotifierProvider.notifier)
                               .loadFileOnline(audioIds[afterIndex - 1]);
                           if (url != null) {
-                            ref.read(cdNotifierProvider.notifier).playOnline(
+                            await ref
+                                .read(cdNotifierProvider.notifier)
+                                .playOnline(
                                   url,
                                   "$onlyTitle $afterIndex",
                                   currentCourse,

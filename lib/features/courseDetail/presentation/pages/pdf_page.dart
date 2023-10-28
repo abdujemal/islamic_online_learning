@@ -9,6 +9,8 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_bottom_view.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/pdf_drawer.dart';
 
+import '../../../../core/Audio Feature/audio_providers.dart';
+import '../../../../core/Audio Feature/current_audio_view.dart';
 import '../../../main/data/course_model.dart';
 
 class PdfPage extends ConsumerStatefulWidget {
@@ -33,6 +35,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
   bool? isReady;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   final Completer<PDFViewController> _controller =
       Completer<PDFViewController>();
   @override
@@ -43,15 +47,28 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentAudio = ref.watch(currentAudioProvider);
+    final currentCourse = ref.watch(checkCourseProvider
+        .call(widget.courseModel.courseId)); // returns the course if it matches
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(widget.courseModel.title),
-        // leading: IconButton(
-        //   onPressed: () {
-        //     context.op
-        //   },
-        //   icon: const Icon(Icons.music_note),
-        // ),
+        leading: IconButton(
+          onPressed: () {
+            _scaffoldKey.currentState!.openDrawer();
+          },
+          icon: const Icon(Icons.music_note),
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size(
+            MediaQuery.of(context).size.width,
+            currentAudio != null && currentCourse == null ? 60 : 0,
+          ),
+          child: currentAudio != null && currentCourse == null
+              ? CurrentAudioView(currentAudio)
+              : const SizedBox(),
+        ),
       ),
       drawer: PdfDrawer(
         audios: widget.courseModel.courseIds.split(","),

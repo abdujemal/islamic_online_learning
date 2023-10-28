@@ -50,15 +50,18 @@ class _AudioItemState extends ConsumerState<AudioItem> {
   }
 
   checkFile() {
-    ref
-        .read(cdNotifierProvider.notifier)
-        .isDownloaded("${widget.title}.mp3", "Audio")
-        .then((value) {
-      setState(() {
-        isDownloaded = value;
-        setState(() {});
+    if (mounted) {
+      ref
+          .read(cdNotifierProvider.notifier)
+          .isDownloaded("${widget.title}.mp3", "Audio")
+          .then((value) {
+        setState(() {
+          setState(() {
+            isDownloaded = value;
+          });
+        });
       });
-    });
+    }
   }
 
   Future<String> getPath(String folderName, String fileName) async {
@@ -143,20 +146,26 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                 .read(cdNotifierProvider.notifier)
                 .loadFileOnline(widget.audioId);
             if (url != null) {
-              ref.read(cdNotifierProvider.notifier).playOnline(
-                    url,
-                    widget.title,
-                    widget.courseModel,
-                    widget.audioId,
-                  );
-              setState(() {
-                isLoading = false;
-              });
+              if (mounted) {
+                await ref.read(cdNotifierProvider.notifier).playOnline(
+                      url,
+                      widget.title,
+                      widget.courseModel,
+                      widget.audioId,
+                    );
+              }
+              if (mounted) {
+                setState(() {
+                  isLoading = false;
+                });
+              }
             } else {
               print("url is null");
-              setState(() {
-                isLoading = false;
-              });
+              if (mounted) {
+                setState(() {
+                  isLoading = false;
+                });
+              }
             }
           },
           child: Stack(
@@ -193,7 +202,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                             color: whiteColor,
                           ),
               ),
-              !isDownloaded
+              !isDownloaded || downLoadProg?.filePath == audioPath
                   ? Positioned(
                       bottom: 0,
                       right: 0,
@@ -209,7 +218,10 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                             checkFile();
                           }
                         },
-                        isLoading: isDownloading,
+                        isLoading: isDownloading ||
+                            downLoadProg?.filePath == audioPath &&
+                                downLoadProg != null &&
+                                downLoadProg.progress < 100,
                         progress:
                             downLoadProg != null ? downLoadProg.progress : 0,
                       ),

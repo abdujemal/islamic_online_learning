@@ -2,6 +2,7 @@ import 'package:animated_search_bar/animated_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/downloadedFiles/presentation/pages/downloaded_files_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/download.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
@@ -95,6 +96,17 @@ class _MainPageState extends ConsumerState<MainPage>
               : const SizedBox(),
         ),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DownloadedFilesPage(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.download),
+          ),
           IconButton(
             onPressed: () {},
             icon: const Icon(

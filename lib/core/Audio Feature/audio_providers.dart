@@ -64,7 +64,7 @@ final audioPlayerFinishedSubscriptionProvider =
     ref.read(audioProvider).seek(Duration.zero);
     positionNotifier.update((state) => Duration.zero);
     currentAudio
-        .update((state) => state?.copyWith(audioState: AudioState.paused));
+        .update((state) => state?.copyWith(audioState: AudioState.idle));
   });
 });
 
@@ -107,9 +107,6 @@ final currentCourseProvider = StateProvider<CourseModel?>((ref) {
 final checkCourseProvider =
     Provider.family<CourseModel?, String>((ref, courseId) {
   final currentCourse = ref.watch(currentCourseProvider);
-
-  print("loggggg:$courseId");
-  print("loggggg:${currentCourse?.courseId}");
 
   if (currentCourse == null) {
     return null;

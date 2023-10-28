@@ -33,20 +33,24 @@ class _PdfItemState extends ConsumerState<PdfItem> {
   void initState() {
     super.initState();
 
-    checkFile();
+    Future.delayed(const Duration(milliseconds: 500)).then((value) {
+      checkFile();
+    });
   }
 
   checkFile() {
-    Future.delayed(const Duration(milliseconds: 500)).then((value) {
+    if (mounted) {
       ref
           .read(cdNotifierProvider.notifier)
           .isDownloaded("${widget.courseModel.title}.pdf", "PDF")
           .then((value) {
-        setState(() {
-          isDownloaded = value;
-        });
+        if (mounted) {
+          setState(() {
+            isDownloaded = value;
+          });
+        }
       });
-    });
+    }
   }
 
   @override
@@ -65,15 +69,17 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                 widget.fileId, "${widget.courseModel.title}.pdf", 'PDF')
             .then((file) {
           if (file != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => PdfPage(
-                  path: file.path,
-                  courseModel: widget.courseModel,
+            if (mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PdfPage(
+                    path: file.path,
+                    courseModel: widget.courseModel,
+                  ),
                 ),
-              ),
-            );
+              );
+            }
           }
 
           checkFile();
