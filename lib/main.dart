@@ -8,6 +8,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 import 'features/main/presentation/pages/main_page.dart';
 import 'firebase_options.dart';
@@ -31,218 +32,228 @@ class Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      color: primaryColor,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: primaryColor,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: whiteColor,
-          titleTextStyle: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-          actionsIconTheme: IconThemeData(
-            color: primaryColor,
-          ),
-          elevation: 2,
-          iconTheme: IconThemeData(
-            color: Colors.black,
-          ),
+    return Consumer(builder: (context, ref, _) {
+      final themeMode = ref.watch(themeProvider);
+      return MaterialApp(
+        color: primaryColor,
+        debugShowCheckedModeBanner: false,
+        themeMode: themeMode,
+        darkTheme: ThemeData.dark().copyWith(
+          chipTheme: ChipThemeData(backgroundColor: Colors.grey.shade700),
         ),
-      ),
-      home: const MainPage(),
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  double position = 0;
-
-  AudioPlayer player = AudioPlayer();
-
-  StreamSubscription<Duration>? _durationSubscription;
-
-  Duration? _duration;
-
-  StreamSubscription<Duration>? _positionSubscription;
-
-  Duration? _position;
-
-  StreamSubscription<void>? _playerCompleteSubscription;
-
-  PlayerState? _playerState;
-
-  String? filePath;
-
-  StreamSubscription<PlayerState>? _playerStateChangeSubscription;
-
-  bool isLoading = false;
-
-  bool get _isPlaying => _playerState == PlayerState.playing;
-
-  bool get _isPaused => _playerState == PlayerState.paused;
-
-  String get _durationText => _duration?.toString().split('.').first ?? '';
-
-  String get _positionText => _position?.toString().split('.').first ?? '';
-
-  @override
-  initState() {
-    super.initState();
-
-    initStream();
-  }
-
-  @override
-  dispose() {
-    super.dispose();
-    _durationSubscription!.cancel();
-    _positionSubscription!.cancel();
-    _playerCompleteSubscription!.cancel();
-    _playerStateChangeSubscription!.cancel();
-  }
-
-  initStream() {
-    _durationSubscription = player.onDurationChanged.listen((duration) {
-      setState(() => _duration = duration);
-    });
-
-    _positionSubscription = player.onPositionChanged.listen(
-      (p) {
-        setState(() => _position = p);
-        // print(_position);
-      },
-    );
-
-    _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
-      setState(() {
-        _playerState = PlayerState.stopped;
-        _position = Duration.zero;
-      });
-    });
-
-    _playerStateChangeSubscription =
-        player.onPlayerStateChanged.listen((state) {
-      setState(() {
-        _playerState = state;
-      });
-    });
-  }
-
-  Future<void> _play() async {
-    if (_playerState != PlayerState.paused) {
-      if (filePath != null) {
-        print("playing");
-        await player.play(DeviceFileSource(filePath!));
-      }
-    } else {
-      final position = _position;
-      if (position != null && position.inMilliseconds > 0) {
-        await player.seek(position);
-      }
-      await player.resume();
-      setState(() => _playerState = PlayerState.playing);
-    }
-  }
-
-  Future<void> _pause() async {
-    await player.pause();
-    setState(() => _playerState = PlayerState.paused);
-  }
-
-  Future<void> _stop() async {
-    await player.stop();
-    setState(() {
-      _playerState = PlayerState.stopped;
-      _position = Duration.zero;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Audio Player"),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(
-          Icons.download,
-        ),
-        onPressed: () async {
-          String fileId =
-              "CQACAgQAAxkBAAMKZJbbdVQWy4V-EkWCprVERnh4pdQAAiQQAAIJtpFTXam6M-zq1WQvBA";
-          // await downloadAudio(fileId, "Audio/File1.mp3");
-          if (filePath != null) {
-            print("playing");
-            await player.play(DeviceFileSource(filePath!));
-          }
-        },
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            Text(
-              _position != null
-                  ? '$_positionText / $_durationText'
-                  : _duration != null
-                      ? _durationText
-                      : '',
-              style: const TextStyle(fontSize: 16.0),
+        theme: ThemeData(
+          chipTheme: const ChipThemeData(
+              backgroundColor: Color.fromARGB(255, 207, 207, 207)),
+          primarySwatch: primaryColor,
+          scaffoldBackgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: whiteColor,
+            titleTextStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
-            Slider(
-              value: (_position != null &&
-                      _duration != null &&
-                      _position!.inMilliseconds > 0 &&
-                      _position!.inMilliseconds < _duration!.inMilliseconds)
-                  ? _position!.inMilliseconds / _duration!.inMilliseconds
-                  : 0.0,
-              onChanged: (v) {
-                final duration = _duration;
-                if (duration == null) {
-                  return;
-                }
-                final position = v * duration.inMilliseconds;
-                player.seek(Duration(milliseconds: position.round()));
-              },
+            actionsIconTheme: IconThemeData(
+              color: primaryColor,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    if (_isPlaying) {
-                      _pause();
-                    } else {
-                      _play();
-                    }
-                  },
-                  icon: _isPlaying
-                      ? const Icon(Icons.pause)
-                      : const Icon(Icons.play_arrow),
-                ),
-                IconButton(
-                  onPressed: () {
-                    _stop();
-                  },
-                  icon: const Icon(Icons.stop),
-                )
-              ],
-            )
-          ],
+            elevation: 2,
+            iconTheme: IconThemeData(
+              color: Colors.black,
+            ),
+          ),
         ),
-      ),
-    );
+        home: const MainPage(),
+      );
+    });
   }
 }
+
+// class HomePage extends StatefulWidget {
+//   const HomePage({super.key});
+
+//   @override
+//   State<HomePage> createState() => _HomePageState();
+// }
+
+// class _HomePageState extends State<HomePage> {
+//   double position = 0;
+
+//   AudioPlayer player = AudioPlayer();
+
+//   StreamSubscription<Duration>? _durationSubscription;
+
+//   Duration? _duration;
+
+//   StreamSubscription<Duration>? _positionSubscription;
+
+//   Duration? _position;
+
+//   StreamSubscription<void>? _playerCompleteSubscription;
+
+//   PlayerState? _playerState;
+
+//   String? filePath;
+
+//   StreamSubscription<PlayerState>? _playerStateChangeSubscription;
+
+//   bool isLoading = false;
+
+//   bool get _isPlaying => _playerState == PlayerState.playing;
+
+//   bool get _isPaused => _playerState == PlayerState.paused;
+
+//   String get _durationText => _duration?.toString().split('.').first ?? '';
+
+//   String get _positionText => _position?.toString().split('.').first ?? '';
+
+//   @override
+//   initState() {
+//     super.initState();
+
+//     initStream();
+//   }
+
+//   @override
+//   dispose() {
+//     super.dispose();
+//     _durationSubscription!.cancel();
+//     _positionSubscription!.cancel();
+//     _playerCompleteSubscription!.cancel();
+//     _playerStateChangeSubscription!.cancel();
+//   }
+
+//   initStream() {
+//     _durationSubscription = player.onDurationChanged.listen((duration) {
+//       setState(() => _duration = duration);
+//     });
+
+//     _positionSubscription = player.onPositionChanged.listen(
+//       (p) {
+//         setState(() => _position = p);
+//         // print(_position);
+//       },
+//     );
+
+//     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
+//       setState(() {
+//         _playerState = PlayerState.stopped;
+//         _position = Duration.zero;
+//       });
+//     });
+
+//     _playerStateChangeSubscription =
+//         player.onPlayerStateChanged.listen((state) {
+//       setState(() {
+//         _playerState = state;
+//       });
+//     });
+//   }
+
+//   Future<void> _play() async {
+//     if (_playerState != PlayerState.paused) {
+//       if (filePath != null) {
+//         print("playing");
+//         await player.play(DeviceFileSource(filePath!));
+//       }
+//     } else {
+//       final position = _position;
+//       if (position != null && position.inMilliseconds > 0) {
+//         await player.seek(position);
+//       }
+//       await player.resume();
+//       setState(() => _playerState = PlayerState.playing);
+//     }
+//   }
+
+//   Future<void> _pause() async {
+//     await player.pause();
+//     setState(() => _playerState = PlayerState.paused);
+//   }
+
+//   Future<void> _stop() async {
+//     await player.stop();
+//     setState(() {
+//       _playerState = PlayerState.stopped;
+//       _position = Duration.zero;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text("Audio Player"),
+//       ),
+//       floatingActionButton: FloatingActionButton(
+//         child: const Icon(
+//           Icons.download,
+//         ),
+//         onPressed: () async {
+//           String fileId =
+//               "CQACAgQAAxkBAAMKZJbbdVQWy4V-EkWCprVERnh4pdQAAiQQAAIJtpFTXam6M-zq1WQvBA";
+//           // await downloadAudio(fileId, "Audio/File1.mp3");
+//           if (filePath != null) {
+//             print("playing");
+//             await player.play(DeviceFileSource(filePath!));
+//           }
+//         },
+//       ),
+//       body: Center(
+//         child: Column(
+//           children: [
+//             Text(
+//               _position != null
+//                   ? '$_positionText / $_durationText'
+//                   : _duration != null
+//                       ? _durationText
+//                       : '',
+//               style: const TextStyle(fontSize: 16.0),
+//             ),
+//             Slider(
+//               value: (_position != null &&
+//                       _duration != null &&
+//                       _position!.inMilliseconds > 0 &&
+//                       _position!.inMilliseconds < _duration!.inMilliseconds)
+//                   ? _position!.inMilliseconds / _duration!.inMilliseconds
+//                   : 0.0,
+//               onChanged: (v) {
+//                 final duration = _duration;
+//                 if (duration == null) {
+//                   return;
+//                 }
+//                 final position = v * duration.inMilliseconds;
+//                 player.seek(Duration(milliseconds: position.round()));
+//               },
+//             ),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 IconButton(
+//                   onPressed: () {
+//                     if (_isPlaying) {
+//                       _pause();
+//                     } else {
+//                       _play();
+//                     }
+//                   },
+//                   icon: _isPlaying
+//                       ? const Icon(Icons.pause)
+//                       : const Icon(Icons.play_arrow),
+//                 ),
+//                 IconButton(
+//                   onPressed: () {
+//                     _stop();
+//                   },
+//                   icon: const Icon(Icons.stop),
+//                 )
+//               ],
+//             )
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 
 // class _ExampleApp extends StatefulWidget {

@@ -43,7 +43,8 @@ class _AudioItemState extends ConsumerState<AudioItem> {
       checkFile();
     }
 
-    getPath('Audio', "${widget.title}.mp3").then((value) {
+    getPath('Audio', "${widget.courseModel.ustaz},${widget.title}.mp3")
+        .then((value) {
       audioPath = value;
       setState(() {});
     });
@@ -53,7 +54,8 @@ class _AudioItemState extends ConsumerState<AudioItem> {
     if (mounted) {
       ref
           .read(cdNotifierProvider.notifier)
-          .isDownloaded("${widget.title}.mp3", "Audio")
+          .isDownloaded(
+              "${widget.courseModel.ustaz},${widget.title}.mp3", "Audio")
           .then((value) {
         setState(() {
           setState(() {
@@ -73,7 +75,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
   @override
   Widget build(BuildContext context) {
     AudioState myState = ref.watch(checkAudioModelProvider
-        .call("${widget.title} ${widget.courseModel.ustaz}"));
+        .call("${widget.courseModel.ustaz},${widget.title}"));
 
     final downLoadProg =
         ref.watch(downloadProgressCheckernProvider.call(audioPath));
@@ -89,9 +91,9 @@ class _AudioItemState extends ConsumerState<AudioItem> {
         trailing: isDownloaded
             ? IconButton(
                 onPressed: () async {
-                  await ref
-                      .read(cdNotifierProvider.notifier)
-                      .deleteFile('${widget.title}.mp3', "Audio");
+                  await ref.read(cdNotifierProvider.notifier).deleteFile(
+                      '${widget.courseModel.ustaz},${widget.title}.mp3',
+                      "Audio");
 
                   checkFile();
                 },
@@ -178,6 +180,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                     BoxShadow(
                       color: Colors.black12,
                       spreadRadius: 2,
+                      blurRadius: 2,
                     ),
                   ],
                 ),
@@ -211,8 +214,10 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                           isDownloading = true;
                           File? file = await ref
                               .read(cdNotifierProvider.notifier)
-                              .downloadFile(widget.audioId,
-                                  "${widget.title}.mp3", 'Audio');
+                              .downloadFile(
+                                  widget.audioId,
+                                  "${widget.courseModel.ustaz},${widget.title}.mp3",
+                                  'Audio');
                           isDownloading = false;
                           if (file != null) {
                             checkFile();

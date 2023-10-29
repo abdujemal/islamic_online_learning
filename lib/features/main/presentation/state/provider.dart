@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/data/main_data_src.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
@@ -10,9 +11,23 @@ import 'package:islamic_online_learning/features/main/presentation/state/main_li
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_state.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/main_repo_impl.dart';
 import 'fav_list_notifier.dart';
+
+enum MyTheme {
+  dark,
+  light,
+}
+
+final themeProvider = StateProvider<ThemeMode>((ref) {
+  return ThemeMode.light;
+});
+
+final sharedPrefProvider = Provider<Future<SharedPreferences>>((ref) {
+  return SharedPreferences.getInstance();
+});
 
 final menuIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -35,7 +50,7 @@ final mainRepoProvider = Provider<MainRepo>((ref) {
 
 final mainNotifierProvider =
     StateNotifierProvider<MainListNotifier, MainListState>((ref) {
-  return MainListNotifier(ref.read(mainRepoProvider));
+  return MainListNotifier(ref.read(mainRepoProvider), ref);
 });
 
 final favNotifierProvider =

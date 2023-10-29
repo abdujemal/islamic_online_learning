@@ -6,6 +6,7 @@ import 'package:islamic_online_learning/features/main/presentation/pages/filtere
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_notifier.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../core/constants.dart';
 import '../state/category_list_notifier.dart';
 import '../state/main_list_notifier.dart';
 import '../state/provider.dart';
@@ -72,11 +73,15 @@ class _HomeState extends ConsumerState<Home>
                       child: ListView.builder(
                         itemCount: 5,
                         scrollDirection: Axis.horizontal,
-                        itemBuilder: (index, context) => Padding(
+                        itemBuilder: (context, index) => Padding(
                           padding: const EdgeInsets.only(left: 10),
                           child: Shimmer.fromColors(
-                            baseColor: Colors.grey.shade300,
-                            highlightColor: Colors.grey.shade100,
+                            baseColor: Theme.of(context)
+                                .chipTheme
+                                .backgroundColor!
+                                .withAlpha(150),
+                            highlightColor:
+                                Theme.of(context).chipTheme.backgroundColor!,
                             child: const Chip(
                               label: Text(
                                 "_______",
@@ -118,7 +123,7 @@ class _HomeState extends ConsumerState<Home>
                       ),
                     ),
                     empty: (_) => const Center(
-                      child: Text("No Category"),
+                      child: Text("ምድብ የለም"),
                     ),
                     error: (_) => Center(
                       child: Text(_.error.messege),
@@ -134,11 +139,15 @@ class _HomeState extends ConsumerState<Home>
                       child: ListView.builder(
                         itemCount: 5,
                         scrollDirection: Axis.horizontal,
-                        itemBuilder: (index, context) => Padding(
+                        itemBuilder: (context, index) => Padding(
                           padding: const EdgeInsets.only(left: 10),
                           child: Shimmer.fromColors(
-                            baseColor: Colors.grey.shade300,
-                            highlightColor: Colors.grey.shade100,
+                            baseColor: Theme.of(context)
+                                .chipTheme
+                                .backgroundColor!
+                                .withAlpha(150),
+                            highlightColor:
+                                Theme.of(context).chipTheme.backgroundColor!,
                             child: const Chip(
                               label: Text(
                                 "_______",
@@ -180,7 +189,7 @@ class _HomeState extends ConsumerState<Home>
                       ),
                     ),
                     empty: (_) => const Center(
-                      child: Text("No Ustaz"),
+                      child: Text("አስተማሪ የለም"),
                     ),
                     error: (_) => Center(
                       child: Text(_.error.messege),
@@ -203,6 +212,7 @@ class _HomeState extends ConsumerState<Home>
                       await categoryNotifier.getCategories();
                       await ustazListNotifier.getUstaz();
                     },
+                    color: primaryColor,
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.only(bottom: 0),
@@ -230,6 +240,8 @@ class _HomeState extends ConsumerState<Home>
                     IconButton(
                       onPressed: () async {
                         await mainNotifier.getCourses(isNew: true);
+                        await categoryNotifier.getCategories();
+                        await ustazListNotifier.getUstaz();
                       },
                       icon: const Icon(Icons.refresh),
                     )

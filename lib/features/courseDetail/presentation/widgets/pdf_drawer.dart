@@ -40,9 +40,9 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
               left: 5,
             ),
             width: double.infinity,
-            decoration: const BoxDecoration(
-              color: whiteColor,
-              boxShadow: [
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 2,

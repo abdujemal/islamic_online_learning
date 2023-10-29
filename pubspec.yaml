@@ -45,9 +45,9 @@ dependencies:
   flutter_riverpod: ^2.4.1
   fluttertoast: ^8.2.2
   freezed_annotation: ^2.4.1
-  # hooks_riverpod: ^2.4.1
   path_provider: ^2.0.15
   permission_handler: ^10.3.0
+  shared_preferences: ^2.2.2
   shimmer: ^3.0.0
   sqflite: ^2.3.0
   telegram_bot_api: ^0.0.3

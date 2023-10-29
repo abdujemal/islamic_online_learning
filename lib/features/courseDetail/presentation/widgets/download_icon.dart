@@ -32,6 +32,7 @@ class _DownloadIconState extends ConsumerState<DownloadIcon> {
             BoxShadow(
               color: Colors.black12,
               spreadRadius: 2,
+              blurRadius: 2,
             ),
           ],
         ),

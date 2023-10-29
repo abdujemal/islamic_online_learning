@@ -156,15 +156,14 @@ class MockMainDataSrc extends _i1.Mock implements _i5.MainDataSrc {
             _i6.Future<List<_i7.CourseModel>>.value(<_i7.CourseModel>[]),
       ) as _i6.Future<List<_i7.CourseModel>>);
   @override
-  _i6.Future<void> saveTheCourse(_i7.CourseModel? courseModel) =>
+  _i6.Future<int> saveTheCourse(_i7.CourseModel? courseModel) =>
       (super.noSuchMethod(
         Invocation.method(
           #saveTheCourse,
           [courseModel],
         ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+        returnValue: _i6.Future<int>.value(0),
+      ) as _i6.Future<int>);
   @override
   _i6.Future<List<String>> getUstazs() => (super.noSuchMethod(
         Invocation.method(
@@ -749,22 +748,22 @@ class MockMainRepo extends _i1.Mock implements _i8.MainRepo {
         )),
       ) as _i6.Future<_i3.Either<_i9.Failure, List<_i7.CourseModel>>>);
   @override
-  _i6.Future<_i3.Either<_i9.Failure, void>> saveCourse(
+  _i6.Future<_i3.Either<_i9.Failure, int>> saveCourse(
           _i7.CourseModel? courseModel) =>
       (super.noSuchMethod(
         Invocation.method(
           #saveCourse,
           [courseModel],
         ),
-        returnValue: _i6.Future<_i3.Either<_i9.Failure, void>>.value(
-            _FakeEither_6<_i9.Failure, void>(
+        returnValue: _i6.Future<_i3.Either<_i9.Failure, int>>.value(
+            _FakeEither_6<_i9.Failure, int>(
           this,
           Invocation.method(
             #saveCourse,
             [courseModel],
           ),
         )),
-      ) as _i6.Future<_i3.Either<_i9.Failure, void>>);
+      ) as _i6.Future<_i3.Either<_i9.Failure, int>>);
   @override
   _i6.Future<_i3.Either<_i9.Failure, void>> deleteCourse(int? id) =>
       (super.noSuchMethod(

@@ -130,9 +130,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
             ),
             height: MediaQuery.of(context).size.height * 0.7,
             width: MediaQuery.of(context).size.width,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(15),
               ),
             ),
@@ -198,11 +198,10 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                   ...List.generate(
                     audios.sublist(0, 2).length,
                     (index) => AudioItem(
-                      audios[index],
-                      "${widget.courseModel.title} ${index + 1}",
-                      widget.courseModel,
-                      false
-                    ),
+                        audios[index],
+                        "${widget.courseModel.title} ${index + 1}",
+                        widget.courseModel,
+                        false),
                   ),
                   if (!widget.courseModel.isStarted && audios.length > 2)
                     Padding(

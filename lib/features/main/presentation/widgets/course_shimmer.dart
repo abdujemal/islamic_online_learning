@@ -14,7 +14,7 @@ class CourseShimmer extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: whiteColor,
+              color: Theme.of(context).cardColor,
             ),
             padding: const EdgeInsets.only(
               top: 18,
@@ -25,8 +25,11 @@ class CourseShimmer extends StatelessWidget {
             child: Row(
               children: [
                 Shimmer.fromColors(
-                  baseColor: Colors.grey.shade300,
-                  highlightColor: Colors.grey.shade100,
+                  baseColor: Theme.of(context)
+                      .chipTheme
+                      .backgroundColor!
+                      .withAlpha(150),
+                  highlightColor: Theme.of(context).chipTheme.backgroundColor!,
                   child: Container(
                     height: 80,
                     width: 80,
@@ -44,13 +47,17 @@ class CourseShimmer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Shimmer.fromColors(
-                        baseColor: Colors.grey.shade300,
-                        highlightColor: Colors.grey.shade100,
+                        baseColor: Theme.of(context)
+                            .chipTheme
+                            .backgroundColor!
+                            .withAlpha(150),
+                        highlightColor:
+                            Theme.of(context).chipTheme.backgroundColor!,
                         child: Container(
                           height: 15,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(15),
-                            color: whiteColor,
+                            color: Theme.of(context).cardColor,
                           ),
                         ),
                       ),
@@ -58,14 +65,18 @@ class CourseShimmer extends StatelessWidget {
                         height: 10,
                       ),
                       Shimmer.fromColors(
-                        baseColor: Colors.grey.shade300,
-                        highlightColor: Colors.grey.shade100,
+                        baseColor: Theme.of(context)
+                            .chipTheme
+                            .backgroundColor!
+                            .withAlpha(150),
+                        highlightColor:
+                            Theme.of(context).chipTheme.backgroundColor!,
                         child: Container(
                           height: 15,
                           width: 60,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(15),
-                            color: whiteColor,
+                            color: Theme.of(context).cardColor,
                           ),
                         ),
                       )
@@ -76,13 +87,16 @@ class CourseShimmer extends StatelessWidget {
                   width: 20,
                 ),
                 Shimmer.fromColors(
-                  baseColor: Colors.grey.shade300,
-                  highlightColor: Colors.grey.shade100,
+                  baseColor: Theme.of(context)
+                      .chipTheme
+                      .backgroundColor!
+                      .withAlpha(150),
+                  highlightColor: Theme.of(context).chipTheme.backgroundColor!,
                   child: Container(
                     height: 40,
                     width: 40,
                     decoration: BoxDecoration(
-                      color: whiteColor,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(40),
                     ),
                   ),

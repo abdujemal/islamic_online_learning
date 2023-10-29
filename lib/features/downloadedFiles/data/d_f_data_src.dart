@@ -13,7 +13,7 @@ class DFDataSrcImpl extends DFDataSrc {
   Future<List<File>> getAudios() async {
     Directory dir = await getApplicationSupportDirectory();
 
-    dir = await dir.rename("${dir.path}/Audio");
+    dir = Directory("${dir.path}/Audio");
 
     List<File> audios = [];
 
@@ -35,7 +35,7 @@ class DFDataSrcImpl extends DFDataSrc {
   Future<List<File>> getPdfs() async {
     Directory dir = await getApplicationSupportDirectory();
 
-    dir = await dir.rename("${dir.path}/PDF");
+    dir = Directory("${dir.path}/PDF");
 
     List<File> pdfs = [];
 
@@ -57,7 +57,7 @@ class DFDataSrcImpl extends DFDataSrc {
   Future<void> deleteAllFiles(String folderName) async {
     Directory dir = await getApplicationSupportDirectory();
 
-    dir = await dir.rename("${dir.path}/$folderName");
+    dir = Directory("${dir.path}/$folderName");
 
     await dir.delete(recursive: true);
   }

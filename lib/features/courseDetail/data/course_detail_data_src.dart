@@ -43,6 +43,18 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
     String botToken = dotenv.env["bot_token"]!;
     final fileUrl =
         'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
+    ref.read(downloadProgressProvider.notifier).update((state) {
+      print(state.length);
+      print(filePath);
+      print("adding...");
+      return [
+        ...state,
+        DownloadProgress(
+          progress: 0,
+          filePath: filePath,
+        ),
+      ];
+    });
     final response = await dio.get(fileUrl);
     final fileData = response.data['result'];
     final fileDownloadUrl =
@@ -53,18 +65,18 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
         double progress = (receivedBytes / totalBytes) * 100;
         if (progress <= 100.0) {
           ref.read(downloadProgressProvider.notifier).update((state) {
-            if (!state.any((e) => e.filePath == filePath)) {
-              print(state.length);
-              print(filePath);
-              print("adding...");
-              return [
-                ...state,
-                DownloadProgress(
-                  progress: progress,
-                  filePath: filePath,
-                ),
-              ];
-            }
+            // if (!state.any((e) => e.filePath == filePath)) {
+            //   print(state.length);
+            //   print(filePath);
+            //   print("adding...");
+            //   return [
+            //     ...state,
+            //     DownloadProgress(
+            //       progress: progress,
+            //       filePath: filePath,
+            //     ),
+            //   ];
+            // }
             // print("updating");
             return state
                 .map(

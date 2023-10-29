@@ -3,6 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/fav_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
@@ -46,6 +47,7 @@ class _FavState extends ConsumerState<Fav>
               onRefresh: () async {
                 await ref.read(favNotifierProvider.notifier).getCourse();
               },
+              color: primaryColor,
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.only(bottom: 0),

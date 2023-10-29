@@ -89,7 +89,7 @@ final checkAudioModelProvider = Provider.family<AudioState, String>((ref, id) {
   if (currentAudio == null) {
     return AudioState.idle;
   }
-  if ("${currentAudio.title} ${currentAudio.ustaz}" == id) {
+  if ("${currentAudio.title},${currentAudio.ustaz}" == id) {
     if (currentAudio.audioState.isPlaused()) {
       return AudioState.paused;
     } else {

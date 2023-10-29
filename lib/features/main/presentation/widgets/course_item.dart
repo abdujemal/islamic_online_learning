@@ -45,7 +45,13 @@ class _CourseItemState extends ConsumerState<CourseItem> {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
-                  color: primaryColor,
+                  color: Theme.of(context).cardColor,
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 5))
+                  ],
                 ),
                 padding: const EdgeInsets.all(6),
                 child: Row(
@@ -74,7 +80,6 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: whiteColor,
                           ),
                         ),
                       ),
@@ -111,7 +116,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                           ? const Icon(
                               Icons.bookmark,
                               size: 30,
-                              color: Colors.amber,
+                              color: primaryColor,
                             )
                           : const Icon(
                               Icons.bookmark_border_outlined,
@@ -133,13 +138,16 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                     left: 2,
                   ),
                   height: 20,
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(5),
                         topRight: Radius.circular(15),
                       ),
-                      color: Colors.amber),
-                  child: Text(widget.courseModel.ustaz),
+                      color: primaryColor),
+                  child: Text(
+                    widget.courseModel.ustaz,
+                    style: const TextStyle(color: whiteColor),
+                  ),
                 ),
               ),
               if (widget.courseModel.category != "")
@@ -153,12 +161,16 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                     ),
                     height: 20,
                     decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(5),
-                          bottomRight: Radius.circular(15),
-                        ),
-                        color: Colors.amber),
-                    child: Text(widget.courseModel.category),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(15),
+                      ),
+                      color: primaryColor,
+                    ),
+                    child: Text(
+                      widget.courseModel.category,
+                      style: const TextStyle(color: whiteColor),
+                    ),
                   ),
                 ),
             ],

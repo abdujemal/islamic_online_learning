@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/constants.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/Audio Feature/audio_model.dart';
@@ -20,10 +21,10 @@ class AudioBottomView extends ConsumerStatefulWidget {
 class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
   bool isLoading = false;
 
-  Future<bool> isDownloaded(String title) {
+  Future<bool> isDownloaded(String title, String ustaz) {
     return ref
         .read(cdNotifierProvider.notifier)
-        .isDownloaded("$title.mp3", "Audio");
+        .isDownloaded("$ustaz,$title.mp3", "Audio");
   }
 
   Future<String> getPath(String folderName, String fileName) async {
@@ -69,6 +70,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                 ),
                 duration != Duration.zero
                     ? Slider(
+                        activeColor: primaryColor,
                         value: position.inMilliseconds /
                                     duration.inMilliseconds <=
                                 1
@@ -105,9 +107,10 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                             return;
                           }
 
-                          if (await isDownloaded("$onlyTitle $beforIndex")) {
-                            final audioPath = await getPath(
-                                'Audio', "$onlyTitle $beforIndex.mp3");
+                          if (await isDownloaded(
+                              "$onlyTitle $beforIndex", currentCourse.ustaz)) {
+                            final audioPath = await getPath('Audio',
+                                "${currentCourse.ustaz},$onlyTitle $beforIndex.mp3");
 
                             ref.read(cdNotifierProvider.notifier).playOffline(
                                   audioPath,
@@ -164,9 +167,10 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                             return;
                           }
 
-                          if (await isDownloaded(currentAudio.title)) {
-                            final audioPath = await getPath(
-                                'Audio', "${currentAudio.title}.mp3");
+                          if (await isDownloaded(
+                              currentAudio.title, currentCourse.ustaz)) {
+                            final audioPath = await getPath('Audio',
+                                "${currentCourse.ustaz},${currentAudio.title}.mp3");
 
                             ref.read(cdNotifierProvider.notifier).playOffline(
                                   audioPath,
@@ -218,9 +222,10 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                             return;
                           }
 
-                          if (await isDownloaded("$onlyTitle $afterIndex")) {
-                            final audioPath = await getPath(
-                                'Audio', "$onlyTitle $afterIndex.mp3");
+                          if (await isDownloaded(
+                              "$onlyTitle $afterIndex", currentCourse.ustaz)) {
+                            final audioPath = await getPath('Audio',
+                                "${currentCourse.ustaz},$onlyTitle $afterIndex.mp3");
 
                             ref.read(cdNotifierProvider.notifier).playOffline(
                                   audioPath,

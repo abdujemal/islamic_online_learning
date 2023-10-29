@@ -91,9 +91,8 @@ class IMainDataSrc extends MainDataSrc {
       }
     }
 
-    // courses.sort((a, b) => b.courseId.compareTo(a.courseId));
+    courses.sort((a, b) => b.courseId.compareTo(a.courseId));
 
-    print(courses.toString());
     return courses;
   }
 

@@ -4,6 +4,7 @@ import 'package:islamic_online_learning/features/main/presentation/state/main_li
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/course_shimmer.dart';
 
+import '../../../../core/constants.dart';
 import '../widgets/course_item.dart';
 import '../widgets/the_end.dart';
 
@@ -70,6 +71,7 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                     mainNotifier.getCourses(
                         isNew: true, key: widget.keey, val: widget.value);
                   },
+                  color: primaryColor,
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.only(bottom: 0),

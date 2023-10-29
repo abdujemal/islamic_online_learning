@@ -25,10 +25,10 @@ class _BottomNavState extends ConsumerState<BottomNav> {
     return Container(
       height: 60,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade300.withAlpha(130),
+            color: Colors.black.withAlpha(20),
             offset: const Offset(0, -6),
             blurRadius: 5,
             spreadRadius: 1,

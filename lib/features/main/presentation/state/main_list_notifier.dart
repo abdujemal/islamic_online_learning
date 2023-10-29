@@ -1,13 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/data/course_model.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_state.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class MainListNotifier extends StateNotifier<MainListState> {
   final MainRepo mainRepo;
+  final Ref ref;
   MainListNotifier(
     this.mainRepo,
+    this.ref,
   ) : super(const MainListState.initial());
 
   List<CourseModel> courses = [];
@@ -93,5 +97,22 @@ class MainListNotifier extends StateNotifier<MainListState> {
       },
     );
     return null;
+  }
+
+  changeTheme(ThemeMode theme) async {
+    final pref = await ref.read(sharedPrefProvider);
+
+    pref.setString("theme", theme == ThemeMode.dark ? 'dark' : 'light');
+
+    getTheme();
+  }
+
+  getTheme() async {
+    final pref = await ref.read(sharedPrefProvider);
+
+    String currentTheme = pref.getString('theme') ?? 'light';
+
+    ref.read(themeProvider.notifier).update(
+        (state) => currentTheme == 'dark' ? ThemeMode.dark : ThemeMode.light);
   }
 }

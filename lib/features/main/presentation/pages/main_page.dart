@@ -38,6 +38,10 @@ class _MainPageState extends ConsumerState<MainPage>
     tabController = TabController(length: 3, vsync: this);
 
     tabController.addListener(_handleTabChange);
+
+    if (mounted) {
+      ref.read(mainNotifierProvider.notifier).getTheme();
+    }
   }
 
   void _handleTabChange() {
@@ -107,12 +111,18 @@ class _MainPageState extends ConsumerState<MainPage>
             },
             icon: const Icon(Icons.download),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.share_rounded,
-            ),
-          )
+          Consumer(builder: (context, ref, _) {
+            final theme = ref.watch(themeProvider);
+            return IconButton(
+              onPressed: () {
+                ref.read(mainNotifierProvider.notifier).changeTheme(
+                    theme == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
+              },
+              icon: Icon(
+                theme == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
+              ),
+            );
+          })
         ],
       ),
       bottomNavigationBar: BottomNav(tabController),
