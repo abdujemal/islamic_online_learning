@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../core/failure.dart';
-import '../../data/course_model.dart';
+import '../../data/model/course_model.dart';
 
 part 'download_list_state.freezed.dart';
 

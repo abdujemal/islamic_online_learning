@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:islamic_online_learning/features/main/data/main_data_src.dart';
 import 'package:mockito/mockito.dart';
 

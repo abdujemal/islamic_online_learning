@@ -34,35 +34,56 @@ class Main extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
       final themeMode = ref.watch(themeProvider);
-      return MaterialApp(
-        color: primaryColor,
-        debugShowCheckedModeBanner: false,
-        themeMode: themeMode,
-        darkTheme: ThemeData.dark().copyWith(
-          chipTheme: ChipThemeData(backgroundColor: Colors.grey.shade700),
+      final fontScale = ref.watch(fontScaleProvider);
+      return MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaleFactor: fontScale,
         ),
-        theme: ThemeData(
-          chipTheme: const ChipThemeData(
-              backgroundColor: Color.fromARGB(255, 207, 207, 207)),
-          primarySwatch: primaryColor,
-          scaffoldBackgroundColor: const Color.fromARGB(255, 240, 240, 240),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: whiteColor,
-            titleTextStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+        child: MaterialApp(
+          color: primaryColor,
+          debugShowCheckedModeBanner: false,
+          themeMode: themeMode,
+          darkTheme: ThemeData.dark().copyWith(
+            chipTheme: ChipThemeData(
+              backgroundColor: Colors.grey.shade700,
             ),
-            actionsIconTheme: IconThemeData(
-              color: primaryColor,
+            dividerColor: Colors.white38,
+            // textTheme: const TextTheme(
+            //   bodyText2: TextStyle(
+            //     fontSize: 15,
+            //   ),
+            // ),
+          ),
+          theme: ThemeData(
+            dividerColor: Colors.black45,
+            // textTheme: const TextTheme(
+            //   bodyText2: TextStyle(
+            //     fontSize: 15,
+            //   ),
+            // ),
+            chipTheme: const ChipThemeData(
+              backgroundColor: Color.fromARGB(255, 207, 207, 207),
             ),
-            elevation: 2,
-            iconTheme: IconThemeData(
-              color: Colors.black,
+            primarySwatch: primaryColor,
+            scaffoldBackgroundColor: const Color.fromARGB(255, 240, 240, 240),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: whiteColor,
+              titleTextStyle: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+              actionsIconTheme: IconThemeData(
+                color: primaryColor,
+              ),
+              elevation: 2,
+              iconTheme: IconThemeData(
+                color: Colors.black,
+              ),
             ),
           ),
+          home: const MainPage(),
         ),
-        home: const MainPage(),
       );
     });
   }

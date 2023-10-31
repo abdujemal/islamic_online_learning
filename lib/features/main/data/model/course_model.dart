@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: annotate_overrides, overridden_fields
 
-import '../domain/course_entity.dart';
+import '../../domain/entity/course_entity.dart';
 
 class CourseModel extends CourseEntity {
   final String courseId;

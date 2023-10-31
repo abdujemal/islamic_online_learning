@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
 import '../../../../core/failure.dart';
 

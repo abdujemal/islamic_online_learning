@@ -6,7 +6,10 @@ class TheEnd extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.only(bottom: 20),
+      padding: EdgeInsets.only(
+        bottom: 20,
+        top: 5,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -16,7 +19,6 @@ class TheEnd extends StatelessWidget {
               thickness: 1,
               indent: 20,
               endIndent: 20,
-              color: Colors.black,
             ),
           ),
           Text("አለቀ"),
@@ -26,7 +28,6 @@ class TheEnd extends StatelessWidget {
               thickness: 1,
               indent: 20,
               endIndent: 20,
-              color: Colors.black,
             ),
           ),
         ],

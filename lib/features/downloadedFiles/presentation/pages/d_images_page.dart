@@ -2,31 +2,31 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/delete_confirmation.dart';
-import 'package:islamic_online_learning/features/downloadedFiles/presentation/stateNotifier/audios_notifier.dart';
+import 'package:islamic_online_learning/features/downloadedFiles/presentation/stateNotifier/images_notifier.dart';
 import 'package:islamic_online_learning/features/downloadedFiles/presentation/stateNotifier/provider.dart';
 
+import '../../../../core/constants.dart';
+import '../../../courseDetail/presentation/widgets/delete_confirmation.dart';
 import '../../../main/presentation/widgets/course_shimmer.dart';
 
-class DAudiosPage extends ConsumerStatefulWidget {
-  const DAudiosPage({super.key});
+class DImagesPage extends ConsumerStatefulWidget {
+  const DImagesPage({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _DAudiosPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _DImagesPageState();
 }
 
-class _DAudiosPageState extends ConsumerState<DAudiosPage> {
-  late AudiosNotifier audiosNotifier;
+class _DImagesPageState extends ConsumerState<DImagesPage> {
+  late ImagesNotifier imageNotifier;
 
   @override
   void initState() {
     super.initState();
 
-    audiosNotifier = ref.read(audiosNotifierProvider.notifier);
+    imageNotifier = ref.read(imagesNotifierProvider.notifier);
 
     Future.delayed(const Duration(seconds: 1)).then((value) {
-      audiosNotifier.getAudios();
+      imageNotifier.getImages();
     });
   }
 
@@ -35,14 +35,9 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
     return fldrs[fldrs.length - 1].split(",").last;
   }
 
-  String getUstaz(String path) {
-    final fldrs = path.split("/");
-    return fldrs[fldrs.length - 1].split(",")[0];
-  }
-
   double getSize(File file) {
     int fileSizeInBytes = file.lengthSync();
-    double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
+    double fileSizeInMB = fileSizeInBytes / 1024;
     return fileSizeInMB;
   }
 
@@ -55,10 +50,10 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
           showDialog(
             context: context,
             builder: (ctx) => DeleteConfirmation(
-              title: "",
+              title: "ሁሉ",
               action: () async {
-                await audiosNotifier.deleteAllFiles();
-                audiosNotifier.getAudios();
+                await imageNotifier.deleteAllFiles();
+                imageNotifier.getImages();
               },
             ),
           );
@@ -70,7 +65,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: ref.watch(audiosNotifierProvider).map(
+        child: ref.watch(imagesNotifierProvider).map(
               initial: (_) => const SizedBox(),
               loading: (_) => ListView.builder(
                 itemCount: 10,
@@ -78,41 +73,31 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
               ),
               loaded: (_) => RefreshIndicator(
                 onRefresh: () async {
-                  await ref.read(audiosNotifierProvider.notifier).getAudios();
+                  await ref.read(imagesNotifierProvider.notifier).getImages();
                 },
                 color: primaryColor,
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 60),
-                  itemCount: _.audios.length,
+                  padding: const EdgeInsets.only(bottom: 0),
+                  itemCount: _.images.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      leading: SizedBox(
-                        height: 60,
+                      leading: Image.file(
+                        _.images[index],
                         width: 60,
-                        child: Column(
-                          children: [
-                            const Icon(
-                              Icons.music_note,
-                              size: 30,
-                            ),
-                            Text(
-                              "${getSize(_.audios[index]).round()} mb",
-                              style: const TextStyle(fontSize: 13),
-                            )
-                          ],
-                        ),
+                        height: 60,
+                        fit: BoxFit.cover,
                       ),
-                      title: Text(getTitle(_.audios[index].path)),
-                      subtitle: Text(getUstaz(_.audios[index].path)),
+                      title: Text(getTitle(_.images[index].path)),
+                      subtitle: Text("${getSize(_.images[index]).round()} kb"),
                       trailing: IconButton(
                         icon: const Icon(
                           Icons.delete,
                           color: Colors.red,
                         ),
                         onPressed: () async {
-                          await _.audios[index].delete();
-                          audiosNotifier.getAudios();
+                          await _.images[index].delete();
+                          imageNotifier.getImages();
                         },
                       ),
                     );
@@ -127,9 +112,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
                     const Text("ምንም የለም"),
                     IconButton(
                       onPressed: () async {
-                        await ref
-                            .read(audiosNotifierProvider.notifier)
-                            .getAudios();
+                        await ref.read(pdfsNotifierProvider.notifier).getPdfs();
                       },
                       icon: const Icon(Icons.refresh),
                     )

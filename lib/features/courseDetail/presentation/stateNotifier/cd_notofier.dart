@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/domain/course_detail_repo.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
 import '../../../../core/Audio Feature/audio_model.dart';
 import '../../../../core/Audio Feature/audio_providers.dart';
@@ -15,16 +16,23 @@ class CDNotifier extends StateNotifier<bool> {
   CDNotifier(this.courseDetailRepo, this.ref) : super(true);
 
   Future<File?> downloadFile(
-      String fileId, String fileName, String folderName) async {
-    toast("Loading...", ToastType.normal);
-    final res =
-        await courseDetailRepo.downloadFile(fileId, fileName, folderName, ref);
+    String fileId,
+    String fileName,
+    String folderName,
+    CancelToken cancelToken,
+  ) async {
+    toast("ትንሽ ይተብቁን...", ToastType.normal);
+    final res = await courseDetailRepo.downloadFile(
+        fileId, fileName, folderName, cancelToken, ref);
 
     File? file;
 
     res.fold(
       (l) {
-        toast(l.messege, ToastType.error);
+        if (!l.messege.contains("[request cancelled]")) {
+          toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
+        }
+        print(l.messege);
       },
       (r) {
         file = r;

@@ -23,7 +23,7 @@ class _DownloadIconState extends ConsumerState<DownloadIcon> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.isLoading ? () {} : widget.onTap,
+      onTap: widget.onTap,
       child: Container(
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
@@ -39,14 +39,25 @@ class _DownloadIconState extends ConsumerState<DownloadIcon> {
         padding: const EdgeInsets.all(1),
         child: widget.isLoading
             ? SizedBox(
-                height: 20,
-                width: 20,
+                height: 23,
+                width: 23,
                 child: Padding(
                   padding: const EdgeInsets.all(2),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    value: widget.progress / 100,
-                    color: Colors.white,
+                  child: Stack(
+                    children: [
+                      const Align(
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.close,
+                          size: 18,
+                        ),
+                      ),
+                      CircularProgressIndicator(
+                        strokeWidth: 2,
+                        value: widget.progress / 100,
+                        color: Colors.white,
+                      ),
+                    ],
                   ),
                 ),
               )

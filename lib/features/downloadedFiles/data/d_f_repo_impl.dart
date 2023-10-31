@@ -42,4 +42,14 @@ class DFRepoImpl extends DFRepo {
       return left(Failure(messege: e.toString()));
     }
   }
+
+  @override
+  FutureEither<List<File>> getImages() async {
+    try {
+      final res = await dfDataSrc.getImages();
+      return right(res);
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
+  }
 }

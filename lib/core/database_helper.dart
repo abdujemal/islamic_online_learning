@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 

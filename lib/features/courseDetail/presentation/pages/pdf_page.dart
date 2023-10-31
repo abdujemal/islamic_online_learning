@@ -4,14 +4,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_bottom_view.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/pdf_drawer.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
-import '../../../main/data/course_model.dart';
+import '../../../main/data/model/course_model.dart';
 
 class PdfPage extends ConsumerStatefulWidget {
   final String path;
@@ -33,23 +35,22 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
   int? pages;
 
+  int? currentPage;
+
   bool? isReady;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final Completer<PDFViewController> _controller =
       Completer<PDFViewController>();
-  @override
-  void initState() {
-    super.initState();
-    print(widget.path);
-  }
 
   @override
   Widget build(BuildContext context) {
     final currentAudio = ref.watch(currentAudioProvider);
     final currentCourse = ref.watch(checkCourseProvider
         .call(widget.courseModel.courseId)); // returns the course if it matches
+
+    final theme = ref.read(themeProvider);
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -70,6 +71,12 @@ class _PdfPageState extends ConsumerState<PdfPage> {
               : const SizedBox(),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Text("ድምጾች"),
+        onPressed: () {
+          _scaffoldKey.currentState!.openDrawer();
+        },
+      ),
       drawer: PdfDrawer(
         audios: widget.courseModel.courseIds.split(","),
         title: widget.courseModel.title,
@@ -80,24 +87,26 @@ class _PdfPageState extends ConsumerState<PdfPage> {
         filePath: widget.path,
         pageSnap: false,
         autoSpacing: false,
+        nightMode: theme == ThemeMode.dark,
         pageFling: false,
-        onRender: (_pages) {
+        onRender: (pgs) {
           setState(() {
-            pages = _pages;
+            pages = pgs;
             isReady = true;
           });
         },
         onError: (error) {
-          print(error.toString());
+          toast(error, ToastType.error);
         },
         onPageError: (page, error) {
-          print('$page: ${error.toString()}');
+          toast('$page: ${error.toString()}', ToastType.error);
         },
         onViewCreated: (PDFViewController pdfViewController) {
           _controller.complete(pdfViewController);
         },
         onPageChanged: (int? page, int? total) {
           if (page != null && total != null) {
+            currentPage = page;
             toast("${page + 1} / ${total + 1}", ToastType.normal);
           }
         },

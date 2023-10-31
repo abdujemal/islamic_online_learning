@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:islamic_online_learning/core/utils.dart';
+import 'package:path_provider/path_provider.dart';
 
 const int numOfDoc = 10;
 
@@ -24,7 +29,6 @@ void toast(String message, ToastType toastType, {bool isLong = false}) {
     msg: message,
     toastLength: isLong ? Toast.LENGTH_SHORT : Toast.LENGTH_SHORT,
     gravity: ToastGravity.BOTTOM,
-    timeInSecForIosWeb: 1,
     backgroundColor: toastType == ToastType.error
         ? Colors.red
         : toastType == ToastType.success
@@ -43,8 +47,31 @@ class FirebaseConst {
   static String courses = "Courses";
   static String ustaz = "Ustaz";
   static String category = "Category";
+  static String faq = "FAQ";
 }
 
 class DatabaseConst {
   static String savedCourses = "SavedCourses";
+}
+
+Future<File?> displayImage(String? imgUrl, String name) async {
+  final directory = await getApplicationSupportDirectory();
+  final filePath = "${directory.path}/Images/$name.jpg";
+  // print(filePath);
+  if (await File(filePath).exists()) {
+    // print("file exsists: ${filePath}");
+    return File(filePath);
+  } else if (imgUrl != null) {
+    try {
+      await Dio().download(imgUrl, filePath);
+
+      // Return the downloaded file
+      return File(filePath);
+    } catch (e) {
+      print(e.toString());
+      return File("");
+    }
+  } else {
+    return null;
+  }
 }

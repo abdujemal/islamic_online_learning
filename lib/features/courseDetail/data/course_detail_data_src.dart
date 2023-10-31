@@ -9,7 +9,12 @@ import 'package:path_provider/path_provider.dart';
 
 abstract class CourseDetailDataSrc {
   Future<File> downloadFile(
-      String fileId, String fileName, String folderName, Ref ref);
+    String fileId,
+    String fileName,
+    String folderName,
+    CancelToken cancelToken,
+    Ref ref,
+  );
   Future<bool> checkIfTheFileIsDownloaded(String fileName, String folderName);
   Future<String> loadFileOnline(String fileId);
   Future<bool> deleteFile(String fileName, String folderName);
@@ -30,10 +35,26 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
 
   @override
   Future<File> downloadFile(
-      String fileId, String fileName, String folderName, Ref ref) async {
+    String fileId,
+    String fileName,
+    String folderName,
+    CancelToken cancelToken,
+    Ref ref,
+  ) async {
     Directory dir = await getApplicationSupportDirectory();
 
     final filePath = "${dir.path}/$folderName/$fileName";
+
+    // if it is clicked again
+    // final isDownloading =
+    //     ref.read(downloadProgressProvider).any((e) => e.filePath == filePath);
+    // CancelToken? cancelToken;
+    // if (isDownloading) {
+    //   return ;
+    // print("problem");
+    // cancelToken = CancelToken();
+    // cancelToken.cancel("በተሳካ ሁኔታ ቆሟል።");
+    // }
 
     if (await File(filePath).exists()) {
       // ref.read(downloadProgressProvider.notifier).update((state) => []);
@@ -52,47 +73,39 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
         DownloadProgress(
           progress: 0,
           filePath: filePath,
+          title: fileName.split(",").last,
         ),
       ];
     });
+
     final response = await dio.get(fileUrl);
     final fileData = response.data['result'];
     final fileDownloadUrl =
         'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
-    await dio.download(fileDownloadUrl, filePath,
-        onReceiveProgress: (receivedBytes, totalBytes) {
-      if (totalBytes != -1) {
-        double progress = (receivedBytes / totalBytes) * 100;
-        if (progress <= 100.0) {
-          ref.read(downloadProgressProvider.notifier).update((state) {
-            // if (!state.any((e) => e.filePath == filePath)) {
-            //   print(state.length);
-            //   print(filePath);
-            //   print("adding...");
-            //   return [
-            //     ...state,
-            //     DownloadProgress(
-            //       progress: progress,
-            //       filePath: filePath,
-            //     ),
-            //   ];
-            // }
-            // print("updating");
-            return state
-                .map(
-                  (DownloadProgress e) => e.filePath == filePath
-                      ? e.copyWith(
-                          progress: progress,
-                          filePath: filePath,
-                        )
-                      : e,
-                )
-                .toList();
-          });
-          // print('Download progress: ${progress.toStringAsFixed(2)}%');
+    await dio.download(
+      fileDownloadUrl,
+      filePath,
+      cancelToken: cancelToken,
+      onReceiveProgress: (receivedBytes, totalBytes) {
+        if (totalBytes != -1) {
+          double progress = (receivedBytes / totalBytes) * 100;
+          if (progress <= 100.0) {
+            ref.read(downloadProgressProvider.notifier).update((state) {
+              return state
+                  .map(
+                    (DownloadProgress e) => e.filePath == filePath
+                        ? e.copyWith(
+                            progress: progress,
+                            filePath: filePath,
+                          )
+                        : e,
+                  )
+                  .toList();
+            });
+          }
         }
-      }
-    });
+      },
+    );
 
     ref
         .read(downloadProgressProvider.notifier)
@@ -129,18 +142,22 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
 class DownloadProgress {
   final double progress;
   final String filePath;
+  final String title;
   DownloadProgress({
     required this.progress,
     required this.filePath,
+    required this.title,
   });
 
   DownloadProgress copyWith({
     double? progress,
     String? filePath,
+    String? title,
   }) {
     return DownloadProgress(
       progress: progress ?? this.progress,
       filePath: filePath ?? this.filePath,
+      title: title ?? this.title,
     );
   }
 }

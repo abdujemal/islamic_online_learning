@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/data/main_data_src.dart';
@@ -16,13 +16,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/main_repo_impl.dart';
 import 'fav_list_notifier.dart';
 
-enum MyTheme {
-  dark,
-  light,
-}
-
 final themeProvider = StateProvider<ThemeMode>((ref) {
-  return ThemeMode.light;
+  return ThemeMode.system;
+});
+
+final fontScaleProvider = StateProvider<double>((ref) {
+  return 1.0;
 });
 
 final sharedPrefProvider = Provider<Future<SharedPreferences>>((ref) {
@@ -33,15 +32,15 @@ final menuIndexProvider = StateProvider<int>((ref) => 0);
 
 final queryProvider = StateProvider<String>((ref) => "");
 
-final firebaseDatabaseProvider =
-    Provider<FirebaseDatabase>((ref) => FirebaseDatabase.instance);
+final firebaseMessagingProvider = Provider<FirebaseMessaging>((ref) {
+  return FirebaseMessaging.instance;
+});
 
 final firebaseFirestoreProvider =
     Provider<FirebaseFirestore>((ref) => FirebaseFirestore.instance);
 
 final mainDataSrcProvider = Provider<MainDataSrc>((ref) {
-  return IMainDataSrc(
-      ref.read(firebaseDatabaseProvider), ref.read(firebaseFirestoreProvider));
+  return IMainDataSrc(ref.read(firebaseFirestoreProvider));
 });
 
 final mainRepoProvider = Provider<MainRepo>((ref) {

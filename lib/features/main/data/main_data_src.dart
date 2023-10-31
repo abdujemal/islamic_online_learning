@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
-import 'course_model.dart';
+import 'model/course_model.dart';
+import 'model/faq_model.dart';
 
 abstract class MainDataSrc {
   Future<List<CourseModel>> getCourses(
@@ -13,6 +13,7 @@ abstract class MainDataSrc {
   );
   Future<List<CourseModel>> getFavoriteCourses();
   Future<List<CourseModel>> getDownloadedCourses();
+  Future<List<FAQModel>> getFAQ();
   Future<int> saveTheCourse(CourseModel courseModel);
   Future<List<String>> getUstazs();
   Future<List<String>> getCategories();
@@ -21,9 +22,8 @@ abstract class MainDataSrc {
 }
 
 class IMainDataSrc extends MainDataSrc {
-  final FirebaseDatabase firebaseDatabase;
   final FirebaseFirestore firebaseFirestore;
-  IMainDataSrc(this.firebaseDatabase, this.firebaseFirestore);
+  IMainDataSrc( this.firebaseFirestore);
 
   DocumentSnapshot? lastCourse;
 
@@ -158,5 +158,15 @@ class IMainDataSrc extends MainDataSrc {
   @override
   Future<void> deleteCourse(int id) async {
     await DatabaseHelper().deleteCourse(id);
+  }
+
+  @override
+  Future<List<FAQModel>> getFAQ() async {
+    final ds = await firebaseFirestore.collection(FirebaseConst.faq).get();
+    List<FAQModel> faq = [];
+    for (var d in ds.docs) {
+      faq.add(FAQModel.fromMap(d));
+    }
+    return faq;
   }
 }

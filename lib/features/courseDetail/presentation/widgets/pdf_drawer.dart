@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 
-import '../../../main/data/course_model.dart';
+import '../../../main/data/model/course_model.dart';
 import 'audio_item.dart';
 
 class PdfDrawer extends ConsumerStatefulWidget {

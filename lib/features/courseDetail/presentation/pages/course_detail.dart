@@ -8,7 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/widgets/list_title.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_item.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/download_all_files.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
@@ -30,6 +31,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   List<String> audios = [];
 
   String? pdfPath;
+
+  bool showAllAudios = false;
 
   @override
   void initState() {
@@ -56,7 +59,13 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
         title: Text(widget.courseModel.title),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => DownloadAllFiles(widget.courseModel),
+              );
+            },
             icon: const Icon(Icons.download),
           ),
         ],
@@ -72,12 +81,37 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
       ),
       body: Stack(
         children: [
-          Image.network(
-            widget.courseModel.image,
-            height: MediaQuery.of(context).size.height * 0.32,
-            width: MediaQuery.of(context).size.width,
-            fit: BoxFit.fill,
-          ),
+          FutureBuilder(
+              future: displayImage(
+                widget.courseModel.image,
+                widget.courseModel.title,
+              ),
+              builder: (context, snap) {
+                return snap.data == null
+                    ? SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.32,
+                        width: MediaQuery.of(context).size.width,
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            color: primaryColor,
+                          ),
+                        ),
+                      )
+                    : snap.data!.path.isEmpty
+                        ? SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.32,
+                            width: MediaQuery.of(context).size.width,
+                            child: const Center(
+                              child: Icon(Icons.error),
+                            ),
+                          )
+                        : Image.file(
+                            snap.data!,
+                            height: MediaQuery.of(context).size.height * 0.32,
+                            width: MediaQuery.of(context).size.width,
+                            fit: BoxFit.fill,
+                          );
+              }),
           Container(
             height: MediaQuery.of(context).size.height * 0.32,
             width: MediaQuery.of(context).size.width,
@@ -131,7 +165,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
             height: MediaQuery.of(context).size.height * 0.7,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(15),
               ),
@@ -143,7 +177,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: ListTitle(
-                      title: "ኪታብን ያቀራው እስተማሪ",
+                      title: "ኪታብን ያቀራው አስተማሪ",
                     ),
                   ),
                   ListTile(
@@ -196,7 +230,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                       ),
                     ),
                   ...List.generate(
-                    audios.sublist(0, 2).length,
+                    showAllAudios ? audios.length : audios.sublist(0, 2).length,
                     (index) => AudioItem(
                         audios[index],
                         "${widget.courseModel.title} ${index + 1}",
@@ -206,7 +240,16 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                   if (!widget.courseModel.isStarted && audios.length > 2)
                     Padding(
                       padding: const EdgeInsets.all(10),
-                      child: Text("በተጨማሪ  ${audios.length - 2} ድምጾች እሉ።"),
+                      child: GestureDetector(
+                        child: Text(showAllAudios
+                            ? "መልሰው"
+                            : "በተጨማሪ  ${audios.length - 2} ድምጾች እሉ።"),
+                        onTap: () {
+                          setState(() {
+                            showAllAudios = !showAllAudios;
+                          });
+                        },
+                      ),
                     ),
                   const SizedBox(
                     height: 20,

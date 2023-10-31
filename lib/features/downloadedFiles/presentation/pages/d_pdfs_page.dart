@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/downloadedFiles/presentation/stateNotifier/pdfs_notifier.dart';
 import 'package:islamic_online_learning/features/downloadedFiles/presentation/stateNotifier/provider.dart';
 
 import '../../../../core/constants.dart';
+import '../../../courseDetail/presentation/widgets/delete_confirmation.dart';
 import '../../../main/presentation/widgets/course_shimmer.dart';
 
 class DPdfsPage extends ConsumerStatefulWidget {
@@ -32,16 +35,33 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
     return fldrs[fldrs.length - 1].split(",").last;
   }
 
+  double getSize(File file) {
+    int fileSizeInBytes = file.lengthSync();
+    double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
+    return fileSizeInMB;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         onPressed: () async {
-          await pdfsNotifier.deleteAllFiles();
-          pdfsNotifier.getPdfs();
+          showDialog(
+            context: context,
+            builder: (ctx) => DeleteConfirmation(
+              title: "ሁሉ",
+              action: () async {
+                await pdfsNotifier.deleteAllFiles();
+                pdfsNotifier.getPdfs();
+              },
+            ),
+          );
         },
-        child: const Icon(Icons.delete),
+        child: const Icon(
+          Icons.delete,
+          color: whiteColor,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -62,8 +82,12 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
                   itemCount: _.pdfs.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      leading: const Icon(Icons.book),
+                      leading: const Icon(
+                        Icons.menu_book_sharp,
+                        size: 30,
+                      ),
                       title: Text(getTitle(_.pdfs[index].path)),
+                      subtitle: Text("${getSize(_.pdfs[index]).round()} mb"),
                       trailing: IconButton(
                         icon: const Icon(
                           Icons.delete,

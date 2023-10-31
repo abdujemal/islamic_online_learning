@@ -1,10 +1,11 @@
-
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/courseDetail/data/course_detail_data_src.dart';
 import 'package:islamic_online_learning/features/courseDetail/domain/course_detail_repo.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../core/failure.dart';
 import '../../../core/typedef.dart';
@@ -28,11 +29,18 @@ class ICourseDetailRepo extends CourseDetailRepo {
 
   @override
   FutureEither<File> downloadFile(
-      String fileId, String fileName, String folderName, Ref ref) async {
+      String fileId, String fileName, String folderName, CancelToken cancelToken, Ref ref) async {
     try {
-      final res = await courseDetailDataSrc.downloadFile(fileId, fileName, folderName, ref);
+      final res = await courseDetailDataSrc.downloadFile(
+          fileId, fileName, folderName, cancelToken, ref);
       return right(res);
     } catch (e) {
+      Directory dir = await getApplicationSupportDirectory();
+
+      final filePath = "${dir.path}/$folderName/$fileName";
+
+      ref.read(downloadProgressProvider.notifier).update(
+          (state) => state.where((e) => e.filePath != filePath).toList());
       return left(Failure(messege: e.toString()));
     }
   }
@@ -46,7 +54,7 @@ class ICourseDetailRepo extends CourseDetailRepo {
       return left(Failure(messege: e.toString()));
     }
   }
-  
+
   @override
   FutureEither<bool> deleteFile(String fileName, String folderName) async {
     try {

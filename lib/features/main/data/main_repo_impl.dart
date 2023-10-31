@@ -1,11 +1,12 @@
 // ignore_for_file: void_checks, avoid_print
 
 import 'package:dartz/dartz.dart';
+import 'package:islamic_online_learning/features/main/data/model/faq_model.dart';
 
 import '../../../core/failure.dart';
 import '../../../core/typedef.dart';
 import '../domain/main_repo.dart';
-import 'course_model.dart';
+import 'model/course_model.dart';
 import 'main_data_src.dart';
 
 class IMainRepo extends MainRepo {
@@ -98,6 +99,16 @@ class IMainRepo extends MainRepo {
     try {
       await mainDataSrc.deleteCourse(id);
       return right("");
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
+  }
+
+  @override
+  FutureEither<List<FAQModel>> getFAQ() async {
+    try {
+      final res = await mainDataSrc.getFAQ();
+      return right(res);
     } catch (e) {
       return left(Failure(messege: e.toString()));
     }

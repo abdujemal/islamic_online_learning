@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_model.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
 final audioProvider = Provider<AudioPlayer>((ref) {
   return AudioPlayer();
@@ -68,28 +68,12 @@ final audioPlayerFinishedSubscriptionProvider =
   });
 });
 
-// final startListenProvider = Provider<>((ref) {
-//  ref.read(audioProvider).onPositionChanged.listen((event) {
-//   ref.controller.state = ref.controller.state!.copyWith(
-//     position: event,
-//   );
-// });
-
-//     return ref.read(audioProvider).onDurationChanged.listen((event) {
-//       ref.controller.state = ref.controller.state!.copyWith(
-//         duration: event,
-//       );
-//     });
-
-//   return ;
-// });
-
 final checkAudioModelProvider = Provider.family<AudioState, String>((ref, id) {
   final currentAudio = ref.watch(currentAudioProvider);
   if (currentAudio == null) {
     return AudioState.idle;
   }
-  if ("${currentAudio.title},${currentAudio.ustaz}" == id) {
+  if ("${currentAudio.ustaz},${currentAudio.title}" == id) {
     if (currentAudio.audioState.isPlaused()) {
       return AudioState.paused;
     } else {

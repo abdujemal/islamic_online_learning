@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/pages/course_detail.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:shimmer/shimmer.dart';
+
+import '../pages/filtered_courses.dart';
 
 class CourseItem extends ConsumerStatefulWidget {
   final CourseModel courseModel;
@@ -48,38 +51,107 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                   color: Theme.of(context).cardColor,
                   boxShadow: const [
                     BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 5))
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 5),
+                    )
                   ],
                 ),
                 padding: const EdgeInsets.all(6),
                 child: Row(
                   children: [
-                    Container(
-                      height: 80,
-                      width: 80,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(widget.courseModel.image),
-                          fit: BoxFit.fill,
+                    FutureBuilder(
+                        future: displayImage(
+                          widget.courseModel.image,
+                          widget.courseModel.title,
                         ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
+                        builder: (context, snap) {
+                          return Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              image: snap.data == null
+                                  ? null
+                                  : snap.data!.path.isNotEmpty
+                                      ? DecorationImage(
+                                          image: FileImage(snap.data!),
+                                          fit: BoxFit.fill,
+                                        )
+                                      : null,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: snap.data == null
+                                ? Shimmer.fromColors(
+                                    baseColor: Theme.of(context)
+                                        .chipTheme
+                                        .backgroundColor!
+                                        .withAlpha(150),
+                                    highlightColor: Theme.of(context)
+                                        .chipTheme
+                                        .backgroundColor!,
+                                    child: Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        color: whiteColor,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                  )
+                                : snap.data!.path.isEmpty
+                                    ? Container(
+                                        height: 80,
+                                        width: 80,
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .chipTheme
+                                              .backgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        child: const Center(
+                                          child: Icon(Icons.error),
+                                        ),
+                                      )
+                                    : null,
+                          );
+                        }),
                     const SizedBox(
                       width: 20,
                     ),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                          top: 10,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 23,
                         ),
-                        child: Text(
-                          widget.courseModel.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CourseDetail(
+                                  courseModel: widget.courseModel,
+                                ),
+                              ),
+                            );
+                          },
+                          onLongPress: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FilteredCourses(
+                                  "title",
+                                  widget.courseModel.title,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            widget.courseModel.title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -137,9 +209,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                     right: 10,
                     left: 2,
                   ),
-                  height: 20,
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
+                  // height: 20,
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(5),
                         topRight: Radius.circular(15),
                       ),
@@ -159,7 +231,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                       right: 10,
                       left: 5,
                     ),
-                    height: 20,
+                    // height: 20,
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(5),

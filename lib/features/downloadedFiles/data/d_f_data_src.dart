@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 abstract class DFDataSrc {
   Future<List<File>> getPdfs();
   Future<List<File>> getAudios();
+  Future<List<File>> getImages();
   Future<void> deleteAllFiles(String folderName);
 }
 
@@ -25,7 +26,31 @@ class DFDataSrcImpl extends DFDataSrc {
           audios.add(File(file.path));
         }
       }
-      return audios;
+
+      return audios.reversed.toList();
+    } else {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<File>> getImages() async {
+    Directory dir = await getApplicationSupportDirectory();
+
+    dir = Directory("${dir.path}/Images");
+
+    List<File> images = [];
+
+    if (await dir.exists()) {
+      final files = dir.listSync();
+
+      for (var file in files) {
+        if (file is File) {
+          images.add(File(file.path));
+        }
+      }
+
+      return images.reversed.toList();
     } else {
       return [];
     }
@@ -47,7 +72,7 @@ class DFDataSrcImpl extends DFDataSrc {
           pdfs.add(File(file.path));
         }
       }
-      return pdfs;
+      return pdfs.reversed.toList();
     } else {
       return [];
     }

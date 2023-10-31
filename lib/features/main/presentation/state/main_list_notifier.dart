@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_state.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
@@ -92,7 +92,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
         toast(l.messege, ToastType.error);
       },
       (r) {
-        toast("በተሳካ ሁኔታ ተመዝግብዋል", ToastType.error);
+        toast("በተሳካ ሁኔታ ተመዝግብዋል", ToastType.success);
         return r;
       },
     );

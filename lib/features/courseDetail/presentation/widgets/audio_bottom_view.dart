@@ -63,7 +63,9 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                       if (isLoading)
                         const SizedBox(
                           width: 130,
-                          child: LinearProgressIndicator(),
+                          child: LinearProgressIndicator(
+                            color: primaryColor,
+                          ),
                         )
                     ],
                   ),

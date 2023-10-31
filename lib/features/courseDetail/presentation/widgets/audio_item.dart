@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_model.dart';
@@ -7,10 +8,11 @@ import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dar
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/download_icon.dart';
-import 'package:islamic_online_learning/features/main/data/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../data/course_detail_data_src.dart';
+import 'delete_confirmation.dart';
 
 class AudioItem extends ConsumerStatefulWidget {
   final String audioId;
@@ -30,6 +32,8 @@ class _AudioItemState extends ConsumerState<AudioItem> {
   bool isDownloading = false;
 
   String? audioPath;
+
+  CancelToken cancelToken = CancelToken();
 
   @override
   void initState() {
@@ -57,11 +61,11 @@ class _AudioItemState extends ConsumerState<AudioItem> {
           .isDownloaded(
               "${widget.courseModel.ustaz},${widget.title}.mp3", "Audio")
           .then((value) {
-        setState(() {
+        if (mounted) {
           setState(() {
             isDownloaded = value;
           });
-        });
+        }
       });
     }
   }
@@ -80,22 +84,37 @@ class _AudioItemState extends ConsumerState<AudioItem> {
     final downLoadProg =
         ref.watch(downloadProgressCheckernProvider.call(audioPath));
 
+    // checkFile();
+
     return Container(
       decoration: BoxDecoration(
-        color: myState.isPlaying() || myState.isPlaused() ? Colors.grey : null,
+        color: myState.isPlaying() || myState.isPlaused()
+            ? Theme.of(context).chipTheme.backgroundColor!
+            : null,
         border: Border(
-          bottom: BorderSide(color: Colors.grey.shade400),
+          bottom: BorderSide(
+            color: Theme.of(context).chipTheme.backgroundColor!,
+          ),
         ),
       ),
       child: ListTile(
         trailing: isDownloaded
             ? IconButton(
                 onPressed: () async {
-                  await ref.read(cdNotifierProvider.notifier).deleteFile(
-                      '${widget.courseModel.ustaz},${widget.title}.mp3',
-                      "Audio");
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (ctx) => DeleteConfirmation(
+                      title: '${widget.title}.mp3',
+                      action: () async {
+                        await ref.read(cdNotifierProvider.notifier).deleteFile(
+                            '${widget.courseModel.ustaz},${widget.title}.mp3',
+                            "Audio");
 
-                  checkFile();
+                        checkFile();
+                      },
+                    ),
+                  );
                 },
                 icon: const Icon(
                   Icons.delete,
@@ -105,6 +124,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
             : null,
         leading: GestureDetector(
           onTap: () async {
+            print(myState.toString());
             if (isLoading) {
               return;
             }
@@ -211,13 +231,20 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                       right: 0,
                       child: DownloadIcon(
                         onTap: () async {
+                          if (isDownloading) {
+                            cancelToken.cancel();
+                            cancelToken = CancelToken();
+                            return;
+                          }
                           isDownloading = true;
                           File? file = await ref
                               .read(cdNotifierProvider.notifier)
                               .downloadFile(
-                                  widget.audioId,
-                                  "${widget.courseModel.ustaz},${widget.title}.mp3",
-                                  'Audio');
+                                widget.audioId,
+                                "${widget.courseModel.ustaz},${widget.title}.mp3",
+                                'Audio',
+                                cancelToken,
+                              );
                           isDownloading = false;
                           if (file != null) {
                             checkFile();
