@@ -50,6 +50,7 @@ class _DownloadIconState extends ConsumerState<DownloadIcon> {
                         child: Icon(
                           Icons.close,
                           size: 18,
+                          color: Colors.white,
                         ),
                       ),
                       CircularProgressIndicator(

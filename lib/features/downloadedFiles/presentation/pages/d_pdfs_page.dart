@@ -44,6 +44,17 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   bottom: PreferredSize(
+      //     preferredSize: Size(
+      //       MediaQuery.of(context).size.width,
+      //       currentAudio != null ? 40 : 0,
+      //     ),
+      //     child: currentAudio != null
+      //         ? CurrentAudioView(currentAudio)
+      //         : const SizedBox(),
+      //   ),
+      // ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         onPressed: () async {

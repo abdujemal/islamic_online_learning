@@ -19,6 +19,8 @@ class MainDrawer extends ConsumerStatefulWidget {
 class _MainDrawerState extends ConsumerState<MainDrawer> {
   bool notification = false;
 
+  bool guide = false;
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +29,13 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
         bool isSubed = pref.getBool("isSubed") ?? false;
         setState(() {
           notification = isSubed;
+        });
+      });
+
+      ref.read(sharedPrefProvider).then((pref) {
+        bool show = pref.getBool("showGuide") ?? true;
+        setState(() {
+          guide = show;
         });
       });
     }
@@ -136,24 +145,23 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                         ),
                       ),
                     ),
-                    child: const ListTile(
-                      leading: Icon(Icons.help),
-                      title: Text("የአፑን አጠቃቅም ለማወቅ"),
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Theme.of(context).chipTheme.backgroundColor!,
-                        ),
+                    child: ListTile(
+                      leading: const Icon(Icons.help),
+                      title: const Text("የአፑን አጠቃቅም አሳየኝ"),
+                      trailing: CupertinoSwitch(
+                        value: guide,
+                        activeColor: primaryColor,
+                        onChanged: (v) async {
+                          setState(() {
+                            guide = v;
+                          });
+                          final pref = await ref.read(sharedPrefProvider);
+                          pref.setBool("showGuide", v);
+                        },
                       ),
                     ),
-                    child: const ListTile(
-                      leading: Icon(Icons.share),
-                      title: Text("አጋራ"),
-                    ),
                   ),
+
                   Container(
                     decoration: BoxDecoration(
                       border: Border(
@@ -206,6 +214,19 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                           }
                         },
                       ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Theme.of(context).chipTheme.backgroundColor!,
+                        ),
+                      ),
+                    ),
+                    child: const ListTile(
+                      leading: Icon(Icons.share),
+                      title: Text("አጋራ"),
                     ),
                   ),
                   Container(

@@ -28,32 +28,15 @@ class PdfItem extends ConsumerStatefulWidget {
 }
 
 class _PdfItemState extends ConsumerState<PdfItem> {
-  // bool isLoading = false;
-  bool isDownloaded = false;
-
   CancelToken cancelToken = CancelToken();
 
-  @override
-  void initState() {
-    super.initState();
-
-    Future.delayed(const Duration(milliseconds: 500)).then((value) {
-      checkFile();
-    });
-  }
-
-  checkFile() {
+  Future<bool> checkFile() async {
     if (mounted) {
-      ref
+      return await ref
           .read(cdNotifierProvider.notifier)
-          .isDownloaded("${widget.courseModel.title}.pdf", "PDF")
-          .then((value) {
-        if (mounted) {
-          setState(() {
-            isDownloaded = value;
-          });
-        }
-      });
+          .isDownloaded("${widget.courseModel.title}.pdf", "PDF");
+    } else {
+      return false;
     }
   }
 
@@ -62,76 +45,109 @@ class _PdfItemState extends ConsumerState<PdfItem> {
     final downLoadProg =
         ref.watch(downloadProgressCheckernProvider.call(widget.path));
 
-    // checkFile();
-    print("pdf item");
+    return FutureBuilder(
+        future: checkFile(),
+        builder: (context, snap) {
+          bool isDownloaded = snap.data ?? false;
+          return Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(20),
+                  offset: const Offset(0, 3),
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(3),
+            margin: const EdgeInsets.all(5),
+            child: ListTile(
+              onTap: () async {
+                if (downLoadProg != null) {
+                  return;
+                }
+                ref
+                    .read(cdNotifierProvider.notifier)
+                    .downloadFile(
+                      widget.fileId,
+                      "${widget.courseModel.title}.pdf",
+                      'PDF',
+                      cancelToken,
+                      context,
+                    )
+                    .then((file) async {
+                  if (file != null) {
+                    if (mounted) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PdfPage(
+                            path: file.path,
+                            courseModel: widget.courseModel,
+                          ),
+                        ),
+                      );
+                    }
+                  }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(20),
-            offset: const Offset(0, 3),
-            blurRadius: 5,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(3),
-      margin: const EdgeInsets.all(5),
-      child: ListTile(
-        onTap: () async {
-          if (downLoadProg != null) {
-            cancelToken.cancel();
-            cancelToken = CancelToken();
-            return;
-          }
-          ref
-              .read(cdNotifierProvider.notifier)
-              .downloadFile(
-                widget.fileId,
-                "${widget.courseModel.title}.pdf",
-                'PDF',
-                cancelToken,
-              )
-              .then((file) {
-            if (file != null) {
-              if (mounted) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => PdfPage(
-                      path: file.path,
-                      courseModel: widget.courseModel,
-                    ),
-                  ),
-                );
-              }
-            }
-
-            checkFile();
-          });
-        },
-        leading: const Icon(Icons.menu_book_sharp),
-        title: Text(widget.courseModel.title),
-        subtitle: downLoadProg != null
-            ? LinearProgressIndicator(
-                value: downLoadProg.progress / 100,
-                backgroundColor: Colors.black26,
-                color: primaryColor,
-              )
-            : null,
-        trailing: isDownloaded
-            ? SizedBox(
-                width: 80,
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.download_done,
-                      color: Colors.green,
-                    ),
-                    IconButton(
+                  isDownloaded = await checkFile();
+                  if (mounted) {
+                    setState(() {});
+                  }
+                });
+              },
+              leading: const Icon(Icons.menu_book_sharp),
+              title: Text(widget.courseModel.title),
+              subtitle: downLoadProg != null
+                  ? Row(
+                      children: [
+                        Expanded(
+                          child: LinearProgressIndicator(
+                            value: downLoadProg.progress / 100,
+                            backgroundColor: Colors.black26,
+                            color: primaryColor,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        GestureDetector(
+                          child: const Icon(Icons.close),
+                          onTap: () {
+                            downLoadProg.cancelToken.cancel();
+                            cancelToken = CancelToken();
+                            return;
+                          },
+                        )
+                      ],
+                    )
+                  : isDownloaded
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text(
+                                "ኪታቡን ከፈት",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : null,
+              trailing: isDownloaded && downLoadProg == null
+                  ? IconButton(
                       onPressed: () async {
                         showDialog(
                           context: context,
@@ -143,7 +159,8 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                                   .read(cdNotifierProvider.notifier)
                                   .deleteFile(
                                       '${widget.courseModel.title}.pdf', "PDF");
-                              checkFile();
+                              isDownloaded = await checkFile();
+                              setState(() {});
                             },
                           ),
                         );
@@ -153,10 +170,9 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                         color: Colors.red,
                       ),
                     )
-                  ],
-                ))
-            : const Icon(Icons.download),
-      ),
-    );
+                  : const Icon(Icons.download),
+            ),
+          );
+        });
   }
 }

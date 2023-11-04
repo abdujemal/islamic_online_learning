@@ -28,8 +28,8 @@ class ICourseDetailRepo extends CourseDetailRepo {
   }
 
   @override
-  FutureEither<File> downloadFile(
-      String fileId, String fileName, String folderName, CancelToken cancelToken, Ref ref) async {
+  FutureEither<File> downloadFile(String fileId, String fileName,
+      String folderName, CancelToken cancelToken, Ref ref) async {
     try {
       final res = await courseDetailDataSrc.downloadFile(
           fileId, fileName, folderName, cancelToken, ref);
@@ -41,6 +41,12 @@ class ICourseDetailRepo extends CourseDetailRepo {
 
       ref.read(downloadProgressProvider.notifier).update(
           (state) => state.where((e) => e.filePath != filePath).toList());
+
+      if (e is DioException && e.error is FileSystemException) {
+        // Handle out of storage error
+        return left(const Failure(messege: "out of storage"));
+      }
+
       return left(Failure(messege: e.toString()));
     }
   }

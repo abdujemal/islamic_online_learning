@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +20,8 @@ class DownloadAllFiles extends ConsumerStatefulWidget {
 
 class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
   bool breakIt = false;
+  CancelToken cancelToken = CancelToken();
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +34,8 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
     print("started");
     CDNotifier cdNotifier = ref.read(cdNotifierProvider.notifier);
     // downloading the pdf
+    cancelToken = CancelToken();
+
     if (widget.courseModel.pdfId.trim().isNotEmpty) {
       final bool isPdfDownloaded = await cdNotifier.isDownloaded(
         "${widget.courseModel.title}.pdf",
@@ -40,7 +46,8 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
           widget.courseModel.pdfId,
           "${widget.courseModel.title}.pdf",
           "PDF",
-          CancelToken(),
+          cancelToken,
+          context,
         );
       }
     }
@@ -49,6 +56,7 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
 
     int i = 0;
     for (String audioId in audioIds) {
+      cancelToken = CancelToken();
       if (breakIt) {
         break;
       }
@@ -63,7 +71,8 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
           audioId,
           '${widget.courseModel.ustaz},${widget.courseModel.title} $i.mp3',
           "Audio",
-          CancelToken(),
+          cancelToken,
+          context,
         );
       }
       if (mounted && i == audioIds.length) {
@@ -111,6 +120,7 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
                 child: TextButton(
                   onPressed: () {
                     breakIt = true;
+                    cancelToken.cancel();
                     Navigator.pop(context);
                   },
                   child: const Text("አጥፋው"),

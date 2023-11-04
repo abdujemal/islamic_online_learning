@@ -2,11 +2,15 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:islamic_online_learning/core/utils.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-const int numOfDoc = 10;
+const int numOfDoc = 6;
+
+const Color cardColor = Color(0xfffcffea);
 
 const primaryColor = MaterialColor(
   0xFF2FA887,
@@ -27,7 +31,7 @@ const primaryColor = MaterialColor(
 void toast(String message, ToastType toastType, {bool isLong = false}) {
   Fluttertoast.showToast(
     msg: message,
-    toastLength: isLong ? Toast.LENGTH_SHORT : Toast.LENGTH_SHORT,
+    toastLength: isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,
     gravity: ToastGravity.BOTTOM,
     backgroundColor: toastType == ToastType.error
         ? Colors.red
@@ -54,16 +58,55 @@ class DatabaseConst {
   static String savedCourses = "SavedCourses";
 }
 
-Future<File?> displayImage(String? imgUrl, String name) async {
+TargetFocus getTutorial({
+  required GlobalKey key,
+  required String identify,
+  required ContentAlign align,
+  required String title,
+  required String subtitle,
+}) {
+  return TargetFocus(
+    identify: identify,
+    keyTarget: key,
+    contents: [
+      TargetContent(
+        align: align,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20.0,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Text(
+                subtitle,
+              ),
+            )
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Future<File?> displayImage(String? id, String name, WidgetRef ref) async {
   final directory = await getApplicationSupportDirectory();
   final filePath = "${directory.path}/Images/$name.jpg";
   // print(filePath);
   if (await File(filePath).exists()) {
     // print("file exsists: ${filePath}");
     return File(filePath);
-  } else if (imgUrl != null) {
+  } else if (id != null) {
     try {
-      await Dio().download(imgUrl, filePath);
+      String url = await ref.read(cdDataSrcProvider).loadFileOnline(id);
+
+      await Dio().download(url, filePath);
 
       // Return the downloaded file
       return File(filePath);

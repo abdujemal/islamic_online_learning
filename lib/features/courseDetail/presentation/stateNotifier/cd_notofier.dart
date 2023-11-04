@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/domain/course_detail_repo.dart';
+import 'package:islamic_online_learning/features/downloadedFiles/presentation/pages/downloaded_files_page.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
 import '../../../../core/Audio Feature/audio_model.dart';
@@ -20,8 +22,9 @@ class CDNotifier extends StateNotifier<bool> {
     String fileName,
     String folderName,
     CancelToken cancelToken,
+    BuildContext context,
   ) async {
-    toast("ትንሽ ይተብቁን...", ToastType.normal);
+    toast("ትንሽ ይጠብቁን...", ToastType.normal);
     final res = await courseDetailRepo.downloadFile(
         fileId, fileName, folderName, cancelToken, ref);
 
@@ -31,8 +34,15 @@ class CDNotifier extends StateNotifier<bool> {
       (l) {
         if (!l.messege.contains("[request cancelled]")) {
           toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
+        } else if (l.messege == "out of storage") {
+          toast("ስልክዎ ስለሞላ የተወሰነ ፋይሎችን ያጥፉ!", ToastType.error);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (ctx) => const DownloadedFilesPage(),
+            ),
+          );
         }
-        print(l.messege);
       },
       (r) {
         file = r;
@@ -83,7 +93,7 @@ class CDNotifier extends StateNotifier<bool> {
 
     res.fold(
       (l) {
-        toast(l.toString(), ToastType.error);
+        toast(l.messege, ToastType.error);
         isDeleted = false;
       },
       (r) {

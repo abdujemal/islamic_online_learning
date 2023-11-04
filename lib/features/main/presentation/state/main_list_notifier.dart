@@ -49,8 +49,10 @@ class MainListNotifier extends StateNotifier<MainListState> {
           );
         } else {
           print(r.length);
-          courses = [...r, ...courses];
-          courses.sort((a, b) => b.courseId.compareTo(a.courseId));
+          courses = [
+            ...courses,
+            ...r,
+          ];
           state = MainListState.loaded(
             courses: courses,
             noMoreToLoad: r.isEmpty,

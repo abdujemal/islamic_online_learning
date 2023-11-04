@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_bottom_view.dart';
@@ -50,7 +49,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
     final currentCourse = ref.watch(checkCourseProvider
         .call(widget.courseModel.courseId)); // returns the course if it matches
 
-    final theme = ref.read(themeProvider);
+    ThemeMode theme = ref.read(themeProvider);
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -64,7 +64,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
         bottom: PreferredSize(
           preferredSize: Size(
             MediaQuery.of(context).size.width,
-            currentAudio != null && currentCourse == null ? 60 : 0,
+            currentAudio != null && currentCourse == null ? 40 : 0,
           ),
           child: currentAudio != null && currentCourse == null
               ? CurrentAudioView(currentAudio)
@@ -72,7 +72,10 @@ class _PdfPageState extends ConsumerState<PdfPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: const Text("ድምጾች"),
+        child: const Text(
+          "ድምጾች",
+          textAlign: TextAlign.center,
+        ),
         onPressed: () {
           _scaffoldKey.currentState!.openDrawer();
         },

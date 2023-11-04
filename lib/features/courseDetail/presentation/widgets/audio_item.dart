@@ -28,7 +28,7 @@ class AudioItem extends ConsumerStatefulWidget {
 
 class _AudioItemState extends ConsumerState<AudioItem> {
   bool isLoading = false;
-  bool isDownloaded = false;
+  // bool isDownloaded = false;
   bool isDownloading = false;
 
   String? audioPath;
@@ -39,14 +39,6 @@ class _AudioItemState extends ConsumerState<AudioItem> {
   void initState() {
     super.initState();
 
-    // Future.delayed(const Duration(milliseconds: 500)).then((value) {
-    //   checkFile();
-    // });
-
-    if (mounted) {
-      checkFile();
-    }
-
     getPath('Audio', "${widget.courseModel.ustaz},${widget.title}.mp3")
         .then((value) {
       audioPath = value;
@@ -54,20 +46,15 @@ class _AudioItemState extends ConsumerState<AudioItem> {
     });
   }
 
-  checkFile() {
+  Future<bool> checkFile() async {
     if (mounted) {
-      ref
+      final isDownloaded = await ref
           .read(cdNotifierProvider.notifier)
           .isDownloaded(
-              "${widget.courseModel.ustaz},${widget.title}.mp3", "Audio")
-          .then((value) {
-        if (mounted) {
-          setState(() {
-            isDownloaded = value;
-          });
-        }
-      });
+              "${widget.courseModel.ustaz},${widget.title}.mp3", "Audio");
+      return isDownloaded;
     }
+    return false;
   }
 
   Future<String> getPath(String folderName, String fileName) async {
@@ -86,191 +73,206 @@ class _AudioItemState extends ConsumerState<AudioItem> {
 
     // checkFile();
 
-    return Container(
-      decoration: BoxDecoration(
-        color: myState.isPlaying() || myState.isPlaused()
-            ? Theme.of(context).chipTheme.backgroundColor!
-            : null,
-        border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).chipTheme.backgroundColor!,
-          ),
-        ),
-      ),
-      child: ListTile(
-        trailing: isDownloaded
-            ? IconButton(
-                onPressed: () async {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (ctx) => DeleteConfirmation(
-                      title: '${widget.title}.mp3',
-                      action: () async {
-                        await ref.read(cdNotifierProvider.notifier).deleteFile(
-                            '${widget.courseModel.ustaz},${widget.title}.mp3',
-                            "Audio");
-
-                        checkFile();
-                      },
-                    ),
-                  );
-                },
-                icon: const Icon(
-                  Icons.delete,
-                  color: Colors.red,
+    return FutureBuilder(
+        future: checkFile(),
+        builder: (context, snap) {
+          bool isDownloaded = snap.data ?? false;
+          return Container(
+            decoration: BoxDecoration(
+              color: myState.isPlaying() || myState.isPlaused()
+                  ? Theme.of(context).chipTheme.backgroundColor!
+                  : null,
+              border: Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).chipTheme.backgroundColor!,
                 ),
-              )
-            : null,
-        leading: GestureDetector(
-          onTap: () async {
-            print(myState.toString());
-            if (isLoading) {
-              return;
-            }
-            if (myState.isPlaying()) {
-              ref.read(audioProvider).pause();
-              ref.read(currentAudioProvider.notifier).update(
-                    (state) => state!.copyWith(
-                      audioState: AudioState.paused,
-                    ),
-                  );
-              return;
-            }
-            if (myState.isPlaused()) {
-              ref.read(audioProvider).resume();
-              ref.read(currentAudioProvider.notifier).update(
-                    (state) => state!.copyWith(
-                      audioState: AudioState.playing,
-                    ),
-                  );
-              return;
-            }
-            if (isDownloaded) {
-              if (audioPath != null) {
-                ref.read(cdNotifierProvider.notifier).playOffline(
-                      audioPath!,
-                      widget.title,
-                      widget.courseModel,
-                      widget.audioId,
-                    );
-                return;
-              } else {
-                toast("try again.", ToastType.error);
-                return;
-              }
-            }
-
-            setState(() {
-              isLoading = true;
-            });
-            String? url = await ref
-                .read(cdNotifierProvider.notifier)
-                .loadFileOnline(widget.audioId);
-            if (url != null) {
-              if (mounted) {
-                await ref.read(cdNotifierProvider.notifier).playOnline(
-                      url,
-                      widget.title,
-                      widget.courseModel,
-                      widget.audioId,
-                    );
-              }
-              if (mounted) {
-                setState(() {
-                  isLoading = false;
-                });
-              }
-            } else {
-              print("url is null");
-              if (mounted) {
-                setState(() {
-                  isLoading = false;
-                });
-              }
-            }
-          },
-          child: Stack(
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                  color: primaryColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      spreadRadius: 2,
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
-                width: 45,
-                padding: const EdgeInsets.all(5),
-                margin: const EdgeInsets.all(5),
-                child: isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: whiteColor,
-                        ),
-                      )
-                    : myState.isIdle() || myState.isPlaused()
-                        ? const Icon(
-                            Icons.play_arrow,
-                            size: 35,
-                            color: whiteColor,
-                          )
-                        : const Icon(
-                            Icons.pause,
-                            size: 35,
-                            color: whiteColor,
-                          ),
               ),
-              !isDownloaded || downLoadProg?.filePath == audioPath
-                  ? Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: DownloadIcon(
-                        onTap: () async {
-                          if (isDownloading) {
-                            cancelToken.cancel();
-                            cancelToken = CancelToken();
-                            return;
-                          }
-                          isDownloading = true;
-                          File? file = await ref
-                              .read(cdNotifierProvider.notifier)
-                              .downloadFile(
-                                widget.audioId,
-                                "${widget.courseModel.ustaz},${widget.title}.mp3",
-                                'Audio',
-                                cancelToken,
-                              );
-                          isDownloading = false;
-                          if (file != null) {
-                            checkFile();
-                          }
-                        },
-                        isLoading: isDownloading ||
-                            downLoadProg?.filePath == audioPath &&
-                                downLoadProg != null &&
-                                downLoadProg.progress < 100,
-                        progress:
-                            downLoadProg != null ? downLoadProg.progress : 0,
+            ),
+            child: ListTile(
+              trailing: isDownloaded && downLoadProg?.filePath != audioPath
+                  ? IconButton(
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (ctx) => DeleteConfirmation(
+                            title: '${widget.title}.mp3',
+                            action: () async {
+                              await ref
+                                  .read(cdNotifierProvider.notifier)
+                                  .deleteFile(
+                                      '${widget.courseModel.ustaz},${widget.title}.mp3',
+                                      "Audio");
+
+                              isDownloaded = await checkFile();
+                              if (mounted) {
+                                setState(() {});
+                              }
+                            },
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
                       ),
                     )
-                  : const SizedBox()
-            ],
-          ),
-        ),
-        title: Text(
-          widget.isFromPDF ? widget.title.split(" ").last : widget.title,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          widget.courseModel.ustaz,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    );
+                  : null,
+              leading: GestureDetector(
+                onTap: () async {
+                  print(myState.toString());
+                  if (isLoading) {
+                    return;
+                  }
+                  if (myState.isPlaying()) {
+                    ref.read(audioProvider).pause();
+                    ref.read(currentAudioProvider.notifier).update(
+                          (state) => state!.copyWith(
+                            audioState: AudioState.paused,
+                          ),
+                        );
+                    return;
+                  }
+                  if (myState.isPlaused()) {
+                    ref.read(audioProvider).resume();
+                    ref.read(currentAudioProvider.notifier).update(
+                          (state) => state!.copyWith(
+                            audioState: AudioState.playing,
+                          ),
+                        );
+                    return;
+                  }
+                  if (isDownloaded) {
+                    if (audioPath != null) {
+                      ref.read(cdNotifierProvider.notifier).playOffline(
+                            audioPath!,
+                            widget.title,
+                            widget.courseModel,
+                            widget.audioId,
+                          );
+                      return;
+                    } else {
+                      toast("try again.", ToastType.error);
+                      return;
+                    }
+                  }
+
+                  setState(() {
+                    isLoading = true;
+                  });
+                  String? url = await ref
+                      .read(cdNotifierProvider.notifier)
+                      .loadFileOnline(widget.audioId);
+                  if (url != null) {
+                    if (mounted) {
+                      await ref.read(cdNotifierProvider.notifier).playOnline(
+                            url,
+                            widget.title,
+                            widget.courseModel,
+                            widget.audioId,
+                          );
+                    }
+                    if (mounted) {
+                      setState(() {
+                        isLoading = false;
+                      });
+                    }
+                  } else {
+                    print("url is null");
+                    if (mounted) {
+                      setState(() {
+                        isLoading = false;
+                      });
+                    }
+                  }
+                },
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                        color: primaryColor,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            spreadRadius: 2,
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                      width: 45,
+                      padding: const EdgeInsets.all(5),
+                      margin: const EdgeInsets.all(5),
+                      child: isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: whiteColor,
+                              ),
+                            )
+                          : myState.isIdle() || myState.isPlaused()
+                              ? const Icon(
+                                  Icons.play_arrow,
+                                  size: 35,
+                                  color: whiteColor,
+                                )
+                              : const Icon(
+                                  Icons.pause,
+                                  size: 35,
+                                  color: whiteColor,
+                                ),
+                    ),
+                    !isDownloaded || downLoadProg?.filePath == audioPath
+                        ? Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: DownloadIcon(
+                              onTap: () async {
+                                if (downLoadProg?.filePath == audioPath) {
+                                  downLoadProg!.cancelToken.cancel();
+                                  cancelToken = CancelToken();
+                                  return;
+                                }
+                                isDownloading = true;
+                                File? file = await ref
+                                    .read(cdNotifierProvider.notifier)
+                                    .downloadFile(
+                                      widget.audioId,
+                                      "${widget.courseModel.ustaz},${widget.title}.mp3",
+                                      'Audio',
+                                      cancelToken,
+                                      context,
+                                    );
+                                isDownloading = false;
+                                if (file != null) {
+                                  isDownloaded = await checkFile();
+                                  if (mounted) {
+                                    setState(() {});
+                                  }
+                                }
+                              },
+                              isLoading: isDownloading ||
+                                  downLoadProg?.filePath == audioPath &&
+                                      downLoadProg != null &&
+                                      downLoadProg.progress < 100,
+                              progress: downLoadProg != null
+                                  ? downLoadProg.progress
+                                  : 0,
+                            ),
+                          )
+                        : const SizedBox()
+                  ],
+                ),
+              ),
+              title: Text(
+                widget.isFromPDF ? widget.title.split(" ").last : widget.title,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                widget.courseModel.ustaz,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          );
+        });
   }
 }

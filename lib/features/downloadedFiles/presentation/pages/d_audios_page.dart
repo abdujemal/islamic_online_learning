@@ -49,13 +49,24 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   bottom: PreferredSize(
+      //     preferredSize: Size(
+      //       MediaQuery.of(context).size.width,
+      //       currentAudio != null ? 40 : 0,
+      //     ),
+      //     child: currentAudio != null
+      //         ? CurrentAudioView(currentAudio)
+      //         : const SizedBox(),
+      //   ),
+      // ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         onPressed: () async {
           showDialog(
             context: context,
             builder: (ctx) => DeleteConfirmation(
-              title: "",
+              title: "ሁሉ",
               action: () async {
                 await audiosNotifier.deleteAllFiles();
                 audiosNotifier.getAudios();

@@ -8,11 +8,18 @@ class CourseShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.only(top: 12),
       child: Stack(
         children: [
           Container(
             decoration: BoxDecoration(
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, 5),
+                )
+              ],
               borderRadius: BorderRadius.circular(15),
               color: Theme.of(context).cardColor,
             ),

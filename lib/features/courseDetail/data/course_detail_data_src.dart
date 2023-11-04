@@ -45,17 +45,6 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
 
     final filePath = "${dir.path}/$folderName/$fileName";
 
-    // if it is clicked again
-    // final isDownloading =
-    //     ref.read(downloadProgressProvider).any((e) => e.filePath == filePath);
-    // CancelToken? cancelToken;
-    // if (isDownloading) {
-    //   return ;
-    // print("problem");
-    // cancelToken = CancelToken();
-    // cancelToken.cancel("በተሳካ ሁኔታ ቆሟል።");
-    // }
-
     if (await File(filePath).exists()) {
       // ref.read(downloadProgressProvider.notifier).update((state) => []);
       return File(filePath);
@@ -71,6 +60,7 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
       return [
         ...state,
         DownloadProgress(
+          cancelToken: cancelToken,
           progress: 0,
           filePath: filePath,
           title: fileName.split(",").last,
@@ -143,21 +133,25 @@ class DownloadProgress {
   final double progress;
   final String filePath;
   final String title;
+  final CancelToken cancelToken;
   DownloadProgress({
     required this.progress,
     required this.filePath,
     required this.title,
+    required this.cancelToken,
   });
 
   DownloadProgress copyWith({
     double? progress,
     String? filePath,
     String? title,
+    CancelToken? cancelToken,
   }) {
     return DownloadProgress(
       progress: progress ?? this.progress,
       filePath: filePath ?? this.filePath,
       title: title ?? this.title,
+      cancelToken: cancelToken ?? this.cancelToken,
     );
   }
 }

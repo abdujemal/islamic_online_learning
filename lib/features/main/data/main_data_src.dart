@@ -23,7 +23,7 @@ abstract class MainDataSrc {
 
 class IMainDataSrc extends MainDataSrc {
   final FirebaseFirestore firebaseFirestore;
-  IMainDataSrc( this.firebaseFirestore);
+  IMainDataSrc(this.firebaseFirestore);
 
   DocumentSnapshot? lastCourse;
 
@@ -39,12 +39,12 @@ class IMainDataSrc extends MainDataSrc {
       ds = isNew
           ? await firebaseFirestore
               .collection(FirebaseConst.courses)
-              .orderBy('courseId', descending: true)
+              .orderBy('dateTime', descending: true)
               .limit(numOfDoc)
               .get()
           : await firebaseFirestore
               .collection(FirebaseConst.courses)
-              .orderBy('courseId', descending: true)
+              .orderBy('dateTime', descending: true)
               .startAfterDocument(lastCourse!)
               .limit(numOfDoc)
               .get();
@@ -53,13 +53,13 @@ class IMainDataSrc extends MainDataSrc {
           ? await firebaseFirestore
               .collection(FirebaseConst.courses)
               .where(key, isEqualTo: val)
-              .orderBy('courseId', descending: true)
+              .orderBy('dateTime', descending: true)
               .limit(numOfDoc)
               .get()
           : await firebaseFirestore
               .collection(FirebaseConst.courses)
               .where(key, isEqualTo: val)
-              .orderBy('courseId', descending: true)
+              .orderBy('dateTime', descending: true)
               .startAfterDocument(lastCourse!)
               .limit(numOfDoc)
               .get();
@@ -90,8 +90,6 @@ class IMainDataSrc extends MainDataSrc {
         );
       }
     }
-
-    courses.sort((a, b) => b.courseId.compareTo(a.courseId));
 
     return courses;
   }

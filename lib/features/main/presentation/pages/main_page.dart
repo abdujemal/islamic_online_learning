@@ -1,5 +1,6 @@
 import 'package:animated_search_bar/animated_search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/download.dart';
@@ -8,6 +9,7 @@ import 'package:islamic_online_learning/features/main/presentation/pages/home.da
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_drawer.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
@@ -21,17 +23,24 @@ class MainPage extends ConsumerStatefulWidget {
 
 class _MainPageState extends ConsumerState<MainPage>
     with TickerProviderStateMixin {
-  List<Widget> tabs = [
-    const Home(),
-    const Fav(),
-    const Download(),
-  ];
-
   final TextEditingController _searchController = TextEditingController();
 
   late TabController tabController;
 
   int i = 0;
+
+  final GlobalKey _searchIconKey = GlobalKey();
+  final GlobalKey _ustazsKey = GlobalKey();
+
+  final GlobalKey _menuKey = GlobalKey();
+  // final GlobalKey _courseNameKey = GlobalKey();
+  // final GlobalKey _courseUstaz = GlobalKey();
+  // final GlobalKey _courseCategory = GlobalKey();
+  // final GlobalKey _bookmarkey = GlobalKey();
+
+  bool show = false;
+
+  bool showOnes = true;
 
   @override
   void initState() {
@@ -48,6 +57,73 @@ class _MainPageState extends ConsumerState<MainPage>
               (state) => pref.getDouble("fontScale") ?? 1.0,
             );
       });
+
+      ref.read(sharedPrefProvider).then((pref) {
+        ref.read(showGuideProvider.notifier).update(
+          (state) {
+            show = pref.getBool("showGuide") ?? true;
+            return show;
+          },
+        );
+      });
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (mounted) {
+        final mainState = ref.read(mainNotifierProvider.notifier);
+
+        mainState.addListener((state) {
+          state.mapOrNull(loaded: (_) {
+            if (mounted) {
+              bool isOnCurrentPage = !Navigator.canPop(context);
+              if (isOnCurrentPage) {
+                if (showOnes) {
+                  showTutorial();
+                  showOnes = false;
+                }
+              }
+            }
+          });
+        });
+      }
+    });
+  }
+
+  showTutorial() {
+    List<TargetFocus> targets = [
+      getTutorial(
+        key: _searchIconKey,
+        identify: "SearchButton",
+        align: ContentAlign.bottom,
+        title: "የሰርች ቁልፍ",
+        subtitle: "ይህንን ቁልፍ ነክተው ደርሶችን በስም መፈለግ ይችላሉ።",
+      ),
+      getTutorial(
+        key: _menuKey,
+        identify: "MenuButton",
+        align: ContentAlign.bottom,
+        title: "የማስተካከያዎች ቁልፍ",
+        subtitle: "ይህንን ቁልፍ ነክተው የተለያዩ ማስተከያዎችን ማግኘት ይችላሉ።",
+      ),
+      getTutorial(
+        key: _ustazsKey,
+        identify: "UstazsButton",
+        align: ContentAlign.right,
+        title: "የኡስታዞች ቁልፍ",
+        subtitle: "ይህንን ቁልፍ ነክተው ኡስታዞችን ዝርዝር ማግኘት ይችላሉ።",
+      ),
+    ];
+
+    if (show) {
+      TutorialCoachMark(
+          targets: targets,
+          colorShadow: primaryColor,
+          onSkip: () {
+            ref.read(sharedPrefProvider).then((pref) {
+              pref.setBool("showGuide", false);
+            });
+            return true;
+          }).show(context: context);
     }
   }
 
@@ -79,12 +155,12 @@ class _MainPageState extends ConsumerState<MainPage>
             controller: _searchController,
             labelStyle: const TextStyle(fontSize: 16),
             searchStyle: const TextStyle(color: Colors.black),
-            cursorColor: Colors.black,
-            searchIcon: const Padding(
-              padding: EdgeInsets.only(top: 5.0),
+            cursorColor: const Color.fromRGBO(0, 0, 0, 1),
+            searchIcon: Padding(
+              padding: const EdgeInsets.only(top: 5.0),
               child: Icon(
+                key: _searchIconKey,
                 Icons.search,
-                color: primaryColor,
               ),
             ),
             textInputAction: TextInputAction.search,
@@ -113,18 +189,33 @@ class _MainPageState extends ConsumerState<MainPage>
           bottom: PreferredSize(
             preferredSize: Size(
               MediaQuery.of(context).size.width,
-              currentAudio != null ? 60 : 0,
+              currentAudio != null ? 40 : 0,
             ),
             child: currentAudio != null
                 ? CurrentAudioView(currentAudio)
                 : const SizedBox(),
           ),
+          leading: Builder(builder: (context) {
+            return IconButton(
+              key: _menuKey,
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          }),
         ),
         drawer: const MainDrawer(),
         bottomNavigationBar: BottomNav(tabController),
         body: TabBarView(
           controller: tabController,
-          children: tabs,
+          children: [
+            Home(
+              ustazKey: _ustazsKey,
+            ),
+            const Fav(),
+            const Download(),
+          ],
         ),
       ),
     );

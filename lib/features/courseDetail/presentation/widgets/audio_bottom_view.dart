@@ -43,8 +43,21 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
 
     return currentAudio != null && currentCourse != null
         ? Container(
-            height: 125,
-            color: Colors.black12,
+            height: 130,
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(15),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(20),
+                  offset: const Offset(0, -3),
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -56,9 +69,12 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        currentAudio.title,
-                        style: const TextStyle(fontSize: 16),
+                      Expanded(
+                        child: Text(
+                          currentAudio.title,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 16),
+                        ),
                       ),
                       if (isLoading)
                         const SizedBox(
@@ -66,7 +82,23 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                           child: LinearProgressIndicator(
                             color: primaryColor,
                           ),
-                        )
+                        ),
+                      GestureDetector(
+                        onTap: () {
+                          ref.read(audioProvider).stop();
+                          ref
+                              .read(currentAudioProvider.notifier)
+                              .update((state) => null);
+                          // ref.read(endListnersProvider);
+                          ref
+                              .read(audioPlayerPositionProvider.notifier)
+                              .update((state) => Duration.zero);
+                          ref
+                              .read(audioPlayerDurationProvider.notifier)
+                              .update((state) => Duration.zero);
+                        },
+                        child: const Icon(Icons.close),
+                      )
                     ],
                   ),
                 ),
@@ -140,7 +172,6 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                               isLoading = false;
                             });
                           } else {
-                            print("url is null");
                             setState(() {
                               isLoading = false;
                             });
@@ -200,7 +231,6 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                               isLoading = false;
                             });
                           } else {
-                            print("url is null");
                             setState(() {
                               isLoading = false;
                             });
@@ -257,7 +287,6 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                               isLoading = false;
                             });
                           } else {
-                            print("url is null");
                             setState(() {
                               isLoading = false;
                             });

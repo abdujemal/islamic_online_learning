@@ -1,10 +1,12 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: must_call_super
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islamic_online_learning/features/main/presentation/pages/filtered_courses.dart';
-import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_notifier.dart';
 import 'package:shimmer/shimmer.dart';
+
+import 'package:islamic_online_learning/features/main/presentation/pages/filtered_courses.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/ustazs.dart';
 
 import '../../../../core/constants.dart';
 import '../state/category_list_notifier.dart';
@@ -15,7 +17,11 @@ import '../widgets/course_shimmer.dart';
 import '../widgets/the_end.dart';
 
 class Home extends ConsumerStatefulWidget {
-  const Home({super.key});
+  final GlobalKey ustazKey;
+  const Home({
+    super.key,
+    required this.ustazKey,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _HomeState();
@@ -24,7 +30,6 @@ class Home extends ConsumerStatefulWidget {
 class _HomeState extends ConsumerState<Home>
     with AutomaticKeepAliveClientMixin<Home> {
   late CategoryListNotifier categoryNotifier;
-  late UstazListNotifier ustazListNotifier;
   late MainListNotifier mainNotifier;
 
   ScrollController scrollController = ScrollController();
@@ -35,7 +40,6 @@ class _HomeState extends ConsumerState<Home>
   initState() {
     super.initState();
     categoryNotifier = ref.read(categoryNotifierProvider.notifier);
-    ustazListNotifier = ref.read(ustazNotifierProvider.notifier);
     mainNotifier = ref.read(mainNotifierProvider.notifier);
 
     scrollController.addListener(_scrollListener);
@@ -43,7 +47,6 @@ class _HomeState extends ConsumerState<Home>
     Future.delayed(const Duration(seconds: 1)).then((value) {
       mainNotifier.getCourses(isNew: true);
       categoryNotifier.getCategories();
-      ustazListNotifier.getUstaz();
     });
   }
 
@@ -64,7 +67,6 @@ class _HomeState extends ConsumerState<Home>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // const ListTitle(title: "ምድብ"),
           isSearching
               ? ref.watch(categoryNotifierProvider).map(
                     initial: (_) => const SizedBox(),
@@ -74,54 +76,95 @@ class _HomeState extends ConsumerState<Home>
                         itemCount: 5,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Shimmer.fromColors(
-                            baseColor: Theme.of(context)
-                                .chipTheme
-                                .backgroundColor!
-                                .withAlpha(150),
-                            highlightColor:
-                                Theme.of(context).chipTheme.backgroundColor!,
-                            child: const Chip(
-                              label: Text(
-                                "_______",
-                                style: TextStyle(
-                                  color: Colors.transparent,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    loaded: (_) => SizedBox(
-                      height: 50,
-                      child: ListView.builder(
-                        itemCount: _.categories.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => FilteredCourses(
-                                    "category",
-                                    _.categories[index],
+                          padding: const EdgeInsets.only(left: 4),
+                          child: index == 0
+                              ? GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (ctx) => const Ustazs(),
+                                      ),
+                                    );
+                                  },
+                                  child: Chip(
+                                    key: widget.ustazKey,
+                                    avatar: Image.asset('assets/teacher.png'),
+                                    backgroundColor: primaryColor,
+                                    label: const Text("ኡስታዞች"),
+                                  ),
+                                )
+                              : Shimmer.fromColors(
+                                  baseColor: Theme.of(context)
+                                      .chipTheme
+                                      .backgroundColor!
+                                      .withAlpha(150),
+                                  highlightColor: Theme.of(context)
+                                      .chipTheme
+                                      .backgroundColor!,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if (index == 0) {}
+                                    },
+                                    child: const Chip(
+                                      label: Text(
+                                        "_______",
+                                        style: TextStyle(
+                                          color: Colors.transparent,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              );
-                            },
-                            child: Chip(
-                              label: Text(
-                                _.categories[index],
+                        ),
+                      ),
+                    ),
+                    loaded: (_) {
+                      List<String> categories = ["ኡስታዞች", ..._.categories];
+                      return SizedBox(
+                        height: 50,
+                        child: ListView.builder(
+                          itemCount: categories.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: GestureDetector(
+                              onTap: () {
+                                if (index == 0) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (ctx) => const Ustazs(),
+                                    ),
+                                  );
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FilteredCourses(
+                                        "category",
+                                        categories[index],
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Chip(
+                                key: index == 0 ? widget.ustazKey : null,
+                                avatar: index == 0
+                                    ? Image.asset('assets/teacher.png')
+                                    : null,
+                                backgroundColor:
+                                    index == 0 ? primaryColor : null,
+                                label: Text(
+                                  categories[index],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                     empty: (_) => const Center(
                       child: Text("ምድብ የለም"),
                     ),
@@ -131,71 +174,71 @@ class _HomeState extends ConsumerState<Home>
                   )
               : const SizedBox(),
           // const ListTitle(title: "ኡስታዞች"),
-          isSearching
-              ? ref.watch(ustazNotifierProvider).map(
-                    initial: (_) => const SizedBox(),
-                    loading: (_) => SizedBox(
-                      height: 50,
-                      child: ListView.builder(
-                        itemCount: 5,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Shimmer.fromColors(
-                            baseColor: Theme.of(context)
-                                .chipTheme
-                                .backgroundColor!
-                                .withAlpha(150),
-                            highlightColor:
-                                Theme.of(context).chipTheme.backgroundColor!,
-                            child: const Chip(
-                              label: Text(
-                                "_______",
-                                style: TextStyle(
-                                  color: Colors.transparent,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    loaded: (_) => SizedBox(
-                      height: 50,
-                      child: ListView.builder(
-                        itemCount: _.ustazs.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => FilteredCourses(
-                                    "ustaz",
-                                    _.ustazs[index],
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Chip(
-                              label: Text(
-                                _.ustazs[index],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    empty: (_) => const Center(
-                      child: Text("አስተማሪ የለም"),
-                    ),
-                    error: (_) => Center(
-                      child: Text(_.error.messege),
-                    ),
-                  )
-              : const SizedBox(),
+          // isSearching
+          // ? ref.watch(ustazNotifierProvider).map(
+          //       initial: (_) => const SizedBox(),
+          //       loading: (_) => SizedBox(
+          //         height: 50,
+          //         child: ListView.builder(
+          //           itemCount: 5,
+          //           scrollDirection: Axis.horizontal,
+          //           itemBuilder: (context, index) => Padding(
+          //             padding: const EdgeInsets.only(left: 10),
+          //             child: Shimmer.fromColors(
+          //               baseColor: Theme.of(context)
+          //                   .chipTheme
+          //                   .backgroundColor!
+          //                   .withAlpha(150),
+          //               highlightColor:
+          //                   Theme.of(context).chipTheme.backgroundColor!,
+          //               child: const Chip(
+          //                 label: Text(
+          //                   "_______",
+          //                   style: TextStyle(
+          //                     color: Colors.transparent,
+          //                   ),
+          //                 ),
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //       ),
+          //       loaded: (_) => SizedBox(
+          //         height: 50,
+          //         child: ListView.builder(
+          //           itemCount: _.ustazs.length,
+          //           scrollDirection: Axis.horizontal,
+          //           itemBuilder: (context, index) => Padding(
+          //             padding: const EdgeInsets.only(left: 10),
+          //             child: GestureDetector(
+          //               onTap: () {
+          //                 Navigator.push(
+          //                   context,
+          //                   MaterialPageRoute(
+          //                     builder: (context) => FilteredCourses(
+          //                       "ustaz",
+          //                       _.ustazs[index],
+          //                     ),
+          //                   ),
+          //                 );
+          //               },
+          //               child: Chip(
+          //                 label: Text(
+          //                   _.ustazs[index],
+          //                 ),
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //       ),
+          //       empty: (_) => const Center(
+          //         child: Text("አስተማሪ የለም"),
+          //       ),
+          //       error: (_) => Center(
+          //         child: Text(_.error.messege),
+          //       ),
+          //     )
+          // : const SizedBox(),
           // const ListTitle(title: "ኪታብ ደርሶች"),
           ref.watch(mainNotifierProvider).map(
                 initial: (_) => const SizedBox(),
@@ -210,7 +253,6 @@ class _HomeState extends ConsumerState<Home>
                     onRefresh: () async {
                       await mainNotifier.getCourses(isNew: true);
                       await categoryNotifier.getCategories();
-                      await ustazListNotifier.getUstaz();
                     },
                     color: primaryColor,
                     child: ListView.builder(
@@ -232,20 +274,21 @@ class _HomeState extends ConsumerState<Home>
                     ),
                   ),
                 ),
-                empty: (_) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("ምንም የለም"),
-                    IconButton(
-                      onPressed: () async {
-                        await mainNotifier.getCourses(isNew: true);
-                        await categoryNotifier.getCategories();
-                        await ustazListNotifier.getUstaz();
-                      },
-                      icon: const Icon(Icons.refresh),
-                    )
-                  ],
+                empty: (_) => Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("ምንም የለም"),
+                      IconButton(
+                        onPressed: () async {
+                          await mainNotifier.getCourses(isNew: true);
+                          await categoryNotifier.getCategories();
+                        },
+                        icon: const Icon(Icons.refresh),
+                      )
+                    ],
+                  ),
                 ),
                 error: (_) => Center(
                   child: Text(_.error.messege),

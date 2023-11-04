@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_model.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/pages/course_detail.dart';
 
 class CurrentAudioView extends ConsumerStatefulWidget {
   final AudioModel audioModel;
@@ -18,51 +19,79 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
   Widget build(BuildContext context) {
     final currentAudio = widget.audioModel;
 
-    return Container(
-      color: primaryColor,
-      child: ListTile(
-        onTap: (){
-          // Navigator.push(context, MaterialPageRoute(builder: (_)=>PdfPage(path: path, isLocal: isLocal, courseModel: courseModel)))
-        },
-        title: Text(
-          currentAudio.title,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(currentAudio.ustaz),
-        trailing: IconButton(
-          onPressed: () {
-            ref.read(audioProvider).stop();
-            ref.read(currentAudioProvider.notifier).update((state) => null);
-            // ref.read(endListnersProvider);
-            ref
-                .read(audioPlayerPositionProvider.notifier)
-                .update((state) => Duration.zero);
-            ref
-                .read(audioPlayerDurationProvider.notifier)
-                .update((state) => Duration.zero);
-          },
-          icon: const Icon(Icons.close),
-        ),
-        leading: IconButton(
-          icon: currentAudio.audioState.isPlaused()
-              ? const Icon(Icons.play_arrow)
-              : const Icon(Icons.pause),
-          onPressed: () {
-            ref.read(currentAudioProvider.notifier).update(
-                  (state) => state!.copyWith(
-                    audioState: currentAudio.audioState.isPlaused()
-                        ? AudioState.playing
-                        : AudioState.paused,
-                  ),
-                );
-            if (currentAudio.audioState.isPlaused()) {
-              ref.read(audioProvider).resume();
-            } else {
-              ref.read(audioProvider).pause();
-            }
-          },
-        ),
-      ),
+    final currentCourse = ref.watch(currentCourseProvider);
+
+    return InkWell(
+      onTap: () {
+        if (currentCourse != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (ctx) => CourseDetail(
+                courseModel: currentCourse,
+              ),
+            ),
+          );
+        }
+      },
+      child: Ink(
+          color: primaryColor,
+          child: Row(
+            children: [
+              IconButton(
+                icon: currentAudio.audioState.isPlaused()
+                    ? const Icon(Icons.play_arrow)
+                    : const Icon(Icons.pause),
+                onPressed: () {
+                  ref.read(currentAudioProvider.notifier).update(
+                        (state) => state!.copyWith(
+                          audioState: currentAudio.audioState.isPlaused()
+                              ? AudioState.playing
+                              : AudioState.paused,
+                        ),
+                      );
+                  if (currentAudio.audioState.isPlaused()) {
+                    ref.read(audioProvider).resume();
+                  } else {
+                    ref.read(audioProvider).pause();
+                  }
+                },
+              ),
+              Expanded(
+                child: Text(
+                  currentAudio.title,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  currentAudio.ustaz,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: DefaultTextStyle.of(context)
+                          .style
+                          .color!
+                          .withOpacity(0.7)),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  ref.read(audioProvider).stop();
+                  ref
+                      .read(currentAudioProvider.notifier)
+                      .update((state) => null);
+                  // ref.read(endListnersProvider);
+                  ref
+                      .read(audioPlayerPositionProvider.notifier)
+                      .update((state) => Duration.zero);
+                  ref
+                      .read(audioPlayerDurationProvider.notifier)
+                      .update((state) => Duration.zero);
+                },
+                icon: const Icon(Icons.close),
+              ),
+            ],
+          )),
     );
   }
 }

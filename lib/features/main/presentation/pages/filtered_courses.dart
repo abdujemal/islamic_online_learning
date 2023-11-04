@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/course_shimmer.dart';
 
+import '../../../../core/Audio Feature/current_audio_view.dart';
 import '../../../../core/constants.dart';
 import '../widgets/course_item.dart';
 import '../widgets/the_end.dart';
@@ -49,6 +51,7 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
 
   @override
   Widget build(BuildContext context) {
+    final currentAudio = ref.watch(currentAudioProvider);
     return WillPopScope(
       onWillPop: () async {
         mainNotifier.getCourses(isNew: true);
@@ -57,6 +60,15 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.value),
+          bottom: PreferredSize(
+            preferredSize: Size(
+              MediaQuery.of(context).size.width,
+              currentAudio != null ? 40 : 0,
+            ),
+            child: currentAudio != null
+                ? CurrentAudioView(currentAudio)
+                : const SizedBox(),
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),

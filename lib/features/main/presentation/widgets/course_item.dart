@@ -64,6 +64,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                         future: displayImage(
                           widget.courseModel.image,
                           widget.courseModel.title,
+                          ref,
                         ),
                         builder: (context, snap) {
                           return Container(
@@ -204,21 +205,43 @@ class _CourseItemState extends ConsumerState<CourseItem> {
               Positioned(
                 top: 0,
                 right: 0,
-                child: Container(
-                  padding: const EdgeInsets.only(
-                    right: 10,
-                    left: 2,
-                  ),
-                  // height: 20,
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(5),
-                        topRight: Radius.circular(15),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CourseDetail(
+                          courseModel: widget.courseModel,
+                        ),
                       ),
-                      color: primaryColor),
-                  child: Text(
-                    widget.courseModel.ustaz,
-                    style: const TextStyle(color: whiteColor),
+                    );
+                  },
+                  onLongPress: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FilteredCourses(
+                          "ustaz",
+                          widget.courseModel.ustaz,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                      right: 10,
+                      left: 2,
+                    ),
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(5),
+                          topRight: Radius.circular(15),
+                        ),
+                        color: primaryColor),
+                    child: Text(
+                      widget.courseModel.ustaz,
+                      style: const TextStyle(color: whiteColor),
+                    ),
                   ),
                 ),
               ),
@@ -226,22 +249,45 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                 Positioned(
                   bottom: 0,
                   right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.only(
-                      right: 10,
-                      left: 5,
-                    ),
-                    // height: 20,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(5),
-                        bottomRight: Radius.circular(15),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CourseDetail(
+                            courseModel: widget.courseModel,
+                          ),
+                        ),
+                      );
+                    },
+                    onLongPress: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FilteredCourses(
+                            "category",
+                            widget.courseModel.category,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                        right: 10,
+                        left: 5,
                       ),
-                      color: primaryColor,
-                    ),
-                    child: Text(
-                      widget.courseModel.category,
-                      style: const TextStyle(color: whiteColor),
+                      // height: 20,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(5),
+                          bottomRight: Radius.circular(15),
+                        ),
+                        color: primaryColor,
+                      ),
+                      child: Text(
+                        widget.courseModel.category,
+                        style: const TextStyle(color: whiteColor),
+                      ),
                     ),
                   ),
                 ),

@@ -9,11 +9,13 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/widgets/list_title.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_item.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/download_all_files.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/schedule_veiw.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
+import '../widgets/audio_bottom_view.dart';
 import '../widgets/pdf_item.dart';
 
 class CourseDetail extends ConsumerStatefulWidget {
@@ -41,6 +43,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
     getPath('PDF', "${widget.courseModel.title}.pdf").then((value) {
       pdfPath = value;
+      showAllAudios = widget.courseModel.pdfId.trim().isEmpty ? true : false;
       setState(() {});
     });
   }
@@ -54,6 +57,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   @override
   Widget build(BuildContext context) {
     final currentAudio = ref.watch(currentAudioProvider);
+    final currentCourse = ref.watch(checkCourseProvider
+        .call(widget.courseModel.courseId)); // returns the course if it matches
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.courseModel.title),
@@ -72,19 +78,21 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
         bottom: PreferredSize(
           preferredSize: Size(
             MediaQuery.of(context).size.width,
-            currentAudio != null ? 60 : 0,
+            currentAudio != null && currentCourse == null ? 40 : 0,
           ),
-          child: currentAudio != null
+          child: currentAudio != null && currentCourse == null
               ? CurrentAudioView(currentAudio)
               : const SizedBox(),
         ),
       ),
+      bottomNavigationBar: AudioBottomView(widget.courseModel.courseId),
       body: Stack(
         children: [
           FutureBuilder(
               future: displayImage(
                 widget.courseModel.image,
                 widget.courseModel.title,
+                ref,
               ),
               builder: (context, snap) {
                 return snap.data == null
@@ -123,7 +131,17 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
               padding: EdgeInsets.only(
                   top: MediaQuery.of(context).size.height * 0.16),
               child: InkWell(
-                onTap: () {},
+                onTap: () async {
+//                   final bool status = await FlutterOverlayWindow.isPermissionGranted();
+
+//  /// request overlay permission
+//  /// it will open the overlay settings page and return `true` once the permission granted.
+//  final bool? status1 = await FlutterOverlayWindow.requestPermission();
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => ScheduleView(widget.courseModel),
+                  );
+                },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     vertical: 10,
@@ -177,7 +195,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: ListTitle(
-                      title: "ኪታብን ያቀራው አስተማሪ",
+                      title: "ኪታብን ያቀራው ኡስታዝ",
                     ),
                   ),
                   ListTile(
@@ -237,7 +255,11 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                         widget.courseModel,
                         false),
                   ),
-                  if (!widget.courseModel.isStarted && audios.length > 2)
+                  if (!widget.courseModel.isStarted &&
+                      audios.length > 2 &&
+                      !widget.courseModel.isStarted &&
+                      widget.courseModel.pdfId != "" &&
+                      pdfPath != null)
                     Padding(
                       padding: const EdgeInsets.all(10),
                       child: GestureDetector(
