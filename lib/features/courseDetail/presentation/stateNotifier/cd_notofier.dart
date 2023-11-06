@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +7,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/domain/course_detail_repo.dart';
 import 'package:islamic_online_learning/features/downloadedFiles/presentation/pages/downloaded_files_page.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/Audio Feature/audio_model.dart';
 import '../../../../core/Audio Feature/audio_providers.dart';
@@ -59,7 +59,7 @@ class CDNotifier extends StateNotifier<bool> {
 
     res.fold(
       (l) {
-        toast(l.messege, ToastType.error);
+        toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
       },
       (r) {
         url = r;
@@ -106,8 +106,12 @@ class CDNotifier extends StateNotifier<bool> {
 
   playOffline(String audioPath, String title, CourseModel courseModel,
       String audioId) async {
-    ref.read(startListnersProvider);
-    ref.read(audioProvider).play(DeviceFileSource(audioPath));
+    // ref.read(audioProvider).setFilePath(audioPath);
+    ref
+        .read(audioProvider.notifier)
+        .update((state) => state..setFilePath(audioPath));
+
+    ref.read(audioProvider).play();
 
     ref.read(currentAudioProvider.notifier).update(
           (state) => AudioModel(
@@ -123,8 +127,13 @@ class CDNotifier extends StateNotifier<bool> {
 
   Future<void> playOnline(
       String url, String title, CourseModel courseModel, String audioId) async {
-    ref.read(startListnersProvider);
-    await ref.read(audioProvider).play(UrlSource(url));
+    // ref.read(startListnersProvider);
+    ref.read(audioProvider.notifier).update((state) => state
+      ..setAudioSource(AudioSource.uri(
+        Uri.parse(url),
+      )));
+
+    ref.read(audioProvider).play();
 
     ref.read(currentAudioProvider.notifier).update(
           (state) => AudioModel(

@@ -160,7 +160,7 @@ class _MainPageState extends ConsumerState<MainPage>
               padding: const EdgeInsets.only(top: 5.0),
               child: Icon(
                 key: _searchIconKey,
-                Icons.search,
+                Icons.search_rounded,
               ),
             ),
             textInputAction: TextInputAction.search,
@@ -198,7 +198,7 @@ class _MainPageState extends ConsumerState<MainPage>
           leading: Builder(builder: (context) {
             return IconButton(
               key: _menuKey,
-              icon: const Icon(Icons.menu),
+              icon: const Icon(Icons.menu_rounded),
               onPressed: () {
                 Scaffold.of(context).openDrawer();
               },

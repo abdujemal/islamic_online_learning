@@ -111,7 +111,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                               BorderRadius.circular(15),
                                         ),
                                         child: const Center(
-                                          child: Icon(Icons.error),
+                                          child: Icon(Icons.error_rounded),
                                         ),
                                       )
                                     : null,
@@ -187,7 +187,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                       },
                       child: isFav
                           ? const Icon(
-                              Icons.bookmark,
+                              Icons.bookmark_rounded,
                               size: 30,
                               color: primaryColor,
                             )

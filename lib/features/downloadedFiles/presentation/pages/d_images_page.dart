@@ -70,7 +70,7 @@ class _DImagesPageState extends ConsumerState<DImagesPage> {
           );
         },
         child: const Icon(
-          Icons.delete,
+          Icons.delete_rounded,
           color: whiteColor,
         ),
       ),
@@ -103,7 +103,7 @@ class _DImagesPageState extends ConsumerState<DImagesPage> {
                       subtitle: Text("${getSize(_.images[index]).round()} kb"),
                       trailing: IconButton(
                         icon: const Icon(
-                          Icons.delete,
+                          Icons.delete_rounded,
                           color: Colors.red,
                         ),
                         onPressed: () async {
@@ -125,7 +125,7 @@ class _DImagesPageState extends ConsumerState<DImagesPage> {
                       onPressed: () async {
                         await ref.read(pdfsNotifierProvider.notifier).getPdfs();
                       },
-                      icon: const Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh_rounded),
                     )
                   ],
                 ),

@@ -145,7 +145,7 @@ class _UstazsState extends ConsumerState<Ustazs> {
                     onPressed: () async {
                       await ustazListNotifier.getUstaz();
                     },
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Icons.refresh_rounded),
                   )
                 ],
               ),

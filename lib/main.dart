@@ -52,7 +52,7 @@ class Main extends StatelessWidget {
             chipTheme: const ChipThemeData(
               backgroundColor: Color.fromARGB(255, 207, 207, 207),
             ),
-            dialogTheme: DialogTheme(
+            dialogTheme: const DialogTheme(
               backgroundColor: cardColor,
             ),
             cardColor: cardColor,
@@ -65,9 +65,9 @@ class Main extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
-              actionsIconTheme: IconThemeData(
-                color: primaryColor,
-              ),
+              // actionsIconTheme: IconThemeData(
+              //   color: primaryColor,
+              // ),
               elevation: 2,
               iconTheme: IconThemeData(
                 color: Colors.black,

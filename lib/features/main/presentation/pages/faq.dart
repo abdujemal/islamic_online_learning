@@ -124,7 +124,7 @@ class _FAQState extends ConsumerState<FAQ> {
                     onPressed: () async {
                       await ref.read(faqNotifierProvider.notifier).getFAQs();
                     },
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Icons.refresh_rounded),
                   )
                 ],
               ),

@@ -70,7 +70,7 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
           );
         },
         child: const Icon(
-          Icons.delete,
+          Icons.delete_rounded,
           color: whiteColor,
         ),
       ),
@@ -94,14 +94,14 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
                   itemBuilder: (context, index) {
                     return ListTile(
                       leading: const Icon(
-                        Icons.menu_book_sharp,
+                        Icons.menu_book_rounded,
                         size: 30,
                       ),
                       title: Text(getTitle(_.pdfs[index].path)),
                       subtitle: Text("${getSize(_.pdfs[index]).round()} mb"),
                       trailing: IconButton(
                         icon: const Icon(
-                          Icons.delete,
+                          Icons.delete_rounded,
                           color: Colors.red,
                         ),
                         onPressed: () async {
@@ -123,7 +123,7 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
                       onPressed: () async {
                         await ref.read(pdfsNotifierProvider.notifier).getPdfs();
                       },
-                      icon: const Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh_rounded),
                     )
                   ],
                 ),

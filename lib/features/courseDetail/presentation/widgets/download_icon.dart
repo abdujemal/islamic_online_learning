@@ -48,7 +48,7 @@ class _DownloadIconState extends ConsumerState<DownloadIcon> {
                       const Align(
                         alignment: Alignment.center,
                         child: Icon(
-                          Icons.close,
+                          Icons.close_rounded,
                           size: 18,
                           color: Colors.white,
                         ),
@@ -63,7 +63,7 @@ class _DownloadIconState extends ConsumerState<DownloadIcon> {
                 ),
               )
             : const Icon(
-                Icons.download,
+                Icons.download_rounded,
                 size: 20,
                 color: whiteColor,
               ),

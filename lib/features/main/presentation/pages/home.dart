@@ -173,73 +173,6 @@ class _HomeState extends ConsumerState<Home>
                     ),
                   )
               : const SizedBox(),
-          // const ListTitle(title: "ኡስታዞች"),
-          // isSearching
-          // ? ref.watch(ustazNotifierProvider).map(
-          //       initial: (_) => const SizedBox(),
-          //       loading: (_) => SizedBox(
-          //         height: 50,
-          //         child: ListView.builder(
-          //           itemCount: 5,
-          //           scrollDirection: Axis.horizontal,
-          //           itemBuilder: (context, index) => Padding(
-          //             padding: const EdgeInsets.only(left: 10),
-          //             child: Shimmer.fromColors(
-          //               baseColor: Theme.of(context)
-          //                   .chipTheme
-          //                   .backgroundColor!
-          //                   .withAlpha(150),
-          //               highlightColor:
-          //                   Theme.of(context).chipTheme.backgroundColor!,
-          //               child: const Chip(
-          //                 label: Text(
-          //                   "_______",
-          //                   style: TextStyle(
-          //                     color: Colors.transparent,
-          //                   ),
-          //                 ),
-          //               ),
-          //             ),
-          //           ),
-          //         ),
-          //       ),
-          //       loaded: (_) => SizedBox(
-          //         height: 50,
-          //         child: ListView.builder(
-          //           itemCount: _.ustazs.length,
-          //           scrollDirection: Axis.horizontal,
-          //           itemBuilder: (context, index) => Padding(
-          //             padding: const EdgeInsets.only(left: 10),
-          //             child: GestureDetector(
-          //               onTap: () {
-          //                 Navigator.push(
-          //                   context,
-          //                   MaterialPageRoute(
-          //                     builder: (context) => FilteredCourses(
-          //                       "ustaz",
-          //                       _.ustazs[index],
-          //                     ),
-          //                   ),
-          //                 );
-          //               },
-          //               child: Chip(
-          //                 label: Text(
-          //                   _.ustazs[index],
-          //                 ),
-          //               ),
-          //             ),
-          //           ),
-          //         ),
-          //       ),
-          //       empty: (_) => const Center(
-          //         child: Text("አስተማሪ የለም"),
-          //       ),
-          //       error: (_) => Center(
-          //         child: Text(_.error.messege),
-          //       ),
-          //     )
-          // : const SizedBox(),
-          // const ListTitle(title: "ኪታብ ደርሶች"),
           ref.watch(mainNotifierProvider).map(
                 initial: (_) => const SizedBox(),
                 loading: (_) => Expanded(
@@ -257,7 +190,7 @@ class _HomeState extends ConsumerState<Home>
                     color: primaryColor,
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 0),
+                      padding: const EdgeInsets.only(bottom: 20),
                       controller: scrollController,
                       itemCount: _.courses.length + 1,
                       itemBuilder: (context, index) {
@@ -285,7 +218,7 @@ class _HomeState extends ConsumerState<Home>
                           await mainNotifier.getCourses(isNew: true);
                           await categoryNotifier.getCategories();
                         },
-                        icon: const Icon(Icons.refresh),
+                        icon: const Icon(Icons.refresh_rounded),
                       )
                     ],
                   ),

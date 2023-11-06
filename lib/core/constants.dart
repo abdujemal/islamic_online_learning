@@ -8,7 +8,7 @@ import 'package:islamic_online_learning/features/courseDetail/presentation/state
 import 'package:path_provider/path_provider.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-const int numOfDoc = 6;
+const int numOfDoc = 20;
 
 const Color cardColor = Color(0xfffcffea);
 

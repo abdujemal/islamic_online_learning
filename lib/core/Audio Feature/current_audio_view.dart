@@ -40,8 +40,8 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
             children: [
               IconButton(
                 icon: currentAudio.audioState.isPlaused()
-                    ? const Icon(Icons.play_arrow)
-                    : const Icon(Icons.pause),
+                    ? const Icon(Icons.play_arrow_rounded)
+                    : const Icon(Icons.pause_rounded),
                 onPressed: () {
                   ref.read(currentAudioProvider.notifier).update(
                         (state) => state!.copyWith(
@@ -51,7 +51,7 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                         ),
                       );
                   if (currentAudio.audioState.isPlaused()) {
-                    ref.read(audioProvider).resume();
+                    ref.read(audioProvider).play();
                   } else {
                     ref.read(audioProvider).pause();
                   }
@@ -81,14 +81,14 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                       .read(currentAudioProvider.notifier)
                       .update((state) => null);
                   // ref.read(endListnersProvider);
-                  ref
-                      .read(audioPlayerPositionProvider.notifier)
-                      .update((state) => Duration.zero);
-                  ref
-                      .read(audioPlayerDurationProvider.notifier)
-                      .update((state) => Duration.zero);
+                  // ref
+                  //     .read(audioPlayerPositionProvider.notifier)
+                  //     .update((state) => Duration.zero);
+                  // ref
+                  //     .read(audioPlayerDurationProvider.notifier)
+                  //     .update((state) => Duration.zero);
                 },
-                icon: const Icon(Icons.close),
+                icon: const Icon(Icons.close_rounded),
               ),
             ],
           )),

@@ -62,10 +62,16 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
           Expanded(
             child: ListView.builder(
               itemCount: widget.audios.length,
-              itemBuilder: (context, index) => AudioItem(widget.audios[index],
-                  "${widget.title} ${index + 1}", widget.courseModel, true),
+              itemBuilder: (context, index) => AudioItem(
+                audioId: widget.audios[index],
+                title: widget.courseModel.title,
+                index: index + 1,
+                courseModel: widget.courseModel,
+                isFromPDF: false,
+                onDownloadDone: () {},
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

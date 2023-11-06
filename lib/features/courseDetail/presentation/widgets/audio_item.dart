@@ -1,15 +1,17 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_model.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/download_icon.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../data/course_detail_data_src.dart';
 import 'delete_confirmation.dart';
@@ -17,10 +19,19 @@ import 'delete_confirmation.dart';
 class AudioItem extends ConsumerStatefulWidget {
   final String audioId;
   final String title;
+  final int index;
   final CourseModel courseModel;
   final bool isFromPDF;
-  const AudioItem(this.audioId, this.title, this.courseModel, this.isFromPDF,
-      {super.key});
+  final VoidCallback onDownloadDone;
+  const AudioItem({
+    super.key,
+    required this.audioId,
+    required this.title,
+    required this.index,
+    required this.courseModel,
+    required this.isFromPDF,
+    required this.onDownloadDone,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _AudioItemState();
@@ -38,8 +49,10 @@ class _AudioItemState extends ConsumerState<AudioItem> {
   @override
   void initState() {
     super.initState();
+    // print("${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3");
 
-    getPath('Audio', "${widget.courseModel.ustaz},${widget.title}.mp3")
+    getPath('Audio',
+            "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3")
         .then((value) {
       audioPath = value;
       setState(() {});
@@ -51,7 +64,8 @@ class _AudioItemState extends ConsumerState<AudioItem> {
       final isDownloaded = await ref
           .read(cdNotifierProvider.notifier)
           .isDownloaded(
-              "${widget.courseModel.ustaz},${widget.title}.mp3", "Audio");
+              "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3",
+              "Audio");
       return isDownloaded;
     }
     return false;
@@ -66,7 +80,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
   @override
   Widget build(BuildContext context) {
     AudioState myState = ref.watch(checkAudioModelProvider
-        .call("${widget.courseModel.ustaz},${widget.title}"));
+        .call("${widget.courseModel.ustaz},${widget.title} ${widget.index}"));
 
     final downLoadProg =
         ref.watch(downloadProgressCheckernProvider.call(audioPath));
@@ -96,12 +110,12 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                           context: context,
                           barrierDismissible: false,
                           builder: (ctx) => DeleteConfirmation(
-                            title: '${widget.title}.mp3',
+                            title: '${widget.title} ${widget.index}.mp3',
                             action: () async {
                               await ref
                                   .read(cdNotifierProvider.notifier)
                                   .deleteFile(
-                                      '${widget.courseModel.ustaz},${widget.title}.mp3',
+                                      '${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3',
                                       "Audio");
 
                               isDownloaded = await checkFile();
@@ -113,7 +127,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                         );
                       },
                       icon: const Icon(
-                        Icons.delete,
+                        Icons.delete_rounded,
                         color: Colors.red,
                       ),
                     )
@@ -134,7 +148,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                     return;
                   }
                   if (myState.isPlaused()) {
-                    ref.read(audioProvider).resume();
+                    ref.read(audioProvider).play();
                     ref.read(currentAudioProvider.notifier).update(
                           (state) => state!.copyWith(
                             audioState: AudioState.playing,
@@ -146,7 +160,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                     if (audioPath != null) {
                       ref.read(cdNotifierProvider.notifier).playOffline(
                             audioPath!,
-                            widget.title,
+                            "${widget.title} ${widget.index}",
                             widget.courseModel,
                             widget.audioId,
                           );
@@ -167,7 +181,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                     if (mounted) {
                       await ref.read(cdNotifierProvider.notifier).playOnline(
                             url,
-                            widget.title,
+                            "${widget.title} ${widget.index}",
                             widget.courseModel,
                             widget.audioId,
                           );
@@ -211,12 +225,12 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                             )
                           : myState.isIdle() || myState.isPlaused()
                               ? const Icon(
-                                  Icons.play_arrow,
+                                  Icons.play_arrow_rounded,
                                   size: 35,
                                   color: whiteColor,
                                 )
                               : const Icon(
-                                  Icons.pause,
+                                  Icons.pause_rounded,
                                   size: 35,
                                   color: whiteColor,
                                 ),
@@ -237,7 +251,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                     .read(cdNotifierProvider.notifier)
                                     .downloadFile(
                                       widget.audioId,
-                                      "${widget.courseModel.ustaz},${widget.title}.mp3",
+                                      "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3",
                                       'Audio',
                                       cancelToken,
                                       context,
@@ -263,9 +277,17 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                   ],
                 ),
               ),
-              title: Text(
-                widget.isFromPDF ? widget.title.split(" ").last : widget.title,
-                overflow: TextOverflow.ellipsis,
+              title: Row(
+                children: [
+                  if (!widget.isFromPDF)
+                    Expanded(
+                      child: Text(
+                        widget.title,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  Expanded(child: Text("${widget.index}"))
+                ],
               ),
               subtitle: Text(
                 widget.courseModel.ustaz,

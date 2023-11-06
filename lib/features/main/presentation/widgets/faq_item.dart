@@ -29,7 +29,7 @@ class _FaqItemState extends ConsumerState<FaqItem> {
               SizedBox(
                 width: 20,
               ),
-              Icon(Icons.subdirectory_arrow_right),
+              Icon(Icons.subdirectory_arrow_right_rounded),
               Expanded(child: Text(widget.faqModel.answer)),
             ],
           ),

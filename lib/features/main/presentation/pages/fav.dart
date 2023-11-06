@@ -50,7 +50,7 @@ class _FavState extends ConsumerState<Fav>
               color: primaryColor,
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 0),
+                padding: const EdgeInsets.only(bottom: 20),
                 itemCount: _.courses.length,
                 itemBuilder: (context, index) {
                   return CourseItem(_.courses[index]);
@@ -66,7 +66,7 @@ class _FavState extends ConsumerState<Fav>
                   onPressed: () async {
                     await ref.read(favNotifierProvider.notifier).getCourse();
                   },
-                  icon: const Icon(Icons.refresh),
+                  icon: const Icon(Icons.refresh_rounded),
                 )
               ],
             ),

@@ -7,7 +7,7 @@ class TheEnd extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.only(
-        bottom: 20,
+        bottom: 0,
         top: 5,
       ),
       child: Row(

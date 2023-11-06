@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
@@ -7,7 +8,9 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/Audio Feature/audio_model.dart';
 import '../../../../core/Audio Feature/audio_providers.dart';
+import '../../../../core/Audio Feature/position_data_model.dart';
 import '../stateNotifier/providers.dart';
+import 'package:rxdart/rxdart.dart';
 
 class AudioBottomView extends ConsumerStatefulWidget {
   final String courseId;
@@ -37,13 +40,11 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
   Widget build(BuildContext context) {
     final currentAudio = ref.watch(currentAudioProvider);
     final currentCourse = ref.watch(checkCourseProvider.call(widget.courseId));
-
-    Duration position = ref.watch(audioPlayerPositionProvider);
-    Duration duration = ref.watch(audioPlayerDurationProvider);
+    final audioPlayer = ref.watch(audioProvider);
 
     return currentAudio != null && currentCourse != null
         ? Container(
-            height: 130,
+            height: 140,
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: const BorderRadius.vertical(
@@ -90,40 +91,53 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                               .read(currentAudioProvider.notifier)
                               .update((state) => null);
                           // ref.read(endListnersProvider);
-                          ref
-                              .read(audioPlayerPositionProvider.notifier)
-                              .update((state) => Duration.zero);
-                          ref
-                              .read(audioPlayerDurationProvider.notifier)
-                              .update((state) => Duration.zero);
                         },
-                        child: const Icon(Icons.close),
+                        child: const Icon(Icons.close_rounded),
                       )
                     ],
                   ),
                 ),
-                duration != Duration.zero
-                    ? Slider(
-                        activeColor: primaryColor,
-                        value: position.inMilliseconds /
-                                    duration.inMilliseconds <=
-                                1
-                            ? position.inMilliseconds / duration.inMilliseconds
-                            : 1,
-                        onChanged: (v) {
-                          final position = v * duration.inMilliseconds;
-                          ref
-                              .read(audioProvider)
-                              .seek(Duration(milliseconds: position.round()));
-                        },
-                      )
-                    : const SizedBox(),
+                const SizedBox(
+                  height: 10,
+                ),
+                StreamBuilder(
+                    stream: Rx.combineLatest3<Duration, Duration, Duration?,
+                        PositionData>(
+                      audioPlayer.positionStream,
+                      audioPlayer.bufferedPositionStream,
+                      audioPlayer.durationStream,
+                      (position, bufferedDuration, duration) => PositionData(
+                        position: position,
+                        bufferedDuration: bufferedDuration,
+                        duration: duration ?? Duration.zero,
+                      ),
+                    ),
+                    builder: (context, snap) {
+                      final positionData = snap.data;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: ProgressBar(
+                          barHeight: 8,
+                          baseBarColor:
+                              Theme.of(context).chipTheme.backgroundColor,
+                          thumbRadius: 8,
+                          timeLabelPadding: 5,
+                          progressBarColor: primaryColor,
+                          thumbColor: primaryColor,
+                          progress: positionData?.position ?? Duration.zero,
+                          total: positionData?.duration ?? Duration.zero,
+                          buffered:
+                              positionData?.bufferedDuration ?? Duration.zero,
+                          onSeek: audioPlayer.seek,
+                        ),
+                      );
+                    }),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(position.toString().split('.').first),
+                      const Text(""),
                       IconButton(
                         onPressed: () async {
                           final beforIndex =
@@ -177,12 +191,12 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                             });
                           }
                         },
-                        icon: const Icon(Icons.fast_rewind),
+                        icon: const Icon(Icons.skip_previous_rounded),
                       ),
                       IconButton(
                         icon: currentAudio.audioState.isPlaying()
-                            ? const Icon(Icons.pause)
-                            : const Icon(Icons.play_arrow),
+                            ? const Icon(Icons.pause_rounded)
+                            : const Icon(Icons.play_arrow_rounded),
                         onPressed: () async {
                           ref.read(currentAudioProvider.notifier).update(
                                 (state) => state!.copyWith(
@@ -193,7 +207,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                 ),
                               );
                           if (currentAudio.audioState.isPlaused()) {
-                            ref.read(audioProvider).resume();
+                            ref.read(audioProvider).play();
                             return;
                           } else if (currentAudio.audioState.isPlaying()) {
                             ref.read(audioProvider).pause();
@@ -292,9 +306,9 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                             });
                           }
                         },
-                        icon: const Icon(Icons.fast_forward),
+                        icon: const Icon(Icons.skip_next_rounded),
                       ),
-                      Text(duration.toString().split('.').first),
+                      Text(''.toString().split('.').first),
                     ],
                   ),
                 )

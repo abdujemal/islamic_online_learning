@@ -14,9 +14,9 @@ class BottomNav extends ConsumerStatefulWidget {
 
 class _BottomNavState extends ConsumerState<BottomNav> {
   List<IconData> icons = [
-    Icons.menu_book,
-    Icons.bookmark,
-    Icons.play_circle,
+    Icons.menu_book_rounded,
+    Icons.bookmark_rounded,
+    Icons.play_circle_rounded,
   ];
 
   @override

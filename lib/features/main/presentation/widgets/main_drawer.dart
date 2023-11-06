@@ -97,8 +97,8 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                                   : ThemeMode.dark);
                         },
                         leading: Icon(theme == ThemeMode.dark
-                            ? Icons.light_mode
-                            : Icons.dark_mode),
+                            ? Icons.light_mode_rounded
+                            : Icons.dark_mode_rounded),
                         title: Text(theme == ThemeMode.dark ? "ብርሃን" : "ምሽት"),
                       ),
                     );
@@ -115,7 +115,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                     child: Consumer(builder: (context, ref, _) {
                       final fontScale = ref.watch(fontScaleProvider);
                       return ListTile(
-                        leading: const Icon(Icons.font_download),
+                        leading: const Icon(Icons.font_download_rounded),
                         title: const Text("የጹሁፍ መጠን"),
                         subtitle: Slider(
                           divisions: 3,
@@ -146,7 +146,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       ),
                     ),
                     child: ListTile(
-                      leading: const Icon(Icons.help),
+                      leading: const Icon(Icons.help_rounded),
                       title: const Text("የአፑን አጠቃቅም አሳየኝ"),
                       trailing: CupertinoSwitch(
                         value: guide,
@@ -179,7 +179,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                           ),
                         );
                       },
-                      leading: const Icon(Icons.download),
+                      leading: const Icon(Icons.download_rounded),
                       title: const Text("ዳውንሎድ የተደረጉ ፋይሎች"),
                     ),
                   ),
@@ -192,7 +192,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       ),
                     ),
                     child: ListTile(
-                      leading: const Icon(Icons.notifications),
+                      leading: const Icon(Icons.notifications_rounded),
                       title: const Text("አዲስ ደርስ ሲገባ መልክት ይግባልኝ"),
                       trailing: CupertinoSwitch(
                         activeColor: primaryColor,
@@ -225,7 +225,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       ),
                     ),
                     child: const ListTile(
-                      leading: Icon(Icons.share),
+                      leading: Icon(Icons.share_rounded),
                       title: Text("አጋራ"),
                     ),
                   ),
@@ -246,7 +246,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                           ),
                         );
                       },
-                      leading: const Icon(Icons.help),
+                      leading: const Icon(Icons.help_rounded),
                       title: const Text("ስለ አፑ የተጠየቁ ጥያቄዎች"),
                     ),
                   ),
@@ -267,7 +267,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                           ),
                         );
                       },
-                      leading: const Icon(Icons.info),
+                      leading: const Icon(Icons.info_rounded),
                       title: const Text("ስለ እኛ"),
                     ),
                   ),

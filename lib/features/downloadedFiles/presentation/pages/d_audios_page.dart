@@ -75,7 +75,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
           );
         },
         child: const Icon(
-          Icons.delete,
+          Icons.delete_rounded,
           color: whiteColor,
         ),
       ),
@@ -104,7 +104,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
                         child: Column(
                           children: [
                             const Icon(
-                              Icons.music_note,
+                              Icons.music_note_rounded,
                               size: 30,
                             ),
                             Text(
@@ -118,7 +118,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
                       subtitle: Text(getUstaz(_.audios[index].path)),
                       trailing: IconButton(
                         icon: const Icon(
-                          Icons.delete,
+                          Icons.delete_rounded,
                           color: Colors.red,
                         ),
                         onPressed: () async {
@@ -142,7 +142,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
                             .read(audiosNotifierProvider.notifier)
                             .getAudios();
                       },
-                      icon: const Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh_rounded),
                     )
                   ],
                 ),

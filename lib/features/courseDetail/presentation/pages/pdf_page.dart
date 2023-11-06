@@ -59,7 +59,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
           onPressed: () {
             _scaffoldKey.currentState!.openDrawer();
           },
-          icon: const Icon(Icons.music_note),
+          icon: const Icon(Icons.music_note_rounded),
         ),
         bottom: PreferredSize(
           preferredSize: Size(

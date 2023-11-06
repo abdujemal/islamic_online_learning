@@ -99,7 +99,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                   }
                 });
               },
-              leading: const Icon(Icons.menu_book_sharp),
+              leading: const Icon(Icons.menu_book_rounded),
               title: Text(widget.courseModel.title),
               subtitle: downLoadProg != null
                   ? Row(
@@ -115,7 +115,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                           width: 10,
                         ),
                         GestureDetector(
-                          child: const Icon(Icons.close),
+                          child: const Icon(Icons.close_rounded),
                           onTap: () {
                             downLoadProg.cancelToken.cancel();
                             cancelToken = CancelToken();
@@ -166,11 +166,11 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                         );
                       },
                       icon: const Icon(
-                        Icons.delete,
+                        Icons.delete_rounded,
                         color: Colors.red,
                       ),
                     )
-                  : const Icon(Icons.download),
+                  : const Icon(Icons.download_rounded),
             ),
           );
         });

@@ -86,7 +86,7 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                   color: primaryColor,
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: 0),
+                    padding: const EdgeInsets.only(bottom: 20),
                     controller: scrollController,
                     itemCount: _.courses.length + 1,
                     itemBuilder: (context, index) {

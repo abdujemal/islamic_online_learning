@@ -99,7 +99,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                     focusColor: primaryColor,
                     hintText: "የቂርዓት ሰዓት",
                     suffixIcon: Icon(
-                      Icons.timer,
+                      Icons.timer_rounded,
                       color: primaryColor,
                     ),
                   ),
