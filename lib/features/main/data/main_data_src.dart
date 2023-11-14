@@ -7,12 +7,11 @@ import 'model/faq_model.dart';
 
 abstract class MainDataSrc {
   Future<List<CourseModel>> getCourses(
-    bool isNew,
-    String? key,
-    String? val,
-  );
+      bool isNew, String? key, String? val, SortingMethod method);
   Future<List<CourseModel>> getFavoriteCourses();
-  Future<List<CourseModel>> getDownloadedCourses();
+  Future<List<CourseModel>> getStartedCourses();
+  Future<List<CourseModel>> getSavedCourses();
+  Future<CourseModel?> getSingleCourse(String courseId);
   Future<List<FAQModel>> getFAQ();
   Future<int> saveTheCourse(CourseModel courseModel);
   Future<List<String>> getUstazs();
@@ -32,6 +31,7 @@ class IMainDataSrc extends MainDataSrc {
     bool isNew,
     String? key,
     String? val,
+    SortingMethod method,
   ) async {
     late QuerySnapshot ds;
 
@@ -39,12 +39,18 @@ class IMainDataSrc extends MainDataSrc {
       ds = isNew
           ? await firebaseFirestore
               .collection(FirebaseConst.courses)
-              .orderBy('dateTime', descending: true)
+              .orderBy(
+                method == SortingMethod.dateDSC ? 'dateTime' : "title",
+                descending: method == SortingMethod.dateDSC,
+              )
               .limit(numOfDoc)
               .get()
           : await firebaseFirestore
               .collection(FirebaseConst.courses)
-              .orderBy('dateTime', descending: true)
+              .orderBy(
+                method == SortingMethod.dateDSC ? 'dateTime' : "title",
+                descending: method == SortingMethod.dateDSC,
+              )
               .startAfterDocument(lastCourse!)
               .limit(numOfDoc)
               .get();
@@ -53,13 +59,15 @@ class IMainDataSrc extends MainDataSrc {
           ? await firebaseFirestore
               .collection(FirebaseConst.courses)
               .where(key, isEqualTo: val)
-              .orderBy('dateTime', descending: true)
+              .orderBy(method == SortingMethod.dateDSC ? 'dateTime' : "title",
+                  descending: method == SortingMethod.dateDSC)
               .limit(numOfDoc)
               .get()
           : await firebaseFirestore
               .collection(FirebaseConst.courses)
               .where(key, isEqualTo: val)
-              .orderBy('dateTime', descending: true)
+              .orderBy(method == SortingMethod.dateDSC ? 'dateTime' : "title",
+                  descending: method == SortingMethod.dateDSC)
               .startAfterDocument(lastCourse!)
               .limit(numOfDoc)
               .get();
@@ -69,25 +77,21 @@ class IMainDataSrc extends MainDataSrc {
       lastCourse = ds.docs[ds.docs.length - 1];
     }
 
-    List<CourseModel> favCourses = await getFavoriteCourses();
+    List<CourseModel> savedCourses = await getSavedCourses();
 
     List<CourseModel> courses = [];
     if (ds.docs.isNotEmpty) {
       for (var d in ds.docs) {
-        bool isFav = false;
-        int? id;
-        for (var fav in favCourses) {
-          if (fav.courseId == d.id) {
-            isFav = true;
-            id = fav.id;
+        if (d.data() != null) {
+          final matchings = savedCourses.where((e) => e.courseId == d.id);
+          if (matchings.isNotEmpty) {
+            CourseModel savedCourse = matchings.first;
+            courses.add(CourseModel.fromMap(d.data() as Map, d.id,
+                copyFrom: savedCourse));
+          } else {
+            courses.add(CourseModel.fromMap(d.data() as Map, d.id));
           }
         }
-        courses.add(
-          CourseModel.fromMap(d.data() as Map, d.id).copyWith(
-            isFav: isFav,
-            id: id,
-          ),
-        );
       }
     }
 
@@ -109,12 +113,13 @@ class IMainDataSrc extends MainDataSrc {
         courses.add(CourseModel.fromMap(d.data(), d.id));
       }
     }
+
     return courses;
   }
 
   @override
-  Future<List<CourseModel>> getDownloadedCourses() async {
-    List<CourseModel> res = await DatabaseHelper().getDownloadedCourses();
+  Future<List<CourseModel>> getStartedCourses() async {
+    List<CourseModel> res = await DatabaseHelper().getStartedCourses();
     return res;
   }
 
@@ -167,4 +172,18 @@ class IMainDataSrc extends MainDataSrc {
     }
     return faq;
   }
+
+  @override
+  Future<List<CourseModel>> getSavedCourses() async {
+    List<CourseModel> res = await DatabaseHelper().getSavedCourses();
+    return res;
+  }
+
+  @override
+  Future<CourseModel?> getSingleCourse(String courseId) async {
+    final res = await DatabaseHelper().getSingleCourse(courseId);
+    return res;
+  }
 }
+
+enum SortingMethod { nameDSC, dateDSC }

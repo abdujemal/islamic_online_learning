@@ -16,11 +16,13 @@ class PdfItem extends ConsumerStatefulWidget {
   final String fileId;
   final String path;
   final CourseModel courseModel;
+  final VoidCallback whenPop;
   const PdfItem({
     super.key,
     required this.fileId,
     required this.path,
     required this.courseModel,
+    required this.whenPop,
   });
 
   @override
@@ -81,7 +83,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                     .then((file) async {
                   if (file != null) {
                     if (mounted) {
-                      Navigator.push(
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => PdfPage(
@@ -90,6 +92,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                           ),
                         ),
                       );
+                      widget.whenPop();
                     }
                   }
 
@@ -170,7 +173,11 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                         color: Colors.red,
                       ),
                     )
-                  : const Icon(Icons.download_rounded),
+                  : downLoadProg != null
+                      ? Text(
+                          "${downLoadProg.progress.toStringAsFixed(2)}%",
+                        )
+                      : const Icon(Icons.download_rounded),
             ),
           );
         });

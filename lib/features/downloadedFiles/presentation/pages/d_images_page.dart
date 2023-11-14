@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,11 +34,7 @@ class _DImagesPageState extends ConsumerState<DImagesPage> {
     return fldrs[fldrs.length - 1].split(",").last;
   }
 
-  double getSize(File file) {
-    int fileSizeInBytes = file.lengthSync();
-    double fileSizeInMB = fileSizeInBytes / 1024;
-    return fileSizeInMB;
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +84,7 @@ class _DImagesPageState extends ConsumerState<DImagesPage> {
                 color: primaryColor,
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 0),
+                  padding: const EdgeInsets.only(bottom: 100),
                   itemCount: _.images.length,
                   itemBuilder: (context, index) {
                     return ListTile(
@@ -100,7 +95,7 @@ class _DImagesPageState extends ConsumerState<DImagesPage> {
                         fit: BoxFit.cover,
                       ),
                       title: Text(getTitle(_.images[index].path)),
-                      subtitle: Text("${getSize(_.images[index]).round()} kb"),
+                      subtitle: Text(formatFileSize(_.images[index].lengthSync())),
                       trailing: IconButton(
                         icon: const Icon(
                           Icons.delete_rounded,

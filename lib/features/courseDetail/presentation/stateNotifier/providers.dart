@@ -20,3 +20,7 @@ final cdRepoProvider = Provider<CourseDetailRepo>((ref) {
 final cdNotifierProvider = StateNotifierProvider<CDNotifier, bool>((ref) {
   return CDNotifier(ref.read(cdRepoProvider), ref);
 });
+
+final loadAudiosProvider = StateProvider<int>((ref) {
+  return 0;
+});

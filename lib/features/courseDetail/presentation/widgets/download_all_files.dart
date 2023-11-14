@@ -1,8 +1,10 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/data/course_detail_data_src.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/cd_notofier.dart';
@@ -11,7 +13,12 @@ import 'package:islamic_online_learning/features/main/data/model/course_model.da
 
 class DownloadAllFiles extends ConsumerStatefulWidget {
   final CourseModel courseModel;
-  const DownloadAllFiles(this.courseModel, {super.key});
+  final void Function(String filePath) onSingleDownloadDone;
+  const DownloadAllFiles({
+    super.key,
+    required this.courseModel,
+    required this.onSingleDownloadDone,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -67,13 +74,16 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
       );
       print(isAudioDownloaded);
       if (!isAudioDownloaded) {
-        await cdNotifier.downloadFile(
+        final file = await cdNotifier.downloadFile(
           audioId,
           '${widget.courseModel.ustaz},${widget.courseModel.title} $i.mp3',
           "Audio",
           cancelToken,
           context,
         );
+        if (file != null) {
+          widget.onSingleDownloadDone(file.path);
+        }
       }
       if (mounted && i == audioIds.length) {
         Navigator.pop(context);
@@ -108,9 +118,19 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
                         itemCount: progs.length,
                         itemBuilder: (context, index) => ListTile(
                           title: Text(progs[index].title),
-                          subtitle: LinearProgressIndicator(
-                            value: progs[index].progress / 100,
-                            color: primaryColor,
+                          subtitle: Column(
+                            children: [
+                              LinearProgressIndicator(
+                                value: progs[index].progress / 100,
+                                color: primaryColor,
+                                backgroundColor: Theme.of(context).dividerColor,
+                              ),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                    "${progs[index].progress.toStringAsFixed(2)}% አልቋል"),
+                              )
+                            ],
                           ),
                         ),
                       ),

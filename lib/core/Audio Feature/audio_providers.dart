@@ -1,16 +1,26 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islamic_online_learning/core/Audio%20Feature/audio_model.dart';
-import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
+
+import 'audio_model.dart';
 
 final audioProvider = StateProvider<AudioPlayer>((ref) {
   return AudioPlayer();
 });
 
-final currentAudioProvider = StateProvider<AudioModel?>((ref) {
-  return null;
-});
+Stream<AudioData> myAudioStream(AudioPlayer audioPlayer) =>
+    Rx.combineLatest2<ProcessingState, SequenceState?, AudioData>(
+      audioPlayer.processingStateStream,
+      audioPlayer.sequenceStateStream,
+      (processingState, sequenceState) => AudioData(
+        processingState: processingState,
+        sequenceState: sequenceState,
+      ),
+    );
+
+// final currentAudioProvider = StateProvider<AudioModel?>((ref) {
+//   return null;
+// });
 
 // final startListnersProvider = Provider<bool>((ref) {
 //   ref.read(audioPlayerPositionSubscriptionProvider);
@@ -66,35 +76,54 @@ final currentAudioProvider = StateProvider<AudioModel?>((ref) {
 //   });
 // });
 
-final checkAudioModelProvider = Provider.family<AudioState, String>((ref, id) {
-  final currentAudio = ref.watch(currentAudioProvider);
-  if (currentAudio == null) {
-    return AudioState.idle;
-  }
-  if ("${currentAudio.ustaz},${currentAudio.title}" == id) {
-    if (currentAudio.audioState.isPlaused()) {
-      return AudioState.paused;
-    } else {
-      return AudioState.playing;
-    }
-  } else {
-    return AudioState.idle;
-  }
-});
+// final checkAudioModelProvider = Provider.family<AudioState, String>((ref, id) {
+//   final currentAudio = ref.watch(currentAudioProvider);
+//   final audioPlayer = ref.watch(audioProvider);
 
-final currentCourseProvider = StateProvider<CourseModel?>((ref) {
-  return null;
-});
+  // audioPlayer.sequenceStateStream.listen((event) {
+  //   if (event != null) {
+  //     final mediaItem = event.currentSource!.tag as MediaItem;
 
-final checkCourseProvider =
-    Provider.family<CourseModel?, String>((ref, courseId) {
-  final currentCourse = ref.watch(currentCourseProvider);
+     
+  //     ref.read(currentAudioProvider.notifier).update(
+  //           (state) => AudioModel(
+  //             title: mediaItem.title,
+  //             ustaz: mediaItem.artist ?? "",
+  //             audioState:
+  //                 audioPlayer.playing ? AudioState.playing : AudioState.paused,
+  //             audioId: mediaItem.id,
+  //           ),
+  //         );
+  //   }
+  // });
 
-  if (currentCourse == null) {
-    return null;
-  } else if (currentCourse.courseId == courseId) {
-    return currentCourse;
-  } else {
-    return null;
-  }
-});
+//   if (currentAudio == null) {
+//     return AudioState.idle;
+//   }
+//   if ("${currentAudio.ustaz},${currentAudio.title}" == id) {
+//     if (currentAudio.audioState.isPlaused()) {
+//       return AudioState.paused;
+//     } else {
+//       return AudioState.playing;
+//     }
+//   } else {
+//     return AudioState.idle;
+//   }
+// });
+
+// final currentCourseProvider = StateProvider<CourseModel?>((ref) {
+//   return null;
+// });
+
+// final checkCourseProvider =
+//     Provider.family<CourseModel?, String>((ref, courseId) {
+//   final currentCourse = ref.watch(currentCourseProvider);
+
+//   if (currentCourse == null) {
+//     return null;
+//   } else if (currentCourse.courseId == courseId) {
+//     return currentCourse;
+//   } else {
+//     return null;
+//   }
+// });

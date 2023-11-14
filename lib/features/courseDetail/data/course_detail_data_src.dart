@@ -16,7 +16,7 @@ abstract class CourseDetailDataSrc {
     Ref ref,
   );
   Future<bool> checkIfTheFileIsDownloaded(String fileName, String folderName);
-  Future<String> loadFileOnline(String fileId);
+  Future<String> loadFileOnline(String fileId, bool isAudio);
   Future<bool> deleteFile(String fileName, String folderName);
 }
 
@@ -51,8 +51,7 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
     }
 
     String botToken = dotenv.env["bot_token"]!;
-    final fileUrl =
-        'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
+
     ref.read(downloadProgressProvider.notifier).update((state) {
       print(state.length);
       print(filePath);
@@ -68,10 +67,18 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
       ];
     });
 
-    final response = await dio.get(fileUrl);
-    final fileData = response.data['result'];
-    final fileDownloadUrl =
-        'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
+    String fileDownloadUrl = "";
+    if (folderName == "Audio") {
+      fileDownloadUrl = fileId.replaceAll("botToken", botToken);
+    } else {
+      final fileUrl =
+          'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
+      final response = await dio.get(fileUrl);
+      final fileData = response.data['result'];
+      fileDownloadUrl =
+          'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
+    }
+
     await dio.download(
       fileDownloadUrl,
       filePath,
@@ -104,17 +111,20 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
   }
 
   @override
-  Future<String> loadFileOnline(String fileId) async {
+  Future<String> loadFileOnline(String fileId, bool isAudio) async {
     String? botToken = dotenv.env['bot_token'];
 
-    final fileUrl =
-        'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
-    final response = await dio.get(fileUrl);
-    final fileData = response.data['result'];
-    final fileDownloadUrl =
-        'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
-
-    return fileDownloadUrl;
+    if (isAudio) {
+      return fileId.replaceAll("botToken", botToken!);
+    } else {
+      final fileUrl =
+          'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
+      final response = await dio.get(fileUrl);
+      final fileData = response.data['result'];
+      final fileDownloadUrl =
+          'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
+      return fileDownloadUrl;
+    }
   }
 
   @override

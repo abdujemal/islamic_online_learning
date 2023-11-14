@@ -25,8 +25,7 @@ class DatabaseHelper {
 
   Future<Database> initializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String path =
-        '${directory.path}/Islamic Online Learning/db/data.db';
+    String path = '${directory.path}/Islamic Online Learning/db/DersData.db';
 
     var notesDatabase =
         await openDatabase(path, version: 1, onCreate: _createDb);
@@ -59,8 +58,10 @@ class DatabaseHelper {
         'isStarted INTEGER,'
         'isFinished INTEGER,'
         'pausedAtAudioNum INTEGER,'
-        'pausedAtAudioMin INTEGER,'
-        'pdfPage INTEGER'
+        'pausedAtAudioSec INTEGER,'
+        'sheduleDates TEXT,'
+        'sheduleTime TEXT,'
+        'pdfPage DOUBLE'
         ')');
   }
 
@@ -87,20 +88,49 @@ class DatabaseHelper {
     );
     List<CourseModel> courses = [];
     for (var courseDb in result) {
-      courses.add(CourseModel.fromMap(courseDb, courseDb['id'] as String));
+      courses
+          .add(CourseModel.fromMap(courseDb, courseDb['courseId'] as String));
     }
     return courses;
   }
 
-  Future<List<CourseModel>> getDownloadedCourses() async {
+  Future<List<CourseModel>> getSavedCourses() async {
+    Database? db = await database;
+
+    var result =
+        await db!.query(DatabaseConst.savedCourses, orderBy: 'lastViewed DESC');
+    List<CourseModel> courses = [];
+    for (var courseDb in result) {
+      courses
+          .add(CourseModel.fromMap(courseDb, courseDb['courseId'] as String));
+    }
+    return courses;
+  }
+
+  Future<CourseModel?> getSingleCourse(String courseId) async {
     Database? db = await database;
 
     var result = await db!.query(DatabaseConst.savedCourses,
-        orderBy: 'lastViewed DESC', where: 'isDownloaded = ?', whereArgs: [1]);
+        where: 'courseId = ?', whereArgs: [courseId]);
     List<CourseModel> courses = [];
     for (var courseDb in result) {
-      courses.add(CourseModel.fromMap(courseDb, courseDb['id'] as String));
+      courses
+          .add(CourseModel.fromMap(courseDb, courseDb['courseId'] as String));
     }
+    return courses.isEmpty ? null : courses.first;
+  }
+
+  Future<List<CourseModel>> getStartedCourses() async {
+    Database? db = await database;
+
+    var result = await db!.query(DatabaseConst.savedCourses,
+        orderBy: 'lastViewed DESC', where: 'isStarted = ?', whereArgs: [1]);
+    List<CourseModel> courses = [];
+    for (var courseDb in result) {
+      courses
+          .add(CourseModel.fromMap(courseDb, courseDb['courseId'] as String));
+    }
+    courses.sort((a, b) => b.lastViewed.compareTo(a.lastViewed));
     return courses;
   }
 
@@ -109,7 +139,7 @@ class DatabaseHelper {
 
     var result = await db!.query(DatabaseConst.savedCourses,
         orderBy: 'lastViewed ASC', where: 'isFav = ?', whereArgs: [1]);
-   
+
     List<CourseModel> tasks = [];
     for (var taskDb in result) {
       tasks.add(CourseModel.fromMap(taskDb, taskDb['courseId'] as String));

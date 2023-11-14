@@ -1,17 +1,18 @@
 import 'package:animated_search_bar/animated_search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/features/main/presentation/pages/download.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/started.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_drawer.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
 
 class MainPage extends ConsumerStatefulWidget {
@@ -41,6 +42,8 @@ class _MainPageState extends ConsumerState<MainPage>
   bool show = false;
 
   bool showOnes = true;
+
+  bool showTopAudio = false;
 
   @override
   void initState() {
@@ -133,7 +136,7 @@ class _MainPageState extends ConsumerState<MainPage>
 
   @override
   Widget build(BuildContext context) {
-    final currentAudio = ref.watch(currentAudioProvider);
+    final audioPlayer = ref.watch(audioProvider);
     return WillPopScope(
       onWillPop: () async {
         if (i == 0) {
@@ -147,77 +150,105 @@ class _MainPageState extends ConsumerState<MainPage>
           return true;
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: AnimatedSearchBar(
-            height: 50,
-            label: "ደርስ አፕ",
-            controller: _searchController,
-            labelStyle: const TextStyle(fontSize: 16),
-            searchStyle: const TextStyle(color: Colors.black),
-            cursorColor: const Color.fromRGBO(0, 0, 0, 1),
-            searchIcon: Padding(
-              padding: const EdgeInsets.only(top: 5.0),
-              child: Icon(
-                key: _searchIconKey,
-                Icons.search_rounded,
+      child: StreamBuilder(
+          stream: myAudioStream(audioPlayer),
+          builder: (context, snap) {
+            final state = snap.data?.sequenceState;
+            final process = snap.data?.processingState;
+
+            if (state?.sequence.isEmpty ?? true) {
+              showTopAudio = false;
+            }
+
+            MediaItem? metaData = state?.currentSource?.tag;
+
+            if (metaData != null) {
+              showTopAudio = true;
+            }
+
+            if (process == ProcessingState.idle) {
+              showTopAudio = false;
+            }
+            return Scaffold(
+              appBar: AppBar(
+                title: AnimatedSearchBar(
+                  height: 50,
+                  label: "ዒልም ፈላጊ",
+                  controller: _searchController,
+                  labelStyle: const TextStyle(fontSize: 16),
+                  searchStyle: TextStyle(
+                    color: ref.read(themeProvider) == ThemeMode.dark
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                  cursorColor: primaryColor,
+                  searchIcon: Padding(
+                    padding: const EdgeInsets.only(top: 5.0),
+                    child: Icon(
+                      key: _searchIconKey,
+                      Icons.search_rounded,
+                    ),
+                  ),
+                  textInputAction: TextInputAction.search,
+                  searchDecoration: const InputDecoration(
+                    hintText: 'ፈልግ...',
+                    alignLabelWithHint: true,
+                    fillColor: Colors.white,
+                    focusColor: Colors.white,
+                    hintStyle: TextStyle(
+                      color: Colors.white70,
+                    ),
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) {
+                    ref.read(queryProvider.notifier).update((state) => value);
+                    if (ref.watch(menuIndexProvider) != 0) {
+                      ref.read(menuIndexProvider.notifier).update((state) => 0);
+                      tabController.animateTo(0);
+                    }
+                    ref
+                        .read(mainNotifierProvider.notifier)
+                        .searchCourses(value, 20);
+                  },
+                  onFieldSubmitted: (value) {
+                    ref
+                        .read(mainNotifierProvider.notifier)
+                        .searchCourses(value, 20);
+                  },
+                ),
+                bottom: PreferredSize(
+                  preferredSize: Size(
+                    MediaQuery.of(context).size.width,
+                    showTopAudio ? 40 : 0,
+                  ),
+                  child: showTopAudio
+                      ? CurrentAudioView(metaData as MediaItem)
+                      : const SizedBox(),
+                ),
+                leading: Builder(builder: (context) {
+                  return IconButton(
+                    key: _menuKey,
+                    icon: const Icon(Icons.menu_rounded),
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                  );
+                }),
               ),
-            ),
-            textInputAction: TextInputAction.search,
-            searchDecoration: const InputDecoration(
-              hintText: 'ፈልግ...',
-              alignLabelWithHint: true,
-              fillColor: Colors.white,
-              focusColor: Colors.white,
-              hintStyle: TextStyle(
-                color: Colors.white70,
+              drawer: const MainDrawer(),
+              bottomNavigationBar: BottomNav(tabController),
+              body: TabBarView(
+                controller: tabController,
+                children: [
+                  Home(
+                    ustazKey: _ustazsKey,
+                  ),
+                  const Fav(),
+                  const Started(),
+                ],
               ),
-              border: InputBorder.none,
-            ),
-            onChanged: (value) {
-              ref.read(queryProvider.notifier).update((state) => value);
-              if (ref.watch(menuIndexProvider) != 0) {
-                ref.read(menuIndexProvider.notifier).update((state) => 0);
-                tabController.animateTo(0);
-              }
-              ref.read(mainNotifierProvider.notifier).searchCourses(value, 20);
-            },
-            onFieldSubmitted: (value) {
-              ref.read(mainNotifierProvider.notifier).searchCourses(value, 20);
-            },
-          ),
-          bottom: PreferredSize(
-            preferredSize: Size(
-              MediaQuery.of(context).size.width,
-              currentAudio != null ? 40 : 0,
-            ),
-            child: currentAudio != null
-                ? CurrentAudioView(currentAudio)
-                : const SizedBox(),
-          ),
-          leading: Builder(builder: (context) {
-            return IconButton(
-              key: _menuKey,
-              icon: const Icon(Icons.menu_rounded),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
             );
           }),
-        ),
-        drawer: const MainDrawer(),
-        bottomNavigationBar: BottomNav(tabController),
-        body: TabBarView(
-          controller: tabController,
-          children: [
-            Home(
-              ustazKey: _ustazsKey,
-            ),
-            const Fav(),
-            const Download(),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islamic_online_learning/core/Audio%20Feature/audio_model.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/features/courseDetail/presentation/pages/course_detail.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:text_scroll/text_scroll.dart';
+
+import '../../features/courseDetail/presentation/pages/course_detail.dart';
+import '../../features/main/presentation/state/provider.dart';
 
 class CurrentAudioView extends ConsumerStatefulWidget {
-  final AudioModel audioModel;
-  const CurrentAudioView(this.audioModel, {super.key});
+  final MediaItem mediaItem;
+  const CurrentAudioView(this.mediaItem, {super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -17,55 +21,63 @@ class CurrentAudioView extends ConsumerStatefulWidget {
 class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
   @override
   Widget build(BuildContext context) {
-    final currentAudio = widget.audioModel;
-
-    final currentCourse = ref.watch(currentCourseProvider);
+    final audioPlayer = ref.watch(audioProvider);
 
     return InkWell(
       onTap: () {
-        if (currentCourse != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (ctx) => CourseDetail(
-                courseModel: currentCourse,
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (ctx) => CourseDetail(
+              cm: CourseModel.fromMap(
+                widget.mediaItem.extras as Map,
+                widget.mediaItem.extras!["courseId"],
               ),
             ),
-          );
-        }
+          ),
+        );
       },
       child: Ink(
-          color: primaryColor,
+        color: primaryColor,
+        child: SizedBox(
+          height: 40,
           child: Row(
             children: [
-              IconButton(
-                icon: currentAudio.audioState.isPlaused()
-                    ? const Icon(Icons.play_arrow_rounded)
-                    : const Icon(Icons.pause_rounded),
-                onPressed: () {
-                  ref.read(currentAudioProvider.notifier).update(
-                        (state) => state!.copyWith(
-                          audioState: currentAudio.audioState.isPlaused()
-                              ? AudioState.playing
-                              : AudioState.paused,
-                        ),
-                      );
-                  if (currentAudio.audioState.isPlaused()) {
-                    ref.read(audioProvider).play();
-                  } else {
-                    ref.read(audioProvider).pause();
+              StreamBuilder(
+                stream: audioPlayer.playerStateStream,
+                builder: (context, snap) {
+                  if (snap.data == null) {
+                    return const SizedBox();
                   }
+                  return IconButton(
+                    icon: snap.data!.playing
+                        ? const Icon(Icons.pause_rounded)
+                        : const Icon(Icons.play_arrow_rounded),
+                    onPressed: () {
+                      if (ref.read(audioProvider).playing) {
+                        ref.read(audioProvider).pause();
+                      } else {
+                        ref.read(audioProvider).play();
+                      }
+                    },
+                  );
                 },
               ),
               Expanded(
-                child: Text(
-                  currentAudio.title,
-                  overflow: TextOverflow.ellipsis,
+                child: TextScroll(
+                  widget.mediaItem.title,
+                  velocity: const Velocity(
+                    pixelsPerSecond: Offset(30, 0),
+                  ),
+                  pauseBetween: const Duration(seconds: 1),
                 ),
+              ),
+              const SizedBox(
+                width: 10,
               ),
               Expanded(
                 child: Text(
-                  currentAudio.ustaz,
+                  "በ${widget.mediaItem.artist!}",
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       color: DefaultTextStyle.of(context)
@@ -75,23 +87,30 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                 ),
               ),
               IconButton(
-                onPressed: () {
+                onPressed: () async {
+                  if (widget.mediaItem.extras?["isFinished"] == 0) {
+                    await ref.read(mainNotifierProvider.notifier).saveCourse(
+                          CourseModel.fromMap(
+                            widget.mediaItem.extras as Map,
+                            widget.mediaItem.extras?["courseId"],
+                          ).copyWith(
+                            isStarted: 1,
+                            pausedAtAudioNum: audioPlayer.currentIndex,
+                            pausedAtAudioSec: audioPlayer.position.inSeconds,
+                            lastViewed: DateTime.now().toString(),
+                          ),
+                          null,
+                          showMsg: false,
+                        );
+                  }
                   ref.read(audioProvider).stop();
-                  ref
-                      .read(currentAudioProvider.notifier)
-                      .update((state) => null);
-                  // ref.read(endListnersProvider);
-                  // ref
-                  //     .read(audioPlayerPositionProvider.notifier)
-                  //     .update((state) => Duration.zero);
-                  // ref
-                  //     .read(audioPlayerDurationProvider.notifier)
-                  //     .update((state) => Duration.zero);
                 },
                 icon: const Icon(Icons.close_rounded),
               ),
             ],
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

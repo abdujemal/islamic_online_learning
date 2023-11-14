@@ -4,7 +4,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
@@ -104,7 +107,7 @@ Future<File?> displayImage(String? id, String name, WidgetRef ref) async {
     return File(filePath);
   } else if (id != null) {
     try {
-      String url = await ref.read(cdDataSrcProvider).loadFileOnline(id);
+      String url = await ref.read(cdDataSrcProvider).loadFileOnline(id, false);
 
       await Dio().download(url, filePath);
 
@@ -117,4 +120,43 @@ Future<File?> displayImage(String? id, String name, WidgetRef ref) async {
   } else {
     return null;
   }
+}
+
+String formatFileSize(int sizeInBytes) {
+  if (sizeInBytes < 1024) {
+    return '$sizeInBytes B';
+  } else if (sizeInBytes < 1024 * 1024) {
+    double sizeInKB = sizeInBytes / 1024;
+    return '${sizeInKB.toStringAsFixed(2)} KB';
+  } else if (sizeInBytes < 1024 * 1024 * 1024) {
+    double sizeInMB = sizeInBytes / (1024 * 1024);
+    return '${sizeInMB.toStringAsFixed(2)} MB';
+  } else if (sizeInBytes < 1024 * 1024 * 1024 * 1024) {
+    double sizeInGB = sizeInBytes / (1024 * 1024 * 1024);
+    return '${sizeInGB.toStringAsFixed(2)} GB';
+  } else {
+    double sizeInTB = sizeInBytes / (1024 * 1024 * 1024 * 1024);
+    return '${sizeInTB.toStringAsFixed(2)} TB';
+  }
+}
+
+bool isPlayingCourseThisCourse(String courseId, WidgetRef ref,
+    {bool alsoIsNotIdle = false}) {
+  final audioPlayer = ref.read(audioProvider);
+  final metaData = audioPlayer.sequenceState?.currentSource?.tag;
+  if (metaData == null) {
+    return false;
+  }
+  MediaItem mediaItem = metaData as MediaItem;
+  if (mediaItem.extras?["courseId"] == courseId) {
+    if (alsoIsNotIdle) {
+      if (audioPlayer.processingState != ProcessingState.idle) {
+        return true;
+      }
+    } else {
+      
+      return true;
+    }
+  }
+  return false;
 }

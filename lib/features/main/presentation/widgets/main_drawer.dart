@@ -68,7 +68,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
               ),
               child: const Center(
                 child: Text(
-                  "ደርስ አፕ",
+                  "ዒልም ፈላጊ",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
@@ -92,9 +92,10 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       child: ListTile(
                         onTap: () {
                           ref.read(mainNotifierProvider.notifier).changeTheme(
-                              theme == ThemeMode.dark
-                                  ? ThemeMode.light
-                                  : ThemeMode.dark);
+                                theme == ThemeMode.dark
+                                    ? ThemeMode.light
+                                    : ThemeMode.dark,
+                              );
                         },
                         leading: Icon(theme == ThemeMode.dark
                             ? Icons.light_mode_rounded

@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
+import 'package:just_audio/just_audio.dart';
 
 class AudioModel extends Equatable {
   final String title;
@@ -42,4 +43,14 @@ extension AudioModifier on AudioState {
   isPlaying() => this == AudioState.playing;
   isPlaused() => this == AudioState.paused;
   isIdle() => this == AudioState.idle;
+}
+
+class AudioData {
+  final ProcessingState processingState;
+  final SequenceState? sequenceState;
+  AudioData({
+    required this.processingState,
+    this.sequenceState,
+  });
+  
 }

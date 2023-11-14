@@ -18,9 +18,10 @@ class IMainRepo extends MainRepo {
     bool isNew,
     String? key,
     String? val,
+    SortingMethod method,
   ) async {
     try {
-      final res = await mainDataSrc.getCourses(isNew, key, val);
+      final res = await mainDataSrc.getCourses(isNew, key, val, method);
       return right(res);
     } catch (e) {
       print(e.toString());
@@ -108,6 +109,39 @@ class IMainRepo extends MainRepo {
   FutureEither<List<FAQModel>> getFAQ() async {
     try {
       final res = await mainDataSrc.getFAQ();
+      return right(res);
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
+  }
+
+  @override
+  FutureEither<CourseModel?> getSingleCourse(String courseId) async {
+    try {
+      final res = await mainDataSrc.getSingleCourse(courseId);
+
+      return right(res);
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
+  }
+
+  @override
+  FutureEither<List<CourseModel>> getSavedCourses() async {
+    try {
+      final res = await mainDataSrc.getSavedCourses();
+
+      return right(res);
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
+  }
+
+  @override
+  FutureEither<List<CourseModel>> getStartedCourses() async {
+    try {
+      final res = await mainDataSrc.getStartedCourses();
+
       return right(res);
     } catch (e) {
       return left(Failure(messege: e.toString()));

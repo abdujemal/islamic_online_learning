@@ -4,17 +4,21 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../../../core/Audio Feature/audio_model.dart';
 import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/position_data_model.dart';
+import '../../../main/data/model/course_model.dart';
 import '../stateNotifier/providers.dart';
 import 'package:rxdart/rxdart.dart';
 
 class AudioBottomView extends ConsumerStatefulWidget {
   final String courseId;
-  const AudioBottomView(this.courseId, {super.key});
+  final VoidCallback onClose;
+  const AudioBottomView(this.courseId, this.onClose, {super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -38,12 +42,31 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
 
   @override
   Widget build(BuildContext context) {
-    final currentAudio = ref.watch(currentAudioProvider);
-    final currentCourse = ref.watch(checkCourseProvider.call(widget.courseId));
     final audioPlayer = ref.watch(audioProvider);
 
-    return currentAudio != null && currentCourse != null
-        ? Container(
+    return StreamBuilder(
+        stream: myAudioStream(audioPlayer),
+        builder: (context, snp) {
+          final state = snp.data?.sequenceState;
+          print("wooooooooooooo");
+          if (state?.sequence.isEmpty ?? true) {
+            return const SizedBox();
+          }
+
+          if (audioPlayer.processingState == ProcessingState.completed) {
+            print("Donw mate");
+          }
+
+          final metaData = state!.currentSource!.tag as MediaItem;
+
+          if ("${metaData.extras?["courseId"]}" != widget.courseId) {
+            return const SizedBox();
+          }
+          final process = snp.data?.processingState;
+          if (audioPlayer.processingState == ProcessingState.idle) {
+            return const SizedBox();
+          }
+          return Container(
             height: 140,
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
@@ -72,27 +95,54 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                     children: [
                       Expanded(
                         child: Text(
-                          currentAudio.title,
+                          metaData.title,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(fontSize: 16),
                         ),
                       ),
-                      if (isLoading)
-                        const SizedBox(
-                          width: 130,
-                          child: LinearProgressIndicator(
-                            color: primaryColor,
+                      if (process == ProcessingState.buffering ||
+                          process == ProcessingState.loading)
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                            ),
+                            child: LinearProgressIndicator(
+                              color: primaryColor,
+                              backgroundColor:
+                                  Theme.of(context).chipTheme.backgroundColor!,
+                            ),
                           ),
                         ),
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
+                          widget.onClose();
+                          if (metaData.extras?["isFinished"] == 0) {
+                            await ref
+                                .read(mainNotifierProvider.notifier)
+                                .saveCourse(
+                                  CourseModel.fromMap(
+                                    metaData.extras as Map,
+                                    metaData.extras?["courseId"],
+                                  ).copyWith(
+                                    isStarted: 1,
+                                    pausedAtAudioNum: audioPlayer.currentIndex,
+                                    pausedAtAudioSec:
+                                        audioPlayer.position.inSeconds,
+                                    lastViewed: DateTime.now().toString(),
+                                  ),
+                                  null,
+                                  showMsg: false,
+                                );
+                          }
                           ref.read(audioProvider).stop();
-                          ref
-                              .read(currentAudioProvider.notifier)
-                              .update((state) => null);
-                          // ref.read(endListnersProvider);
                         },
-                        child: const Icon(Icons.close_rounded),
+                        child: const Row(
+                          children: [
+                            Text("መዝግብ ና አቁም"),
+                            Icon(Icons.close),
+                          ],
+                        ),
                       )
                     ],
                   ),
@@ -137,184 +187,102 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(""),
                       IconButton(
-                        onPressed: () async {
-                          final beforIndex =
-                              int.parse(currentAudio.title.split(" ").last) - 1;
-
-                          final audioIds = currentCourse.courseIds.split(",");
-
-                          final onlyTitle = currentAudio.title
-                              .split(" ")
-                              .sublist(
-                                  0, currentAudio.title.split(" ").length - 1)
-                              .join(" ");
-
-                          if (beforIndex < 1) {
+                        onPressed: () {
+                          if (audioPlayer.position.inSeconds <= 10) {
+                            audioPlayer.seek(Duration.zero);
                             return;
                           }
-
-                          if (await isDownloaded(
-                              "$onlyTitle $beforIndex", currentCourse.ustaz)) {
-                            final audioPath = await getPath('Audio',
-                                "${currentCourse.ustaz},$onlyTitle $beforIndex.mp3");
-
-                            ref.read(cdNotifierProvider.notifier).playOffline(
-                                  audioPath,
-                                  "$onlyTitle $beforIndex",
-                                  currentCourse,
-                                  audioIds[beforIndex - 1],
-                                );
-                            return;
-                          }
-
-                          setState(() {
-                            isLoading = true;
-                          });
-                          String? url = await ref
-                              .read(cdNotifierProvider.notifier)
-                              .loadFileOnline(audioIds[beforIndex - 1]);
-                          if (url != null) {
-                            ref.read(cdNotifierProvider.notifier).playOnline(
-                                  url,
-                                  "$onlyTitle $beforIndex",
-                                  currentCourse,
-                                  audioIds[beforIndex - 1],
-                                );
-                            setState(() {
-                              isLoading = false;
-                            });
-                          } else {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
+                          audioPlayer.seek(
+                            Duration(
+                              seconds: audioPlayer.position.inSeconds - 10,
+                            ),
+                          );
                         },
-                        icon: const Icon(Icons.skip_previous_rounded),
+                        icon: const Icon(
+                          Icons.replay_10_rounded,
+                          size: 40,
+                        ),
                       ),
                       IconButton(
-                        icon: currentAudio.audioState.isPlaying()
-                            ? const Icon(Icons.pause_rounded)
-                            : const Icon(Icons.play_arrow_rounded),
                         onPressed: () async {
-                          ref.read(currentAudioProvider.notifier).update(
-                                (state) => state!.copyWith(
-                                  audioState:
-                                      currentAudio.audioState.isPlaused()
-                                          ? AudioState.playing
-                                          : AudioState.paused,
-                                ),
-                              );
-                          if (currentAudio.audioState.isPlaused()) {
-                            ref.read(audioProvider).play();
-                            return;
-                          } else if (currentAudio.audioState.isPlaying()) {
+                          ref.read(audioProvider).seekToPrevious();
+                        },
+                        icon: const Icon(Icons.skip_previous_rounded, size: 40),
+                      ),
+                      IconButton(
+                        icon: audioPlayer.playing
+                            ? const Icon(Icons.pause_rounded, size: 40)
+                            : const Icon(Icons.play_arrow_rounded, size: 40),
+                        onPressed: () async {
+                          if (audioPlayer.playing) {
+                            widget.onClose();
+                            if (metaData.extras?["isFinished"] == 0) {
+                              await ref
+                                  .read(mainNotifierProvider.notifier)
+                                  .saveCourse(
+                                    CourseModel.fromMap(
+                                      metaData.extras as Map,
+                                      metaData.extras?["courseId"],
+                                    ).copyWith(
+                                      isStarted: 1,
+                                      pausedAtAudioNum:
+                                          audioPlayer.currentIndex,
+                                      pausedAtAudioSec:
+                                          audioPlayer.position.inSeconds,
+                                      lastViewed: DateTime.now().toString(),
+                                    ),
+                                    null,
+                                    showMsg: false,
+                                  );
+                            }
                             ref.read(audioProvider).pause();
+                            setState(() {});
                             return;
-                          }
-
-                          if (await isDownloaded(
-                              currentAudio.title, currentCourse.ustaz)) {
-                            final audioPath = await getPath('Audio',
-                                "${currentCourse.ustaz},${currentAudio.title}.mp3");
-
-                            ref.read(cdNotifierProvider.notifier).playOffline(
-                                  audioPath,
-                                  currentAudio.title,
-                                  currentCourse,
-                                  currentAudio.audioId,
-                                );
-                            return;
-                          }
-
-                          setState(() {
-                            isLoading = true;
-                          });
-                          String? url = await ref
-                              .read(cdNotifierProvider.notifier)
-                              .loadFileOnline(currentAudio.audioId);
-                          if (url != null) {
-                            ref.read(cdNotifierProvider.notifier).playOnline(
-                                  url,
-                                  currentAudio.title,
-                                  currentCourse,
-                                  currentAudio.audioId,
-                                );
-                            setState(() {
-                              isLoading = false;
-                            });
                           } else {
-                            setState(() {
-                              isLoading = false;
-                            });
+                            ref.read(audioProvider).play();
+                            setState(() {});
+                            return;
                           }
                         },
                       ),
                       IconButton(
                         onPressed: () async {
-                          final afterIndex =
-                              int.parse(currentAudio.title.split(" ").last) + 1;
-
-                          final audioIds = currentCourse.courseIds.split(",");
-
-                          final onlyTitle = currentAudio.title
-                              .split(" ")
-                              .sublist(
-                                  0, currentAudio.title.split(" ").length - 1)
-                              .join(" ");
-
-                          if (afterIndex > audioIds.length) {
-                            return;
-                          }
-
-                          if (await isDownloaded(
-                              "$onlyTitle $afterIndex", currentCourse.ustaz)) {
-                            final audioPath = await getPath('Audio',
-                                "${currentCourse.ustaz},$onlyTitle $afterIndex.mp3");
-
-                            ref.read(cdNotifierProvider.notifier).playOffline(
-                                  audioPath,
-                                  "$onlyTitle $afterIndex",
-                                  currentCourse,
-                                  audioIds[afterIndex - 1],
-                                );
-                            return;
-                          }
-
-                          setState(() {
-                            isLoading = true;
-                          });
-                          String? url = await ref
-                              .read(cdNotifierProvider.notifier)
-                              .loadFileOnline(audioIds[afterIndex - 1]);
-                          if (url != null) {
-                            await ref
-                                .read(cdNotifierProvider.notifier)
-                                .playOnline(
-                                  url,
-                                  "$onlyTitle $afterIndex",
-                                  currentCourse,
-                                  audioIds[afterIndex - 1],
-                                );
-                            setState(() {
-                              isLoading = false;
-                            });
-                          } else {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
+                          ref.read(audioProvider).seekToNext();
                         },
-                        icon: const Icon(Icons.skip_next_rounded),
+                        icon: const Icon(Icons.skip_next_rounded, size: 40),
                       ),
-                      Text(''.toString().split('.').first),
+                      IconButton(
+                        onPressed: () {
+                          if (audioPlayer.duration == null) {
+                            return;
+                          }
+                          if (audioPlayer.position.inSeconds >=
+                              audioPlayer.duration!.inSeconds - 10) {
+                            audioPlayer.seek(
+                              Duration(
+                                seconds: audioPlayer.duration!.inSeconds,
+                              ),
+                            );
+                            return;
+                          }
+                          audioPlayer.seek(
+                            Duration(
+                              seconds: audioPlayer.position.inSeconds + 10,
+                            ),
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.forward_10_rounded,
+                          size: 40,
+                        ),
+                      ),
                     ],
                   ),
                 )
               ],
             ),
-          )
-        : const SizedBox();
+          );
+        });
   }
 }

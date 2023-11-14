@@ -6,11 +6,15 @@ import 'package:islamic_online_learning/features/downloadedFiles/presentation/st
 
 import '../../../../core/constants.dart';
 
+
+
 class AudiosNotifier extends StateNotifier<AudiosState> {
   final DFRepo dfRepo;
   AudiosNotifier(
     this.dfRepo,
   ) : super(const AudiosState.initial());
+
+
 
   getAudios() async {
     state = const AudiosState.loading();
@@ -25,6 +29,7 @@ class AudiosNotifier extends StateNotifier<AudiosState> {
           state = AudiosState.empty(audios: r);
           return;
         }
+
         state = AudiosState.loaded(audios: r);
       },
     );
@@ -39,7 +44,7 @@ class AudiosNotifier extends StateNotifier<AudiosState> {
         toast(l.toString(), ToastType.error);
       },
       (r) {
-        toast("ሁሉም ፒዲኡፍ ጠፍትዋል", ToastType.success);
+        toast("ሁሉም ፋይሎች ጠፍትዋል", ToastType.success);
       },
     );
   }

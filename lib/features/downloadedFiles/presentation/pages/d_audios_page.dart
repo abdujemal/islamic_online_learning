@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,11 +39,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
     return fldrs[fldrs.length - 1].split(",")[0];
   }
 
-  double getSize(File file) {
-    int fileSizeInBytes = file.lengthSync();
-    double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-    return fileSizeInMB;
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +89,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
                 color: primaryColor,
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 60),
+                  padding: const EdgeInsets.only(bottom: 100),
                   itemCount: _.audios.length,
                   itemBuilder: (context, index) {
                     return ListTile(
@@ -108,7 +103,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
                               size: 30,
                             ),
                             Text(
-                              "${getSize(_.audios[index]).round()} mb",
+                              formatFileSize(_.audios[index].lengthSync()),
                               style: const TextStyle(fontSize: 13),
                             )
                           ],

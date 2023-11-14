@@ -99,7 +99,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                     focusColor: primaryColor,
                     hintText: "የቂርዓት ሰዓት",
                     suffixIcon: Icon(
-                      Icons.timer_rounded,
+                      Icons.access_alarms_rounded,
                       color: primaryColor,
                     ),
                   ),
@@ -156,8 +156,6 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
 
                       Schedule().scheduleNotification(0, "title", "body");
                       Navigator.pop(context);
-
-                      // action
                     }
                   },
                   child: Ink(
@@ -170,7 +168,13 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                         horizontal: 13,
                         vertical: 5,
                       ),
-                      child: Text("መዝግብ"),
+                      child: Text(
+                        "መዝግብ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
+                      ),
                     ),
                   ),
                 ),

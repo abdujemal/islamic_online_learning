@@ -8,12 +8,19 @@ import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
 import 'features/main/presentation/pages/main_page.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+    androidNotificationIcon: 'mipmap/book',
+  );
   await dotenv.load();
   // await AndroidAlarmManager.initialize();
   await DatabaseHelper().initializeDatabase();
@@ -37,7 +44,7 @@ class Main extends StatelessWidget {
           textScaleFactor: fontScale,
         ),
         child: MaterialApp(
-          // title: "ደርስ አል-ሃበሻ",
+          title: "ዒልም ፈላጊ",
           color: primaryColor,
           debugShowCheckedModeBanner: false,
           themeMode: themeMode,

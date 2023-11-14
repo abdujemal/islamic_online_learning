@@ -1,4 +1,4 @@
-import 'dart:io';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,12 +33,6 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
   String getTitle(String path) {
     final fldrs = path.split("/");
     return fldrs[fldrs.length - 1].split(",").last;
-  }
-
-  double getSize(File file) {
-    int fileSizeInBytes = file.lengthSync();
-    double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-    return fileSizeInMB;
   }
 
   @override
@@ -89,7 +83,7 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
                 color: primaryColor,
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 0),
+                  padding: const EdgeInsets.only(bottom: 100),
                   itemCount: _.pdfs.length,
                   itemBuilder: (context, index) {
                     return ListTile(
@@ -98,7 +92,8 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
                         size: 30,
                       ),
                       title: Text(getTitle(_.pdfs[index].path)),
-                      subtitle: Text("${getSize(_.pdfs[index]).round()} mb"),
+                      subtitle:
+                          Text(formatFileSize(_.pdfs[index].lengthSync())),
                       trailing: IconButton(
                         icon: const Icon(
                           Icons.delete_rounded,

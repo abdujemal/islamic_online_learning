@@ -7,9 +7,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/domain/course_detail_repo.dart';
 import 'package:islamic_online_learning/features/downloadedFiles/presentation/pages/downloaded_files_page.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
-import 'package:just_audio/just_audio.dart';
 
-import '../../../../core/Audio Feature/audio_model.dart';
 import '../../../../core/Audio Feature/audio_providers.dart';
 
 class CDNotifier extends StateNotifier<bool> {
@@ -33,7 +31,11 @@ class CDNotifier extends StateNotifier<bool> {
     res.fold(
       (l) {
         if (!l.messege.contains("[request cancelled]")) {
-          toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
+          if (l.messege.contains("Failed host lookup")) {
+            toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
+          } else {
+            print(l.messege);
+          }
         } else if (l.messege == "out of storage") {
           toast("ስልክዎ ስለሞላ የተወሰነ ፋይሎችን ያጥፉ!", ToastType.error);
           Navigator.push(
@@ -52,14 +54,21 @@ class CDNotifier extends StateNotifier<bool> {
     return file;
   }
 
-  Future<String?> loadFileOnline(String fileId) async {
-    final res = await courseDetailRepo.loadFileOnline(fileId);
+  Future<String?> loadFileOnline(
+    String fileId,
+    bool isAudio, {
+    bool showError = true,
+  }) async {
+    final res = await courseDetailRepo.loadFileOnline(fileId, isAudio);
 
     String? url;
 
     res.fold(
       (l) {
-        toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
+        if (showError) {
+          toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
+        }
+        print(l.messege);
       },
       (r) {
         url = r;
@@ -112,37 +121,18 @@ class CDNotifier extends StateNotifier<bool> {
         .update((state) => state..setFilePath(audioPath));
 
     ref.read(audioProvider).play();
-
-    ref.read(currentAudioProvider.notifier).update(
-          (state) => AudioModel(
-            title: title,
-            ustaz: courseModel.ustaz,
-            audioState: AudioState.playing,
-            audioId: audioId,
-          ),
-        );
-
-    ref.read(currentCourseProvider.notifier).update((state) => courseModel);
   }
 
   Future<void> playOnline(
       String url, String title, CourseModel courseModel, String audioId) async {
     // ref.read(startListnersProvider);
-    ref.read(audioProvider.notifier).update((state) => state
-      ..setAudioSource(AudioSource.uri(
-        Uri.parse(url),
-      )));
-
-    ref.read(audioProvider).play();
-
-    ref.read(currentAudioProvider.notifier).update(
-          (state) => AudioModel(
-              title: title,
-              ustaz: courseModel.ustaz,
-              audioState: AudioState.playing,
-              audioId: audioId),
+    ref.read(audioProvider.notifier).update(
+          (state) => state
+            ..setUrl(
+              url,
+            ),
         );
 
-    ref.read(currentCourseProvider.notifier).update((state) => courseModel);
+    ref.read(audioProvider).play();
   }
 }

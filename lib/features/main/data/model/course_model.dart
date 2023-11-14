@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: annotate_overrides, overridden_fields
 
+import 'dart:convert';
+
 import '../../domain/entity/course_entity.dart';
 
 class CourseModel extends CourseEntity {
@@ -14,12 +16,14 @@ class CourseModel extends CourseEntity {
   final String title;
   final String ustaz;
   final String lastViewed;
-  final bool isFav;
-  final bool isStarted;
-  final bool isFinished;
+  final int isFav;
+  final int isStarted;
+  final int isFinished;
   final int pausedAtAudioNum;
-  final int pausedAtAudioMin;
-  final int pdfPage;
+  final int pausedAtAudioSec;
+  final double pdfPage;
+  final String sheduleTime;
+  final String sheduleDates;
   final String image;
 
   const CourseModel({
@@ -37,7 +41,9 @@ class CourseModel extends CourseEntity {
     required this.isStarted,
     required this.isFinished,
     required this.pausedAtAudioNum,
-    required this.pausedAtAudioMin,
+    required this.pausedAtAudioSec,
+    required this.sheduleDates,
+    required this.sheduleTime,
     required this.pdfPage,
     required this.image,
   }) : super(
@@ -55,7 +61,9 @@ class CourseModel extends CourseEntity {
           isStarted: isStarted,
           isFinished: isFinished,
           pausedAtAudioNum: pausedAtAudioNum,
-          pausedAtAudioMin: pausedAtAudioMin,
+          pausedAtAudioSec: pausedAtAudioSec,
+          sheduleDates: sheduleDates,
+          sheduleTime: sheduleTime,
           pdfPage: pdfPage,
           image: image,
         );
@@ -71,21 +79,38 @@ class CourseModel extends CourseEntity {
       'pdfId': pdfId,
       'title': title,
       'ustaz': ustaz,
-      "image": image,
+      'image': image,
       'lastViewed': lastViewed,
-      'isFav': isFav ? 1 : 0,
-      'isStarted': isStarted ? 1 : 0,
-      'isFinished': isFinished ? 1 : 0,
+      'isFav': isFav,
+      'isStarted': isStarted,
+      'isFinished': isFinished,
       'pausedAtAudioNum': pausedAtAudioNum,
-      'pausedAtAudioMin': pausedAtAudioMin,
+      'pausedAtAudioSec': pausedAtAudioSec,
+      'sheduleDates': sheduleDates,
+      'sheduleTime': sheduleTime,
       'pdfPage': pdfPage,
     };
   }
 
-  factory CourseModel.fromMap(Map map, String id) {
+  Map<String, dynamic> toOriginalMap() {
+    
+    return {
+      'courseId': courseId,
+      'author': author,
+      'category': category,
+      'courseIds': courseIds,
+      'noOfRecord': noOfRecord,
+      'pdfId': pdfId,
+      'title': title,
+      'ustaz': ustaz,
+      'image': image,
+    };
+  }
+
+  factory CourseModel.fromMap(Map map, String id, {CourseModel? copyFrom}) {
     return CourseModel(
       courseId: id,
-      id: map['id'],
+      id: map['id'] ?? (copyFrom?.id),
       author: map['author'] as String,
       category: map['category'] as String,
       courseIds: map['courseIds'] as String,
@@ -93,13 +118,22 @@ class CourseModel extends CourseEntity {
       pdfId: map['pdfId'] as String,
       title: map['title'] as String,
       ustaz: map['ustaz'] as String,
-      lastViewed: map['lastViewed'] ?? "",
-      isFav: map['isFav'] == 1,
-      isStarted: map['isStarted'] == 1,
-      isFinished: map['isFinished'] == 1,
-      pausedAtAudioNum: map['pausedAtAudioNum'] ?? 0,
-      pausedAtAudioMin: map['pausedAtAudioMin'] ?? 0,
-      pdfPage: map['pdfPage'] ?? 1,
+      lastViewed:
+          map['lastViewed'] ?? (copyFrom != null ? copyFrom.lastViewed : ""),
+      isFav: map['isFav'] ?? (copyFrom != null ? copyFrom.isFav : 0),
+      isStarted:
+          map['isStarted'] ?? (copyFrom != null ? copyFrom.isStarted : 0),
+      isFinished:
+          map['isFinished'] ?? (copyFrom != null ? copyFrom.isFinished : 0),
+      pausedAtAudioNum: map['pausedAtAudioNum'] ??
+          (copyFrom != null ? copyFrom.pausedAtAudioNum : 0),
+      pausedAtAudioSec: map['pausedAtAudioSec'] ??
+          (copyFrom != null ? copyFrom.pausedAtAudioSec : 0),
+      sheduleDates: map['sheduleDates'] ??
+          (copyFrom != null ? copyFrom.sheduleDates : ""),
+      sheduleTime:
+          map['sheduleTime'] ?? (copyFrom != null ? copyFrom.sheduleTime : ""),
+      pdfPage: map['pdfPage'] ?? (copyFrom != null ? copyFrom.pdfPage : 0.0),
       image: map['image'],
     );
   }
@@ -115,12 +149,14 @@ class CourseModel extends CourseEntity {
     String? title,
     String? ustaz,
     String? lastViewed,
-    bool? isFav,
-    bool? isStarted,
-    bool? isFinished,
+    int? isFav,
+    int? isStarted,
+    int? isFinished,
     int? pausedAtAudioNum,
-    int? pausedAtAudioMin,
-    int? pdfPage,
+    int? pausedAtAudioSec,
+    String? sheduleDates,
+    String? sheduleTime,
+    double? pdfPage,
     String? image,
   }) {
     return CourseModel(
@@ -138,9 +174,16 @@ class CourseModel extends CourseEntity {
       isStarted: isStarted ?? this.isStarted,
       isFinished: isFinished ?? this.isFinished,
       pausedAtAudioNum: pausedAtAudioNum ?? this.pausedAtAudioNum,
-      pausedAtAudioMin: pausedAtAudioMin ?? this.pausedAtAudioMin,
+      pausedAtAudioSec: pausedAtAudioSec ?? this.pausedAtAudioSec,
+      sheduleDates: sheduleDates ?? this.sheduleDates,
+      sheduleTime: sheduleTime ?? this.sheduleTime,
       pdfPage: pdfPage ?? this.pdfPage,
       image: image ?? this.image,
     );
   }
+
+  String toJsonString() => json.encode(toMap());
+
+  CourseModel fromJsonString(String jsn, String id) =>
+      CourseModel.fromMap(json.decode(jsn), id);
 }

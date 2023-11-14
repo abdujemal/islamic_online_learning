@@ -1,12 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/fav_list_state.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 import '../../../../core/constants.dart';
 
 class FavListNotifier extends StateNotifier<FavListState> {
   final MainRepo mainRepo;
-  FavListNotifier(this.mainRepo) : super(const FavListState.initial());
+  final Ref ref;
+  FavListNotifier(this.mainRepo, this.ref)
+      : super(const FavListState.initial());
 
   getCourse() async {
     state = const FavListState.loading();
@@ -38,6 +41,8 @@ class FavListNotifier extends StateNotifier<FavListState> {
         (r) {
           toast("በተሳካ ሁኔታ ጠፍትዋ", ToastType.success);
           getCourse();
+          ref.read(mainNotifierProvider.notifier).updateCourses();
+          ref.read(startedNotifierProvider.notifier).getCouses();
         },
       );
     } else {

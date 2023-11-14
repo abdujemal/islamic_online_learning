@@ -6,6 +6,8 @@ import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_state.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
+import '../../data/main_data_src.dart';
+
 class MainListNotifier extends StateNotifier<MainListState> {
   final MainRepo mainRepo;
   final Ref ref;
@@ -18,7 +20,12 @@ class MainListNotifier extends StateNotifier<MainListState> {
 
   int itreationCounter = 0;
 
-  Future<void> getCourses({bool isNew = true, String? key, String? val}) async {
+  Future<void> getCourses({
+    bool isNew = true,
+    String? key,
+    String? val,
+    SortingMethod method = SortingMethod.dateDSC,
+  }) async {
     if (itreationCounter == 0) {
       if (isNew) {
         state = const MainListState.loading();
@@ -30,7 +37,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
         );
       }
       itreationCounter = 1;
-      final res = await mainRepo.getCourses(isNew, key, val);
+      final res = await mainRepo.getCourses(isNew, key, val, method);
       itreationCounter = 0;
       // print(itreationCounter);
 
@@ -63,6 +70,21 @@ class MainListNotifier extends StateNotifier<MainListState> {
     }
   }
 
+  Future<CourseModel?> getSingleCourse(String courseId) async {
+    CourseModel? courseModel;
+    final res = await mainRepo.getSingleCourse(courseId);
+
+    res.fold(
+      (l) {
+        toast(l.messege, ToastType.error);
+      },
+      (r) {
+        courseModel = r;
+      },
+    );
+    return courseModel;
+  }
+
   searchCourses(String qwery, int? noOfElt) async {
     state = const MainListState.loading();
 
@@ -86,15 +108,63 @@ class MainListNotifier extends StateNotifier<MainListState> {
     );
   }
 
-  Future<int?> saveCourse(CourseModel courseModel, bool isFav) async {
-    final res = await mainRepo.saveCourse(courseModel.copyWith(isFav: isFav));
+  updateCourses() async {
+    List<CourseModel> savedCourses =
+        await ref.read(mainDataSrcProvider).getSavedCourses();
+
+    List<CourseModel> newList = [];
+
+    for (CourseModel cm in courses) {
+      final matchings = savedCourses.where((e) => e.courseId == cm.courseId);
+      if (matchings.isNotEmpty) {
+        CourseModel savedCourse = matchings.first;
+        newList.add(
+          CourseModel.fromMap(
+            cm.toOriginalMap(),
+            cm.courseId,
+            copyFrom: savedCourse,
+          ),
+        );
+      } else {
+        newList.add(
+          CourseModel.fromMap(
+            cm.toOriginalMap(),
+            cm.courseId,
+          ),
+        );
+      }
+    }
+
+    courses = newList;
+    await Future.delayed(const Duration(seconds: 1));
+    state = MainListState.loaded(
+      courses: newList,
+      isLoadingMore: false,
+      noMoreToLoad: false,
+    );
+  }
+
+  Future<int?> saveCourse(CourseModel courseModel, int? isFav,
+      {bool showMsg = true}) async {
+    final res = await mainRepo.saveCourse(
+      courseModel.copyWith(
+        isFav: isFav,
+      ),
+    );
 
     res.fold(
       (l) {
         toast(l.messege, ToastType.error);
+        print(l.messege);
       },
       (r) {
-        toast("በተሳካ ሁኔታ ተመዝግብዋል", ToastType.success);
+        if (showMsg) {
+          toast("በተሳካ ሁኔታ ተመዝግብዋል", ToastType.success);
+        }
+        updateCourses();
+        ref.read(favNotifierProvider.notifier).getCourse();
+        ref.read(startedNotifierProvider.notifier).getCouses();
+
         return r;
       },
     );

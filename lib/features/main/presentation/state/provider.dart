@@ -11,6 +11,8 @@ import 'package:islamic_online_learning/features/main/presentation/state/faq_lis
 import 'package:islamic_online_learning/features/main/presentation/state/fav_list_state.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_state.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/started_list_notifier.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/started_list_state.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,7 +62,7 @@ final mainNotifierProvider =
 
 final favNotifierProvider =
     StateNotifierProvider<FavListNotifier, FavListState>((ref) {
-  return FavListNotifier(ref.read(mainRepoProvider));
+  return FavListNotifier(ref.read(mainRepoProvider), ref);
 });
 
 final categoryNotifierProvider =
@@ -76,4 +78,9 @@ final ustazNotifierProvider =
 final faqNotifierProvider =
     StateNotifierProvider<FaqListNotifier, FAQListState>((ref) {
   return FaqListNotifier(ref.read(mainRepoProvider));
+});
+
+final startedNotifierProvider =
+    StateNotifierProvider<StartedListNotifier, StartedListState>((ref) {
+  return StartedListNotifier(ref.read(mainRepoProvider), ref);
 });

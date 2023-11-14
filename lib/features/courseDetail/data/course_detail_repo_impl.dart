@@ -52,9 +52,9 @@ class ICourseDetailRepo extends CourseDetailRepo {
   }
 
   @override
-  FutureEither<String> loadFileOnline(String fileId) async {
+  FutureEither<String> loadFileOnline(String fileId, bool isAudio) async {
     try {
-      final res = await courseDetailDataSrc.loadFileOnline(fileId);
+      final res = await courseDetailDataSrc.loadFileOnline(fileId, isAudio);
       return right(res);
     } catch (e) {
       return left(Failure(messege: e.toString()));

@@ -32,6 +32,8 @@ dependencies:
   audio_video_progress_bar: ^2.0.1
   awesome_notifications: ^0.8.2
   cloud_firestore: ^4.9.3
+  confetti: ^0.7.0
+  connectivity_plus: ^5.0.1
   cupertino_icons: ^1.0.2
   dartz: ^0.10.1
   dio: ^5.2.1+1
@@ -54,15 +56,33 @@ dependencies:
   shared_preferences: ^2.2.2
   shimmer: ^3.0.0
   sqflite: ^2.3.0
+  text_scroll: ^0.2.0
   tutorial_coach_mark: ^1.2.11
 
 dev_dependencies:
   build_runner: ^2.4.6
+  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^3.0.0
   flutter_test:
     sdk: flutter
   freezed: any
   mockito: ^5.4.2
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/book.png"
+  background_color: "#fcffea"
+  web:
+    generate: true
+    image_path: "assets/book.png"
+  windows:
+    generate: true
+    image_path: "assets/book.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/book.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

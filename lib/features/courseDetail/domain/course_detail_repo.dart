@@ -9,6 +9,6 @@ abstract class CourseDetailRepo {
       String folderName, CancelToken cancelToken, Ref ref);
   FutureEither<bool> checkIfTheFileIsDownloaded(
       String fileName, String folderName);
-  FutureEither<String> loadFileOnline(String fileId);
+  FutureEither<String> loadFileOnline(String fileId, bool isAudio);
   FutureEither<bool> deleteFile(String fileName, String folderName);
 }

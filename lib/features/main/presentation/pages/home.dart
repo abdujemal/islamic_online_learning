@@ -36,6 +36,8 @@ class _HomeState extends ConsumerState<Home>
 
   int countIteration = 0;
 
+  bool isSearching = false;
+
   @override
   initState() {
     super.initState();
@@ -53,13 +55,15 @@ class _HomeState extends ConsumerState<Home>
   Future<void> _scrollListener() async {
     if (scrollController.position.pixels ==
         scrollController.position.maxScrollExtent) {
-      await mainNotifier.getCourses(isNew: false);
+      if (isSearching) {
+        await mainNotifier.getCourses(isNew: false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isSearching = ref.watch(queryProvider) == "";
+    isSearching = ref.watch(queryProvider) == "";
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 10,
@@ -181,32 +185,36 @@ class _HomeState extends ConsumerState<Home>
                     itemBuilder: (index, context) => const CourseShimmer(),
                   ),
                 ),
-                loaded: (_) => Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () async {
-                      await mainNotifier.getCourses(isNew: true);
-                      await categoryNotifier.getCategories();
-                    },
-                    color: primaryColor,
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 20),
-                      controller: scrollController,
-                      itemCount: _.courses.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index <= _.courses.length - 1) {
-                          return CourseItem(_.courses[index]);
-                        } else if (_.isLoadingMore) {
-                          return const CourseShimmer();
-                        } else if (_.noMoreToLoad) {
-                          return const TheEnd();
-                        } else {
-                          return const SizedBox();
+                loaded: (_) {
+                  return Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        if (isSearching) {
+                          await mainNotifier.getCourses(isNew: true);
+                          await categoryNotifier.getCategories();
                         }
                       },
+                      color: primaryColor,
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 20),
+                        controller: scrollController,
+                        itemCount: _.courses.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index <= _.courses.length - 1) {
+                            return CourseItem(_.courses[index]);
+                          } else if (_.isLoadingMore) {
+                            return const CourseShimmer();
+                          } else if (_.noMoreToLoad) {
+                            return const TheEnd();
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
                 empty: (_) => Center(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
