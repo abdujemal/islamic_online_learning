@@ -68,16 +68,16 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
     });
 
     String fileDownloadUrl = "";
-    if (folderName == "Audio") {
-      fileDownloadUrl = fileId.replaceAll("botToken", botToken);
-    } else {
-      final fileUrl =
-          'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
-      final response = await dio.get(fileUrl);
-      final fileData = response.data['result'];
-      fileDownloadUrl =
-          'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
-    }
+    // if (folderName == "Audio") {
+    fileDownloadUrl = fileId;
+    // } else {
+    //   final fileUrl =
+    //       'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
+    //   final response = await dio.get(fileUrl);
+    //   final fileData = response.data['result'];
+    //   fileDownloadUrl =
+    //       'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
+    // }
 
     await dio.download(
       fileDownloadUrl,
