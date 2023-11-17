@@ -74,9 +74,12 @@ class _MainPageState extends ConsumerState<MainPage>
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (mounted) {
         final mainState = ref.read(mainNotifierProvider.notifier);
-
         mainState.addListener((state) {
           state.mapOrNull(loaded: (_) {
+            // showDialog(
+            //   context: context,
+            //   builder: (ctx) => UpdateAllCourses(_.courses),
+            // );
             if (mounted) {
               bool isOnCurrentPage = !Navigator.canPop(context);
               if (isOnCurrentPage) {

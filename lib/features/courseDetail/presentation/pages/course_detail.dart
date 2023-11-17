@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
@@ -80,6 +81,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
     playList = [];
     Directory dir = await getApplicationSupportDirectory();
+    String? botToken = dotenv.env['bot_token'];
 
     int i = 0;
     List<AudioSource> lst = [];
@@ -107,21 +109,22 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
           ),
         );
       } else {
-        final url = await ref
+        String? url = await ref
             .read(cdNotifierProvider.notifier)
             .loadFileOnline(id, true, showError: false);
         if (url != null) {
+          // url = url.replaceAll("botToken", botToken!);
           if (mounted) {
             ref.read(loadAudiosProvider.notifier).update((state) => state + 1);
           }
-
+          print(url);
           lst.add(
             AudioSource.uri(
               Uri.parse(
                 url,
               ),
               tag: MediaItem(
-                id: id,
+                id: "$i",
                 title: "${courseModel.title} $i",
                 artist: courseModel.ustaz,
                 album: courseModel.category,

@@ -112,19 +112,24 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
 
   @override
   Future<String> loadFileOnline(String fileId, bool isAudio) async {
-    String? botToken = dotenv.env['bot_token'];
+    // String? botToken = dotenv.env['bot_token'];
 
-    if (isAudio) {
-      return fileId.replaceAll("botToken", botToken!);
-    } else {
-      final fileUrl =
-          'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
-      final response = await dio.get(fileUrl);
-      final fileData = response.data['result'];
-      final fileDownloadUrl =
-          'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
-      return fileDownloadUrl;
-    }
+    // if (isAudio) {
+    //   print("$botToken");
+    //   //replaceAll("botToken", botToken!)
+    //   List<String> l = fileId.split("/");
+    //   l[4] = "bot${botToken}";
+    //   // print(fileId.replaceAll("botToken", botToken!));
+    return fileId;
+    // } else {
+    //   final fileUrl =
+    //       'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
+    //   final response = await dio.get(fileUrl);
+    //   final fileData = response.data['result'];
+    //   final fileDownloadUrl =
+    //       'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
+    //   return fileDownloadUrl;
+    // }
   }
 
   @override

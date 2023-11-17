@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/domain/course_detail_repo.dart';
@@ -62,7 +63,7 @@ class CDNotifier extends StateNotifier<bool> {
     final res = await courseDetailRepo.loadFileOnline(fileId, isAudio);
 
     String? url;
-
+   
     res.fold(
       (l) {
         if (showError) {
