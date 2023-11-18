@@ -156,14 +156,12 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   }
 
   Future<void> refresh() async {
-    print("refreshing...");
+    if (kDebugMode) {
+      print("refreshing...");
+    }
     final res = await ref
         .read(mainNotifierProvider.notifier)
         .getSingleCourse(widget.cm.courseId);
-
-    print(
-        "from res:- ${Duration(seconds: res?.pausedAtAudioSec ?? 0).inMinutes}");
-
     if (res != null) {
       courseModel = CourseModel.fromMap(
         widget.cm.toOriginalMap(),

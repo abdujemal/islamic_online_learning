@@ -127,8 +127,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                       GestureDetector(
                         onTap: () async {
                           widget.onClose();
-                          print(
-                              "isFinished: ${metaData.extras?["isFinished"]}");
+                         
                           if (metaData.extras?["isFinished"] == 0) {
                             if (!audioPlayer.hasNext) {
                               showDialog(
@@ -189,7 +188,6 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                               );
                               ref.read(audioProvider).stop();
                             } else {
-                              print(metaData.extras?["courseId"]);
                               ref
                                   .read(mainNotifierProvider.notifier)
                                   .saveCourse(
@@ -213,9 +211,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                     .getSingleCourse(
                                         metaData.extras?["courseId"])
                                     .then((value) {
-                                  print("Saved ");
-                                  print(
-                                      "${Duration(seconds: value?.pausedAtAudioSec ?? 0).inMinutes}");
+                                 
                                   ref.read(audioProvider).stop();
                                 });
                               }).catchError((e) {

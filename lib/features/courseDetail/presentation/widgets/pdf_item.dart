@@ -92,7 +92,6 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                           ),
                         ),
                       ).then((value) {
-                        print("When pops");
                         widget.whenPop();
                       });
                     }
