@@ -215,9 +215,9 @@ class MockMainRepo extends _i1.Mock implements _i7.MainRepo {
 
   @override
   _i4.Future<_i2.Either<_i8.Failure, List<_i5.CourseModel>>>
-      getCoursesHistory() => (super.noSuchMethod(
+      getSavedCourses() => (super.noSuchMethod(
             Invocation.method(
-              #getCoursesHistory,
+              #getSavedCourses,
               [],
             ),
             returnValue: _i4
@@ -225,7 +225,25 @@ class MockMainRepo extends _i1.Mock implements _i7.MainRepo {
                 _FakeEither_0<_i8.Failure, List<_i5.CourseModel>>(
               this,
               Invocation.method(
-                #getCoursesHistory,
+                #getSavedCourses,
+                [],
+              ),
+            )),
+          ) as _i4.Future<_i2.Either<_i8.Failure, List<_i5.CourseModel>>>);
+
+  @override
+  _i4.Future<_i2.Either<_i8.Failure, List<_i5.CourseModel>>>
+      getStartedCourses() => (super.noSuchMethod(
+            Invocation.method(
+              #getStartedCourses,
+              [],
+            ),
+            returnValue: _i4
+                .Future<_i2.Either<_i8.Failure, List<_i5.CourseModel>>>.value(
+                _FakeEither_0<_i8.Failure, List<_i5.CourseModel>>(
+              this,
+              Invocation.method(
+                #getStartedCourses,
                 [],
               ),
             )),
@@ -244,24 +262,6 @@ class MockMainRepo extends _i1.Mock implements _i7.MainRepo {
               this,
               Invocation.method(
                 #getFavoriteCourses,
-                [],
-              ),
-            )),
-          ) as _i4.Future<_i2.Either<_i8.Failure, List<_i5.CourseModel>>>);
-
-  @override
-  _i4.Future<_i2.Either<_i8.Failure, List<_i5.CourseModel>>>
-      getDownloadedCourses() => (super.noSuchMethod(
-            Invocation.method(
-              #getDownloadedCourses,
-              [],
-            ),
-            returnValue: _i4
-                .Future<_i2.Either<_i8.Failure, List<_i5.CourseModel>>>.value(
-                _FakeEither_0<_i8.Failure, List<_i5.CourseModel>>(
-              this,
-              Invocation.method(
-                #getDownloadedCourses,
                 [],
               ),
             )),

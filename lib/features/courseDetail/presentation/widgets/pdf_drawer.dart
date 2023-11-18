@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
@@ -58,7 +59,9 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
       } else {
         isConnected = false;
       }
-      print("is Connected: $isConnected");
+      if (kDebugMode) {
+        print("is Connected: $isConnected");
+      }
     });
 
     courseModel = widget.courseModel;
@@ -127,7 +130,9 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
     if (mounted) {
       setState(() {});
     }
-    print("playlist itams: ${playList.length}");
+    if (kDebugMode) {
+      print("playlist itams: ${playList.length}");
+    }
   }
 
   Future<bool> checkFile(int index) async {
@@ -199,7 +204,7 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                       title: courseModel.title,
                       index: index + 1,
                       courseModel: courseModel,
-                      isFromPDF: true,
+                      isFromPDF: false,
                       onDownloadDone: (String filePath) async {
                         Directory dir = await getApplicationSupportDirectory();
 
@@ -268,7 +273,7 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                     canNeverPlay: !isLoadingAudio && playList.isEmpty,
                     audioId: widget.audios[index],
                     title: courseModel.title,
-                    index: index,
+                    index: index + 1,
                     courseModel: courseModel,
                     isFromPDF: false,
                     onDownloadDone: (String filePath) async {

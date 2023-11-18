@@ -152,7 +152,7 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                         ),
                       ),
                       empty: (_) => const Center(
-                        child: Text("No Courses"),
+                        child: Text("ምድብ የለም"),
                       ),
                       error: (_) => Center(
                         child: Text(_.error.messege),

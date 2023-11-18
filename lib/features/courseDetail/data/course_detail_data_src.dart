@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -50,12 +50,14 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
       return File(filePath);
     }
 
-    String botToken = dotenv.env["bot_token"]!;
+    
 
     ref.read(downloadProgressProvider.notifier).update((state) {
-      print(state.length);
-      print(filePath);
-      print("adding...");
+      if (kDebugMode) {
+        print(state.length);
+        print(filePath);
+        print("adding...");
+      }
       return [
         ...state,
         DownloadProgress(

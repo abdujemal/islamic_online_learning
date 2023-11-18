@@ -3,8 +3,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
@@ -81,7 +81,6 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
     playList = [];
     Directory dir = await getApplicationSupportDirectory();
-    String? botToken = dotenv.env['bot_token'];
 
     int i = 0;
     List<AudioSource> lst = [];
@@ -117,14 +116,13 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
           if (mounted) {
             ref.read(loadAudiosProvider.notifier).update((state) => state + 1);
           }
-          print(url);
           lst.add(
             AudioSource.uri(
               Uri.parse(
                 url,
               ),
               tag: MediaItem(
-                id: "$i",
+                id: url,
                 title: "${courseModel.title} $i",
                 artist: courseModel.ustaz,
                 album: courseModel.category,
@@ -141,7 +139,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     if (mounted) {
       setState(() {});
     }
-    print("playlist itams: ${playList.length}");
+    if (kDebugMode) {
+      print("playlist itams: ${playList.length}");
+    }
   }
 
   Future<bool> checkFile(int index) async {
@@ -156,10 +156,13 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   }
 
   Future<void> refresh() async {
-    await Future.delayed(const Duration(seconds: 2));
+    print("refreshing...");
     final res = await ref
         .read(mainNotifierProvider.notifier)
         .getSingleCourse(widget.cm.courseId);
+
+    print(
+        "from res:- ${Duration(seconds: res?.pausedAtAudioSec ?? 0).inMinutes}");
 
     if (res != null) {
       courseModel = CourseModel.fromMap(
@@ -174,11 +177,14 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
             null,
             showMsg: false,
           );
-      print("it worked");
-      print(courseModel.pdfPage);
+      if (kDebugMode) {
+        print(Duration(seconds: courseModel.pausedAtAudioSec).inMinutes);
+      }
       setState(() {});
     } else {
-      print("it is null");
+      if (kDebugMode) {
+        print("it is null");
+      }
     }
   }
 
@@ -240,9 +246,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                     expandedHeight: MediaQuery.of(context).size.height * 0.40,
                     collapsedHeight: 60,
                     title: TextScroll(
-                      courseModel.title,
                       pauseBetween: const Duration(seconds: 1),
                       velocity: const Velocity(pixelsPerSecond: Offset(30, 0)),
+                      courseModel.title,
                     ),
                     floating: false,
                     pinned: true,
@@ -278,7 +284,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                             builder: (context) => DownloadAllFiles(
                               courseModel: courseModel,
                               onSingleDownloadDone: (filePath) async {
-                                print("Dwonload done $filePath");
+                                if (kDebugMode) {
+                                  print("Dwonload done $filePath");
+                                }
                                 int index = int.parse(filePath
                                     .replaceAll(".mp3", "")
                                     .split(" ")
@@ -496,6 +504,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                         pausedAtAudioSec: 0,
                                       );
                                       setState(() {});
+                                      createPlayList();
                                     },
                                   ),
                               ],
@@ -587,7 +596,6 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   path: pdfPath!,
                                   courseModel: courseModel,
                                   whenPop: () {
-                                    print("Absolutely it is running it");
                                     refresh();
                                   },
                                 ),
@@ -645,7 +653,10 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                     state!.currentSource!.tag as MediaItem;
 
                                 return AudioItem(
-                                  isPlaying: mediaItem.id == audios[index - 1],
+                                  isPlaying:
+                                      mediaItem.id == audios[index - 1] &&
+                                          audioPlayer.processingState !=
+                                              ProcessingState.idle,
                                   canAudioPlay: playList.isNotEmpty,
                                   canNeverPlay:
                                       !isLoadingAudio && playList.isEmpty,
@@ -698,7 +709,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       ref.read(audioProvider).play();
                                     }
                                   },
-                                  onPlayTabed: () {
+                                  onPlayTabed: () async {
                                     // updating the model if the currently playing course is this course
                                     if (isPlayingCourseThisCourse(
                                         courseModel.courseId, ref)) {
@@ -718,7 +729,14 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           initialIndex: index - 1,
                                           preload: false,
                                         );
-                                    ref.read(audioProvider).play();
+                                    try {
+                                      await ref.read(audioProvider).play();
+                                    } catch (e) {
+                                      if (kDebugMode) {
+                                        print(e.toString());
+                                      }
+                                      await ref.read(audioProvider).stop();
+                                    }
                                   },
                                 );
                               }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -114,7 +115,9 @@ Future<File?> displayImage(String? id, String name, WidgetRef ref) async {
       // Return the downloaded file
       return File(filePath);
     } catch (e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print("$e");
+      }
       return File("");
     }
   } else {
@@ -154,7 +157,6 @@ bool isPlayingCourseThisCourse(String courseId, WidgetRef ref,
         return true;
       }
     } else {
-      
       return true;
     }
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
@@ -55,7 +56,9 @@ class MainListNotifier extends StateNotifier<MainListState> {
             isLoadingMore: false,
           );
         } else {
-          print(r.length);
+          if (kDebugMode) {
+            print(r.length);
+          }
           courses = [
             ...courses,
             ...r,
@@ -155,7 +158,9 @@ class MainListNotifier extends StateNotifier<MainListState> {
     res.fold(
       (l) {
         toast(l.messege, ToastType.error);
-        print(l.messege);
+        if (kDebugMode) {
+          print(l.messege);
+        }
       },
       (r) {
         if (showMsg) {

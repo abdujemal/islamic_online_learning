@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_state.dart';
@@ -16,7 +17,9 @@ class UstazListNotifier extends StateNotifier<UstazListState> {
         state = UstazListState.error(error: l);
       },
       (r) {
-        print("loaded");
+        if (kDebugMode) {
+          print("loaded");
+        }
         if (r.isEmpty) {
           state = UstazListState.empty(ustazs: r);
           return;

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
@@ -8,12 +9,15 @@ import 'package:islamic_online_learning/features/main/presentation/state/provide
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/position_data_model.dart';
 import '../../../main/data/model/course_model.dart';
 import '../stateNotifier/providers.dart';
 import 'package:rxdart/rxdart.dart';
+
+import 'finish_confirmation.dart';
 
 class AudioBottomView extends ConsumerStatefulWidget {
   final String courseId;
@@ -48,13 +52,17 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
         stream: myAudioStream(audioPlayer),
         builder: (context, snp) {
           final state = snp.data?.sequenceState;
-          print("wooooooooooooo");
+          if (kDebugMode) {
+            print("wooooooooooooo");
+          }
           if (state?.sequence.isEmpty ?? true) {
             return const SizedBox();
           }
 
           if (audioPlayer.processingState == ProcessingState.completed) {
-            print("Donw mate");
+            if (kDebugMode) {
+              print("Donw mate");
+            }
           }
 
           final metaData = state!.currentSource!.tag as MediaItem;
@@ -94,9 +102,11 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(
+                        child: TextScroll(
+                          pauseBetween: const Duration(seconds: 1),
+                          velocity:
+                              const Velocity(pixelsPerSecond: Offset(30, 0)),
                           metaData.title,
-                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(fontSize: 16),
                         ),
                       ),
@@ -117,31 +127,108 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                       GestureDetector(
                         onTap: () async {
                           widget.onClose();
+                          print(
+                              "isFinished: ${metaData.extras?["isFinished"]}");
                           if (metaData.extras?["isFinished"] == 0) {
-                            await ref
-                                .read(mainNotifierProvider.notifier)
-                                .saveCourse(
-                                  CourseModel.fromMap(
-                                    metaData.extras as Map,
-                                    metaData.extras?["courseId"],
-                                  ).copyWith(
-                                    isStarted: 1,
-                                    pausedAtAudioNum: audioPlayer.currentIndex,
-                                    pausedAtAudioSec:
-                                        audioPlayer.position.inSeconds,
-                                    lastViewed: DateTime.now().toString(),
-                                  ),
-                                  null,
-                                  showMsg: false,
-                                );
+                            if (!audioPlayer.hasNext) {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (ctx) => FinishConfirmation(
+                                  title: metaData.title
+                                      .split(" ")
+                                      .sublist(
+                                        0,
+                                        metaData.title.split(" ").length - 2,
+                                      )
+                                      .join(" "),
+                                  onConfirm: () {
+                                    ref
+                                        .read(mainNotifierProvider.notifier)
+                                        .saveCourse(
+                                          CourseModel.fromMap(
+                                            metaData.extras as Map,
+                                            metaData.extras?["courseId"],
+                                          ).copyWith(
+                                            isStarted: 1,
+                                            isFinished: 1,
+                                            pausedAtAudioNum:
+                                                audioPlayer.currentIndex,
+                                            pausedAtAudioSec:
+                                                audioPlayer.position.inSeconds,
+                                            lastViewed:
+                                                DateTime.now().toString(),
+                                          ),
+                                          null,
+                                          showMsg: false,
+                                        );
+                                    Navigator.pop(context);
+                                  },
+                                  onDenied: () {
+                                    ref
+                                        .read(mainNotifierProvider.notifier)
+                                        .saveCourse(
+                                          CourseModel.fromMap(
+                                            metaData.extras as Map,
+                                            metaData.extras?["courseId"],
+                                          ).copyWith(
+                                            isStarted: 1,
+                                            pausedAtAudioNum:
+                                                audioPlayer.currentIndex,
+                                            pausedAtAudioSec:
+                                                audioPlayer.position.inSeconds,
+                                            lastViewed:
+                                                DateTime.now().toString(),
+                                          ),
+                                          null,
+                                          showMsg: false,
+                                        );
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              );
+                              ref.read(audioProvider).stop();
+                            } else {
+                              print(metaData.extras?["courseId"]);
+                              ref
+                                  .read(mainNotifierProvider.notifier)
+                                  .saveCourse(
+                                    CourseModel.fromMap(
+                                      metaData.extras as Map,
+                                      metaData.extras?["courseId"],
+                                    ).copyWith(
+                                      isStarted: 1,
+                                      pausedAtAudioNum:
+                                          audioPlayer.currentIndex,
+                                      pausedAtAudioSec:
+                                          audioPlayer.position.inSeconds,
+                                      lastViewed: DateTime.now().toString(),
+                                    ),
+                                    null,
+                                    showMsg: false,
+                                  )
+                                  .then((value) {
+                                ref
+                                    .read(mainNotifierProvider.notifier)
+                                    .getSingleCourse(
+                                        metaData.extras?["courseId"])
+                                    .then((value) {
+                                  print("Saved ");
+                                  print(
+                                      "${Duration(seconds: value?.pausedAtAudioSec ?? 0).inMinutes}");
+                                  ref.read(audioProvider).stop();
+                                });
+                              }).catchError((e) {
+                                print("$e");
+                              });
+                            }
                           }
-                          ref.read(audioProvider).stop();
                         },
-                        child: const Row(
-                          children: [
-                            Text("መዝግብ ና አቁም"),
-                            Icon(Icons.close),
-                          ],
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 5.0,
+                          ),
+                          child: Icon(Icons.close),
                         ),
                       )
                     ],

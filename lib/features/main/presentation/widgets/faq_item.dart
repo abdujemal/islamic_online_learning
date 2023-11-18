@@ -26,14 +26,14 @@ class _FaqItemState extends ConsumerState<FaqItem> {
         children: [
           Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
-              Icon(Icons.subdirectory_arrow_right_rounded),
+              const Icon(Icons.subdirectory_arrow_right_rounded),
               Expanded(child: Text(widget.faqModel.answer)),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           )
         ],

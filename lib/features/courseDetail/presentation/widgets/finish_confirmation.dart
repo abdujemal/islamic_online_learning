@@ -9,11 +9,13 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class FinishConfirmation extends ConsumerStatefulWidget {
-  final VoidCallback action;
+  final VoidCallback onConfirm;
+  final VoidCallback? onDenied;
   final String title;
   const FinishConfirmation({
     super.key,
-    required this.action,
+    required this.onConfirm,
+    this.onDenied,
     required this.title,
   });
 
@@ -72,7 +74,7 @@ class _FinishConfirmationState extends ConsumerState<FinishConfirmation> {
         ),
         backgroundColor: Theme.of(context).cardColor,
         child: SizedBox(
-          height: showCup ? 300 : 165,
+          height: showCup ? 250 : 175,
           child: Padding(
             padding: const EdgeInsets.all(25),
             child: Stack(
@@ -113,10 +115,11 @@ class _FinishConfirmationState extends ConsumerState<FinishConfirmation> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
+                              onPressed: widget.onDenied ??
+                                  () {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
                               child: Text(
                                 "አይ",
                                 style: TextStyle(
@@ -136,9 +139,9 @@ class _FinishConfirmationState extends ConsumerState<FinishConfirmation> {
                                 _controller.play();
                                 _controller1.play();
 
-                                Future.delayed(const Duration(seconds: 6))
+                                Future.delayed(const Duration(seconds: 4))
                                     .then((value) {
-                                  widget.action();
+                                  widget.onConfirm();
                                 });
                               },
                               child: Ink(
@@ -153,8 +156,7 @@ class _FinishConfirmationState extends ConsumerState<FinishConfirmation> {
                                 child: const Text(
                                   "አዎን",
                                   style: TextStyle(
-                                    fontSize: 20,
-                                  ),
+                                      fontSize: 20, color: whiteColor),
                                 ),
                               ),
                             ),

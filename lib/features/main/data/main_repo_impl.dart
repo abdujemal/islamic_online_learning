@@ -52,18 +52,6 @@ class IMainRepo extends MainRepo {
   }
 
   @override
-  FutureEither<List<CourseModel>> getCoursesHistory() {
-    // TODO: implement getCoursesHistory
-    throw UnimplementedError();
-  }
-
-  @override
-  FutureEither<List<CourseModel>> getDownloadedCourses() {
-    // TODO: implement getDownloadedCourses
-    throw UnimplementedError();
-  }
-
-  @override
   FutureEither<List<CourseModel>> getFavoriteCourses() async {
     try {
       final res = await mainDataSrc.getFavoriteCourses();

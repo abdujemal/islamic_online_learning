@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/domain/course_detail_repo.dart';
@@ -35,7 +35,9 @@ class CDNotifier extends StateNotifier<bool> {
           if (l.messege.contains("Failed host lookup")) {
             toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
           } else {
-            print(l.messege);
+            if (kDebugMode) {
+              print(l.messege);
+            }
           }
         } else if (l.messege == "out of storage") {
           toast("ስልክዎ ስለሞላ የተወሰነ ፋይሎችን ያጥፉ!", ToastType.error);
@@ -69,7 +71,9 @@ class CDNotifier extends StateNotifier<bool> {
         if (showError) {
           toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
         }
-        print(l.messege);
+        if (kDebugMode) {
+          print(l.messege);
+        }
       },
       (r) {
         url = r;

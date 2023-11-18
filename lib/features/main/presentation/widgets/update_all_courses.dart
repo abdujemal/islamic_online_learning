@@ -1,8 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
 class UpdateAllCourses extends ConsumerStatefulWidget {
@@ -56,7 +54,7 @@ class _UpdateAllCoursesState extends ConsumerState<UpdateAllCourses> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      child: Container(
+      child: SizedBox(
         height: 400,
         child: SingleChildScrollView(
           child: Column(

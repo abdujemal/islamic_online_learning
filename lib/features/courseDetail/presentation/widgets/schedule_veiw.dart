@@ -125,6 +125,11 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                       child: Chip(
                         label: Text(
                           weekDays.keys.toList()[index],
+                          style: TextStyle(
+                            color: weekDays.values.toList()[index]
+                                ? whiteColor
+                                : null,
+                          ),
                         ),
                         backgroundColor: weekDays.values.toList()[index]
                             ? primaryColor

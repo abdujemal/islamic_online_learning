@@ -83,7 +83,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                     .then((file) async {
                   if (file != null) {
                     if (mounted) {
-                      await Navigator.push(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => PdfPage(
@@ -91,8 +91,10 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                             courseModel: widget.courseModel,
                           ),
                         ),
-                      );
-                      widget.whenPop();
+                      ).then((value) {
+                        print("When pops");
+                        widget.whenPop();
+                      });
                     }
                   }
 

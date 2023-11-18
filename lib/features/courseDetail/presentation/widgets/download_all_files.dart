@@ -2,6 +2,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,7 +39,9 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
   }
 
   downloadAllFiles() async {
-    print("started");
+    if (kDebugMode) {
+      print("started");
+    }
     CDNotifier cdNotifier = ref.read(cdNotifierProvider.notifier);
     // downloading the pdf
     cancelToken = CancelToken();
@@ -72,7 +75,9 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
         '${widget.courseModel.ustaz},${widget.courseModel.title} $i.mp3',
         "Audio",
       );
-      print(isAudioDownloaded);
+      if (kDebugMode) {
+        print(isAudioDownloaded);
+      }
       if (!isAudioDownloaded) {
         final file = await cdNotifier.downloadFile(
           audioId,

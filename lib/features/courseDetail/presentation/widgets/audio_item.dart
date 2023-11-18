@@ -2,8 +2,10 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -16,6 +18,7 @@ import 'package:islamic_online_learning/features/main/data/model/course_model.da
 import '../../../main/presentation/state/provider.dart';
 import '../../data/course_detail_data_src.dart';
 import 'delete_confirmation.dart';
+import 'finish_confirmation.dart';
 
 class AudioItem extends ConsumerStatefulWidget {
   final String audioId;
@@ -181,24 +184,78 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                         if (metaData != null) {
                           if ((metaData as MediaItem).extras?["isFinished"] ==
                               0) {
-                            await ref
-                                .read(mainNotifierProvider.notifier)
-                                .saveCourse(
-                                  CourseModel.fromMap(
-                                    (metaData as MediaItem).extras as Map,
-                                    metaData.extras?["courseId"],
-                                  ).copyWith(
-                                    isStarted: 1,
-                                    pausedAtAudioNum: audioPlayer.currentIndex,
-                                    pausedAtAudioSec:
-                                        audioPlayer.position.inSeconds,
-                                    lastViewed: DateTime.now().toString(),
-                                  ),
-                                  null,
-                                  showMsg: false,
-                                );
+                            if (!audioPlayer.hasNext &&
+                                audioPlayer.processingState !=
+                                    ProcessingState.idle) {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (ctx) => FinishConfirmation(
+                                  title: widget.courseModel.title,
+                                  onConfirm: () {
+                                    ref
+                                        .read(mainNotifierProvider.notifier)
+                                        .saveCourse(
+                                          widget.courseModel.copyWith(
+                                            isStarted: 1,
+                                            isFinished: 1,
+                                            lastViewed:
+                                                DateTime.now().toString(),
+                                            pausedAtAudioNum: widget
+                                                    .courseModel.courseIds
+                                                    .split(",")
+                                                    .length -
+                                                1,
+                                          ),
+                                          null,
+                                          showMsg: false,
+                                        );
+                                    Navigator.pop(context);
+                                  },
+                                  onDenied: () {
+                                    ref
+                                        .read(mainNotifierProvider.notifier)
+                                        .saveCourse(
+                                          widget.courseModel.copyWith(
+                                            isStarted: 1,
+                                            lastViewed:
+                                                DateTime.now().toString(),
+                                            pausedAtAudioNum: widget
+                                                    .courseModel.courseIds
+                                                    .split(",")
+                                                    .length -
+                                                1,
+                                          ),
+                                          null,
+                                          showMsg: false,
+                                        );
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              );
+                            } else {
+                              await ref
+                                  .read(mainNotifierProvider.notifier)
+                                  .saveCourse(
+                                    CourseModel.fromMap(
+                                      metaData.extras as Map,
+                                      metaData.extras?["courseId"],
+                                    ).copyWith(
+                                      isStarted: 1,
+                                      pausedAtAudioNum:
+                                          audioPlayer.currentIndex,
+                                      pausedAtAudioSec:
+                                          audioPlayer.position.inSeconds,
+                                      lastViewed: DateTime.now().toString(),
+                                    ),
+                                    null,
+                                    showMsg: false,
+                                  );
+                            }
                           }
-                          print(metaData.extras?["courseId"]);
+                          if (kDebugMode) {
+                            print(metaData.extras?["courseId"]);
+                          }
                         }
                         widget.onPlayTabed();
                       },

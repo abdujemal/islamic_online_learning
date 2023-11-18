@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import 'package:islamic_online_learning/features/courseDetail/presentation/widge
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
@@ -58,17 +60,23 @@ class _PdfPageState extends ConsumerState<PdfPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    courseModel = widget.courseModel;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final audioPlayer = ref.watch(audioProvider);
 
     ThemeMode theme = ref.read(themeProvider);
 
-    courseModel = widget.courseModel;
-
     return WillPopScope(
       onWillPop: () async {
-        print("currentPage:$currentPage");
-        print("totalPage:$pages");
+        if (kDebugMode) {
+          print("currentPage:$currentPage");
+          print("totalPage:$pages");
+        }
         if (currentPage != null && pages != null) {
           if ((currentPage! + 1) / pages! == 1) {
             showDialog(
@@ -76,7 +84,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
               barrierDismissible: false,
               builder: (ctx) => FinishConfirmation(
                 title: courseModel.title,
-                action: () {
+                onConfirm: () {
                   ref.read(mainNotifierProvider.notifier).saveCourse(
                         courseModel.copyWith(
                           isStarted: 1,
@@ -95,8 +103,12 @@ class _PdfPageState extends ConsumerState<PdfPage> {
               ),
             );
           } else {
-            print(currentPage! + 1);
-            ref.read(mainNotifierProvider.notifier).saveCourse(
+            if (kDebugMode) {
+              print("the page is${currentPage! + 1}");
+            }
+            ref
+                .read(mainNotifierProvider.notifier)
+                .saveCourse(
                   courseModel.copyWith(
                     isStarted: 1,
                     pdfPage: currentPage! + 1,
@@ -104,8 +116,12 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                   ),
                   null,
                   showMsg: false,
-                );
-            Navigator.pop(context);
+                )
+                .then(
+              (value) {
+                Navigator.pop(context);
+              },
+            );
           }
         }
         return false;
@@ -132,7 +148,11 @@ class _PdfPageState extends ConsumerState<PdfPage> {
             return Scaffold(
               key: _scaffoldKey,
               appBar: AppBar(
-                title: Text(courseModel.title),
+                title: TextScroll(
+                  pauseBetween: const Duration(seconds: 1),
+                  velocity: const Velocity(pixelsPerSecond: Offset(30, 0)),
+                  courseModel.title,
+                ),
                 actions: [
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10),

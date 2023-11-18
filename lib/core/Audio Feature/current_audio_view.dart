@@ -7,6 +7,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 import '../../features/courseDetail/presentation/pages/course_detail.dart';
+import '../../features/courseDetail/presentation/widgets/finish_confirmation.dart';
 import '../../features/main/presentation/state/provider.dart';
 
 class CurrentAudioView extends ConsumerStatefulWidget {
@@ -89,19 +90,70 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
               IconButton(
                 onPressed: () async {
                   if (widget.mediaItem.extras?["isFinished"] == 0) {
-                    await ref.read(mainNotifierProvider.notifier).saveCourse(
-                          CourseModel.fromMap(
-                            widget.mediaItem.extras as Map,
-                            widget.mediaItem.extras?["courseId"],
-                          ).copyWith(
-                            isStarted: 1,
-                            pausedAtAudioNum: audioPlayer.currentIndex,
-                            pausedAtAudioSec: audioPlayer.position.inSeconds,
-                            lastViewed: DateTime.now().toString(),
-                          ),
-                          null,
-                          showMsg: false,
-                        );
+                    if (!audioPlayer.hasNext) {
+                      await showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (ctx) => FinishConfirmation(
+                          title: widget.mediaItem.title
+                              .split(" ")
+                              .sublist(
+                                0,
+                                widget.mediaItem.title.split(" ").length - 2,
+                              )
+                              .join(" "),
+                          onConfirm: () {
+                            ref.read(mainNotifierProvider.notifier).saveCourse(
+                                  CourseModel.fromMap(
+                                    widget.mediaItem.extras as Map,
+                                    widget.mediaItem.extras?["courseId"],
+                                  ).copyWith(
+                                    isStarted: 1,
+                                    isFinished: 1,
+                                    pausedAtAudioNum: audioPlayer.currentIndex,
+                                    pausedAtAudioSec:
+                                        audioPlayer.position.inSeconds,
+                                    lastViewed: DateTime.now().toString(),
+                                  ),
+                                  null,
+                                  showMsg: false,
+                                );
+                            Navigator.pop(context);
+                          },
+                          onDenied: () {
+                            ref.read(mainNotifierProvider.notifier).saveCourse(
+                                  CourseModel.fromMap(
+                                    widget.mediaItem.extras as Map,
+                                    widget.mediaItem.extras?["courseId"],
+                                  ).copyWith(
+                                    isStarted: 1,
+                                    pausedAtAudioNum: audioPlayer.currentIndex,
+                                    pausedAtAudioSec:
+                                        audioPlayer.position.inSeconds,
+                                    lastViewed: DateTime.now().toString(),
+                                  ),
+                                  null,
+                                  showMsg: false,
+                                );
+                            Navigator.pop(context);
+                          },
+                        ),
+                      );
+                    } else {
+                      await ref.read(mainNotifierProvider.notifier).saveCourse(
+                            CourseModel.fromMap(
+                              widget.mediaItem.extras as Map,
+                              widget.mediaItem.extras?["courseId"],
+                            ).copyWith(
+                              isStarted: 1,
+                              pausedAtAudioNum: audioPlayer.currentIndex,
+                              pausedAtAudioSec: audioPlayer.position.inSeconds,
+                              lastViewed: DateTime.now().toString(),
+                            ),
+                            null,
+                            showMsg: false,
+                          );
+                    }
                   }
                   ref.read(audioProvider).stop();
                 },
