@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
@@ -39,8 +38,6 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
     return fldrs[fldrs.length - 1].split(",")[0];
   }
 
- 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +60,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
             builder: (ctx) => DeleteConfirmation(
               title: "ሁሉ",
               action: () async {
-                await audiosNotifier.deleteAllFiles();
+                await audiosNotifier.deleteAllFiles(context);
                 audiosNotifier.getAudios();
               },
             ),

@@ -23,7 +23,7 @@ class CDNotifier extends StateNotifier<bool> {
     CancelToken cancelToken,
     BuildContext context,
   ) async {
-    toast("ትንሽ ይጠብቁን...", ToastType.normal);
+    toast("ትንሽ ይጠብቁን...", ToastType.normal, context);
     final res = await courseDetailRepo.downloadFile(
         fileId, fileName, folderName, cancelToken, ref);
 
@@ -33,14 +33,14 @@ class CDNotifier extends StateNotifier<bool> {
       (l) {
         if (!l.messege.contains("[request cancelled]")) {
           if (l.messege.contains("Failed host lookup")) {
-            toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
+            toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, context, isLong: true);
           } else {
             if (kDebugMode) {
               print(l.messege);
             }
           }
         } else if (l.messege == "out of storage") {
-          toast("ስልክዎ ስለሞላ የተወሰነ ፋይሎችን ያጥፉ!", ToastType.error);
+          toast("ስልክዎ ስለሞላ የተወሰነ ፋይሎችን ያጥፉ!", ToastType.error, context);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -59,17 +59,18 @@ class CDNotifier extends StateNotifier<bool> {
 
   Future<String?> loadFileOnline(
     String fileId,
-    bool isAudio, {
+    bool isAudio,
+    BuildContext context, {
     bool showError = true,
   }) async {
     final res = await courseDetailRepo.loadFileOnline(fileId, isAudio);
 
     String? url;
-   
+
     res.fold(
       (l) {
         if (showError) {
-          toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, isLong: true);
+          toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.error, context, isLong: true);
         }
         if (kDebugMode) {
           print(l.messege);
@@ -83,14 +84,14 @@ class CDNotifier extends StateNotifier<bool> {
     return url;
   }
 
-  Future<bool> isDownloaded(String fileName, String folderName) async {
+  Future<bool> isDownloaded(String fileName, String folderName, BuildContext context) async {
     bool isAvailable = false;
     final res =
         await courseDetailRepo.checkIfTheFileIsDownloaded(fileName, folderName);
 
     res.fold(
       (l) {
-        toast(l.toString(), ToastType.error);
+        toast(l.toString(), ToastType.error, context);
       },
       (r) {
         isAvailable = r;
@@ -100,14 +101,14 @@ class CDNotifier extends StateNotifier<bool> {
     return isAvailable;
   }
 
-  Future<bool> deleteFile(String fileName, String folderName) async {
+  Future<bool> deleteFile(String fileName, String folderName, BuildContext context) async {
     bool isDeleted = false;
 
     final res = await courseDetailRepo.deleteFile(fileName, folderName);
 
     res.fold(
       (l) {
-        toast(l.messege, ToastType.error);
+        toast(l.messege, ToastType.error, context);
         isDeleted = false;
       },
       (r) {

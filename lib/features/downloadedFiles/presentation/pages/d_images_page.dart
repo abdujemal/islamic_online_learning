@@ -58,7 +58,7 @@ class _DImagesPageState extends ConsumerState<DImagesPage> {
             builder: (ctx) => DeleteConfirmation(
               title: "ሁሉ",
               action: () async {
-                await imageNotifier.deleteAllFiles();
+                await imageNotifier.deleteAllFiles(context);
                 imageNotifier.getImages();
               },
             ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/data/main_data_src.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/beginner_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/category_list_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/category_list_state.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/faq_list_notifier.dart';
@@ -18,6 +19,7 @@ import 'package:islamic_online_learning/features/main/presentation/state/ustaz_l
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/main_repo_impl.dart';
+import 'beginner_list_state.dart';
 import 'fav_list_notifier.dart';
 
 final themeProvider = StateProvider<ThemeMode>((ref) {
@@ -30,6 +32,10 @@ final fontScaleProvider = StateProvider<double>((ref) {
 
 final showGuideProvider = StateProvider<bool>((ref) {
   return false;
+});
+
+final showBeginnerProvider = StateProvider<bool>((ref) {
+  return true;
 });
 
 final sharedPrefProvider = Provider<Future<SharedPreferences>>((ref) {
@@ -83,4 +89,9 @@ final faqNotifierProvider =
 final startedNotifierProvider =
     StateNotifierProvider<StartedListNotifier, StartedListState>((ref) {
   return StartedListNotifier(ref.read(mainRepoProvider), ref);
+});
+
+final beginnerListProvider =
+    StateNotifierProvider<BeginnerListNotifier, BeginnerListState>((ref) {
+  return BeginnerListNotifier(ref.read(mainRepoProvider));
 });

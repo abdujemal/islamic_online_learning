@@ -1,5 +1,6 @@
 import 'dart:async';
 // import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,6 +11,7 @@ import 'package:islamic_online_learning/core/database_helper.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
+// import 'features/courseDetail/presentation/widgets/delete_confirmation.dart';
 import 'features/main/presentation/pages/main_page.dart';
 import 'firebase_options.dart';
 
@@ -22,7 +24,7 @@ Future<void> main() async {
     androidNotificationIcon: 'mipmap/book',
   );
   await dotenv.load();
-  // await AndroidAlarmManager.initialize();
+  await AndroidAlarmManager.initialize();
   await DatabaseHelper().initializeDatabase();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -53,6 +55,7 @@ class Main extends StatelessWidget {
               backgroundColor: Colors.grey.shade700,
             ),
             dividerColor: Colors.white38,
+            
           ),
           theme: ThemeData(
             dividerColor: Colors.black45,
@@ -97,10 +100,11 @@ class Main extends StatelessWidget {
 //       home: Material(
 //         child: DeleteConfirmation(
 //           title: "title",
-//           action: () {},
+//           action: () async {
+//             // await FlutterOverlayWindow.closeOverlay();
+//           },
 //         ),
 //       ),
 //     ),
 //   );
 // }
-

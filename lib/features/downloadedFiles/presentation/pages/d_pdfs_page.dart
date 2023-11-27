@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/downloadedFiles/presentation/stateNotifier/pdfs_notifier.dart';
@@ -57,7 +55,7 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
             builder: (ctx) => DeleteConfirmation(
               title: "ሁሉ",
               action: () async {
-                await pdfsNotifier.deleteAllFiles();
+                await pdfsNotifier.deleteAllFiles(context);
                 pdfsNotifier.getPdfs();
               },
             ),

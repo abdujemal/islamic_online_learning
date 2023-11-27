@@ -32,7 +32,23 @@ const primaryColor = MaterialColor(
   },
 );
 
-void toast(String message, ToastType toastType, {bool isLong = false}) {
+void toast(String message, ToastType toastType, BuildContext context,
+    {bool isLong = false}) {
+  // final snackbar = SnackBar(
+  //   content: Text(
+  //     message,
+  //     style: const TextStyle(color: whiteColor),
+  //   ),
+  //   duration: Duration(seconds: isLong ? 5 : 1),
+  //   backgroundColor: toastType == ToastType.error
+  //       ? Colors.red
+  //       : toastType == ToastType.success
+  //           ? primaryColor
+  //           : Colors.black,
+  // );
+
+  // // Show the snackbar
+  // ScaffoldMessenger.of(context).showSnackBar(snackbar);
   Fluttertoast.showToast(
     msg: message,
     toastLength: isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,

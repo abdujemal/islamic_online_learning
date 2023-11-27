@@ -101,27 +101,30 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
           ),
         );
       } else {
-        final url = await ref
-            .read(cdNotifierProvider.notifier)
-            .loadFileOnline(id, true, showError: false);
-        if (url != null) {
-          ref.read(loadAudiosProvider.notifier).update((state) => state + 1);
+        if (mounted) {
+          final url = await ref
+              .read(cdNotifierProvider.notifier)
+              .loadFileOnline(id, true, context, showError: false);
+          if (url != null) {
+            ref.read(loadAudiosProvider.notifier).update((state) => state + 1);
 
-          lst.add(
-            AudioSource.uri(
-              Uri.parse(
-                url,
+            lst.add(
+              AudioSource.uri(
+                Uri.parse(
+                  url,
+                ),
+                tag: MediaItem(
+                  id: id,
+                  title: "${courseModel.title} $i",
+                  artist: courseModel.ustaz,
+                  album: courseModel.category,
+                  artUri:
+                      Uri.file("${dir.path}/Images/${courseModel.title}.jpg"),
+                  extras: courseModel.toMap(),
+                ),
               ),
-              tag: MediaItem(
-                id: id,
-                title: "${courseModel.title} $i",
-                artist: courseModel.ustaz,
-                album: courseModel.category,
-                artUri: Uri.file("${dir.path}/Images/${courseModel.title}.jpg"),
-                extras: courseModel.toMap(),
-              ),
-            ),
-          );
+            );
+          }
         }
       }
     }
@@ -137,11 +140,12 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
 
   Future<bool> checkFile(int index) async {
     if (mounted) {
-      final isDownloaded = await ref
-          .read(cdNotifierProvider.notifier)
-          .isDownloaded(
-              "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
-              "Audio");
+      final isDownloaded =
+          await ref.read(cdNotifierProvider.notifier).isDownloaded(
+                "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
+                "Audio",
+                context,
+              );
       return isDownloaded;
     }
     return false;

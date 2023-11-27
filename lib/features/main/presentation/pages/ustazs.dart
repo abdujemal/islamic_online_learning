@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
+import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/ustaz_list_notifier.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -120,6 +121,7 @@ class _UstazsState extends ConsumerState<Ustazs> {
                     onRefresh: () async {
                       await ustazListNotifier.getUstaz();
                     },
+                    color: primaryColor,
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
                       itemCount: _.ustazs.length,

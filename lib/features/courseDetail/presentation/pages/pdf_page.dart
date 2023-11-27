@@ -85,6 +85,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
               builder: (ctx) => FinishConfirmation(
                 title: courseModel.title,
                 onConfirm: () {
+                  if(mounted){
+
                   ref.read(mainNotifierProvider.notifier).saveCourse(
                         courseModel.copyWith(
                           isStarted: 1,
@@ -95,8 +97,10 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                               courseModel.courseIds.split(",").length - 1,
                         ),
                         null,
+                        context,
                         showMsg: false,
                       );
+                  }
                   Navigator.pop(context);
                   Navigator.pop(context);
                 },
@@ -115,6 +119,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                     lastViewed: DateTime.now().toString(),
                   ),
                   null,
+                  context,
                   showMsg: false,
                 )
                 .then(
@@ -300,10 +305,10 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                   });
                 },
                 onError: (error) {
-                  toast(error, ToastType.error);
+                  toast(error, ToastType.error, context);
                 },
                 onPageError: (page, error) {
-                  toast('$page: ${error.toString()}', ToastType.error);
+                  toast('$page: ${error.toString()}', ToastType.error, context);
                 },
                 onViewCreated: (PDFViewController pdfViewController) {
                   _controller = pdfViewController;
@@ -311,7 +316,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                 onPageChanged: (int? page, int? total) {
                   if (page != null && total != null) {
                     currentPage = page;
-                    toast("${page + 1} / $total", ToastType.normal);
+                    toast("${page + 1} / $total", ToastType.normal, context);
                   }
                 },
               ),

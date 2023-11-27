@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,12 +22,14 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
 
   bool guide = false;
 
+  bool beginner = true;
+
   @override
   void initState() {
     super.initState();
     if (mounted) {
       ref.read(sharedPrefProvider).then((pref) {
-        bool isSubed = pref.getBool("isSubed") ?? false;
+        bool isSubed = pref.getBool("isSubed") ?? true;
         setState(() {
           notification = isSubed;
         });
@@ -36,6 +39,15 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
         bool show = pref.getBool("showGuide") ?? true;
         setState(() {
           guide = show;
+        });
+      });
+
+      ref.read(sharedPrefProvider).then((pref) {
+        bool? show = pref.getBool("showBeginner");
+        print(show);
+        ref.read(showBeginnerProvider.notifier).update((state) => show ?? true);
+        setState(() {
+          beginner = show ?? true;
         });
       });
     }
@@ -104,6 +116,27 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       ),
                     );
                   }),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Theme.of(context).chipTheme.backgroundColor!,
+                        ),
+                      ),
+                    ),
+                    child: ListTile(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (ctx) => const DownloadedFilesPage(),
+                          ),
+                        );
+                      },
+                      leading: const Icon(Icons.download_rounded),
+                      title: const Text("ዳውንሎድ የተደረጉ ፋይሎች"),
+                    ),
+                  ),
                   // fontScale
                   Container(
                     decoration: BoxDecoration(
@@ -138,6 +171,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       );
                     }),
                   ),
+
                   Container(
                     decoration: BoxDecoration(
                       border: Border(
@@ -162,7 +196,6 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       ),
                     ),
                   ),
-
                   Container(
                     decoration: BoxDecoration(
                       border: Border(
@@ -172,18 +205,26 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       ),
                     ),
                     child: ListTile(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (ctx) => const DownloadedFilesPage(),
-                          ),
-                        );
-                      },
-                      leading: const Icon(Icons.download_rounded),
-                      title: const Text("ዳውንሎድ የተደረጉ ፋይሎች"),
+                      leading: const Icon(Icons.book),
+                      title: const Text("የጀማሪ ደርሶችን አሳየኝ"),
+                      trailing: CupertinoSwitch(
+                        value: beginner,
+                        activeColor: primaryColor,
+                        onChanged: (v) async {
+                          setState(() {
+                            beginner = v;
+                          });
+                          ref
+                              .read(showBeginnerProvider.notifier)
+                              .update((state) => v);
+
+                          final pref = await ref.read(sharedPrefProvider);
+                          pref.setBool("showBeginner", v);
+                        },
+                      ),
                     ),
                   ),
+
                   Container(
                     decoration: BoxDecoration(
                       border: Border(
@@ -205,6 +246,14 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                           final pref = await ref.read(sharedPrefProvider);
                           pref.setBool("isSubed", v);
                           if (v) {
+                            AwesomeNotifications()
+                                .isNotificationAllowed()
+                                .then((isAllowed) {
+                              if (!isAllowed) {
+                                AwesomeNotifications()
+                                    .requestPermissionToSendNotifications();
+                              }
+                            });
                             ref
                                 .read(firebaseMessagingProvider)
                                 .subscribeToTopic("ders");

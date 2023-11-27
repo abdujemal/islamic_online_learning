@@ -142,7 +142,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                   height: 15,
                 ),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     if (_formKey.currentState!.validate()) {
                       bool check = false;
                       weekDays.forEach((key, value) {
@@ -154,13 +154,34 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                         toast(
                           "እባክዎ ከቀናት ውስጥ የሚመችዎትን ቀን ይምረጡ።",
                           ToastType.error,
+                          context,
                           isLong: true,
                         );
                         return;
                       }
 
-                      Schedule().scheduleNotification(0, "title", "body");
-                      Navigator.pop(context);
+                      // final bool state =
+                      //     await FlutterOverlayWindow.isPermissionGranted();
+
+                      // if (!state) {
+                      //   final bool? status =
+                      //       await FlutterOverlayWindow.requestPermission();
+
+                      //   if (status != true) {
+                      //     toast("አስታዋሽዎን መመዝገብ አልቻልንም።", ToastType.error);
+                      //     return;
+                      //   }
+                      // }
+
+                      await Schedule().scheduleNotification(
+                        0,
+                        "የደርስ አስታዋሽ",
+                        widget.courseModel.title,
+                        DateTime.now(),
+                      );
+                      if (mounted) {
+                        Navigator.pop(context);
+                      }
                     }
                   },
                   child: Ink(

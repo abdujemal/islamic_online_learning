@@ -16,6 +16,7 @@ abstract class MainDataSrc {
   Future<int> saveTheCourse(CourseModel courseModel);
   Future<List<String>> getUstazs();
   Future<List<String>> getCategories();
+  Future<List<CourseModel>> getBeginnerCourses();
   Future<List<CourseModel>> searchCourses(String query, int? numOfelt);
   Future<void> deleteCourse(int id);
 }
@@ -43,7 +44,7 @@ class IMainDataSrc extends MainDataSrc {
                 method == SortingMethod.dateDSC ? 'dateTime' : "title",
                 descending: method == SortingMethod.dateDSC,
               )
-              .limit(numOfDoc)
+              .limit(24)
               .get()
           : await firebaseFirestore
               .collection(FirebaseConst.courses)
@@ -137,6 +138,23 @@ class IMainDataSrc extends MainDataSrc {
       categories.add(d.data()['name']);
     }
     return categories;
+  }
+
+  @override
+  Future<List<CourseModel>> getBeginnerCourses() async {
+    final ds = await firebaseFirestore
+        .collection(FirebaseConst.courses)
+        .where(
+          "isBeginner",
+          isEqualTo: true,
+        )
+        .get();
+    List<CourseModel> courses = [];
+    for (var d in ds.docs) {
+      courses.add(CourseModel.fromMap(d.data(), d.id));
+    }
+    print(courses);
+    return courses;
   }
 
   @override

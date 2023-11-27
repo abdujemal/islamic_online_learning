@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 
@@ -29,17 +30,17 @@ class PdfsNotifier extends StateNotifier<PdfsState> {
     );
   }
 
-  Future<void> deleteAllFiles() async {
-    toast("deleting...", ToastType.normal);
+  Future<void> deleteAllFiles(BuildContext context) async {
+    toast("deleting...", ToastType.normal, context);
 
     final res = await dfRepo.deleteAllFiles("PDF");
 
     res.fold(
       (l) {
-        toast(l.toString(), ToastType.error);
+        toast(l.toString(), ToastType.error, context);
       },
       (r) {
-        toast("ሁሉም ፒዲኡፍ ጠፍትዋል", ToastType.success);
+        toast("ሁሉም ፋይሎች ጠፍትዋል", ToastType.success, context);
       },
     );
   }

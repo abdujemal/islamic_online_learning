@@ -1,4 +1,6 @@
 import 'package:animated_search_bar/animated_search_bar.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
@@ -65,9 +67,37 @@ class _MainPageState extends ConsumerState<MainPage>
         ref.read(showGuideProvider.notifier).update(
           (state) {
             show = pref.getBool("showGuide") ?? true;
+
             return show;
           },
         );
+      });
+
+      ref.read(sharedPrefProvider).then((pref) {
+        ref.read(showGuideProvider.notifier).update(
+          (state) {
+            show = pref.getBool("isSubed") ?? true;
+            if (show) {
+              FirebaseMessaging.instance.subscribeToTopic("ders");
+            }
+
+            return show;
+          },
+        );
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        ref.watch(menuIndexProvider.notifier).addListener(
+          (state) {
+            tabController.animateTo(state);
+          },
+        );
+      });
+
+      AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+        if (!isAllowed) {
+          AwesomeNotifications().requestPermissionToSendNotifications();
+        }
       });
     }
 
@@ -142,12 +172,15 @@ class _MainPageState extends ConsumerState<MainPage>
     final audioPlayer = ref.watch(audioProvider);
     return WillPopScope(
       onWillPop: () async {
-        if (i == 0) {
+        if (tabController.index != 0) {
+          ref.read(menuIndexProvider.notifier).update((state) => 0);
+          return false;
+        } else if (i == 0) {
           i++;
           Future.delayed(const Duration(seconds: 5)).then((v) {
             i = 0;
           });
-          toast("እባክዎ ድጋሚ ይንኩት!", ToastType.normal);
+          toast("እባክዎ ድጋሚ ይንኩት!", ToastType.normal, context);
           return false;
         } else {
           return true;

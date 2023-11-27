@@ -79,7 +79,8 @@ class _AudioItemState extends ConsumerState<AudioItem> {
           .read(cdNotifierProvider.notifier)
           .isDownloaded(
               "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3",
-              "Audio");
+              "Audio",
+              context);
       return isDownloaded;
     }
     return false;
@@ -135,7 +136,8 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                         .read(cdNotifierProvider.notifier)
                                         .deleteFile(
                                             '${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3',
-                                            "Audio");
+                                            "Audio",
+                                            context);
 
                                     isDownloaded = await checkFile();
                                     if (mounted) {
@@ -161,11 +163,12 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                           return;
                         }
                         if (widget.canNeverPlay) {
-                          toast("እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.normal);
+                          toast(
+                              "እባክዎ ኢንተርኔትዎን ያብሩ!", ToastType.normal, context);
                           return;
                         }
                         if (!widget.canAudioPlay) {
-                          toast("እባክዎ ትንሽ ይጠብቁ...", ToastType.normal);
+                          toast("እባክዎ ትንሽ ይጠብቁ...", ToastType.normal, context);
                           return;
                         }
 
@@ -208,6 +211,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                                 1,
                                           ),
                                           null,
+                                          context,
                                           showMsg: false,
                                         );
                                     Navigator.pop(context);
@@ -227,6 +231,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                                 1,
                                           ),
                                           null,
+                                          context,
                                           showMsg: false,
                                         );
                                     Navigator.pop(context);
@@ -249,6 +254,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                       lastViewed: DateTime.now().toString(),
                                     ),
                                     null,
+                                    context,
                                     showMsg: false,
                                   );
                             }

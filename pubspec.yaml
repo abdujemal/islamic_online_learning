@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  android_alarm_manager_plus: any
   animated_search_bar: ^2.7.0
   audio_video_progress_bar: ^2.0.1
   awesome_notifications: ^0.8.2
@@ -39,10 +40,13 @@ dependencies:
   dio: ^5.2.1+1
   equatable: ^2.0.5
   firebase_core: ^2.16.0
-  firebase_messaging: ^14.7.3
+  firebase_messaging: any
   flutter:
     sdk: flutter
+  flutter_alarm_clock: ^0.1.1
+  # flutter_background_service: ^5.0.4
   flutter_dotenv: ^5.1.0
+  # flutter_overlay_window: ^0.4.3
   flutter_pdfview: ^1.3.2
   flutter_riverpod: ^2.4.1
   fluttertoast: ^8.2.2
@@ -66,23 +70,22 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   freezed: any
-  mockito: ^5.4.2
 
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/book.png"
+  image_path: "assets/logo.jpg"
   background_color: "#fcffea"
   web:
     generate: true
-    image_path: "assets/book.png"
+    image_path: "assets/logo.jpg"
   windows:
     generate: true
-    image_path: "assets/book.png"
+    image_path: "assets/logo.jpg"
     icon_size: 48 # min:48, max:256, default: 48
   macos:
     generate: true
-    image_path: "assets/book.png"
+    image_path: "assets/logo.jpg"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

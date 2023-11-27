@@ -1,7 +1,9 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
+
+import '../../../../core/constants.dart';
 
 class UpdateAllCourses extends ConsumerStatefulWidget {
   final List<CourseModel> courses;
@@ -30,16 +32,32 @@ class _UpdateAllCoursesState extends ConsumerState<UpdateAllCourses> {
       currentCourse = "${cm.title} by ${cm.ustaz}";
       setState(() {});
       i = 0;
-      for (String audioId in cm.courseIds.split(",")) {
-        i++;
-        await Future.delayed(const Duration(milliseconds: 100));
-        // final url =
-        //     await ref.read(cdNotifierProvider.notifier).loadFileOnline(audioId, true);
-        if (!audioId.contains("https://")) {
-          wrongurls.add("${cm.title} on audio $i");
-        }
-        setState(() {});
-      }
+      // for (String audioId in cm.courseIds.split(",")) {
+      //   i++;
+
+      //   final url =
+      //       await ref.read(cdNotifierProvider.notifier).loadFileOnline(audioId, true);
+
+      // setState(() {});
+      // }
+      final newImage = cm.image.replaceAll(
+          "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
+
+      final newPdf = cm.pdfId.replaceAll(
+          "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
+
+      // await FirebaseFirestore.instance
+      //     .collection(FirebaseConst.courses)
+      //     .doc(cm.courseId)
+      //     .update(
+      //       cm
+      //           .copyWith(
+      //             image: newImage,
+      //             pdfId: newPdf,
+      //           )
+      //           .toOriginalMap(),
+      //     );
+
       // if (urls.length == cm.courseIds.split(",").length) {
       //   FirebaseFirestore.instance
       //       .collection(FirebaseConst.courses)

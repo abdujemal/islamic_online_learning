@@ -73,13 +73,14 @@ class MainListNotifier extends StateNotifier<MainListState> {
     }
   }
 
-  Future<CourseModel?> getSingleCourse(String courseId) async {
+  Future<CourseModel?> getSingleCourse(
+      String courseId, BuildContext context) async {
     CourseModel? courseModel;
     final res = await mainRepo.getSingleCourse(courseId);
 
     res.fold(
       (l) {
-        toast(l.messege, ToastType.error);
+        toast(l.messege, ToastType.error, context);
       },
       (r) {
         courseModel = r;
@@ -147,7 +148,8 @@ class MainListNotifier extends StateNotifier<MainListState> {
     );
   }
 
-  Future<int?> saveCourse(CourseModel courseModel, int? isFav,
+  Future<int?> saveCourse(
+      CourseModel courseModel, int? isFav, BuildContext context,
       {bool showMsg = true}) async {
     final res = await mainRepo.saveCourse(
       courseModel.copyWith(
@@ -157,14 +159,14 @@ class MainListNotifier extends StateNotifier<MainListState> {
 
     res.fold(
       (l) {
-        toast(l.messege, ToastType.error);
+        toast(l.messege, ToastType.error, context);
         if (kDebugMode) {
           print(l.messege);
         }
       },
       (r) {
         if (showMsg) {
-          toast("በተሳካ ሁኔታ ተመዝግብዋል", ToastType.success);
+          toast("በተሳካ ሁኔታ ተመዝግብዋል", ToastType.success, context);
         }
         updateCourses();
         ref.read(favNotifierProvider.notifier).getCourse();

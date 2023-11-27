@@ -12,7 +12,7 @@ class StartedListNotifier extends StateNotifier<StartedListState> {
     this.ref,
   ) : super(const StartedListState.initial());
 
-  getCouses() async {
+  Future<void> getCouses() async {
     state = const StartedListState.loading();
 
     final res = await mainRepo.getStartedCourses();

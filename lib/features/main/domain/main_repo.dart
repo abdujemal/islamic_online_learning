@@ -17,6 +17,7 @@ abstract class MainRepo {
   FutureEither<List<String>> getUstazs();
   FutureEither<List<String>> getCategories();
   FutureEither<List<FAQModel>> getFAQ();
+  FutureEither<List<CourseModel>> getBeginnerCourses();
   FutureEither<List<CourseModel>> searchCourses(String query, int? numOfElt);
   FutureEither<int> saveCourse(CourseModel courseModel);
   FutureEither<void> deleteCourse(int id);

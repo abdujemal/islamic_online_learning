@@ -30,6 +30,12 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 
 android {
+//    dependenciesInfo {
+//        // Disables dependency metadata when building APKs.
+//        includeInApk = false
+//        // Disables dependency metadata when building Android App Bundles.
+//        includeInBundle = false
+//    }
     namespace "com.aj.islamic_online_learning"
     compileSdkVersion 34
     ndkVersion flutter.ndkVersion
@@ -74,5 +80,6 @@ flutter {
 
 dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
 }

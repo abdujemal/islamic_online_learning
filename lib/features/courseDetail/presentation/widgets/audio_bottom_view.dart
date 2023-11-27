@@ -35,7 +35,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
   Future<bool> isDownloaded(String title, String ustaz) {
     return ref
         .read(cdNotifierProvider.notifier)
-        .isDownloaded("$ustaz,$title.mp3", "Audio");
+        .isDownloaded("$ustaz,$title.mp3", "Audio", context);
   }
 
   Future<String> getPath(String folderName, String fileName) async {
@@ -59,19 +59,13 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
             return const SizedBox();
           }
 
-          if (audioPlayer.processingState == ProcessingState.completed) {
-            if (kDebugMode) {
-              print("Donw mate");
-            }
-          }
-
           final metaData = state!.currentSource!.tag as MediaItem;
 
           if ("${metaData.extras?["courseId"]}" != widget.courseId) {
             return const SizedBox();
           }
           final process = snp.data?.processingState;
-          if (audioPlayer.processingState == ProcessingState.idle) {
+          if (process == ProcessingState.idle) {
             return const SizedBox();
           }
           return Container(
@@ -127,7 +121,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                       GestureDetector(
                         onTap: () async {
                           widget.onClose();
-                         
+
                           if (metaData.extras?["isFinished"] == 0) {
                             if (!audioPlayer.hasNext) {
                               showDialog(
@@ -159,6 +153,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                                 DateTime.now().toString(),
                                           ),
                                           null,
+                                          context,
                                           showMsg: false,
                                         );
                                     Navigator.pop(context);
@@ -180,6 +175,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                                 DateTime.now().toString(),
                                           ),
                                           null,
+                                          context,
                                           showMsg: false,
                                         );
                                     Navigator.pop(context);
@@ -203,19 +199,21 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                       lastViewed: DateTime.now().toString(),
                                     ),
                                     null,
+                                    context,
                                     showMsg: false,
                                   )
                                   .then((value) {
                                 ref
                                     .read(mainNotifierProvider.notifier)
                                     .getSingleCourse(
-                                        metaData.extras?["courseId"])
+                                        metaData.extras?["courseId"], context)
                                     .then((value) {
-                                 
                                   ref.read(audioProvider).stop();
                                 });
                               }).catchError((e) {
-                                print("$e");
+                                if (kDebugMode) {
+                                  print("$e");
+                                }
                               });
                             }
                           }
@@ -293,42 +291,49 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                         },
                         icon: const Icon(Icons.skip_previous_rounded, size: 40),
                       ),
-                      IconButton(
-                        icon: audioPlayer.playing
-                            ? const Icon(Icons.pause_rounded, size: 40)
-                            : const Icon(Icons.play_arrow_rounded, size: 40),
-                        onPressed: () async {
-                          if (audioPlayer.playing) {
-                            widget.onClose();
-                            if (metaData.extras?["isFinished"] == 0) {
-                              await ref
-                                  .read(mainNotifierProvider.notifier)
-                                  .saveCourse(
-                                    CourseModel.fromMap(
-                                      metaData.extras as Map,
-                                      metaData.extras?["courseId"],
-                                    ).copyWith(
-                                      isStarted: 1,
-                                      pausedAtAudioNum:
-                                          audioPlayer.currentIndex,
-                                      pausedAtAudioSec:
-                                          audioPlayer.position.inSeconds,
-                                      lastViewed: DateTime.now().toString(),
-                                    ),
-                                    null,
-                                    showMsg: false,
-                                  );
-                            }
-                            ref.read(audioProvider).pause();
-                            setState(() {});
-                            return;
-                          } else {
-                            ref.read(audioProvider).play();
-                            setState(() {});
-                            return;
-                          }
-                        },
-                      ),
+                      StreamBuilder(
+                          stream: audioPlayer.playingStream,
+                          builder: (context, snap) {
+                            return IconButton(
+                              icon: snap.data == true
+                                  ? const Icon(Icons.pause_rounded, size: 40)
+                                  : const Icon(Icons.play_arrow_rounded,
+                                      size: 40),
+                              onPressed: () async {
+                                if (audioPlayer.playing) {
+                                  widget.onClose();
+                                  if (metaData.extras?["isFinished"] == 0) {
+                                    await ref
+                                        .read(mainNotifierProvider.notifier)
+                                        .saveCourse(
+                                          CourseModel.fromMap(
+                                            metaData.extras as Map,
+                                            metaData.extras?["courseId"],
+                                          ).copyWith(
+                                            isStarted: 1,
+                                            pausedAtAudioNum:
+                                                audioPlayer.currentIndex,
+                                            pausedAtAudioSec:
+                                                audioPlayer.position.inSeconds,
+                                            lastViewed:
+                                                DateTime.now().toString(),
+                                          ),
+                                          null,
+                                          context,
+                                          showMsg: false,
+                                        );
+                                  }
+                                  ref.read(audioProvider).pause();
+                                  setState(() {});
+                                  return;
+                                } else {
+                                  ref.read(audioProvider).play();
+                                  setState(() {});
+                                  return;
+                                }
+                              },
+                            );
+                          }),
                       IconButton(
                         onPressed: () async {
                           ref.read(audioProvider).seekToNext();

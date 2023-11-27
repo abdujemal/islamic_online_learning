@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/features/main/presentation/widgets/beginner_courses_list.dart';
+import 'package:islamic_online_learning/features/main/presentation/widgets/started_course_list.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'package:islamic_online_learning/features/main/presentation/pages/filtered_courses.dart';
@@ -31,6 +33,7 @@ class _HomeState extends ConsumerState<Home>
     with AutomaticKeepAliveClientMixin<Home> {
   late CategoryListNotifier categoryNotifier;
   late MainListNotifier mainNotifier;
+  // late StartedListNotifier startedListNotifier;
 
   ScrollController scrollController = ScrollController();
 
@@ -43,12 +46,15 @@ class _HomeState extends ConsumerState<Home>
     super.initState();
     categoryNotifier = ref.read(categoryNotifierProvider.notifier);
     mainNotifier = ref.read(mainNotifierProvider.notifier);
+    // startedListNotifier = ref.read(startedNotifierProvider.notifier);
 
     scrollController.addListener(_scrollListener);
 
-    Future.delayed(const Duration(seconds: 1)).then((value) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       mainNotifier.getCourses(isNew: true);
       categoryNotifier.getCategories();
+      ref.read(beginnerListProvider.notifier).getCourses();
+      ref.watch(startedNotifierProvider.notifier).getCouses();
     });
   }
 
@@ -95,7 +101,12 @@ class _HomeState extends ConsumerState<Home>
                                     key: widget.ustazKey,
                                     avatar: Image.asset('assets/teacher.png'),
                                     backgroundColor: primaryColor,
-                                    label: const Text("ኡስታዞች"),
+                                    label: const Text(
+                                      "ኡስታዞች",
+                                      style: TextStyle(
+                                        color: whiteColor,
+                                      ),
+                                    ),
                                   ),
                                 )
                               : Shimmer.fromColors(
@@ -162,6 +173,9 @@ class _HomeState extends ConsumerState<Home>
                                     index == 0 ? primaryColor : null,
                                 label: Text(
                                   categories[index],
+                                  style: TextStyle(
+                                    color: index == 0 ? whiteColor : null,
+                                  ),
                                 ),
                               ),
                             ),
@@ -181,7 +195,7 @@ class _HomeState extends ConsumerState<Home>
                 initial: (_) => const SizedBox(),
                 loading: (_) => Expanded(
                   child: ListView.builder(
-                    itemCount: 10,
+                    itemCount: isSearching ? 10 + 1 : 10,
                     itemBuilder: (index, context) => const CourseShimmer(),
                   ),
                 ),
@@ -192,6 +206,12 @@ class _HomeState extends ConsumerState<Home>
                         if (isSearching) {
                           await mainNotifier.getCourses(isNew: true);
                           await categoryNotifier.getCategories();
+                          await ref
+                              .read(beginnerListProvider.notifier)
+                              .getCourses();
+                          await ref
+                              .watch(startedNotifierProvider.notifier)
+                              .getCouses();
                         }
                       },
                       color: primaryColor,
@@ -199,10 +219,22 @@ class _HomeState extends ConsumerState<Home>
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.only(bottom: 20),
                         controller: scrollController,
-                        itemCount: _.courses.length + 1,
+                        itemCount:
+                            // isSearching
+                            /*?*/ _.courses.length + 3,
+                        // : _.courses.length + 1,
                         itemBuilder: (context, index) {
-                          if (index <= _.courses.length - 1) {
-                            return CourseItem(_.courses[index]);
+                          if (index == 0) {
+                            return !isSearching
+                                ? const SizedBox()
+                                : const StartedCourseList();
+                          } else if (index == 4) {
+                            return !isSearching
+                                ? const SizedBox()
+                                : const BeginnerCoursesList();
+                          } else if (index <= _.courses.length + 1) {
+                            return CourseItem(
+                                _.courses[index < 4 ? index - 1 : index - 2]);
                           } else if (_.isLoadingMore) {
                             return const CourseShimmer();
                           } else if (_.noMoreToLoad) {

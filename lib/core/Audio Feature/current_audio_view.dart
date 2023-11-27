@@ -52,8 +52,14 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                   }
                   return IconButton(
                     icon: snap.data!.playing
-                        ? const Icon(Icons.pause_rounded)
-                        : const Icon(Icons.play_arrow_rounded),
+                        ? const Icon(
+                            Icons.pause_rounded,
+                            color: whiteColor,
+                          )
+                        : const Icon(
+                            Icons.play_arrow_rounded,
+                            color: whiteColor,
+                          ),
                     onPressed: () {
                       if (ref.read(audioProvider).playing) {
                         ref.read(audioProvider).pause();
@@ -67,6 +73,9 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
               Expanded(
                 child: TextScroll(
                   widget.mediaItem.title,
+                  style: const TextStyle(
+                    color: whiteColor,
+                  ),
                   velocity: const Velocity(
                     pixelsPerSecond: Offset(30, 0),
                   ),
@@ -81,10 +90,8 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                   "በ${widget.mediaItem.artist!}",
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      color: DefaultTextStyle.of(context)
-                          .style
-                          .color!
-                          .withOpacity(0.7)),
+                    color: Colors.grey.shade300,
+                  ),
                 ),
               ),
               IconButton(
@@ -103,21 +110,27 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                               )
                               .join(" "),
                           onConfirm: () {
-                            ref.read(mainNotifierProvider.notifier).saveCourse(
-                                  CourseModel.fromMap(
-                                    widget.mediaItem.extras as Map,
-                                    widget.mediaItem.extras?["courseId"],
-                                  ).copyWith(
-                                    isStarted: 1,
-                                    isFinished: 1,
-                                    pausedAtAudioNum: audioPlayer.currentIndex,
-                                    pausedAtAudioSec:
-                                        audioPlayer.position.inSeconds,
-                                    lastViewed: DateTime.now().toString(),
-                                  ),
-                                  null,
-                                  showMsg: false,
-                                );
+                            if (mounted) {
+                              ref
+                                  .read(mainNotifierProvider.notifier)
+                                  .saveCourse(
+                                    CourseModel.fromMap(
+                                      widget.mediaItem.extras as Map,
+                                      widget.mediaItem.extras?["courseId"],
+                                    ).copyWith(
+                                      isStarted: 1,
+                                      isFinished: 1,
+                                      pausedAtAudioNum:
+                                          audioPlayer.currentIndex,
+                                      pausedAtAudioSec:
+                                          audioPlayer.position.inSeconds,
+                                      lastViewed: DateTime.now().toString(),
+                                    ),
+                                    null,
+                                    context,
+                                    showMsg: false,
+                                  );
+                            }
                             Navigator.pop(context);
                           },
                           onDenied: () {
@@ -133,6 +146,7 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                                     lastViewed: DateTime.now().toString(),
                                   ),
                                   null,
+                                  context,
                                   showMsg: false,
                                 );
                             Navigator.pop(context);
@@ -151,13 +165,17 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                               lastViewed: DateTime.now().toString(),
                             ),
                             null,
+                            context,
                             showMsg: false,
                           );
                     }
                   }
                   ref.read(audioProvider).stop();
                 },
-                icon: const Icon(Icons.close_rounded),
+                icon: const Icon(
+                  Icons.close_rounded,
+                  color: whiteColor,
+                ),
               ),
             ],
           ),

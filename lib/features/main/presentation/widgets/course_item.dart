@@ -60,26 +60,28 @@ class _CourseItemState extends ConsumerState<CourseItem> {
           ),
         );
       } else {
-        final url = await ref
-            .read(cdNotifierProvider.notifier)
-            .loadFileOnline(id, true, showError: false);
-        if (url != null) {
-          lst.add(
-            AudioSource.uri(
-              Uri.parse(
-                url,
+        if (mounted) {
+          final url = await ref
+              .read(cdNotifierProvider.notifier)
+              .loadFileOnline(id, true, showError: false, context);
+          if (url != null) {
+            lst.add(
+              AudioSource.uri(
+                Uri.parse(
+                  url,
+                ),
+                tag: MediaItem(
+                  id: id,
+                  title: "${widget.courseModel.title} $i",
+                  artist: widget.courseModel.ustaz,
+                  album: widget.courseModel.category,
+                  artUri: Uri.file(
+                      "${dir.path}/Images/${widget.courseModel.title}.jpg"),
+                  extras: widget.courseModel.toMap(),
+                ),
               ),
-              tag: MediaItem(
-                id: id,
-                title: "${widget.courseModel.title} $i",
-                artist: widget.courseModel.ustaz,
-                album: widget.courseModel.category,
-                artUri: Uri.file(
-                    "${dir.path}/Images/${widget.courseModel.title}.jpg"),
-                extras: widget.courseModel.toMap(),
-              ),
-            ),
-          );
+            );
+          }
         }
       }
     }
@@ -100,11 +102,12 @@ class _CourseItemState extends ConsumerState<CourseItem> {
 
   Future<bool> checkFile(int index) async {
     if (mounted) {
-      final isDownloaded = await ref
-          .read(cdNotifierProvider.notifier)
-          .isDownloaded(
-              "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
-              "Audio");
+      final isDownloaded =
+          await ref.read(cdNotifierProvider.notifier).isDownloaded(
+                "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
+                "Audio",
+                context,
+              );
       return isDownloaded;
     }
     return false;
@@ -128,7 +131,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => CourseDetail(cm: widget.courseModel),
+            builder: (_) => CourseDetail(
+              cm: widget.courseModel,
+            ),
           ),
         );
       },
@@ -269,48 +274,52 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                               .read(
                                                                   audioProvider)
                                                               .play();
-                                                          bool isPDFDownloded = await ref
-                                                              .read(
-                                                                  cdNotifierProvider
-                                                                      .notifier)
-                                                              .isDownloaded(
-                                                                  "${widget.courseModel.title}.pdf",
-                                                                  "PDF");
-                                                          if (widget.courseModel
-                                                                  .pdfId
-                                                                  .trim()
-                                                                  .isEmpty ||
-                                                              !isPDFDownloded) {
-                                                            if (mounted) {
-                                                              Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder: (_) =>
-                                                                      CourseDetail(
-                                                                    cm: widget
-                                                                        .courseModel,
+                                                          if (mounted) {
+                                                            bool isPDFDownloded = await ref
+                                                                .read(cdNotifierProvider
+                                                                    .notifier)
+                                                                .isDownloaded(
+                                                                    "${widget.courseModel.title}.pdf",
+                                                                    "PDF",
+                                                                    context);
+                                                            if (widget
+                                                                    .courseModel
+                                                                    .pdfId
+                                                                    .trim()
+                                                                    .isEmpty ||
+                                                                !isPDFDownloded) {
+                                                              if (mounted) {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                    builder: (_) =>
+                                                                        CourseDetail(
+                                                                      cm: widget
+                                                                          .courseModel,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              );
-                                                            }
-                                                          } else {
-                                                            String path =
-                                                                await getPath(
-                                                                    'PDF',
-                                                                    "${widget.courseModel.title}.pdf");
-                                                            if (mounted) {
-                                                              Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder: (_) =>
-                                                                      PdfPage(
-                                                                    path: path,
-                                                                    courseModel:
-                                                                        widget
-                                                                            .courseModel,
+                                                                );
+                                                              }
+                                                            } else {
+                                                              String path =
+                                                                  await getPath(
+                                                                      'PDF',
+                                                                      "${widget.courseModel.title}.pdf");
+                                                              if (mounted) {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                    builder: (_) =>
+                                                                        PdfPage(
+                                                                      path:
+                                                                          path,
+                                                                      courseModel:
+                                                                          widget
+                                                                              .courseModel,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              );
+                                                                );
+                                                              }
                                                             }
                                                           }
                                                         }
@@ -336,18 +345,12 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                         BorderRadius.circular(
                                                             15),
                                                   ),
-                                                  child: Container(
-                                                    height: 33,
-                                                    width: 33,
-                                                    decoration:
-                                                        const BoxDecoration(
+                                                  child: const Align(
+                                                    child: Icon(
+                                                      Icons
+                                                          .check_circle_outline,
                                                       color: cardColor,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: const Icon(
-                                                      Icons.check_circle,
-                                                      color: primaryColor,
-                                                      size: 33,
+                                                      size: 39,
                                                     ),
                                                   ),
                                                 )
@@ -374,11 +377,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                     child: Text(
                                       "${(percentage * 100).toStringAsFixed(1)}%",
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 12,
-                                        color: percentage == 1
-                                            ? primaryColor
-                                            : whiteColor,
+                                        color: whiteColor,
                                       ),
                                     ),
                                   )
@@ -457,16 +458,16 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                           if (widget.courseModel.isStarted == 1) {
                             await ref
                                 .read(mainNotifierProvider.notifier)
-                                .saveCourse(widget.courseModel, 0);
+                                .saveCourse(widget.courseModel, 0, context);
                           } else {
                             ref
                                 .read(favNotifierProvider.notifier)
-                                .deleteCourse(widget.courseModel.id);
+                                .deleteCourse(widget.courseModel.id, context);
                           }
                         } else {
                           await ref
                               .read(mainNotifierProvider.notifier)
-                              .saveCourse(widget.courseModel, 1);
+                              .saveCourse(widget.courseModel, 1, context);
                         }
                       },
                       child: widget.courseModel.isFav == 1

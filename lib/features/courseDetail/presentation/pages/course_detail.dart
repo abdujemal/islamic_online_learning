@@ -108,29 +108,34 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
           ),
         );
       } else {
-        String? url = await ref
-            .read(cdNotifierProvider.notifier)
-            .loadFileOnline(id, true, showError: false);
-        if (url != null) {
-          // url = url.replaceAll("botToken", botToken!);
-          if (mounted) {
-            ref.read(loadAudiosProvider.notifier).update((state) => state + 1);
+        if (mounted) {
+          String? url = await ref
+              .read(cdNotifierProvider.notifier)
+              .loadFileOnline(id, true, context, showError: false);
+          if (url != null) {
+            // url = url.replaceAll("botToken", botToken!);
+            if (mounted) {
+              ref
+                  .read(loadAudiosProvider.notifier)
+                  .update((state) => state + 1);
+            }
+            lst.add(
+              AudioSource.uri(
+                Uri.parse(
+                  url,
+                ),
+                tag: MediaItem(
+                  id: url,
+                  title: "${courseModel.title} $i",
+                  artist: courseModel.ustaz,
+                  album: courseModel.category,
+                  artUri:
+                      Uri.file("${dir.path}/Images/${courseModel.title}.jpg"),
+                  extras: courseModel.toMap(),
+                ),
+              ),
+            );
           }
-          lst.add(
-            AudioSource.uri(
-              Uri.parse(
-                url,
-              ),
-              tag: MediaItem(
-                id: url,
-                title: "${courseModel.title} $i",
-                artist: courseModel.ustaz,
-                album: courseModel.category,
-                artUri: Uri.file("${dir.path}/Images/${courseModel.title}.jpg"),
-                extras: courseModel.toMap(),
-              ),
-            ),
-          );
         }
       }
     }
@@ -148,8 +153,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     if (mounted) {
       final isDownloaded = await ref
           .read(cdNotifierProvider.notifier)
-          .isDownloaded(
-              "${courseModel.ustaz},${courseModel.title} $index.mp3", "Audio");
+          .isDownloaded("${courseModel.ustaz},${courseModel.title} $index.mp3",
+              "Audio", context);
       return isDownloaded;
     }
     return false;
@@ -161,24 +166,27 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
     final res = await ref
         .read(mainNotifierProvider.notifier)
-        .getSingleCourse(widget.cm.courseId);
+        .getSingleCourse(widget.cm.courseId, context);
     if (res != null) {
       courseModel = CourseModel.fromMap(
         widget.cm.toOriginalMap(),
         widget.cm.courseId,
         copyFrom: res,
       );
-      await ref.read(mainNotifierProvider.notifier).saveCourse(
-            courseModel.copyWith(
-              lastViewed: DateTime.now().toString(),
-            ),
-            null,
-            showMsg: false,
-          );
-      if (kDebugMode) {
-        print(Duration(seconds: courseModel.pausedAtAudioSec).inMinutes);
+      if (mounted) {
+        await ref.read(mainNotifierProvider.notifier).saveCourse(
+              courseModel.copyWith(
+                lastViewed: DateTime.now().toString(),
+              ),
+              null,
+              context,
+              showMsg: false,
+            );
+        if (kDebugMode) {
+          print(Duration(seconds: courseModel.pausedAtAudioSec).inMinutes);
+        }
+        setState(() {});
       }
-      setState(() {});
     } else {
       if (kDebugMode) {
         print("it is null");
@@ -255,9 +263,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                       IconButton(
                         onPressed: () {
                           ref.read(mainNotifierProvider.notifier).saveCourse(
-                                courseModel,
-                                courseModel.isFav == 1 ? 0 : 1,
-                              );
+                              courseModel,
+                              courseModel.isFav == 1 ? 0 : 1,
+                              context);
                           courseModel = courseModel.copyWith(
                             isFav: courseModel.isFav == 1 ? 0 : 1,
                           );
@@ -276,6 +284,19 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                       ),
                       IconButton(
                         onPressed: () {
+                          ref.read(mainNotifierProvider.notifier).saveCourse(
+                                courseModel.copyWith(
+                                  isStarted: 1,
+                                ),
+                                null,
+                                context,
+                                showMsg: false,
+                              );
+                          courseModel = courseModel.copyWith(
+                            isStarted: 1,
+                          );
+                          setState(() {});
+
                           showDialog(
                             context: context,
                             barrierDismissible: false,
@@ -450,28 +471,32 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           ),
                                         );
                                         audioPlayer.play();
-                                        bool isPDFDownloded = await ref
-                                            .read(cdNotifierProvider.notifier)
-                                            .isDownloaded(
+                                        if (mounted) {
+                                          bool isPDFDownloded = await ref
+                                              .read(cdNotifierProvider.notifier)
+                                              .isDownloaded(
                                                 "${courseModel.title}.pdf",
-                                                "PDF");
-                                        if (courseModel.pdfId
-                                                .trim()
-                                                .isNotEmpty &&
-                                            isPDFDownloded) {
-                                          String path = await getPath('PDF',
-                                              "${courseModel.title}.pdf");
-                                          if (mounted) {
-                                            await Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => PdfPage(
-                                                  path: path,
-                                                  courseModel: courseModel,
+                                                "PDF",
+                                                context,
+                                              );
+                                          if (courseModel.pdfId
+                                                  .trim()
+                                                  .isNotEmpty &&
+                                              isPDFDownloded) {
+                                            String path = await getPath('PDF',
+                                                "${courseModel.title}.pdf");
+                                            if (mounted) {
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => PdfPage(
+                                                    path: path,
+                                                    courseModel: courseModel,
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                            refresh();
+                                              );
+                                              refresh();
+                                            }
                                           }
                                         }
                                       }
@@ -494,6 +519,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                                   DateTime.now().toString(),
                                             ),
                                             null,
+                                            context,
+                                            showMsg: false,
                                           );
                                       courseModel = courseModel.copyWith(
                                         isFinished: 0,

@@ -36,7 +36,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
     if (mounted) {
       return await ref
           .read(cdNotifierProvider.notifier)
-          .isDownloaded("${widget.courseModel.title}.pdf", "PDF");
+          .isDownloaded("${widget.courseModel.title}.pdf", "PDF", context);
     } else {
       return false;
     }
@@ -161,8 +161,8 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                             action: () async {
                               await ref
                                   .read(cdNotifierProvider.notifier)
-                                  .deleteFile(
-                                      '${widget.courseModel.title}.pdf', "PDF");
+                                  .deleteFile('${widget.courseModel.title}.pdf',
+                                      "PDF", context);
                               isDownloaded = await checkFile();
                               setState(() {});
                             },

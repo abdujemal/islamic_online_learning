@@ -135,4 +135,15 @@ class IMainRepo extends MainRepo {
       return left(Failure(messege: e.toString()));
     }
   }
+
+  @override
+  FutureEither<List<CourseModel>> getBeginnerCourses() async {
+    try {
+      final res = await mainDataSrc.getBeginnerCourses();
+
+      return right(res);
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
+  }
 }
