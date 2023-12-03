@@ -24,17 +24,20 @@ class Schedule {
           importance: NotificationImportance.Max,
           ledColor: primaryColor,
           playSound: true,
-          // soundSource: 'asset://assets/alarm.wav',
+          // soundSource: 'asset://assets/نظم الآجرومية - ٧.mp3',
           // onlyAlertOnce: false,
+          // icon: 'mipmap/book',
+          defaultRingtoneType: DefaultRingtoneType.Alarm,
           enableVibration: true,
           enableLights: true,
+          criticalAlerts: true,
         ),
       ],
     );
   }
 
-  Future<void> scheduleNotification(
-      int id, String title, String body, DateTime dateTime) async {
+  Future<void> scheduleNotification(int id, String title, String body,
+      DateTime dateTime, List<int> weekDays) async {
     // Create a notification content
     // final content = NotificationContent(
     //   id: id,
@@ -59,20 +62,53 @@ class Schedule {
     // );
     // await AndroidAlarmManager.oneShot(
     //     const Duration(seconds: 20), 1, printHello);
+    print("today: ${DateTime.now().weekday}");
 
-    final content = NotificationContent(
-      id: 1,
-      channelKey: 'ders_app_alarm',
-      title: title,
-      body: body,
-      category: NotificationCategory.Alarm,
-      wakeUpScreen: true,
-    );
+    for (int weekDay in weekDays) {
+      print(weekDay);
 
-    await AwesomeNotifications().createNotification(
+      final content = NotificationContent(
+        id: id,
+        channelKey: 'ders_app_alarm',
+        title: title,
+        body: body,
+        category: NotificationCategory.Reminder,
+        // customSound: 'asset://assets/alarm.wav',
+        // customSound: 'asset://assets/alarm.wav',
+        autoDismissible: false,
+        wakeUpScreen: true,
+      );
+
+      await AwesomeNotifications().createNotification(
         content: content,
+
         // actionButtons: [action1, action2],
-        schedule: NotificationInterval(interval: dateTime.second));
+        actionButtons: [
+          NotificationActionButton(
+            key: 'stop',
+            label: 'Stop Sound',
+            actionType: ActionType.KeepOnTop,
+            enabled: true,
+          ),
+          NotificationActionButton(
+            key: 'open',
+            label: 'Open Ders',
+            actionType: ActionType.Default,
+            enabled: true,
+          ),
+        ],
+
+        schedule: NotificationCalendar(
+          allowWhileIdle: true,
+          preciseAlarm: true,
+          repeats: true,
+          weekday: weekDay,
+          hour: dateTime.hour,
+          minute: dateTime.minute,
+          second: dateTime.second,
+        ),
+      );
+    }
 
     // AwesomeNotifications().actionStream.listen((receivedNotification) {
     //   if (receivedNotification.actionKey == 'ACTION_ONE' ||

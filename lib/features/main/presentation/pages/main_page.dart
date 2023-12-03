@@ -67,23 +67,16 @@ class _MainPageState extends ConsumerState<MainPage>
         ref.read(showGuideProvider.notifier).update(
           (state) {
             show = pref.getBool("showGuide") ?? true;
-
             return show;
           },
         );
       });
 
       ref.read(sharedPrefProvider).then((pref) {
-        ref.read(showGuideProvider.notifier).update(
-          (state) {
-            show = pref.getBool("isSubed") ?? true;
-            if (show) {
-              FirebaseMessaging.instance.subscribeToTopic("ders");
-            }
-
-            return show;
-          },
-        );
+        bool isSubed = pref.getBool("isSubed") ?? true;
+        if (isSubed) {
+          FirebaseMessaging.instance.subscribeToTopic("ders");
+        }
       });
 
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -113,9 +106,11 @@ class _MainPageState extends ConsumerState<MainPage>
             if (mounted) {
               bool isOnCurrentPage = !Navigator.canPop(context);
               if (isOnCurrentPage) {
-                if (showOnes) {
-                  showTutorial();
-                  showOnes = false;
+                if (show) {
+                  if (showOnes) {
+                    showTutorial();
+                    showOnes = false;
+                  }
                 }
               }
             }

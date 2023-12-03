@@ -51,29 +51,34 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
               width: 200,
               child: ref.watch(beginnerListProvider).map(
                     initial: (_) => const SizedBox(),
-                    loading: (_) => ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: 10,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) => Shimmer.fromColors(
-                        baseColor: Theme.of(context)
-                            .chipTheme
-                            .backgroundColor!
-                            .withAlpha(150),
-                        highlightColor:
-                            Theme.of(context).chipTheme.backgroundColor!,
-                        child: Container(
-                          height: 140,
-                          width: 100,
-                          margin: const EdgeInsets.only(
-                            right: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: whiteColor,
-                            borderRadius: BorderRadius.circular(15),
+                    loading: (_) => Column(
+                      children: [
+                        
+                        ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: 10,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => Shimmer.fromColors(
+                            baseColor: Theme.of(context)
+                                .chipTheme
+                                .backgroundColor!
+                                .withAlpha(150),
+                            highlightColor:
+                                Theme.of(context).chipTheme.backgroundColor!,
+                            child: Container(
+                              height: 140,
+                              width: 100,
+                              margin: const EdgeInsets.only(
+                                right: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: whiteColor,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                     loaded: (_) => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

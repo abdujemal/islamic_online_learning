@@ -234,6 +234,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                   isStarted: 1,
                   pausedAtAudioNum: audioPlayer.currentIndex,
                   pausedAtAudioSec: audioPlayer.position.inSeconds,
+                  lastViewed: DateTime.now().toString(),
                 );
 
                 setState(() {});
@@ -744,6 +745,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                             audioPlayer.currentIndex,
                                         pausedAtAudioSec:
                                             audioPlayer.position.inSeconds,
+                                        lastViewed: DateTime.now().toString(),
                                       );
                                       setState(() {});
                                     }
@@ -827,6 +829,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           audioPlayer.currentIndex,
                                       pausedAtAudioSec:
                                           audioPlayer.position.inSeconds,
+                                      lastViewed: DateTime.now().toString(),
                                     );
                                     setState(() {});
                                   }

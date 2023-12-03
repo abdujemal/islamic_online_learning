@@ -1,5 +1,4 @@
 import 'dart:async';
-// import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +9,6 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-
-// import 'features/courseDetail/presentation/widgets/delete_confirmation.dart';
 import 'features/main/presentation/pages/main_page.dart';
 import 'firebase_options.dart';
 

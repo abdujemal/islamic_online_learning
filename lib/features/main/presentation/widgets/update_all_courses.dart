@@ -46,17 +46,21 @@ class _UpdateAllCoursesState extends ConsumerState<UpdateAllCourses> {
       final newPdf = cm.pdfId.replaceAll(
           "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
 
-      // await FirebaseFirestore.instance
-      //     .collection(FirebaseConst.courses)
-      //     .doc(cm.courseId)
-      //     .update(
-      //       cm
-      //           .copyWith(
-      //             image: newImage,
-      //             pdfId: newPdf,
-      //           )
-      //           .toOriginalMap(),
-      //     );
+      final newAudio = cm.courseIds.replaceAll(
+          "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
+
+      await FirebaseFirestore.instance
+          .collection(FirebaseConst.courses)
+          .doc(cm.courseId)
+          .update(
+            cm
+                .copyWith(
+                  image: newImage,
+                  pdfId: newPdf,
+                  courseIds: newAudio,
+                )
+                .toOriginalMap(),
+          );
 
       // if (urls.length == cm.courseIds.split(",").length) {
       //   FirebaseFirestore.instance

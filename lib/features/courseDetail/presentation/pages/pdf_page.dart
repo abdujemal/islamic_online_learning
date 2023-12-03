@@ -85,21 +85,20 @@ class _PdfPageState extends ConsumerState<PdfPage> {
               builder: (ctx) => FinishConfirmation(
                 title: courseModel.title,
                 onConfirm: () {
-                  if(mounted){
-
-                  ref.read(mainNotifierProvider.notifier).saveCourse(
-                        courseModel.copyWith(
-                          isStarted: 1,
-                          isFinished: 1,
-                          pdfPage: currentPage! + 1,
-                          lastViewed: DateTime.now().toString(),
-                          pausedAtAudioNum:
-                              courseModel.courseIds.split(",").length - 1,
-                        ),
-                        null,
-                        context,
-                        showMsg: false,
-                      );
+                  if (mounted) {
+                    ref.read(mainNotifierProvider.notifier).saveCourse(
+                          courseModel.copyWith(
+                            isStarted: 1,
+                            isFinished: 1,
+                            pdfPage: currentPage! + 1,
+                            lastViewed: DateTime.now().toString(),
+                            pausedAtAudioNum:
+                                courseModel.courseIds.split(",").length - 1,
+                          ),
+                          null,
+                          context,
+                          showMsg: false,
+                        );
                   }
                   Navigator.pop(context);
                   Navigator.pop(context);
@@ -198,6 +197,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                                 int pg = int.parse(_pageTc.text) - 1;
                                 _controller.setPage(pg);
                                 _pageFocus.unfocus();
+                                _pageTc.text = "";
                               }
                             },
                           )
@@ -285,6 +285,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                       isStarted: 1,
                       pausedAtAudioNum: audioPlayer.currentIndex,
                       pausedAtAudioSec: audioPlayer.position.inSeconds,
+                  lastViewed: DateTime.now().toString(),
+
                     );
 
                     setState(() {});

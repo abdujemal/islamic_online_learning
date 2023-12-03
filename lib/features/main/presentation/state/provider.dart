@@ -34,6 +34,10 @@ final showGuideProvider = StateProvider<bool>((ref) {
   return false;
 });
 
+// final isSubedProvider = StateProvider<bool>((ref) {
+//   return false;
+// });
+
 final showBeginnerProvider = StateProvider<bool>((ref) {
   return true;
 });

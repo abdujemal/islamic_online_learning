@@ -169,7 +169,7 @@ class _UstazsState extends ConsumerState<Ustazs> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("ምንም የለም"),
+                        const Text("እባክዎ ኢንተርኔት አብርተው ድጋሚ ይሞክሩ።"),
                         IconButton(
                           onPressed: () async {
                             await ustazListNotifier.getUstaz();

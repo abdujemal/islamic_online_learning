@@ -257,6 +257,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                             isStarted: 1,
                             pausedAtAudioNum: audioPlayer.currentIndex,
                             pausedAtAudioSec: audioPlayer.position.inSeconds,
+                  lastViewed: DateTime.now().toString(),
+
                           );
                           setState(() {});
                         }
@@ -326,6 +328,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                           isStarted: 1,
                           pausedAtAudioNum: audioPlayer.currentIndex,
                           pausedAtAudioSec: audioPlayer.position.inSeconds,
+                  lastViewed: DateTime.now().toString(),
+
                         );
                         setState(() {});
                       }

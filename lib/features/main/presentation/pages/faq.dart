@@ -143,7 +143,7 @@ class _FAQState extends ConsumerState<FAQ> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("ምንም የለም"),
+                          const Text("እባክዎ ኢንተርኔት አብርተው ድጋሚ ይሞክሩ።"),
                           IconButton(
                             onPressed: () async {
                               await ref

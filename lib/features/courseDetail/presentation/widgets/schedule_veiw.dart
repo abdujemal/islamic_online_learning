@@ -173,11 +173,21 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                       //   }
                       // }
 
+                      List<int> days = [];
+                      int i = 0;
+                      for (bool d in weekDays.values) {
+                        i++;
+                        if (d) {
+                          days.add(i);
+                        }
+                      }
+
                       await Schedule().scheduleNotification(
                         0,
                         "የደርስ አስታዋሽ",
                         widget.courseModel.title,
-                        DateTime.now(),
+                        selectedSheduleDateTime,
+                        days,
                       );
                       if (mounted) {
                         Navigator.pop(context);
