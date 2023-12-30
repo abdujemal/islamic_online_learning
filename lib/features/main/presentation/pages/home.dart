@@ -174,12 +174,10 @@ class _HomeState extends ConsumerState<Home>
                     } else if (index <= _.courses.length + 2) {
                       return CourseItem(
                           _.courses[index < 5 ? index - 2 : index - 3]);
-                    } else if (_.isLoadingMore) {
-                      return const CourseShimmer();
                     } else if (_.noMoreToLoad) {
                       return const TheEnd();
                     } else {
-                      return const SizedBox();
+                      return const CourseShimmer();
                     }
                   },
                 ),

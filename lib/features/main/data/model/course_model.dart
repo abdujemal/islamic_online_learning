@@ -22,6 +22,7 @@ class CourseModel extends CourseEntity {
   final int pausedAtAudioNum;
   final int pausedAtAudioSec;
   final double pdfPage;
+  final double pdfNum;
   final String sheduleTime;
   final String sheduleDates;
   final String image;
@@ -45,6 +46,7 @@ class CourseModel extends CourseEntity {
     required this.sheduleDates,
     required this.sheduleTime,
     required this.pdfPage,
+    required this.pdfNum,
     required this.image,
   }) : super(
           id: id,
@@ -65,6 +67,7 @@ class CourseModel extends CourseEntity {
           sheduleDates: sheduleDates,
           sheduleTime: sheduleTime,
           pdfPage: pdfPage,
+          pdfNum: pdfNum,
           image: image,
         );
 
@@ -89,11 +92,11 @@ class CourseModel extends CourseEntity {
       'sheduleDates': sheduleDates,
       'sheduleTime': sheduleTime,
       'pdfPage': pdfPage,
+      'pdfNum': pdfNum,
     };
   }
 
   Map<String, dynamic> toOriginalMap() {
-    
     return {
       'courseId': courseId,
       'author': author,
@@ -134,6 +137,7 @@ class CourseModel extends CourseEntity {
       sheduleTime:
           map['sheduleTime'] ?? (copyFrom != null ? copyFrom.sheduleTime : ""),
       pdfPage: map['pdfPage'] ?? (copyFrom != null ? copyFrom.pdfPage : 0.0),
+      pdfNum: map['pdfNum'] ?? (copyFrom != null ? copyFrom.pdfNum : 1),
       image: map['image'],
     );
   }
@@ -157,6 +161,7 @@ class CourseModel extends CourseEntity {
     String? sheduleDates,
     String? sheduleTime,
     double? pdfPage,
+    double? pdfNum,
     String? image,
   }) {
     return CourseModel(
@@ -178,6 +183,7 @@ class CourseModel extends CourseEntity {
       sheduleDates: sheduleDates ?? this.sheduleDates,
       sheduleTime: sheduleTime ?? this.sheduleTime,
       pdfPage: pdfPage ?? this.pdfPage,
+      pdfNum: pdfNum ?? this.pdfNum,
       image: image ?? this.image,
     );
   }

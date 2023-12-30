@@ -15,10 +15,14 @@ import 'delete_confirmation.dart';
 class PdfItem extends ConsumerStatefulWidget {
   final String fileId;
   final String path;
+  final String title;
+  final double volume;
   final CourseModel courseModel;
   final VoidCallback whenPop;
   const PdfItem({
     super.key,
+    required this.title,
+    required this.volume,
     required this.fileId,
     required this.path,
     required this.courseModel,
@@ -36,7 +40,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
     if (mounted) {
       return await ref
           .read(cdNotifierProvider.notifier)
-          .isDownloaded("${widget.courseModel.title}.pdf", "PDF", context);
+          .isDownloaded("${widget.title}.pdf", "PDF", context);
     } else {
       return false;
     }
@@ -75,7 +79,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                     .read(cdNotifierProvider.notifier)
                     .downloadFile(
                       widget.fileId,
-                      "${widget.courseModel.title}.pdf",
+                      "${widget.title}.pdf",
                       'PDF',
                       cancelToken,
                       context,
@@ -87,6 +91,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => PdfPage(
+                            volume: widget.volume,
                             path: file.path,
                             courseModel: widget.courseModel,
                           ),
@@ -104,7 +109,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                 });
               },
               leading: const Icon(Icons.menu_book_rounded),
-              title: Text(widget.courseModel.title),
+              title: Text( widget.title),
               subtitle: downLoadProg != null
                   ? Row(
                       children: [
@@ -157,12 +162,12 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                           context: context,
                           barrierDismissible: false,
                           builder: (ctx) => DeleteConfirmation(
-                            title: '${widget.courseModel.title}.pdf',
+                            title: '${widget.title}.pdf',
                             action: () async {
                               await ref
                                   .read(cdNotifierProvider.notifier)
-                                  .deleteFile('${widget.courseModel.title}.pdf',
-                                      "PDF", context);
+                                  .deleteFile(
+                                      '${widget.title}.pdf', "PDF", context);
                               isDownloaded = await checkFile();
                               setState(() {});
                             },

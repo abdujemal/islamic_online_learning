@@ -1,13 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/faq_model.dart';
 
 import '../../../../core/constants.dart';
 
 class UpdateAllCourses extends ConsumerStatefulWidget {
-  final List<CourseModel> courses;
-  const UpdateAllCourses(this.courses, {super.key});
+  final List<FAQModel> category;
+  const UpdateAllCourses(this.category, {super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -28,8 +30,8 @@ class _UpdateAllCoursesState extends ConsumerState<UpdateAllCourses> {
 
   Future<void> updateAllCourses() async {
     wrongurls = [];
-    for (CourseModel cm in widget.courses) {
-      currentCourse = "${cm.title} by ${cm.ustaz}";
+    for (FAQModel cm in widget.category) {
+      currentCourse = cm.question; // "${cm.title} by ${cm.ustaz}";
       setState(() {});
       i = 0;
       // for (String audioId in cm.courseIds.split(",")) {
@@ -40,27 +42,27 @@ class _UpdateAllCoursesState extends ConsumerState<UpdateAllCourses> {
 
       // setState(() {});
       // }
-      final newImage = cm.image.replaceAll(
-          "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
+      // final newImage = cm.image.replaceAll(
+      //     "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
 
-      final newPdf = cm.pdfId.replaceAll(
-          "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
+      // final newPdf = cm.pdfId.replaceAll(
+      //     "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
 
-      final newAudio = cm.courseIds.replaceAll(
-          "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
+      // final newAudio = cm.courseIds.replaceAll(
+      //     "https://f005.backblazeb2.com", "https://b2.ilmfelagi.com");
 
-      await FirebaseFirestore.instance
-          .collection(FirebaseConst.courses)
-          .doc(cm.courseId)
-          .update(
-            cm
-                .copyWith(
-                  image: newImage,
-                  pdfId: newPdf,
-                  courseIds: newAudio,
-                )
-                .toOriginalMap(),
-          );
+      // await FirebaseDatabase.instance
+      //     .ref()
+      //     .child(FirebaseConst.courses)
+      //     .child(cm.courseId)
+      //     .update(
+      //       cm.toOriginalMap(),
+      //     );
+      await FirebaseDatabase.instance
+          .ref()
+          .child(FirebaseConst.faq)
+          .push()
+          .update(cm.toMap());
 
       // if (urls.length == cm.courseIds.split(",").length) {
       //   FirebaseFirestore.instance

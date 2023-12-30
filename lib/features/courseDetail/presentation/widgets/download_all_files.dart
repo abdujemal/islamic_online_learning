@@ -47,19 +47,27 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
     cancelToken = CancelToken();
 
     if (widget.courseModel.pdfId.trim().isNotEmpty) {
-      final bool isPdfDownloaded = await cdNotifier.isDownloaded(
-        "${widget.courseModel.title}.pdf",
-        "PDF",
-        context,
-      );
-      if (!isPdfDownloaded) {
-        await cdNotifier.downloadFile(
-          widget.courseModel.pdfId,
-          "${widget.courseModel.title}.pdf",
+      List<String> pdfIds = widget.courseModel.pdfId.split(',');
+
+      int i = 1;
+      for (String pdfId in pdfIds) {
+        final bool isPdfDownloaded = await cdNotifier.isDownloaded(
+          "${widget.courseModel.title} $i.pdf",
           "PDF",
-          cancelToken,
           context,
         );
+        if (!isPdfDownloaded) {
+          await cdNotifier.downloadFile(
+            pdfId,
+            widget.courseModel.pdfId.contains(",")
+                ? "${widget.courseModel.title} $i.pdf"
+                : "${widget.courseModel.title}.pdf",
+            "PDF",
+            cancelToken,
+            context,
+          );
+        }
+        i++;
       }
     }
 
@@ -100,10 +108,11 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
   @override
   Widget build(BuildContext context) {
     final progs = ref.watch(downloadProgressProvider);
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
+    return PopScope(
+      // onWillPop: () async {
+      //   return false;
+      // },
+      canPop: false,
       child: Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(

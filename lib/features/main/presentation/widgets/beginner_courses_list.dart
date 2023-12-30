@@ -41,19 +41,18 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
             padding: const EdgeInsets.only(
               top: 15,
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: primaryColor.withAlpha(230),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              padding: const EdgeInsets.all(10),
-              height: 195,
-              width: 200,
-              child: ref.watch(beginnerListProvider).map(
-                    initial: (_) => const SizedBox(),
-                    loading: (_) => Column(
+            child: ref.watch(beginnerListProvider).map(
+                  initial: (_) => const SizedBox(),
+                  loading: (_) => Container(
+                    decoration: BoxDecoration(
+                      color: primaryColor.withAlpha(230),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    padding: const EdgeInsets.all(10),
+                    height: 195,
+                    width: 200,
+                    child: Column(
                       children: [
-                        
                         ListView.builder(
                           physics: const BouncingScrollPhysics(),
                           itemCount: 10,
@@ -80,7 +79,16 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
                         ),
                       ],
                     ),
-                    loaded: (_) => Column(
+                  ),
+                  loaded: (_) => Container(
+                    decoration: BoxDecoration(
+                      color: primaryColor.withAlpha(230),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    padding: const EdgeInsets.all(10),
+                    height: 195,
+                    width: 200,
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
@@ -126,12 +134,12 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
                         ),
                       ],
                     ),
-                    empty: (_) => const SizedBox(),
-                    error: (_) => Center(
-                      child: Text(_.error.messege),
-                    ),
                   ),
-            ),
+                  empty: (_) => const SizedBox(),
+                  error: (_) => Center(
+                    child: Text(_.error.messege),
+                  ),
+                ),
           );
   }
 }

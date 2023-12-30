@@ -40,6 +40,9 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
                           );
                         },
                         child: Chip(
+                          labelPadding: const EdgeInsets.all(0),
+                          clipBehavior: Clip.antiAlias,
+                          side: BorderSide.none,
                           avatar: Image.asset('assets/teacher.png'),
                           backgroundColor: primaryColor,
                           label: const Text(
@@ -62,6 +65,9 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
                             if (index == 0) {}
                           },
                           child: const Chip(
+                            labelPadding: EdgeInsets.all(0),
+                            clipBehavior: Clip.antiAlias,
+                            side: BorderSide.none,
                             label: Text(
                               "_______",
                               style: TextStyle(

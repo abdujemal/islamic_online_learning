@@ -42,7 +42,7 @@ class CourseDetail extends ConsumerStatefulWidget {
 class _CourseDetailState extends ConsumerState<CourseDetail> {
   List<String> audios = [];
 
-  String? pdfPath;
+  List<String> pdfPaths = [];
 
   List<AudioSource> playList = [];
 
@@ -68,10 +68,17 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
       createPlayList();
     }
 
-    getPath('PDF', "${courseModel.title}.pdf").then((value) {
-      pdfPath = value;
-      setState(() {});
-    });
+    for (int i = 1; i <= courseModel.pdfId.split(",").length; i++) {
+      getPath(
+              'PDF',
+              courseModel.pdfId.contains(",")
+                  ? "${courseModel.title} $i.pdf"
+                  : "${courseModel.title}.pdf")
+          .then((value) {
+        pdfPaths.add(value);
+        setState(() {});
+      });
+    }
   }
 
   Future<void> createPlayList() async {
@@ -472,25 +479,38 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           ),
                                         );
                                         audioPlayer.play();
+
                                         if (mounted) {
                                           bool isPDFDownloded = await ref
                                               .read(cdNotifierProvider.notifier)
                                               .isDownloaded(
-                                                "${courseModel.title}.pdf",
+                                                courseModel.pdfId.contains(",")
+                                                    ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                    : "${courseModel.title}.pdf",
                                                 "PDF",
                                                 context,
                                               );
+                                          print(
+                                              "isPDFDownloded:- $isPDFDownloded");
+                                          print(courseModel.pdfId.contains(",")
+                                              ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                              : "${courseModel.title}.pdf");
                                           if (courseModel.pdfId
                                                   .trim()
                                                   .isNotEmpty &&
                                               isPDFDownloded) {
-                                            String path = await getPath('PDF',
-                                                "${courseModel.title}.pdf");
+                                            String path = await getPath(
+                                              'PDF',
+                                              courseModel.pdfId.contains(",")
+                                                  ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                  : "${courseModel.title}.pdf",
+                                            );
                                             if (mounted) {
                                               await Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (_) => PdfPage(
+                                                    volume: courseModel.pdfNum,
                                                     path: path,
                                                     courseModel: courseModel,
                                                   ),
@@ -616,15 +636,24 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   ),
                                 ),
                               if (courseModel.pdfId.trim() != "" &&
-                                  pdfPath != null)
-                                PdfItem(
-                                  fileId: courseModel.pdfId,
-                                  path: pdfPath!,
-                                  courseModel: courseModel,
-                                  whenPop: () {
-                                    refresh();
-                                  },
-                                ),
+                                  pdfPaths.isNotEmpty)
+                                // ...List.generate(courseModel.pdfId.split(",").length, (index) =>
+                                for (int i = 1;
+                                    i <= courseModel.pdfId.split(",").length;
+                                    i++)
+                                  PdfItem(
+                                    fileId: courseModel.pdfId.split(",")[i - 1],
+                                    path: pdfPaths[i - 1],
+                                    volume: i.toDouble(),
+                                    courseModel: courseModel,
+                                    title: courseModel.pdfId.contains(",")
+                                        ? "${courseModel.title} $i"
+                                        : courseModel.title,
+                                    whenPop: () {
+                                      refresh();
+                                    },
+                                  ),
+                              //),
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Row(

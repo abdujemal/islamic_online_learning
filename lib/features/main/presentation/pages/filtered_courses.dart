@@ -141,12 +141,10 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                           itemBuilder: (context, index) {
                             if (index <= _.courses.length - 1) {
                               return CourseItem(_.courses[index]);
-                            } else if (_.isLoadingMore) {
-                              return const CourseShimmer();
                             } else if (_.noMoreToLoad) {
                               return const TheEnd();
                             } else {
-                              return const SizedBox();
+                              return const CourseShimmer();
                             }
                           },
                         ),

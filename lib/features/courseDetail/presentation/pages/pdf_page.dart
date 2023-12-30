@@ -21,10 +21,12 @@ class PdfPage extends ConsumerStatefulWidget {
   final String path;
   final int pageNum;
   final CourseModel courseModel;
+  final double volume;
   const PdfPage({
     super.key,
     required this.path,
     this.pageNum = 0,
+    required this.volume,
     required this.courseModel,
   });
 
@@ -91,6 +93,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                             isStarted: 1,
                             isFinished: 1,
                             pdfPage: currentPage! + 1,
+                            pdfNum: widget.volume,
                             lastViewed: DateTime.now().toString(),
                             pausedAtAudioNum:
                                 courseModel.courseIds.split(",").length - 1,
@@ -115,6 +118,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                   courseModel.copyWith(
                     isStarted: 1,
                     pdfPage: currentPage! + 1,
+                    pdfNum: widget.volume,
                     lastViewed: DateTime.now().toString(),
                   ),
                   null,
@@ -123,6 +127,15 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                 )
                 .then(
               (value) {
+                ref.read(mainNotifierProvider.notifier).updateCourse(
+                      courseModel.copyWith(
+                        isStarted: 1,
+                        pdfPage: currentPage! + 1,
+                        pdfNum: widget.volume,
+                        lastViewed: DateTime.now().toString(),
+                      ),
+                    );
+
                 Navigator.pop(context);
               },
             );
@@ -285,8 +298,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                       isStarted: 1,
                       pausedAtAudioNum: audioPlayer.currentIndex,
                       pausedAtAudioSec: audioPlayer.position.inSeconds,
-                  lastViewed: DateTime.now().toString(),
-
+                      lastViewed: DateTime.now().toString(),
                     );
 
                     setState(() {});

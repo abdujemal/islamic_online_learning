@@ -73,6 +73,16 @@ class MainListNotifier extends StateNotifier<MainListState> {
     }
   }
 
+  Future<void> updateCourse(CourseModel courseModel) async {
+    courses =
+        courses.map((e) => e.id == courseModel.id ? courseModel : e).toList();
+    state = MainListState.loaded(
+      courses: courses,
+      noMoreToLoad: false,
+      isLoadingMore: true,
+    );
+  }
+
   Future<CourseModel?> getSingleCourse(
       String courseId, BuildContext context) async {
     CourseModel? courseModel;

@@ -18,7 +18,7 @@ Future<void> main() async {
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
-    androidNotificationIcon: 'mipmap/book',
+    androidNotificationIcon: 'mipmap/launcher_icon',
   );
   await dotenv.load();
   await AndroidAlarmManager.initialize();
@@ -27,6 +27,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await Schedule().init();
+
   runApp(const ProviderScope(child: Main()));
 }
 
@@ -40,7 +41,7 @@ class Main extends StatelessWidget {
       final fontScale = ref.watch(fontScaleProvider);
       return MediaQuery(
         data: MediaQuery.of(context).copyWith(
-          textScaleFactor: fontScale,
+          textScaler: TextScaler.linear(fontScale),
         ),
         child: MaterialApp(
           title: "ዒልም ፈላጊ",
@@ -52,7 +53,16 @@ class Main extends StatelessWidget {
               backgroundColor: Colors.grey.shade700,
             ),
             dividerColor: Colors.white38,
-            
+            // cardColor: Theme.of(context).dialogTheme.backgroundColor,
+            colorScheme: const ColorScheme.dark(
+              primary: primaryColor,
+            ),
+            dialogTheme: const DialogTheme(
+              backgroundColor: darkCardColor,
+            ),
+            cardColor: darkCardColor,
+
+            // colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
           ),
           theme: ThemeData(
             dividerColor: Colors.black45,
@@ -63,7 +73,9 @@ class Main extends StatelessWidget {
               backgroundColor: cardColor,
             ),
             cardColor: cardColor,
-            primarySwatch: primaryColor,
+            // primarySwatch: primaryColor,
+            colorScheme: const ColorScheme.light(primary: primaryColor),
+
             scaffoldBackgroundColor: const Color.fromARGB(255, 240, 240, 240),
             appBarTheme: const AppBarTheme(
               backgroundColor: cardColor,

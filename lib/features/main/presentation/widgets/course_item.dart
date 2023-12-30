@@ -274,20 +274,58 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                               .read(
                                                                   audioProvider)
                                                               .play();
+
                                                           if (mounted) {
-                                                            bool isPDFDownloded = await ref
-                                                                .read(cdNotifierProvider
-                                                                    .notifier)
-                                                                .isDownloaded(
-                                                                    "${widget.courseModel.title}.pdf",
-                                                                    "PDF",
-                                                                    context);
+                                                            bool
+                                                                isPDFDownloded =
+                                                                await ref
+                                                                    .read(cdNotifierProvider
+                                                                        .notifier)
+                                                                    .isDownloaded(
+                                                                      widget.courseModel
+                                                                              .pdfId
+                                                                              .contains(",")
+                                                                          ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
+                                                                          : "${widget.courseModel.title}.pdf",
+                                                                      "PDF",
+                                                                      context,
+                                                                    );
                                                             if (widget
                                                                     .courseModel
                                                                     .pdfId
                                                                     .trim()
-                                                                    .isEmpty ||
-                                                                !isPDFDownloded) {
+                                                                    .isNotEmpty &&
+                                                                isPDFDownloded) {
+                                                              String path =
+                                                                  await getPath(
+                                                                'PDF',
+                                                                widget.courseModel
+                                                                        .pdfId
+                                                                        .contains(
+                                                                            ",")
+                                                                    ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
+                                                                    : "${widget.courseModel.title}.pdf",
+                                                              );
+                                                              if (mounted) {
+                                                                await Navigator
+                                                                    .push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                    builder: (_) =>
+                                                                        PdfPage(
+                                                                      volume: widget
+                                                                          .courseModel
+                                                                          .pdfNum,
+                                                                      path:
+                                                                          path,
+                                                                      courseModel:
+                                                                          widget
+                                                                              .courseModel,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              }
+                                                            } else {
                                                               if (mounted) {
                                                                 Navigator.push(
                                                                   context,
@@ -296,26 +334,6 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                                         CourseDetail(
                                                                       cm: widget
                                                                           .courseModel,
-                                                                    ),
-                                                                  ),
-                                                                );
-                                                              }
-                                                            } else {
-                                                              String path =
-                                                                  await getPath(
-                                                                      'PDF',
-                                                                      "${widget.courseModel.title}.pdf");
-                                                              if (mounted) {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder: (_) =>
-                                                                        PdfPage(
-                                                                      path:
-                                                                          path,
-                                                                      courseModel:
-                                                                          widget
-                                                                              .courseModel,
                                                                     ),
                                                                   ),
                                                                 );

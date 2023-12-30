@@ -16,6 +16,8 @@ const int numOfDoc = 20;
 
 const Color cardColor = Color(0xfffcffea);
 
+const Color darkCardColor = Color(0xff3f3f3d);
+
 const primaryColor = MaterialColor(
   0xFF2FA887,
   <int, Color>{

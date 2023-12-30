@@ -20,6 +20,7 @@ class CourseEntity extends Equatable {
   final String sheduleTime;
   final String sheduleDates;
   final double pdfPage;
+  final double pdfNum;
   final String image;
 
   const CourseEntity({
@@ -41,6 +42,7 @@ class CourseEntity extends Equatable {
     required this.sheduleTime,
     required this.sheduleDates,
     required this.pdfPage,
+    required this.pdfNum,
     required this.image,
   });
 
@@ -64,6 +66,7 @@ class CourseEntity extends Equatable {
         sheduleDates,
         sheduleTime,
         pdfPage,
+        pdfNum,
         image,
       ];
 }

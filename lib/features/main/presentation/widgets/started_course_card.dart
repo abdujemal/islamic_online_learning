@@ -212,13 +212,39 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                           bool isPDFDownloded = await ref
                                               .read(cdNotifierProvider.notifier)
                                               .isDownloaded(
-                                                  "${widget.courseModel.title}.pdf",
-                                                  "PDF",
-                                                  context);
+                                                widget.courseModel.pdfId
+                                                        .contains(",")
+                                                    ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
+                                                    : "${widget.courseModel.title}.pdf",
+                                                "PDF",
+                                                context,
+                                              );
                                           if (widget.courseModel.pdfId
                                                   .trim()
-                                                  .isEmpty ||
-                                              !isPDFDownloded) {
+                                                  .isNotEmpty &&
+                                              isPDFDownloded) {
+                                            String path = await getPath(
+                                              'PDF',
+                                              widget.courseModel.pdfId
+                                                      .contains(",")
+                                                  ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
+                                                  : "${widget.courseModel.title}.pdf",
+                                            );
+                                            if (mounted) {
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => PdfPage(
+                                                    volume: widget
+                                                        .courseModel.pdfNum,
+                                                    path: path,
+                                                    courseModel:
+                                                        widget.courseModel,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          } else {
                                             if (mounted) {
                                               Navigator.push(
                                                 context,
@@ -229,23 +255,48 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                                 ),
                                               );
                                             }
-                                          } else {
-                                            String path = await getPath('PDF',
-                                                "${widget.courseModel.title}.pdf");
-                                            if (mounted) {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) => PdfPage(
-                                                    path: path,
-                                                    courseModel:
-                                                        widget.courseModel,
-                                                  ),
-                                                ),
-                                              );
-                                            }
                                           }
                                         }
+                                        // if (mounted) {
+                                        //   bool isPDFDownloded = await ref
+                                        //       .read(cdNotifierProvider.notifier)
+                                        //       .isDownloaded(
+                                        //           "${widget.courseModel.title}.pdf",
+                                        //           "PDF",
+                                        //           context);
+                                        //   if (widget.courseModel.pdfId
+                                        //           .trim()
+                                        //           .isEmpty ||
+                                        //       !isPDFDownloded) {
+                                        //     if (mounted) {
+                                        //   Navigator.push(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //       builder: (_) => CourseDetail(
+                                        //         cm: widget.courseModel,
+                                        //       ),
+                                        //     ),
+                                        //   );
+                                        // }
+                                        //   } else {
+                                        //     String path = await getPath('PDF',
+                                        //         "${widget.courseModel.title}.pdf");
+                                        //     if (mounted) {
+                                        //       Navigator.push(
+                                        //         context,
+                                        //         MaterialPageRoute(
+                                        //           builder: (_) => PdfPage(
+                                        //             volume: widget
+                                        //                 .courseModel.pdfNum,
+                                        //             path: path,
+                                        //             courseModel:
+                                        //                 widget.courseModel,
+                                        //           ),
+                                        //         ),
+                                        //       );
+                                        //     }
+                                        //   }
+                                        // }
                                       }
                                     },
                                     icon: const Icon(
