@@ -116,8 +116,7 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
 
   @override
   Widget build(BuildContext context) {
-    percentage = (widget.courseModel.pausedAtAudioNum + 1) /
-        widget.courseModel.noOfRecord;
+    percentage = getPersentage(widget.courseModel);
 
     return FutureBuilder(
       future: displayImage(

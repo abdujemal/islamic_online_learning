@@ -188,8 +188,8 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                           if ((metaData as MediaItem).extras?["isFinished"] ==
                               0) {
                             if (!audioPlayer.hasNext &&
-                                audioPlayer.processingState !=
-                                    ProcessingState.idle) {
+                                audioPlayer.processingState ==
+                                    ProcessingState.completed) {
                               showDialog(
                                 context: context,
                                 barrierDismissible: false,

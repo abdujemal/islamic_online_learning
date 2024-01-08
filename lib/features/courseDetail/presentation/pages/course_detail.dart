@@ -211,7 +211,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   Widget build(BuildContext context) {
     final audioPlayer = ref.watch(audioProvider);
 
-    percentage = (courseModel.pausedAtAudioNum + 1) / courseModel.noOfRecord;
+    percentage = getPersentage(courseModel);
 
     return StreamBuilder(
       stream: myAudioStream(audioPlayer),
@@ -533,8 +533,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           .saveCourse(
                                             courseModel.copyWith(
                                               isFinished: 0,
-                                               pdfPage: 0,
-                                              pausedAtAudioNum: -1,
+                                              pdfPage: 0,
+                                              pausedAtAudioNum: 0,
                                               pausedAtAudioSec: 0,
                                               lastViewed:
                                                   DateTime.now().toString(),
@@ -546,7 +546,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       courseModel = courseModel.copyWith(
                                         isFinished: 0,
                                         pdfPage: 0,
-                                        pausedAtAudioNum: -1,
+                                        pausedAtAudioNum: 0,
                                         pausedAtAudioSec: 0,
                                       );
                                       setState(() {});

@@ -115,8 +115,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
 
   @override
   Widget build(BuildContext context) {
-    percentage = (widget.courseModel.pausedAtAudioNum + 1) /
-        widget.courseModel.noOfRecord;
+    percentage = getPersentage(widget.courseModel);
 
     // if (widget.courseModel.isFinished == 0 && percentage == 1) {
     //   ref.read(mainNotifierProvider.notifier).saveCourse(

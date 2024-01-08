@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
@@ -115,6 +116,20 @@ TargetFocus getTutorial({
       ),
     ],
   );
+}
+
+double getPersentage(CourseModel courseModel) {
+  // double percentage =
+  //     (courseModel.pausedAtAudioNum + 1) / courseModel.noOfRecord;
+  int numOfAudio = courseModel.courseIds.split(",").length;
+  double avgAudio = courseModel.totalDuration / numOfAudio;
+  int pausedAtAudioNum = courseModel.pausedAtAudioNum + 1;
+  int pausedAtSec = courseModel.pausedAtAudioSec;
+
+  double percnt = ((avgAudio * (pausedAtAudioNum - 1)) + pausedAtSec) /
+      courseModel.totalDuration;
+
+  return percnt > 1 ? 1 : percnt;
 }
 
 Future<File?> displayImage(String? id, String name, WidgetRef ref) async {

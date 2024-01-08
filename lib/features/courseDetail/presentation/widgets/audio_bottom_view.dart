@@ -68,6 +68,60 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
           if (process == ProcessingState.idle) {
             return const SizedBox();
           }
+
+          // if (process == ProcessingState.completed) {
+          //   if (!audioPlayer.hasNext) {
+          //     showDialog(
+          //       context: context,
+          //       barrierDismissible: false,
+          //       builder: (ctx) => FinishConfirmation(
+          //         title: metaData.title
+          //             .split(" ")
+          //             .sublist(
+          //               0,
+          //               metaData.title.split(" ").length - 2,
+          //             )
+          //             .join(" "),
+          //         onConfirm: () {
+          //           ref.read(mainNotifierProvider.notifier).saveCourse(
+          //                 CourseModel.fromMap(
+          //                   metaData.extras as Map,
+          //                   metaData.extras?["courseId"],
+          //                 ).copyWith(
+          //                   isStarted: 1,
+          //                   isFinished: 1,
+          //                   pausedAtAudioNum: audioPlayer.currentIndex,
+          //                   pausedAtAudioSec: audioPlayer.position.inSeconds,
+          //                   lastViewed: DateTime.now().toString(),
+          //                 ),
+          //                 null,
+          //                 context,
+          //                 showMsg: false,
+          //               );
+          //           Navigator.pop(context);
+          //         },
+          //         onDenied: () {
+          //           ref.read(mainNotifierProvider.notifier).saveCourse(
+          //                 CourseModel.fromMap(
+          //                   metaData.extras as Map,
+          //                   metaData.extras?["courseId"],
+          //                 ).copyWith(
+          //                   isStarted: 1,
+          //                   pausedAtAudioNum: audioPlayer.currentIndex,
+          //                   pausedAtAudioSec: audioPlayer.position.inSeconds,
+          //                   lastViewed: DateTime.now().toString(),
+          //                 ),
+          //                 null,
+          //                 context,
+          //                 showMsg: false,
+          //               );
+          //           Navigator.pop(context);
+          //         },
+          //       ),
+          //     );
+          //     ref.read(audioProvider).stop();
+          //   }
+          // }
           return Container(
             height: 140,
             decoration: BoxDecoration(
@@ -123,7 +177,8 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                           widget.onClose();
 
                           if (metaData.extras?["isFinished"] == 0) {
-                            if (!audioPlayer.hasNext) {
+                            if (!audioPlayer.hasNext &&
+                                process == ProcessingState.completed) {
                               showDialog(
                                 context: context,
                                 barrierDismissible: false,
