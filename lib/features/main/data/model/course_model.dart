@@ -26,6 +26,7 @@ class CourseModel extends CourseEntity {
   final String sheduleTime;
   final String sheduleDates;
   final String image;
+  final int totalDuration;
 
   const CourseModel({
     required this.courseId,
@@ -48,6 +49,7 @@ class CourseModel extends CourseEntity {
     required this.pdfPage,
     required this.pdfNum,
     required this.image,
+    required this.totalDuration,
   }) : super(
           id: id,
           courseId: courseId,
@@ -69,6 +71,7 @@ class CourseModel extends CourseEntity {
           pdfPage: pdfPage,
           pdfNum: pdfNum,
           image: image,
+          totalDuration: totalDuration,
         );
 
   Map<String, dynamic> toMap() {
@@ -93,6 +96,7 @@ class CourseModel extends CourseEntity {
       'sheduleTime': sheduleTime,
       'pdfPage': pdfPage,
       'pdfNum': pdfNum,
+      'totalDuration': totalDuration
     };
   }
 
@@ -107,6 +111,7 @@ class CourseModel extends CourseEntity {
       'title': title,
       'ustaz': ustaz,
       'image': image,
+      'totalDuration': totalDuration
     };
   }
 
@@ -139,31 +144,32 @@ class CourseModel extends CourseEntity {
       pdfPage: map['pdfPage'] ?? (copyFrom != null ? copyFrom.pdfPage : 0.0),
       pdfNum: map['pdfNum'] ?? (copyFrom != null ? copyFrom.pdfNum : 1),
       image: map['image'],
+      totalDuration: map["totalDuration"] ?? 0,
     );
   }
 
-  CourseModel copyWith({
-    String? courseId,
-    String? author,
-    int? id,
-    String? category,
-    String? courseIds,
-    int? noOfRecord,
-    String? pdfId,
-    String? title,
-    String? ustaz,
-    String? lastViewed,
-    int? isFav,
-    int? isStarted,
-    int? isFinished,
-    int? pausedAtAudioNum,
-    int? pausedAtAudioSec,
-    String? sheduleDates,
-    String? sheduleTime,
-    double? pdfPage,
-    double? pdfNum,
-    String? image,
-  }) {
+  CourseModel copyWith(
+      {String? courseId,
+      String? author,
+      int? id,
+      String? category,
+      String? courseIds,
+      int? noOfRecord,
+      String? pdfId,
+      String? title,
+      String? ustaz,
+      String? lastViewed,
+      int? isFav,
+      int? isStarted,
+      int? isFinished,
+      int? pausedAtAudioNum,
+      int? pausedAtAudioSec,
+      String? sheduleDates,
+      String? sheduleTime,
+      double? pdfPage,
+      double? pdfNum,
+      String? image,
+      int? totalDuration}) {
     return CourseModel(
       courseId: courseId ?? this.courseId,
       author: author ?? this.author,
@@ -185,6 +191,7 @@ class CourseModel extends CourseEntity {
       pdfPage: pdfPage ?? this.pdfPage,
       pdfNum: pdfNum ?? this.pdfNum,
       image: image ?? this.image,
+      totalDuration: totalDuration ?? this.totalDuration,
     );
   }
 

@@ -22,6 +22,7 @@ class CourseEntity extends Equatable {
   final double pdfPage;
   final double pdfNum;
   final String image;
+  final int totalDuration;
 
   const CourseEntity({
     required this.id,
@@ -44,6 +45,7 @@ class CourseEntity extends Equatable {
     required this.pdfPage,
     required this.pdfNum,
     required this.image,
+    required this.totalDuration,
   });
 
   @override
@@ -68,5 +70,6 @@ class CourseEntity extends Equatable {
         pdfPage,
         pdfNum,
         image,
+        totalDuration,
       ];
 }

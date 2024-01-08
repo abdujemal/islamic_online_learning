@@ -26,7 +26,7 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
             children: List.generate(
               // itemCount: 5,
               // scrollDirection: Axis.horizontal,
-              12,
+              16,
               (index) => Padding(
                 padding: const EdgeInsets.only(left: 4),
                 child: index == 0
@@ -41,7 +41,6 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
                         },
                         child: Chip(
                           labelPadding: const EdgeInsets.all(0),
-                          clipBehavior: Clip.antiAlias,
                           side: BorderSide.none,
                           avatar: Image.asset('assets/teacher.png'),
                           backgroundColor: primaryColor,
@@ -66,7 +65,6 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
                           },
                           child: const Chip(
                             labelPadding: EdgeInsets.all(0),
-                            clipBehavior: Clip.antiAlias,
                             side: BorderSide.none,
                             label: Text(
                               "_______",

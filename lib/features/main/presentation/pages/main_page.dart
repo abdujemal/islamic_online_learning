@@ -4,7 +4,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
-import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/started.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
@@ -12,7 +11,6 @@ import 'package:islamic_online_learning/features/main/presentation/pages/home.da
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_drawer.dart';
-import 'package:islamic_online_learning/features/main/presentation/widgets/update_all_courses.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -103,6 +101,12 @@ class _MainPageState extends ConsumerState<MainPage>
 
         mainState.addListener((state) {
           state.mapOrNull(loaded: (_) {
+            // showDialog(
+            //   context: context,
+            //   builder: (context) => UpdateAllCourses(
+            //     _.courses,
+            //   ),
+            // );
             if (mounted) {
               bool isOnCurrentPage = !Navigator.canPop(context);
               if (isOnCurrentPage) {
@@ -245,6 +249,9 @@ class _MainPageState extends ConsumerState<MainPage>
                     ref
                         .read(mainNotifierProvider.notifier)
                         .searchCourses(value, 20);
+                  },
+                  onClose: () {
+                    ref.read(mainNotifierProvider.notifier).getCourses();
                   },
                 ),
                 bottom: PreferredSize(

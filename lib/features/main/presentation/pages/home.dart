@@ -78,13 +78,13 @@ class _HomeState extends ConsumerState<Home>
             loading: (_) => ListView.builder(
               itemCount: isSearching ? 10 + 1 : 10,
               itemBuilder: (context, index) {
-                if (index == 0) {
+                if (index == 0 && isSearching) {
                   return Wrap(
                     // height: 50,
                     children: List.generate(
                       // itemCount: 5,
                       // scrollDirection: Axis.horizontal,
-                      12,
+                      16,
                       (index) => Padding(
                         padding: const EdgeInsets.only(left: 4),
                         child: index == 0
@@ -100,6 +100,8 @@ class _HomeState extends ConsumerState<Home>
                                 child: Chip(
                                   avatar: Image.asset('assets/teacher.png'),
                                   backgroundColor: primaryColor,
+                                  labelPadding: const EdgeInsets.all(0),
+                                  side: BorderSide.none,
                                   label: const Text(
                                     "ኡስታዞች",
                                     style: TextStyle(
@@ -121,6 +123,8 @@ class _HomeState extends ConsumerState<Home>
                                     if (index == 0) {}
                                   },
                                   child: const Chip(
+                                    labelPadding: EdgeInsets.all(0),
+                                    side: BorderSide.none,
                                     label: Text(
                                       "_______",
                                       style: TextStyle(

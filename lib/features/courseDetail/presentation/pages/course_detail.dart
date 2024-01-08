@@ -533,7 +533,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           .saveCourse(
                                             courseModel.copyWith(
                                               isFinished: 0,
-                                              pdfPage: 0,
+                                               pdfPage: 0,
                                               pausedAtAudioNum: -1,
                                               pausedAtAudioSec: 0,
                                               lastViewed:

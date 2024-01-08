@@ -41,7 +41,9 @@ class IMainDataSrc extends MainDataSrc {
           ? await firebaseFirestore
               .collection(FirebaseConst.courses)
               .orderBy(
-                method == SortingMethod.dateDSC ? 'dateTime' : "title",
+                method == SortingMethod.dateDSC
+                    ? 'dateTime'
+                    : "title",
                 descending: method == SortingMethod.dateDSC,
               )
               .limit(numOfDoc)
