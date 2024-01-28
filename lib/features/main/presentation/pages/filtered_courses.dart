@@ -35,6 +35,10 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
 
   bool showTopAudio = false;
 
+  bool showFloatingBtn = false;
+
+  double maxExt = 6;
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +60,28 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
   }
 
   Future<void> _scrollListener() async {
+    if (scrollController.offset > 400) {
+      bool rebuild = false;
+      if (showFloatingBtn == false) {
+        rebuild = true;
+      }
+      showFloatingBtn = true;
+
+      if (rebuild) {
+        setState(() {});
+      }
+    } else {
+      bool rebuild = false;
+      if (showFloatingBtn == true) {
+        rebuild = true;
+      }
+      showFloatingBtn = false;
+
+      if (rebuild) {
+        setState(() {});
+      }
+    }
+    maxExt = scrollController.position.maxScrollExtent / 100;
     if (scrollController.position.pixels ==
         scrollController.position.maxScrollExtent) {
       await mainNotifier.getCourses(
@@ -133,20 +159,48 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                           );
                         },
                         color: primaryColor,
-                        child: ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.only(bottom: 20),
-                          controller: scrollController,
-                          itemCount: _.courses.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index <= _.courses.length - 1) {
-                              return CourseItem(_.courses[index]);
-                            } else if (_.noMoreToLoad) {
-                              return const TheEnd();
-                            } else {
-                              return const CourseShimmer();
-                            }
-                          },
+                        child: Stack(
+                          children: [
+                            ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.only(bottom: 20),
+                              controller: scrollController,
+                              itemCount: _.courses.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index <= _.courses.length - 1) {
+                                  return CourseItem(_.courses[index]);
+                                } else if (_.noMoreToLoad) {
+                                  return const TheEnd();
+                                } else {
+                                  return maxExt < _.courses.length
+                                      ? const CourseShimmer()
+                                      : const SizedBox();
+                                }
+                              },
+                            ),
+                            AnimatedPositioned(
+                              right: 5,
+                              bottom: showFloatingBtn ? 5 : -57,
+                              duration: const Duration(milliseconds: 500),
+                              child: Opacity(
+                                opacity: /*showFloatingBtn ?*/ 1.0 /*: 0.0*/,
+                                child: FloatingActionButton(
+                                  onPressed: () => scrollController
+                                      .animateTo(
+                                        0.0, // Scroll to the top
+                                        curve: Curves.easeOut,
+                                        duration:
+                                            const Duration(milliseconds: 500),
+                                      )
+                                      .then((value) => setState(() {})),
+                                  child: const Icon(
+                                    Icons.arrow_upward,
+                                    color: whiteColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       empty: (_) => const Center(

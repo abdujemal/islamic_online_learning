@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:animated_search_bar/animated_search_bar.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,13 +51,25 @@ class _MainPageState extends ConsumerState<MainPage>
 
   bool showTopAudio = false;
 
+  ScrollController _scrollController = ScrollController();
+
+  Timer? searchTimer;
+
   @override
   void initState() {
     super.initState();
 
+    
+
     tabController = TabController(length: 3, vsync: this);
 
     tabController.addListener(_handleTabChange);
+
+    if (FirebaseAuth.instance.currentUser == null) {
+      FirebaseAuth.instance.signInAnonymously().then((value) {
+        toast("እንኳን ደህና መጡ!", ToastType.success, context);
+      });
+    }
 
     if (mounted) {
       ref.read(mainNotifierProvider.notifier).getTheme();
@@ -166,6 +182,16 @@ class _MainPageState extends ConsumerState<MainPage>
     ref.read(menuIndexProvider.notifier).update((state) => tabController.index);
   }
 
+  void startSearchTimer(String searchQuery) {
+    // Cancel any previous timer if it exists
+    searchTimer?.cancel();
+
+    // Start a new timer
+    searchTimer = Timer(const Duration(seconds: 2), () {
+      ref.read(mainNotifierProvider.notifier).searchCourses(searchQuery, 20);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final audioPlayer = ref.watch(audioProvider);
@@ -241,9 +267,8 @@ class _MainPageState extends ConsumerState<MainPage>
                       ref.read(menuIndexProvider.notifier).update((state) => 0);
                       tabController.animateTo(0);
                     }
-                    ref
-                        .read(mainNotifierProvider.notifier)
-                        .searchCourses(value, 20);
+
+                    startSearchTimer(value);
                   },
                   onFieldSubmitted: (value) {
                     ref

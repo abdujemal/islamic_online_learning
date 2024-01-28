@@ -1,12 +1,12 @@
 import 'dart:async';
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/pages/course_detail.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'features/main/presentation/pages/main_page.dart';
@@ -20,19 +20,111 @@ Future<void> main() async {
     androidNotificationOngoing: true,
     androidNotificationIcon: 'mipmap/ic_launcher',
   );
-  await dotenv.load();
-  await AndroidAlarmManager.initialize();
   await DatabaseHelper().initializeDatabase();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await Schedule().init();
 
-  runApp(const ProviderScope(child: Main()));
+  final PendingDynamicLinkData? initialLink =
+      await FirebaseDynamicLinks.instance.getInitialLink();
+
+  runApp(
+    ProviderScope(
+      child: Main(
+        initialLink: initialLink,
+      ),
+    ),
+  );
 }
 
-class Main extends StatelessWidget {
-  const Main({super.key});
+// void handleIncomingIntent() async {
+//   final initialUri = await getInitialUri(); // Use a library to get the initial URL
+//   if (initialUri != null && initialUri.scheme == 'your-app') {
+//     final courseId = int.parse(initialUri.pathSegments.last);
+//     // Navigate to the course page with the extracted ID
+//   }
+// }
+
+class Main extends ConsumerStatefulWidget {
+  final PendingDynamicLinkData? initialLink;
+  const Main({required this.initialLink, super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _MainState();
+}
+
+class _MainState extends ConsumerState<Main> {
+  FirebaseDynamicLinks firebaseDynamicLink = FirebaseDynamicLinks.instance;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      print("link:- ${widget.initialLink?.link}");
+      print("Segments: ${widget.initialLink?.link.pathSegments}");
+      if (widget.initialLink?.link.pathSegments.contains("courses") ?? false) {
+        String id = Uri.decodeFull(widget.initialLink?.link.toString() ?? "")
+            .split("/")
+            .last
+            .replaceAll("courses?id=", "")
+            .replaceAll("+", " ");
+        print("id: $id");
+        // String? id = widget.initialLink!.link.queryParameters["id"];
+
+        getCourseAndRedirect(id);
+      }
+    });
+
+    // firebaseDynamicLink.onLink.listen((event) {
+    //   print("link:- ${event.link}");
+    //   print("Segments: ${event.link.pathSegments}");
+    //   if (event.link.pathSegments.contains("courses")) {
+    // String id = Uri.decodeFull(event.link.toString())
+    //     .split("/")
+    //     .last
+    //     .replaceAll("courses?id=", "")
+    //     .replaceAll("+", " ");
+    // print("id: $id");
+
+    //     getCourseAndRedirect(id);
+    //   }
+    // }).onError((e) {
+    //   toast(
+    //     e.toString(),
+    //     ToastType.error,
+    //     context,
+    //     isLong: true,
+    //   );
+    // });
+  }
+
+  getCourseAndRedirect(String? id) async {
+    print("course id:$id");
+    if (id == null) {
+      return;
+    }
+    if (id.isEmpty) {
+      return;
+    }
+    final res = await ref
+        .read(mainNotifierProvider.notifier)
+        .getSingleCourse(id, context, fromCloud: true);
+    print("wait ... ");
+    if (res != null) {
+      print("redirecting ... ");
+      if (mounted) {
+        print("go");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CourseDetail(cm: res),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +154,11 @@ class Main extends StatelessWidget {
             ),
             cardColor: darkCardColor,
 
+            listTileTheme: const ListTileThemeData(
+              titleTextStyle: TextStyle(
+                fontSize: 16,
+              ),
+            ),
             // colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
           ),
           theme: ThemeData(
@@ -73,9 +170,7 @@ class Main extends StatelessWidget {
               backgroundColor: cardColor,
             ),
             cardColor: cardColor,
-            // primarySwatch: primaryColor,
             colorScheme: const ColorScheme.light(primary: primaryColor),
-
             scaffoldBackgroundColor: const Color.fromARGB(255, 240, 240, 240),
             appBarTheme: const AppBarTheme(
               backgroundColor: cardColor,
@@ -84,6 +179,12 @@ class Main extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
+              // primarySwatch: primaryColor,
+              // listTileTheme: const ListTileThemeData(
+              //   titleTextStyle: TextStyle(
+              //     fontSize: 16,
+              //   ),
+              // ),
               // actionsIconTheme: IconThemeData(
               //   color: primaryColor,
               // ),
@@ -99,6 +200,7 @@ class Main extends StatelessWidget {
     });
   }
 }
+
 
 // overlay entry point
 // @pragma("vm:entry-point")

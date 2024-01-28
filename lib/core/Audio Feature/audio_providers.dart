@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
@@ -5,7 +6,17 @@ import 'package:rxdart/rxdart.dart';
 import 'audio_model.dart';
 
 final audioProvider = StateProvider<AudioPlayer>((ref) {
-  return AudioPlayer();
+  final player = AudioPlayer();
+
+  final connectivity = Connectivity();
+
+  connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
+    if (result == ConnectivityResult.none && player.playing) {
+      player.pause();
+    }
+  });
+
+  return player;
 });
 
 Stream<AudioData> myAudioStream(AudioPlayer audioPlayer) =>

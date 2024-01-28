@@ -158,7 +158,7 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
                     cancelToken.cancel();
                     Navigator.pop(context);
                   },
-                  child: const Text("አጥፋው"),
+                  child: const Text("አቁም"),
                 ),
               ),
             ],

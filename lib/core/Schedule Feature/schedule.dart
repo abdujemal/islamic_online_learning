@@ -1,7 +1,4 @@
-import 'dart:isolate';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 
 class Schedule {
@@ -10,22 +7,21 @@ class Schedule {
       null,
       [
         NotificationChannel(
-          channelKey: 'ders_app',
-          channelName: 'Ders App Channel',
+          channelKey: 'ilm_felagi',
+          channelName: 'ዒልም ፈላጊ',
           channelDescription: 'Ders app',
           defaultColor: primaryColor,
           ledColor: primaryColor,
         ),
         NotificationChannel(
-          channelKey: 'ders_app_alarm',
-          channelName: 'Ders App Alarm Channel',
+          channelKey: 'ilm_felagi_alarm',
+          channelName: 'ዒልም ፈላጊ አስታዋሽ',
           channelDescription: 'Ders app Alarm',
           defaultColor: primaryColor,
           importance: NotificationImportance.Max,
           ledColor: primaryColor,
           // playSound: true,
           soundSource: "resource://raw/alarm",
-          icon: "resource://mipmap/launcher_icon",
           // onlyAlertOnce: false,
           // icon: 'mipmap/book',
           // defaultRingtoneType: DefaultRingtoneType.Alarm,
@@ -38,12 +34,18 @@ class Schedule {
     );
   }
 
+  Future<void> deleteNotification(int id, List<int> weekDays) async {
+    for (int weekDay in weekDays) {
+      await AwesomeNotifications().cancel((weekDay * 1000000) + id);
+    }
+  }
+
   Future<void> scheduleNotification(int id, String title, String body,
       DateTime dateTime, List<int> weekDays) async {
     // Create a notification content
     // final content = NotificationContent(
     //   id: id,
-    //   channelKey: 'ders_app',
+    //   channelKey: 'ilm_felagi',
     //   title: title,
     //   body: body,
     //   // payload: {'data': 'your_custom_data'},
@@ -70,8 +72,8 @@ class Schedule {
       print(weekDay);
 
       final content = NotificationContent(
-        id: id,
-        channelKey: 'ders_app_alarm',
+        id: (weekDay * 1000000) + id,
+        channelKey: 'ilm_felagi_alarm',
         title: title,
         body: body,
         category: NotificationCategory.Alarm,
@@ -88,13 +90,13 @@ class Schedule {
         actionButtons: [
           NotificationActionButton(
             key: 'stop',
-            label: 'Stop Sound',
+            label: 'አጥፋ',
             actionType: ActionType.KeepOnTop,
             enabled: true,
           ),
           NotificationActionButton(
             key: 'open',
-            label: 'Open Ders',
+            label: 'ክፈት',
             actionType: ActionType.Default,
             enabled: true,
           ),
@@ -167,16 +169,16 @@ class Schedule {
   }
 }
 
-@pragma('vm:entry-point')
-printHello() async {
-  final DateTime now = DateTime.now();
-  final int isolateId = Isolate.current.hashCode;
-  print("[$now] Hello, world! isolate=$isolateId");
+// @pragma('vm:entry-point')
+// printHello() async {
+//   final DateTime now = DateTime.now();
+//   final int isolateId = Isolate.current.hashCode;
+//   print("[$now] Hello, world! isolate=$isolateId");
 
   // AwesomeNotifications().createNotification(
   //   content: NotificationContent(
   //     id: 0,
-  //     channelKey: "ders_app_alarm",
+  //     channelKey: "ilm_felagi_alarm",
   //     title: "Alarm",
   //     body: "Alarm",
   //   ),
@@ -188,10 +190,10 @@ printHello() async {
   //   ),
   // );
 
-  FlutterAlarmClock.createAlarm(
-    hour: 0,
-    minutes: 0,
-  );
+  // FlutterAlarmClock.createAlarm(
+  //   hour: 0,
+  //   minutes: 0,
+  // );
 
   // final pref = await SharedPreferences.getInstance();
   // pref.setString("ScheduleTitle", value)
@@ -207,4 +209,4 @@ printHello() async {
   // );
   // await Schedule().init();
   // runApp(const ProviderScope(child: Main()));
-}
+// }P

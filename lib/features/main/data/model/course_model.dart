@@ -21,10 +21,11 @@ class CourseModel extends CourseEntity {
   final int isFinished;
   final int pausedAtAudioNum;
   final int pausedAtAudioSec;
+  final int isScheduleOn;
   final double pdfPage;
   final double pdfNum;
-  final String sheduleTime;
-  final String sheduleDates;
+  final String scheduleTime;
+  final String scheduleDates;
   final String image;
   final int totalDuration;
 
@@ -44,8 +45,9 @@ class CourseModel extends CourseEntity {
     required this.isFinished,
     required this.pausedAtAudioNum,
     required this.pausedAtAudioSec,
-    required this.sheduleDates,
-    required this.sheduleTime,
+    required this.scheduleDates,
+    required this.scheduleTime,
+    required this.isScheduleOn,
     required this.pdfPage,
     required this.pdfNum,
     required this.image,
@@ -64,10 +66,11 @@ class CourseModel extends CourseEntity {
           isFav: isFav,
           isStarted: isStarted,
           isFinished: isFinished,
+          isScheduleOn: isScheduleOn,
           pausedAtAudioNum: pausedAtAudioNum,
           pausedAtAudioSec: pausedAtAudioSec,
-          sheduleDates: sheduleDates,
-          sheduleTime: sheduleTime,
+          scheduleDates: scheduleDates,
+          scheduleTime: scheduleTime,
           pdfPage: pdfPage,
           pdfNum: pdfNum,
           image: image,
@@ -92,8 +95,9 @@ class CourseModel extends CourseEntity {
       'isFinished': isFinished,
       'pausedAtAudioNum': pausedAtAudioNum,
       'pausedAtAudioSec': pausedAtAudioSec,
-      'sheduleDates': sheduleDates,
-      'sheduleTime': sheduleTime,
+      "scheduleDates": scheduleDates,
+      "scheduleTime": scheduleTime,
+      'isScheduleOn': isScheduleOn,
       'pdfPage': pdfPage,
       'pdfNum': pdfNum,
       'totalDuration': totalDuration
@@ -137,10 +141,12 @@ class CourseModel extends CourseEntity {
           (copyFrom != null ? copyFrom.pausedAtAudioNum : 0),
       pausedAtAudioSec: map['pausedAtAudioSec'] ??
           (copyFrom != null ? copyFrom.pausedAtAudioSec : 0),
-      sheduleDates: map['sheduleDates'] ??
-          (copyFrom != null ? copyFrom.sheduleDates : ""),
-      sheduleTime:
-          map['sheduleTime'] ?? (copyFrom != null ? copyFrom.sheduleTime : ""),
+      scheduleDates: map['scheduleDates'] ??
+          (copyFrom != null ? copyFrom.scheduleDates : ""),
+      scheduleTime: map['scheduleTime'] ??
+          (copyFrom != null ? copyFrom.scheduleTime : ""),
+      isScheduleOn:
+          map['isScheduleOn'] ?? (copyFrom != null ? copyFrom.isScheduleOn : 0),
       pdfPage: map['pdfPage'] ?? (copyFrom != null ? copyFrom.pdfPage : 0.0),
       pdfNum: map['pdfNum'] ?? (copyFrom != null ? copyFrom.pdfNum : 1),
       image: map['image'],
@@ -164,8 +170,9 @@ class CourseModel extends CourseEntity {
       int? isFinished,
       int? pausedAtAudioNum,
       int? pausedAtAudioSec,
-      String? sheduleDates,
-      String? sheduleTime,
+      int? isScheduleOn,
+      String? scheduleDates,
+      String? scheduleTime,
       double? pdfPage,
       double? pdfNum,
       String? image,
@@ -186,8 +193,9 @@ class CourseModel extends CourseEntity {
       isFinished: isFinished ?? this.isFinished,
       pausedAtAudioNum: pausedAtAudioNum ?? this.pausedAtAudioNum,
       pausedAtAudioSec: pausedAtAudioSec ?? this.pausedAtAudioSec,
-      sheduleDates: sheduleDates ?? this.sheduleDates,
-      sheduleTime: sheduleTime ?? this.sheduleTime,
+      scheduleDates: scheduleDates ?? this.scheduleDates,
+      scheduleTime: scheduleTime ?? this.scheduleTime,
+      isScheduleOn: isScheduleOn ?? this.isScheduleOn,
       pdfPage: pdfPage ?? this.pdfPage,
       pdfNum: pdfNum ?? this.pdfNum,
       image: image ?? this.image,

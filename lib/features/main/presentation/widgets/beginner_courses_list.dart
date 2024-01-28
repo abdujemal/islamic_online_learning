@@ -63,7 +63,8 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
                                 .backgroundColor!
                                 .withAlpha(150),
                             highlightColor:
-                                Theme.of(context).chipTheme.backgroundColor!,
+                                Theme.of(context).chipTheme.backgroundColor ??
+                                    Colors.white30,
                             child: Container(
                               height: 140,
                               width: 100,

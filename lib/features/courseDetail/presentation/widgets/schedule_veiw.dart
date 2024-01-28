@@ -7,7 +7,13 @@ import 'package:islamic_online_learning/features/main/data/model/course_model.da
 
 class ScheduleView extends ConsumerStatefulWidget {
   final CourseModel courseModel;
-  const ScheduleView(this.courseModel, {super.key});
+  final Future<int?> Function(
+      String scheduleDates, String scheduleTime, int isScheduleOn) onSave;
+  const ScheduleView({
+    required this.courseModel,
+    required this.onSave,
+    super.key,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ScheduleViewState();
@@ -16,6 +22,8 @@ class ScheduleView extends ConsumerStatefulWidget {
 class _ScheduleViewState extends ConsumerState<ScheduleView> {
   DateTime selectedSheduleDateTime = DateTime.now();
   final TextEditingController _timeController = TextEditingController();
+
+  int isScheduledOn = 0;
 
   Map<String, bool> weekDays = {
     "ሰኞ": false,
@@ -59,6 +67,38 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    if (widget.courseModel.scheduleDates.isEmpty) {
+      isScheduledOn = 1;
+    }
+
+    if (widget.courseModel.scheduleDates.isNotEmpty &&
+        widget.courseModel.scheduleTime.isNotEmpty) {
+      _timeController.text = DateFormat.jm().format(
+        DateTime.parse(
+          widget.courseModel.scheduleTime,
+        ),
+      );
+
+      selectedSheduleDateTime = DateTime.parse(
+        widget.courseModel.scheduleTime,
+      );
+
+      final days =
+          widget.courseModel.scheduleDates.split(",").map((e) => int.parse(e));
+
+      for (int i in days) {
+        weekDays[weekDays.keys.toList()[i - 1]] = true;
+      }
+
+      isScheduledOn = widget.courseModel.isScheduleOn;
+      setState(() {});
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _timeController.dispose();
@@ -73,18 +113,42 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SizedBox(
-          height: 330,
+          height: 360,
           child: Form(
             key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "አስታዋሽ መመዝገቢያ",
-                  style: TextStyle(fontSize: 18),
+                // const Text(
+                //   "አስታዋሽ መመዝገቢያ",
+                //   style: TextStyle(fontSize: 18),
+                // ),
+                // const SizedBox(
+                //   height: 10,
+                // ),
+                SwitchListTile(
+                  dense: true,
+                  title: const Text(
+                    "አስታዋሽ መመዝገቢያ",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  value: isScheduledOn == 1,
+                  activeColor: primaryColor,
+                  inactiveTrackColor: Colors.transparent,
+                  onChanged: (bool? v) {
+                    if (v == true) {
+                      setState(() {
+                        isScheduledOn = 1;
+                      });
+                    } else {
+                      setState(() {
+                        isScheduledOn = 0;
+                      });
+                    }
+                  },
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
                 TextFormField(
                   validator: (value) {
@@ -182,13 +246,39 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                         }
                       }
 
-                      await Schedule().scheduleNotification(
-                        0,
-                        "የደርስ አስታዋሽ",
-                        widget.courseModel.title,
-                        selectedSheduleDateTime,
-                        days,
+                      int? id = await widget.onSave(
+                        days.join(","),
+                        selectedSheduleDateTime.toString(),
+                        isScheduledOn,
                       );
+
+                      print("courseId: $id");
+
+                      if (isScheduledOn == 1 && id != null) {
+                        await Schedule().scheduleNotification(
+                          id,
+                          "የደርስ አስታዋሽ",
+                          widget.courseModel.title,
+                          selectedSheduleDateTime,
+                          days,
+                        );
+
+                        List<int> otherDays = [1, 2, 3, 4, 5, 6, 7];
+                        for (int e in days) {
+                          otherDays.remove(e);
+                        }
+                        print(otherDays);
+                        await Schedule().deleteNotification(
+                          id,
+                          otherDays,
+                        );
+                      } else {
+                        await Schedule().deleteNotification(
+                          id!,
+                          days,
+                        );
+                      }
+
                       if (mounted) {
                         Navigator.pop(context);
                       }

@@ -12,13 +12,15 @@ class CourseEntity extends Equatable {
   final String title;
   final String ustaz;
   final String lastViewed;
+
   final int isFav;
   final int isStarted;
   final int isFinished;
+  final int isScheduleOn;
   final int pausedAtAudioNum;
   final int pausedAtAudioSec;
-  final String sheduleTime;
-  final String sheduleDates;
+  final String scheduleTime;
+  final String scheduleDates;
   final double pdfPage;
   final double pdfNum;
   final String image;
@@ -40,8 +42,9 @@ class CourseEntity extends Equatable {
     required this.isFinished,
     required this.pausedAtAudioNum,
     required this.pausedAtAudioSec,
-    required this.sheduleTime,
-    required this.sheduleDates,
+    required this.scheduleTime,
+    required this.scheduleDates,
+    required this.isScheduleOn,
     required this.pdfPage,
     required this.pdfNum,
     required this.image,
@@ -65,8 +68,9 @@ class CourseEntity extends Equatable {
         isFinished,
         pausedAtAudioSec,
         pausedAtAudioNum,
-        sheduleDates,
-        sheduleTime,
+        scheduleDates,
+        scheduleTime,
+        isScheduleOn,
         pdfPage,
         pdfNum,
         image,

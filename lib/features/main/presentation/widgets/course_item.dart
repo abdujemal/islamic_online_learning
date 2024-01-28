@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
+import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/pages/course_detail.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/pages/pdf_page.dart';
@@ -21,7 +22,8 @@ import '../pages/filtered_courses.dart';
 
 class CourseItem extends ConsumerStatefulWidget {
   final CourseModel courseModel;
-  const CourseItem(this.courseModel, {super.key});
+  final bool fromHome;
+  const CourseItem(this.courseModel, {this.fromHome = true, super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _CourseItemState();
@@ -167,117 +169,119 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                             ref,
                           ),
                           builder: (context, snap) {
-                            return Container(
-                              height: 80,
-                              width: 80,
-                              decoration: BoxDecoration(
-                                image: snap.data == null
-                                    ? null
-                                    : snap.data!.path.isNotEmpty
-                                        ? DecorationImage(
-                                            image: FileImage(snap.data!),
-                                            fit: BoxFit.fill,
-                                          )
-                                        : null,
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: snap.data == null
-                                  ? Shimmer.fromColors(
-                                      baseColor: Theme.of(context)
-                                          .chipTheme
-                                          .backgroundColor!
-                                          .withAlpha(150),
-                                      highlightColor: Theme.of(context)
-                                          .chipTheme
-                                          .backgroundColor!,
-                                      child: Container(
-                                        height: 80,
-                                        width: 80,
-                                        decoration: BoxDecoration(
-                                          color: whiteColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                      ),
-                                    )
-                                  : snap.data!.path.isEmpty
-                                      ? Container(
-                                          height: 80,
-                                          width: 80,
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .chipTheme
-                                                .backgroundColor,
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                          ),
-                                          child: const Center(
-                                            child: Icon(Icons.error_rounded),
+                            return Stack(
+                              children: [
+                                Container(
+                                  height: 80,
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                    image: snap.data == null
+                                        ? null
+                                        : snap.data!.path.isNotEmpty
+                                            ? DecorationImage(
+                                                image: FileImage(snap.data!),
+                                                fit: BoxFit.fill,
+                                              )
+                                            : null,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: snap.data == null
+                                      ? Shimmer.fromColors(
+                                          baseColor: Theme.of(context)
+                                              .chipTheme
+                                              .backgroundColor!
+                                              .withAlpha(150),
+                                          highlightColor: Theme.of(context)
+                                              .chipTheme
+                                              .backgroundColor!,
+                                          child: Container(
+                                            height: 80,
+                                            width: 80,
+                                            decoration: BoxDecoration(
+                                              color: whiteColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
                                           ),
                                         )
-                                      : widget.courseModel.isStarted == 1 &&
-                                              widget.courseModel.isFinished == 0
+                                      : snap.data!.path.isEmpty
                                           ? Container(
                                               height: 80,
                                               width: 80,
                                               decoration: BoxDecoration(
-                                                color: Colors.black38,
+                                                color: Theme.of(context)
+                                                    .chipTheme
+                                                    .backgroundColor,
                                                 borderRadius:
                                                     BorderRadius.circular(15),
                                               ),
-                                              child: Stack(
-                                                children: [
-                                                  Align(
-                                                    child: SizedBox(
-                                                      height: 40,
-                                                      width: 40,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: cardColor,
-                                                        value: percentage,
-                                                        backgroundColor:
-                                                            Colors.grey,
-                                                      ),
-                                                    ),
+                                              child: const Center(
+                                                child:
+                                                    Icon(Icons.error_rounded),
+                                              ),
+                                            )
+                                          : widget.courseModel.isStarted == 1 &&
+                                                  widget.courseModel
+                                                          .isFinished ==
+                                                      0
+                                              ? Container(
+                                                  height: 80,
+                                                  width: 80,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black38,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
                                                   ),
-                                                  Align(
-                                                    child: IconButton(
-                                                      onPressed: () async {
-                                                        await createPlayList();
-                                                        if (playList
-                                                            .isNotEmpty) {
-                                                          await ref
-                                                              .read(
-                                                                  audioProvider)
-                                                              .setAudioSource(
-                                                                ConcatenatingAudioSource(
-                                                                  children:
-                                                                      playList,
-                                                                ),
-                                                                initialIndex: widget
+                                                  child: Stack(
+                                                    children: [
+                                                      Align(
+                                                        child: SizedBox(
+                                                          height: 40,
+                                                          width: 40,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            color: cardColor,
+                                                            value: percentage,
+                                                            backgroundColor:
+                                                                Colors.grey,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Align(
+                                                        child: IconButton(
+                                                          onPressed: () async {
+                                                            await createPlayList();
+                                                            if (playList
+                                                                .isNotEmpty) {
+                                                              await ref
+                                                                  .read(
+                                                                      audioProvider)
+                                                                  .setAudioSource(
+                                                                    ConcatenatingAudioSource(
+                                                                      children:
+                                                                          playList,
+                                                                    ),
+                                                                    initialIndex: widget.courseModel.pausedAtAudioNum <
+                                                                            0
+                                                                        ? 0
+                                                                        : widget
                                                                             .courseModel
-                                                                            .pausedAtAudioNum <
-                                                                        0
-                                                                    ? 0
-                                                                    : widget
-                                                                        .courseModel
-                                                                        .pausedAtAudioNum,
-                                                                initialPosition:
-                                                                    Duration(
-                                                                  seconds: widget
-                                                                      .courseModel
-                                                                      .pausedAtAudioSec,
-                                                                ),
-                                                              );
-                                                          ref
-                                                              .read(
-                                                                  audioProvider)
-                                                              .play();
+                                                                            .pausedAtAudioNum,
+                                                                    initialPosition:
+                                                                        Duration(
+                                                                      seconds: widget
+                                                                          .courseModel
+                                                                          .pausedAtAudioSec,
+                                                                    ),
+                                                                  );
+                                                              ref
+                                                                  .read(
+                                                                      audioProvider)
+                                                                  .play();
 
-                                                          if (mounted) {
-                                                            bool
-                                                                isPDFDownloded =
-                                                                await ref
+                                                              if (mounted) {
+                                                                bool isPDFDownloded = await ref
                                                                     .read(cdNotifierProvider
                                                                         .notifier)
                                                                     .isDownloaded(
@@ -289,89 +293,104 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                                       "PDF",
                                                                       context,
                                                                     );
-                                                            if (widget
-                                                                    .courseModel
-                                                                    .pdfId
-                                                                    .trim()
-                                                                    .isNotEmpty &&
-                                                                isPDFDownloded) {
-                                                              String path =
-                                                                  await getPath(
-                                                                'PDF',
-                                                                widget.courseModel
+                                                                if (widget
+                                                                        .courseModel
                                                                         .pdfId
-                                                                        .contains(
-                                                                            ",")
-                                                                    ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
-                                                                    : "${widget.courseModel.title}.pdf",
-                                                              );
-                                                              if (mounted) {
-                                                                await Navigator
-                                                                    .push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder: (_) =>
-                                                                        PdfPage(
-                                                                      volume: widget
-                                                                          .courseModel
-                                                                          .pdfNum,
-                                                                      path:
-                                                                          path,
-                                                                      courseModel:
-                                                                          widget
+                                                                        .trim()
+                                                                        .isNotEmpty &&
+                                                                    isPDFDownloded) {
+                                                                  String path =
+                                                                      await getPath(
+                                                                    'PDF',
+                                                                    widget.courseModel
+                                                                            .pdfId
+                                                                            .contains(",")
+                                                                        ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
+                                                                        : "${widget.courseModel.title}.pdf",
+                                                                  );
+                                                                  if (mounted) {
+                                                                    await Navigator
+                                                                        .push(
+                                                                      context,
+                                                                      MaterialPageRoute(
+                                                                        builder:
+                                                                            (_) =>
+                                                                                PdfPage(
+                                                                          volume: widget
+                                                                              .courseModel
+                                                                              .pdfNum,
+                                                                          path:
+                                                                              path,
+                                                                          courseModel:
+                                                                              widget.courseModel,
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                } else {
+                                                                  if (mounted) {
+                                                                    Navigator
+                                                                        .push(
+                                                                      context,
+                                                                      MaterialPageRoute(
+                                                                        builder:
+                                                                            (_) =>
+                                                                                CourseDetail(
+                                                                          cm: widget
                                                                               .courseModel,
-                                                                    ),
-                                                                  ),
-                                                                );
-                                                              }
-                                                            } else {
-                                                              if (mounted) {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder: (_) =>
-                                                                        CourseDetail(
-                                                                      cm: widget
-                                                                          .courseModel,
-                                                                    ),
-                                                                  ),
-                                                                );
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                }
                                                               }
                                                             }
-                                                          }
-                                                        }
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons
-                                                            .play_arrow_rounded,
-                                                        color: cardColor,
-                                                        size: 33,
+                                                          },
+                                                          icon: const Icon(
+                                                            Icons
+                                                                .play_arrow_rounded,
+                                                            color: cardColor,
+                                                            size: 33,
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          : widget.courseModel.isFinished == 1
-                                              ? Container(
-                                                  padding:
-                                                      const EdgeInsets.all(23),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.black38,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: const Align(
-                                                    child: Icon(
-                                                      Icons
-                                                          .check_circle_outline,
-                                                      color: cardColor,
-                                                      size: 39,
-                                                    ),
+                                                    ],
                                                   ),
                                                 )
-                                              : null,
+                                              : widget.courseModel.isFinished ==
+                                                      1
+                                                  ? Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              23),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.black38,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                      ),
+                                                      child: const Align(
+                                                        child: Icon(
+                                                          Icons
+                                                              .check_circle_outline,
+                                                          color: cardColor,
+                                                          size: 39,
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : null,
+                                ),
+                                widget.courseModel.isStarted == 1 &&
+                                        widget.courseModel.isScheduleOn == 1
+                                    ? const Positioned(
+                                        right: 0,
+                                        child: Icon(
+                                          Icons.notifications_active,
+                                          size: 20,
+                                        ),
+                                      )
+                                    : const SizedBox()
+                              ],
                             );
                           },
                         ),
@@ -469,35 +488,82 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                     const SizedBox(
                       width: 20,
                     ),
-                    GestureDetector(
-                      onTap: () async {
-                        if (widget.courseModel.isFav == 1) {
-                          if (widget.courseModel.isStarted == 1) {
-                            await ref
-                                .read(mainNotifierProvider.notifier)
-                                .saveCourse(widget.courseModel, 0, context);
-                          } else {
-                            ref
-                                .read(favNotifierProvider.notifier)
-                                .deleteCourse(widget.courseModel.id, context);
-                          }
-                        } else {
-                          await ref
-                              .read(mainNotifierProvider.notifier)
-                              .saveCourse(widget.courseModel, 1, context);
-                        }
-                      },
-                      child: widget.courseModel.isFav == 1
-                          ? const Icon(
-                              Icons.bookmark_rounded,
-                              size: 30,
-                              color: primaryColor,
-                            )
-                          : const Icon(
-                              Icons.bookmark_border_outlined,
-                              size: 30,
+                    !widget.fromHome && widget.courseModel.isStarted == 1
+                        ? GestureDetector(
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
                             ),
-                    ),
+                            onTap: () async {
+                              if (widget.courseModel.isFav == 1) {
+                                await ref
+                                    .read(mainNotifierProvider.notifier)
+                                    .saveCourse(
+                                      widget.courseModel.copyWith(isStarted: 0),
+                                      widget.courseModel.isFav,
+                                      context,
+                                    );
+
+                                List<int> days = widget
+                                    .courseModel.scheduleDates
+                                    .split(",")
+                                    .map((e) => int.parse(e))
+                                    .toList();
+
+                                await Schedule().deleteNotification(
+                                  widget.courseModel.id!,
+                                  days,
+                                );
+                              } else {
+                                await ref
+                                    .read(favNotifierProvider.notifier)
+                                    .deleteCourse(
+                                        widget.courseModel.id, context);
+
+                                List<int> days = widget
+                                    .courseModel.scheduleDates
+                                    .split(",")
+                                    .map((e) => int.parse(e))
+                                    .toList();
+
+                                await Schedule().deleteNotification(
+                                  widget.courseModel.id!,
+                                  days,
+                                );
+                              }
+                            },
+                          )
+                        : GestureDetector(
+                            onTap: () async {
+                              if (widget.courseModel.isFav == 1) {
+                                if (widget.courseModel.isStarted == 1) {
+                                  await ref
+                                      .read(mainNotifierProvider.notifier)
+                                      .saveCourse(
+                                          widget.courseModel, 0, context);
+                                } else {
+                                  ref
+                                      .read(favNotifierProvider.notifier)
+                                      .deleteCourse(
+                                          widget.courseModel.id, context);
+                                }
+                              } else {
+                                await ref
+                                    .read(mainNotifierProvider.notifier)
+                                    .saveCourse(widget.courseModel, 1, context);
+                              }
+                            },
+                            child: widget.courseModel.isFav == 1
+                                ? const Icon(
+                                    Icons.bookmark_rounded,
+                                    size: 30,
+                                    color: primaryColor,
+                                  )
+                                : const Icon(
+                                    Icons.bookmark_border_outlined,
+                                    size: 30,
+                                  ),
+                          ),
                     const SizedBox(
                       width: 5,
                     ),

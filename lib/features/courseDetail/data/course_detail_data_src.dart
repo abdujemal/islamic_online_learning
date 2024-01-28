@@ -3,8 +3,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:path_provider/path_provider.dart';
 
 abstract class CourseDetailDataSrc {
@@ -17,6 +19,7 @@ abstract class CourseDetailDataSrc {
   );
   Future<bool> checkIfTheFileIsDownloaded(String fileName, String folderName);
   Future<String> loadFileOnline(String fileId, bool isAudio);
+  Future<String> createDynamicLink(CourseModel courseModel);
   Future<bool> deleteFile(String fileName, String folderName);
 }
 
@@ -49,8 +52,6 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
       // ref.read(downloadProgressProvider.notifier).update((state) => []);
       return File(filePath);
     }
-
-    
 
     ref.read(downloadProgressProvider.notifier).update((state) {
       if (kDebugMode) {
@@ -143,6 +144,27 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
     await File(filePath).delete();
 
     return true;
+  }
+
+  @override
+  Future<String> createDynamicLink(CourseModel courseModel) async {
+    final dynamicLinkParams = DynamicLinkParameters(
+      link:
+          Uri.parse("https://ilmfelagi.com/courses?id=${courseModel.courseId}"),
+      uriPrefix: "https://ilmfelagi.page.link",
+      androidParameters: const AndroidParameters(
+        packageName: "com.aj.islamic_online_learning",
+      ),
+      socialMetaTagParameters: SocialMetaTagParameters(
+        title: courseModel.title,
+        imageUrl: Uri.parse(courseModel.image),
+        description: "በ${courseModel.ustaz}",
+      ),
+    );
+    final dynamicLink =
+        await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
+
+    return dynamicLink.shortUrl.toString();
   }
 }
 

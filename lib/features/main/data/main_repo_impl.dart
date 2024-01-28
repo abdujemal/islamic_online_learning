@@ -104,9 +104,9 @@ class IMainRepo extends MainRepo {
   }
 
   @override
-  FutureEither<CourseModel?> getSingleCourse(String courseId) async {
+  FutureEither<CourseModel?> getSingleCourse(String courseId, bool fromCloud) async {
     try {
-      final res = await mainDataSrc.getSingleCourse(courseId);
+      final res = await mainDataSrc.getSingleCourse(courseId, fromCloud);
 
       return right(res);
     } catch (e) {

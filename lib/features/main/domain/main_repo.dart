@@ -13,7 +13,7 @@ abstract class MainRepo {
   FutureEither<List<CourseModel>> getSavedCourses();
   FutureEither<List<CourseModel>> getStartedCourses();
   FutureEither<List<CourseModel>> getFavoriteCourses();
-  FutureEither<CourseModel?> getSingleCourse(String courseId);
+  FutureEither<CourseModel?> getSingleCourse(String courseId, bool fromCloud);
   FutureEither<List<String>> getUstazs();
   FutureEither<List<String>> getCategories();
   FutureEither<List<FAQModel>> getFAQ();

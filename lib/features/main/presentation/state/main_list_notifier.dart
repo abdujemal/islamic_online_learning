@@ -84,9 +84,15 @@ class MainListNotifier extends StateNotifier<MainListState> {
   }
 
   Future<CourseModel?> getSingleCourse(
-      String courseId, BuildContext context) async {
+    String courseId,
+    BuildContext context, {
+    bool fromCloud = false,
+  }) async {
     CourseModel? courseModel;
-    final res = await mainRepo.getSingleCourse(courseId);
+    final res = await mainRepo.getSingleCourse(
+      courseId,
+      fromCloud,
+    );
 
     res.fold(
       (l) {
@@ -167,12 +173,15 @@ class MainListNotifier extends StateNotifier<MainListState> {
       ),
     );
 
+    int? id;
+
     res.fold(
       (l) {
         toast(l.messege, ToastType.error, context);
         if (kDebugMode) {
           print(l.messege);
         }
+        id = null;
       },
       (r) {
         if (showMsg) {
@@ -181,11 +190,12 @@ class MainListNotifier extends StateNotifier<MainListState> {
         updateCourses();
         ref.read(favNotifierProvider.notifier).getCourse();
         ref.read(startedNotifierProvider.notifier).getCouses();
-
-        return r;
+        print("real id : $r");
+        id = r;
       },
     );
-    return null;
+
+    return id;
   }
 
   changeTheme(ThemeMode theme) async {

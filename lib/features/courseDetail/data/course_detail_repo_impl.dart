@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/courseDetail/data/course_detail_data_src.dart';
 import 'package:islamic_online_learning/features/courseDetail/domain/course_detail_repo.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../core/failure.dart';
@@ -65,6 +66,16 @@ class ICourseDetailRepo extends CourseDetailRepo {
   FutureEither<bool> deleteFile(String fileName, String folderName) async {
     try {
       final res = await courseDetailDataSrc.deleteFile(fileName, folderName);
+      return right(res);
+    } catch (e) {
+      return left(Failure(messege: e.toString()));
+    }
+  }
+
+  @override
+  FutureEither<String> createDynamicLink(CourseModel courseModel) async {
+    try {
+      final res = await courseDetailDataSrc.createDynamicLink(courseModel);
       return right(res);
     } catch (e) {
       return left(Failure(messege: e.toString()));

@@ -84,7 +84,8 @@ class CDNotifier extends StateNotifier<bool> {
     return url;
   }
 
-  Future<bool> isDownloaded(String fileName, String folderName, BuildContext context) async {
+  Future<bool> isDownloaded(
+      String fileName, String folderName, BuildContext context) async {
     bool isAvailable = false;
     final res =
         await courseDetailRepo.checkIfTheFileIsDownloaded(fileName, folderName);
@@ -101,7 +102,8 @@ class CDNotifier extends StateNotifier<bool> {
     return isAvailable;
   }
 
-  Future<bool> deleteFile(String fileName, String folderName, BuildContext context) async {
+  Future<bool> deleteFile(
+      String fileName, String folderName, BuildContext context) async {
     bool isDeleted = false;
 
     final res = await courseDetailRepo.deleteFile(fileName, folderName);
@@ -117,6 +119,26 @@ class CDNotifier extends StateNotifier<bool> {
     );
 
     return isDeleted;
+  }
+
+  Future<String> createDynamicLink(
+      CourseModel courseModel, BuildContext context) async {
+    String url = "";
+
+    final res = await courseDetailRepo.createDynamicLink(courseModel);
+
+    res.fold(
+      (l) {
+        toast(l.messege, ToastType.error, context);
+        print(l.messege);
+      },
+      (r) {
+        url = r;
+        print("url: $url");
+      },
+    );
+
+    return url;
   }
 
   playOffline(String audioPath, String title, CourseModel courseModel,

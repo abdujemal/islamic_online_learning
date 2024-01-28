@@ -25,7 +25,7 @@ class DatabaseHelper {
 
   Future<Database> initializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = '${directory.path}/Islamic Online Learning/db/ilmfelagiDB.db';
+    String path = '${directory.path}/Islamic Online Learning/db/ilmfelagiDb.db';
 
     var notesDatabase =
         await openDatabase(path, version: 1, onCreate: _createDb);
@@ -59,8 +59,9 @@ class DatabaseHelper {
         'isFinished INTEGER,'
         'pausedAtAudioNum INTEGER,'
         'pausedAtAudioSec INTEGER,'
-        'sheduleDates TEXT,'
-        'sheduleTime TEXT,'
+        "scheduleDates TEXT,"
+        "scheduleTime TEXT,"
+        'isScheduleOn INTEGER,'
         'pdfPage DOUBLE,'
         'pdfNum DOUBLE,'
         'totalDuration INTEGER'

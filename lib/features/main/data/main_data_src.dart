@@ -11,7 +11,7 @@ abstract class MainDataSrc {
   Future<List<CourseModel>> getFavoriteCourses();
   Future<List<CourseModel>> getStartedCourses();
   Future<List<CourseModel>> getSavedCourses();
-  Future<CourseModel?> getSingleCourse(String courseId);
+  Future<CourseModel?> getSingleCourse(String courseId, bool fromCloud);
   Future<List<FAQModel>> getFAQ();
   Future<int> saveTheCourse(CourseModel courseModel);
   Future<List<String>> getUstazs();
@@ -41,9 +41,7 @@ class IMainDataSrc extends MainDataSrc {
           ? await firebaseFirestore
               .collection(FirebaseConst.courses)
               .orderBy(
-                method == SortingMethod.dateDSC
-                    ? 'dateTime'
-                    : "title",
+                method == SortingMethod.dateDSC ? 'dateTime' : "title",
                 descending: method == SortingMethod.dateDSC,
               )
               .limit(numOfDoc)
@@ -200,7 +198,20 @@ class IMainDataSrc extends MainDataSrc {
   }
 
   @override
-  Future<CourseModel?> getSingleCourse(String courseId) async {
+  Future<CourseModel?> getSingleCourse(String courseId, bool fromCloud) async {
+    if (fromCloud) {
+      final res = await firebaseFirestore
+          .collection(FirebaseConst.courses)
+          .doc(courseId)
+          .get();
+
+      if (res.exists) {
+        
+        return CourseModel.fromMap(res.data() as Map, res.id);
+      } else {
+        return null;
+      }
+    }
     final res = await DatabaseHelper().getSingleCourse(courseId);
     return res;
   }

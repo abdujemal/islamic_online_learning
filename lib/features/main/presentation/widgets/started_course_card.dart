@@ -328,44 +328,86 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                   Positioned.fill(
                     child: Align(
                       alignment: Alignment.bottomCenter,
-                      child: Container(
-                        width: 100,
-                        padding: const EdgeInsets.all(1),
-                        decoration: const BoxDecoration(
-                          color: Colors.black45,
-                          borderRadius: BorderRadius.vertical(
-                            bottom: Radius.circular(15),
-                          ),
-                        ),
-                        child: widget.courseModel.isStarted == 1
-                            ? Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5.0),
-                                child: Text(
-                                  "${(percentage * 100).toStringAsFixed(1)}%",
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: whiteColor,
-                                  ),
-                                ),
-                              )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.music_note_rounded,
-                                    color: whiteColor,
-                                    size: 19,
-                                  ),
-                                  Text(
-                                    "${widget.courseModel.noOfRecord}",
-                                    style: const TextStyle(
-                                      color: whiteColor,
-                                    ),
-                                  ),
-                                ],
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 100,
+                            padding: const EdgeInsets.all(1),
+                            decoration: const BoxDecoration(
+                              color: Colors.black45,
+                              borderRadius: BorderRadius.vertical(
+                                bottom: Radius.circular(15),
                               ),
+                            ),
+                            child: widget.courseModel.isStarted == 1
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          "${(percentage * 100).toStringAsFixed(1)}%",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: whiteColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          widget.courseModel.title,
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: whiteColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        widget.courseModel.title,
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: whiteColor,
+                                        ),
+                                      ),
+                                      // Row(
+                                      //   mainAxisAlignment: MainAxisAlignment.center,
+                                      //   children: [
+                                      //     const Icon(
+                                      //       Icons.music_note_rounded,
+                                      //       color: whiteColor,
+                                      //       size: 19,
+                                      //     ),
+                                      //     Text(
+                                      //       "${widget.courseModel.noOfRecord}",
+                                      //       style: const TextStyle(
+                                      //         color: whiteColor,
+                                      //       ),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                    ],
+                                  ),
+                          ),
+                          widget.courseModel.isStarted == 1 &&
+                                  widget.courseModel.isScheduleOn == 1
+                              ? const Positioned(
+                                  right: 0,
+                                  child: Icon(
+                                    Icons.notifications_active,
+                                    size: 20,
+                                  ),
+                                )
+                              : const SizedBox()
+                        ],
                       ),
                     ),
                   ),

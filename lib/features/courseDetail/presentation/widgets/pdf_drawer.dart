@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
@@ -15,6 +16,7 @@ import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/constants.dart';
 import '../../../main/data/model/course_model.dart';
 import 'audio_item.dart';
+import 'download_all_files.dart';
 
 class PdfDrawer extends ConsumerStatefulWidget {
   final List<String> audios;
@@ -180,14 +182,90 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                 )
               ],
             ),
-            child: Center(
-              child: Text(
-                "የ${widget.title} ድምጾች",
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
+            child: Row(
+              children: [
+                Spacer(),
+                Text(
+                  "የ${widget.title} ድምጾች",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 18,
+                  ),
                 ),
-              ),
+                Spacer(),
+                IconButton(
+                  onPressed: () {
+                    ref.read(mainNotifierProvider.notifier).saveCourse(
+                          courseModel.copyWith(
+                            isStarted: 1,
+                          ),
+                          null,
+                          context,
+                          showMsg: false,
+                        );
+                    courseModel = courseModel.copyWith(
+                      isStarted: 1,
+                    );
+                    setState(() {});
+
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => DownloadAllFiles(
+                        courseModel: courseModel,
+                        onSingleDownloadDone: (filePath) async {
+                          if (kDebugMode) {
+                            print("Dwonload done $filePath");
+                          }
+                          int index = int.parse(
+                              filePath.replaceAll(".mp3", "").split(" ").last);
+                          Directory dir =
+                              await getApplicationSupportDirectory();
+
+                          if (playList.isEmpty ||
+                              index >= widget.audios.length) {
+                            createPlayList();
+                            return;
+                          }
+
+                          playList[index - 1] = AudioSource.file(
+                            filePath,
+                            tag: MediaItem(
+                              id: widget.audios[index - 1],
+                              title: "${courseModel.title} $index",
+                              artist: courseModel.ustaz,
+                              album: courseModel.category,
+                              artUri: Uri.file(
+                                  "${dir.path}/Images/${courseModel.title}.jpg"),
+                              extras: courseModel.toMap(),
+                            ),
+                          );
+
+                          if (isPlayingCourseThisCourse(
+                            courseModel.courseId,
+                            ref,
+                            alsoIsNotIdle: true,
+                          )) {
+                            ref.read(audioProvider).setAudioSource(
+                                  ConcatenatingAudioSource(
+                                    children: playList,
+                                  ),
+                                  initialIndex:
+                                      ref.read(audioProvider).currentIndex,
+                                  initialPosition:
+                                      ref.read(audioProvider).position,
+                                  // preload: false,
+                                );
+
+                            ref.read(audioProvider).play();
+                          }
+                        },
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.download_rounded),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -257,8 +335,7 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                             isStarted: 1,
                             pausedAtAudioNum: audioPlayer.currentIndex,
                             pausedAtAudioSec: audioPlayer.position.inSeconds,
-                  lastViewed: DateTime.now().toString(),
-
+                            lastViewed: DateTime.now().toString(),
                           );
                           setState(() {});
                         }
@@ -328,8 +405,7 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                           isStarted: 1,
                           pausedAtAudioNum: audioPlayer.currentIndex,
                           pausedAtAudioSec: audioPlayer.position.inSeconds,
-                  lastViewed: DateTime.now().toString(),
-
+                          lastViewed: DateTime.now().toString(),
                         );
                         setState(() {});
                       }

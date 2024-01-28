@@ -19,6 +19,7 @@ import 'package:islamic_online_learning/features/main/presentation/state/provide
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
@@ -44,7 +45,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
   List<String> pdfPaths = [];
 
-  List<AudioSource> playList = [];
+  late ConcatenatingAudioSource playList;
 
   bool showTopAudio = false;
 
@@ -86,7 +87,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     if (mounted) {
       setState(() {});
     }
-    playList = [];
+
     Directory dir = await getApplicationSupportDirectory();
 
     int i = 0;
@@ -146,7 +147,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
         }
       }
     }
-    playList.addAll(lst);
+    playList = ConcatenatingAudioSource(children: lst);
     isLoadingAudio = false;
     if (mounted) {
       setState(() {});
@@ -321,43 +322,46 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                 Directory dir =
                                     await getApplicationSupportDirectory();
 
-                                if (playList.isEmpty ||
+                                if (playList.children.isEmpty ||
                                     index >= audios.length) {
                                   createPlayList();
                                   return;
                                 }
-
-                                playList[index - 1] = AudioSource.file(
-                                  filePath,
-                                  tag: MediaItem(
-                                    id: audios[index - 1],
-                                    title: "${courseModel.title} $index",
-                                    artist: courseModel.ustaz,
-                                    album: courseModel.category,
-                                    artUri: Uri.file(
-                                        "${dir.path}/Images/${courseModel.title}.jpg"),
-                                    extras: courseModel.toMap(),
-                                  ),
-                                );
-
                                 if (isPlayingCourseThisCourse(
                                   courseModel.courseId,
                                   ref,
                                   alsoIsNotIdle: true,
                                 )) {
-                                  ref.read(audioProvider).setAudioSource(
-                                        ConcatenatingAudioSource(
-                                          children: playList,
-                                        ),
-                                        initialIndex: ref
-                                            .read(audioProvider)
-                                            .currentIndex,
-                                        initialPosition:
-                                            ref.read(audioProvider).position,
-                                        preload: false,
-                                      );
+                                  playList.removeAt(index - 1);
+                                  playList.insert(
+                                    index - 1,
+                                    AudioSource.file(
+                                      filePath,
+                                      tag: MediaItem(
+                                        id: audios[index - 1],
+                                        title: "${courseModel.title} $index",
+                                        artist: courseModel.ustaz,
+                                        album: courseModel.category,
+                                        artUri: Uri.file(
+                                            "${dir.path}/Images/${courseModel.title}.jpg"),
+                                        extras: courseModel.toMap(),
+                                      ),
+                                    ),
+                                  );
 
-                                  ref.read(audioProvider).play();
+                                  // ref.read(audioProvider).setAudioSource(
+                                  //       ConcatenatingAudioSource(
+                                  //         children: playList,
+                                  //       ),
+                                  //       initialIndex: ref
+                                  //           .read(audioProvider)
+                                  //           .currentIndex,
+                                  //       initialPosition:
+                                  //           ref.read(audioProvider).position,
+                                  //       // preload: false,
+                                  //     );
+
+                                  // ref.read(audioProvider).play();
                                 }
                               },
                             ),
@@ -365,6 +369,18 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                         },
                         icon: const Icon(Icons.download_rounded),
                       ),
+                      IconButton(
+                        onPressed: () async {
+                          final url = await ref
+                              .read(cdNotifierProvider.notifier)
+                              .createDynamicLink(courseModel, context);
+
+                          if (url.isNotEmpty) {
+                            await Share.share(url, subject: "ይህንን ደርስ ይመልከቱ");
+                          }
+                        },
+                        icon: const Icon(Icons.share),
+                      )
                     ],
                     bottom: PreferredSize(
                       preferredSize: Size(
@@ -443,14 +459,72 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 MainBtn(
-                                  title: "አስታዋሽ መዝግብ",
-                                  icon: Icons.alarm_add_rounded,
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (ctx) =>
-                                          ScheduleView(courseModel),
-                                    );
+                                  title: courseModel.scheduleDates.isNotEmpty
+                                      ? "ማስታወሻውን አስተካክል"
+                                      : "አስታዋሽ መዝግብ",
+                                  icon: courseModel.scheduleDates.isNotEmpty
+                                      ? Icons.access_alarms
+                                      : Icons.alarm_add_rounded,
+                                  onTap: () async {
+                                    // final int? i = await ref
+                                    //     .read(mainNotifierProvider.notifier)
+                                    //     .saveCourse(
+                                    //       courseModel.copyWith(
+                                    //         isStarted: 1,
+                                    //       ),
+                                    //       null,
+                                    //       context,
+                                    //       showMsg: false,
+                                    //     );
+                                    // courseModel = courseModel.copyWith(
+                                    //   isStarted: 1,
+                                    //   id: i,
+                                    // );
+                                    // print(i);
+                                    setState(() {});
+                                    if (mounted) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (ctx) => ScheduleView(
+                                          courseModel: courseModel,
+                                          onSave: (scheduleDates, scheduleTime,
+                                              isScheduleOn) async {
+                                            await ref
+                                                .read(mainNotifierProvider
+                                                    .notifier)
+                                                .saveCourse(
+                                                  courseModel.copyWith(
+                                                    isStarted: 1,
+                                                    scheduleDates:
+                                                        scheduleDates,
+                                                    scheduleTime: scheduleTime,
+                                                    isScheduleOn: isScheduleOn,
+                                                  ),
+                                                  null,
+                                                  context,
+                                                  showMsg: false,
+                                                );
+                                            courseModel = courseModel.copyWith(
+                                              isStarted: 1,
+                                              scheduleDates: scheduleDates,
+                                              scheduleTime: scheduleTime,
+                                              isScheduleOn: isScheduleOn,
+                                            );
+
+                                            if (mounted) {
+                                              final res = await ref
+                                                  .read(mainNotifierProvider
+                                                      .notifier)
+                                                  .getSingleCourse(
+                                                      widget.cm.courseId,
+                                                      context);
+                                              return res?.id;
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      );
+                                    }
                                   },
                                 ),
                                 const SizedBox(
@@ -463,11 +537,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                     icon: Icons.play_arrow_rounded,
                                     onTap: () async {
                                       await createPlayList();
-                                      if (playList.isNotEmpty) {
+                                      if (playList.children.isNotEmpty) {
                                         await audioPlayer.setAudioSource(
-                                          ConcatenatingAudioSource(
-                                            children: playList,
-                                          ),
+                                          playList,
                                           initialIndex:
                                               courseModel.pausedAtAudioNum < 0
                                                   ? 0
@@ -699,38 +771,54 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                             ],
                           );
                         } else if (index > 0 && index - 1 < audios.length) {
-                          return StreamBuilder(
-                            stream: audioPlayer.sequenceStateStream,
-                            builder: (context, snap) {
-                              final state = snap.data;
-                              if (state?.sequence.isNotEmpty ?? false) {
-                                final mediaItem =
-                                    state!.currentSource!.tag as MediaItem;
+                          if (state?.sequence.isNotEmpty ?? false) {
+                            final mediaItem =
+                                state!.currentSource!.tag as MediaItem;
 
-                                return AudioItem(
-                                  isPlaying:
-                                      mediaItem.id == audios[index - 1] &&
-                                          audioPlayer.processingState !=
-                                              ProcessingState.idle,
-                                  canAudioPlay: playList.isNotEmpty,
-                                  canNeverPlay:
-                                      !isLoadingAudio && playList.isEmpty,
-                                  audioId: audios[index - 1],
-                                  title: courseModel.title,
-                                  index: index,
-                                  courseModel: courseModel,
-                                  isFromPDF: false,
-                                  onDownloadDone: (String filePath) async {
-                                    Directory dir =
-                                        await getApplicationSupportDirectory();
+                            return AudioItem(
+                              isPlaying: mediaItem.id == audios[index - 1] &&
+                                  audioPlayer.processingState !=
+                                      ProcessingState.idle,
+                              canAudioPlay: playList.children.isNotEmpty,
+                              canNeverPlay:
+                                  !isLoadingAudio && playList.children.isEmpty,
+                              audioId: audios[index - 1],
+                              title: courseModel.title,
+                              index: index,
+                              courseModel: courseModel,
+                              isFromPDF: false,
+                              onDownloadDone: (String filePath) async {
+                                Directory dir =
+                                    await getApplicationSupportDirectory();
 
-                                    if (playList.isEmpty ||
-                                        index >= audios.length) {
-                                      createPlayList();
-                                      return;
-                                    }
+                                if (playList.children.isEmpty ||
+                                    index >= audios.length) {
+                                  createPlayList();
+                                  return;
+                                }
 
-                                    playList[index - 1] = AudioSource.file(
+                                // playList[index - 1] = AudioSource.file(
+                                //   filePath,
+                                //   tag: MediaItem(
+                                //     id: audios[index - 1],
+                                //     title: "${courseModel.title} $index",
+                                //     artist: courseModel.ustaz,
+                                //     album: courseModel.category,
+                                //     artUri: Uri.file(
+                                //         "${dir.path}/Images/${courseModel.title}.jpg"),
+                                //     extras: courseModel.toMap(),
+                                //   ),
+                                // );
+
+                                if (isPlayingCourseThisCourse(
+                                  courseModel.courseId,
+                                  ref,
+                                  alsoIsNotIdle: true,
+                                )) {
+                                  playList.removeAt(index - 1);
+                                  playList.insert(
+                                    index - 1,
+                                    AudioSource.file(
                                       filePath,
                                       tag: MediaItem(
                                         id: audios[index - 1],
@@ -741,82 +829,103 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                             "${dir.path}/Images/${courseModel.title}.jpg"),
                                         extras: courseModel.toMap(),
                                       ),
-                                    );
+                                    ),
+                                  );
+                                  // ref.read(audioProvider).setAudioSource(
+                                  //       ConcatenatingAudioSource(
+                                  //         children: playList,
+                                  //       ),
+                                  //       initialIndex: ref
+                                  //           .read(audioProvider)
+                                  //           .currentIndex,
+                                  //       initialPosition:
+                                  //           ref.read(audioProvider).position,
+                                  //       // preload: false,
+                                  //     );
 
-                                    if (isPlayingCourseThisCourse(
-                                      courseModel.courseId,
-                                      ref,
-                                      alsoIsNotIdle: true,
-                                    )) {
-                                      ref.read(audioProvider).setAudioSource(
-                                            ConcatenatingAudioSource(
-                                              children: playList,
-                                            ),
-                                            initialIndex: ref
-                                                .read(audioProvider)
-                                                .currentIndex,
-                                            initialPosition: ref
-                                                .read(audioProvider)
-                                                .position,
-                                            preload: false,
-                                          );
+                                  // ref.read(audioProvider).play();
+                                }
+                              },
+                              onPlayTabed: () async {
+                                // updating the model if the currently playing course is this course
+                                if (isPlayingCourseThisCourse(
+                                        courseModel.courseId, ref) &&
+                                    processState != ProcessingState.idle) {
+                                  print("clicked");
+                                  courseModel = courseModel.copyWith(
+                                    isStarted: 1,
+                                    pausedAtAudioNum: audioPlayer.currentIndex,
+                                    pausedAtAudioSec:
+                                        audioPlayer.position.inSeconds,
+                                    lastViewed: DateTime.now().toString(),
+                                  );
+                                  setState(() {});
+                                  int destinationIndex = index - 1;
+                                  int currentIndex =
+                                      audioPlayer.currentIndex ?? 0;
 
-                                      ref.read(audioProvider).play();
-                                    }
-                                  },
-                                  onPlayTabed: () async {
-                                    // updating the model if the currently playing course is this course
-                                    if (isPlayingCourseThisCourse(
-                                        courseModel.courseId, ref)) {
-                                      courseModel = courseModel.copyWith(
-                                        isStarted: 1,
-                                        pausedAtAudioNum:
-                                            audioPlayer.currentIndex,
-                                        pausedAtAudioSec:
-                                            audioPlayer.position.inSeconds,
-                                        lastViewed: DateTime.now().toString(),
-                                      );
-                                      setState(() {});
-                                    }
-                                    ref.read(audioProvider).setAudioSource(
-                                          ConcatenatingAudioSource(
-                                            children: playList,
-                                          ),
-                                          initialIndex: index - 1,
-                                          preload: false,
-                                        );
-                                    try {
-                                      await ref.read(audioProvider).play();
-                                    } catch (e) {
-                                      if (kDebugMode) {
-                                        print(e.toString());
-                                      }
-                                      await ref.read(audioProvider).stop();
-                                    }
-                                  },
-                                );
-                              }
-                              return AudioItem(
-                                isPlaying: false,
-                                canAudioPlay: playList.isNotEmpty,
-                                canNeverPlay:
-                                    !isLoadingAudio && playList.isEmpty,
-                                audioId: audios[index - 1],
-                                title: courseModel.title,
-                                index: index,
-                                courseModel: courseModel,
-                                isFromPDF: false,
-                                onDownloadDone: (String filePath) async {
-                                  Directory dir =
-                                      await getApplicationSupportDirectory();
+                                  int dnc =
+                                      (destinationIndex - currentIndex).abs();
 
-                                  if (playList.isEmpty ||
-                                      index >= audios.length) {
-                                    createPlayList();
-                                    return;
+                                  for (int i = 0; i < dnc; i++) {
+                                    print("it works");
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 50));
+                                    if (destinationIndex > currentIndex) {
+                                      print(">");
+                                      ref.read(audioProvider).seekToNext();
+                                    } else {
+                                      print("<");
+                                      ref.read(audioProvider).seekToPrevious();
+                                    }
                                   }
+                                } else {
+                                  ref.read(audioProvider).setAudioSource(
+                                        playList,
+                                        initialIndex: index - 1,
+                                        // preload: false,
+                                      );
+                                  try {
+                                    await ref.read(audioProvider).play();
+                                  } catch (e) {
+                                    if (kDebugMode) {
+                                      print(e.toString());
+                                    }
+                                    await ref.read(audioProvider).stop();
+                                  }
+                                }
+                              },
+                            );
+                          }
+                          return AudioItem(
+                            isPlaying: false,
+                            canAudioPlay: playList.children.isNotEmpty,
+                            canNeverPlay:
+                                !isLoadingAudio && playList.children.isEmpty,
+                            audioId: audios[index - 1],
+                            title: courseModel.title,
+                            index: index,
+                            courseModel: courseModel,
+                            isFromPDF: false,
+                            onDownloadDone: (String filePath) async {
+                              Directory dir =
+                                  await getApplicationSupportDirectory();
 
-                                  playList[index - 1] = AudioSource.file(
+                              if (playList.children.isEmpty ||
+                                  index >= audios.length) {
+                                createPlayList();
+                                return;
+                              }
+
+                              if (isPlayingCourseThisCourse(
+                                courseModel.courseId,
+                                ref,
+                                alsoIsNotIdle: true,
+                              )) {
+                                playList.removeAt(index - 1);
+                                playList.insert(
+                                  index - 1,
+                                  AudioSource.file(
                                     filePath,
                                     tag: MediaItem(
                                       id: audios[index - 1],
@@ -827,51 +936,43 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           "${dir.path}/Images/${courseModel.title}.jpg"),
                                       extras: courseModel.toMap(),
                                     ),
+                                  ),
+                                );
+                                // ref.read(audioProvider).setAudioSource(
+                                //       ConcatenatingAudioSource(
+                                //         children: playList,
+                                //       ),
+                                //       initialIndex:
+                                //           ref.read(audioProvider).currentIndex,
+                                //       initialPosition:
+                                //           ref.read(audioProvider).position,
+                                //       // preload: false,
+                                //     );
+
+                                // ref.read(audioProvider).play();
+                              }
+                            },
+                            onPlayTabed: () {
+                              if (isPlayingCourseThisCourse(
+                                  courseModel.courseId, ref)) {
+                                courseModel = courseModel.copyWith(
+                                  isStarted: 1,
+                                  pausedAtAudioNum: audioPlayer.currentIndex,
+                                  pausedAtAudioSec:
+                                      audioPlayer.position.inSeconds,
+                                  lastViewed: DateTime.now().toString(),
+                                );
+                                setState(() {});
+                              }
+                              ref
+                                  .read(audioProvider.notifier)
+                                  .update((state) => AudioPlayer());
+                              ref.read(audioProvider).setAudioSource(
+                                    playList,
+                                    initialIndex: index - 1,
+                                    // preload: false,
                                   );
-
-                                  if (isPlayingCourseThisCourse(
-                                    courseModel.courseId,
-                                    ref,
-                                    alsoIsNotIdle: true,
-                                  )) {
-                                    ref.read(audioProvider).setAudioSource(
-                                          ConcatenatingAudioSource(
-                                            children: playList,
-                                          ),
-                                          initialIndex: ref
-                                              .read(audioProvider)
-                                              .currentIndex,
-                                          initialPosition:
-                                              ref.read(audioProvider).position,
-                                          preload: false,
-                                        );
-
-                                    ref.read(audioProvider).play();
-                                  }
-                                },
-                                onPlayTabed: () {
-                                  if (isPlayingCourseThisCourse(
-                                      courseModel.courseId, ref)) {
-                                    courseModel = courseModel.copyWith(
-                                      isStarted: 1,
-                                      pausedAtAudioNum:
-                                          audioPlayer.currentIndex,
-                                      pausedAtAudioSec:
-                                          audioPlayer.position.inSeconds,
-                                      lastViewed: DateTime.now().toString(),
-                                    );
-                                    setState(() {});
-                                  }
-                                  ref.read(audioProvider).setAudioSource(
-                                        ConcatenatingAudioSource(
-                                          children: playList,
-                                        ),
-                                        initialIndex: index - 1,
-                                        preload: false,
-                                      );
-                                  ref.read(audioProvider).play();
-                                },
-                              );
+                              ref.read(audioProvider).play();
                             },
                           );
                         } else if (index == audios.length + 1) {

@@ -66,10 +66,32 @@ android {
     }
 
     buildTypes {
+        // debug {
+        //     minifyEnabled false
+        //   }
+        debug { 
+            defaultConfig.minSdkVersion 21 
+            multiDexEnabled true
+            shrinkResources false
+            minifyEnabled true
+        }
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
+
+            minifyEnabled true
+
+            // Enables resource shrinking, which is performed by the
+            // Android Gradle plugin.
+            shrinkResources true
+
+            // Includes the default ProGuard rules files that are packaged with
+            // the Android Gradle plugin. To learn more, go to the section about
+            // R8 configuration files.
+            proguardFiles getDefaultProguardFile(
+                    'proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
         }
     }
 }
@@ -80,6 +102,7 @@ flutter {
 
 dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation("com.google.firebase:firebase-perf")
     // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
 }

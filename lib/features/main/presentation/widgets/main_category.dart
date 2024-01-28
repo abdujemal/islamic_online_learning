@@ -58,7 +58,8 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
                             .backgroundColor!
                             .withAlpha(150),
                         highlightColor:
-                            Theme.of(context).chipTheme.backgroundColor!,
+                            Theme.of(context).chipTheme.backgroundColor ??
+                                Colors.white30,
                         child: GestureDetector(
                           onTap: () {
                             if (index == 0) {}
