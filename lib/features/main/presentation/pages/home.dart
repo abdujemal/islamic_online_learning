@@ -4,11 +4,13 @@
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:uni_links/uni_links.dart';
+
 import 'package:islamic_online_learning/features/main/presentation/pages/ustazs.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/beginner_courses_list.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_category.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/started_course_list.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/constants.dart';
 import '../../../courseDetail/presentation/pages/course_detail.dart';
@@ -20,10 +22,15 @@ import '../widgets/course_shimmer.dart';
 import '../widgets/the_end.dart';
 
 class Home extends ConsumerStatefulWidget {
-  final GlobalKey ustazKey;
+  final GlobalKey courseTitle;
+  final GlobalKey courseUstaz;
+  final GlobalKey courseCategory;
+
   const Home({
     super.key,
-    required this.ustazKey,
+    required this.courseTitle,
+    required this.courseUstaz,
+    required this.courseCategory,
   });
 
   @override
@@ -58,20 +65,39 @@ class _HomeState extends ConsumerState<Home>
       categoryNotifier.getCategories();
       ref.read(beginnerListProvider.notifier).getCourses();
       ref.watch(startedNotifierProvider.notifier).getCouses();
+
+      FirebaseDynamicLinks.instance.getInitialLink().then((value) {
+        print("link:- ${value?.link}");
+        print("Segments: ${value?.link.pathSegments}");
+        if (value?.link.pathSegments.contains("courses") ?? false) {
+          String id = Uri.decodeFull(value?.link.toString() ?? "")
+              .split("/")
+              .last
+              .replaceAll("courses?id=", "")
+              .replaceAll("+", " ");
+          print("id: $id");
+          // String? id = widget.initialLink!.link.queryParameters["id"];
+
+          getCourseAndRedirect(id);
+        }
+      });
     });
 
-    FirebaseDynamicLinks.instance.onLink.listen((event) {
-      print("link:- ${event.link}");
-      print("Segments: ${event.link.pathSegments}");
-      if (event.link.pathSegments.contains("courses")) {
-        String id = Uri.decodeFull(event.link.toString())
-            .split("/")
-            .last
-            .replaceAll("courses?id=", "")
-            .replaceAll("+", " ");
-        print("id: $id");
+    linkStream.listen((event) {
+      if (event != null) {
+        Uri link = Uri.parse(event);
+        print("link:- ${link.toString()}");
+        print("Segments: ${link.pathSegments}");
+        if (link.pathSegments.contains("courses")) {
+          String id = Uri.decodeFull(link.toString())
+              .split("/")
+              .last
+              .replaceAll("courses?id=", "")
+              .replaceAll("+", " ");
+          print("id: $id");
 
-        getCourseAndRedirect(id);
+          getCourseAndRedirect(id);
+        }
       }
     }).onError((e) {
       toast(
@@ -105,6 +131,10 @@ class _HomeState extends ConsumerState<Home>
             builder: (_) => CourseDetail(cm: res),
           ),
         );
+      }
+    } else {
+      if (mounted) {
+        toast("ስህተት ተፈጥሯል።", ToastType.error, context);
       }
     }
   }
@@ -165,7 +195,7 @@ class _HomeState extends ConsumerState<Home>
                         children: List.generate(
                           // itemCount: 5,
                           // scrollDirection: Axis.horizontal,
-                          16,
+                          4,
                           (index) => Padding(
                             padding: const EdgeInsets.only(left: 4),
                             child: index == 0
@@ -260,7 +290,12 @@ class _HomeState extends ConsumerState<Home>
                               : const BeginnerCoursesList();
                         } else if (index <= _.courses.length + 2) {
                           return CourseItem(
-                              _.courses[index < 5 ? index - 2 : index - 3]);
+                            _.courses[index < 5 ? index - 2 : index - 3],
+                            index: index < 5 ? index - 2 : index - 3,
+                            courseCategory: widget.courseCategory,
+                            courseTitle: widget.courseTitle,
+                            courseUstaz: widget.courseUstaz,
+                          );
                         } else if (_.noMoreToLoad) {
                           return const TheEnd();
                         } else {

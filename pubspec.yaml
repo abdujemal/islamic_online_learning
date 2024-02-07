@@ -31,6 +31,7 @@ dependencies:
   animated_search_bar: ^2.7.0
   audio_video_progress_bar: ^2.0.1
   awesome_notifications: ^0.9.2
+  cached_network_image: ^3.3.1
   cloud_firestore: any
   confetti: ^0.7.0
   connectivity_plus: ^5.0.1
@@ -49,6 +50,7 @@ dependencies:
   flutter_riverpod: ^2.4.1
   fluttertoast: ^8.2.4
   freezed_annotation: ^2.4.1
+  image: ^4.1.6
   intl: ^0.19.0
   just_audio: ^0.9.35
   just_audio_background: ^0.0.1-beta.10

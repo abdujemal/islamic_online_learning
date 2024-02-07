@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -118,338 +119,329 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
   Widget build(BuildContext context) {
     percentage = getPersentage(widget.courseModel);
 
-    return FutureBuilder(
-      future: displayImage(
-        widget.courseModel.image,
-        widget.courseModel.category == "ተፍሲር"
-            ? "ተፍሲር"
-            : widget.courseModel.title,
-        ref,
+    return Padding(
+      padding: const EdgeInsets.only(
+        right: 10,
       ),
-      builder: (context, snap) {
-        return Padding(
-          padding: const EdgeInsets.only(
-            right: 10,
-          ),
-          child: SizedBox(
-            height: 140,
-            width: 100,
-            child:
-                // Column(
-                //   children: [
-                InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CourseDetail(
-                      cm: widget.courseModel,
+      child: SizedBox(
+        height: 140,
+        width: 100,
+        child:
+            // Column(
+            //   children: [
+            InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CourseDetail(
+                  cm: widget.courseModel,
+                ),
+              ),
+            );
+          },
+          child: Stack(
+            children: [
+              Container(
+                height: 140,
+                width: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  image: DecorationImage(
+                    image: CachedNetworkImageProvider(
+                      widget.courseModel.image,
                     ),
+                    fit: BoxFit.fill,
                   ),
-                );
-              },
-              child: Stack(
-                children: [
-                  Container(
-                    height: 140,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      image: snap.data != null && snap.data!.path != ""
-                          ? DecorationImage(
-                              image: FileImage(snap.data!),
-                              fit: BoxFit.fill,
-                            )
-                          : null,
-                    ),
-                    child: widget.courseModel.isStarted == 1 &&
-                            widget.courseModel.isFinished == 0
+                ),
+                child: widget.courseModel.isStarted == 1 &&
+                        widget.courseModel.isFinished == 0
+                    ? Container(
+                        height: 80,
+                        width: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.black38,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Stack(
+                          children: [
+                            Align(
+                              child: SizedBox(
+                                height: 40,
+                                width: 40,
+                                child: CircularProgressIndicator(
+                                  color: cardColor,
+                                  value: percentage,
+                                  backgroundColor: Colors.grey,
+                                ),
+                              ),
+                            ),
+                            Align(
+                              child: IconButton(
+                                onPressed: () async {
+                                  await createPlayList();
+                                  if (playList.isNotEmpty) {
+                                    await ref
+                                        .read(audioProvider)
+                                        .setAudioSource(
+                                          ConcatenatingAudioSource(
+                                            children: playList,
+                                          ),
+                                          initialIndex: widget.courseModel
+                                                      .pausedAtAudioNum <
+                                                  0
+                                              ? 0
+                                              : widget
+                                                  .courseModel.pausedAtAudioNum,
+                                          initialPosition: Duration(
+                                            seconds: widget
+                                                .courseModel.pausedAtAudioSec,
+                                          ),
+                                        );
+                                    ref.read(audioProvider).play();
+                                    if (mounted) {
+                                      bool isPDFDownloded = await ref
+                                          .read(cdNotifierProvider.notifier)
+                                          .isDownloaded(
+                                            widget.courseModel.pdfId
+                                                    .contains(",")
+                                                ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
+                                                : "${widget.courseModel.title}.pdf",
+                                            "PDF",
+                                            context,
+                                          );
+                                      if (widget.courseModel.pdfId
+                                              .trim()
+                                              .isNotEmpty &&
+                                          isPDFDownloded) {
+                                        String path = await getPath(
+                                          'PDF',
+                                          widget.courseModel.pdfId.contains(",")
+                                              ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
+                                              : "${widget.courseModel.title}.pdf",
+                                        );
+                                        if (mounted) {
+                                          await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => PdfPage(
+                                                volume:
+                                                    widget.courseModel.pdfNum,
+                                                path: path,
+                                                courseModel: widget.courseModel,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        if (mounted) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => CourseDetail(
+                                                cm: widget.courseModel,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    }
+                                    // if (mounted) {
+                                    //   bool isPDFDownloded = await ref
+                                    //       .read(cdNotifierProvider.notifier)
+                                    //       .isDownloaded(
+                                    //           "${widget.courseModel.title}.pdf",
+                                    //           "PDF",
+                                    //           context);
+                                    //   if (widget.courseModel.pdfId
+                                    //           .trim()
+                                    //           .isEmpty ||
+                                    //       !isPDFDownloded) {
+                                    //     if (mounted) {
+                                    //   Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //       builder: (_) => CourseDetail(
+                                    //         cm: widget.courseModel,
+                                    //       ),
+                                    //     ),
+                                    //   );
+                                    // }
+                                    //   } else {
+                                    //     String path = await getPath('PDF',
+                                    //         "${widget.courseModel.title}.pdf");
+                                    //     if (mounted) {
+                                    //       Navigator.push(
+                                    //         context,
+                                    //         MaterialPageRoute(
+                                    //           builder: (_) => PdfPage(
+                                    //             volume: widget
+                                    //                 .courseModel.pdfNum,
+                                    //             path: path,
+                                    //             courseModel:
+                                    //                 widget.courseModel,
+                                    //           ),
+                                    //         ),
+                                    //       );
+                                    //     }
+                                    //   }
+                                    // }
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.play_arrow_rounded,
+                                  color: cardColor,
+                                  size: 33,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : widget.courseModel.isFinished == 1
                         ? Container(
-                            height: 80,
-                            width: 80,
+                            padding: const EdgeInsets.all(23),
                             decoration: BoxDecoration(
                               color: Colors.black38,
                               borderRadius: BorderRadius.circular(15),
                             ),
-                            child: Stack(
-                              children: [
-                                Align(
-                                  child: SizedBox(
-                                    height: 40,
-                                    width: 40,
-                                    child: CircularProgressIndicator(
-                                      color: cardColor,
-                                      value: percentage,
-                                      backgroundColor: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                                Align(
-                                  child: IconButton(
-                                    onPressed: () async {
-                                      await createPlayList();
-                                      if (playList.isNotEmpty) {
-                                        await ref
-                                            .read(audioProvider)
-                                            .setAudioSource(
-                                              ConcatenatingAudioSource(
-                                                children: playList,
-                                              ),
-                                              initialIndex: widget.courseModel
-                                                          .pausedAtAudioNum <
-                                                      0
-                                                  ? 0
-                                                  : widget.courseModel
-                                                      .pausedAtAudioNum,
-                                              initialPosition: Duration(
-                                                seconds: widget.courseModel
-                                                    .pausedAtAudioSec,
-                                              ),
-                                            );
-                                        ref.read(audioProvider).play();
-                                        if (mounted) {
-                                          bool isPDFDownloded = await ref
-                                              .read(cdNotifierProvider.notifier)
-                                              .isDownloaded(
-                                                widget.courseModel.pdfId
-                                                        .contains(",")
-                                                    ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
-                                                    : "${widget.courseModel.title}.pdf",
-                                                "PDF",
-                                                context,
-                                              );
-                                          if (widget.courseModel.pdfId
-                                                  .trim()
-                                                  .isNotEmpty &&
-                                              isPDFDownloded) {
-                                            String path = await getPath(
-                                              'PDF',
-                                              widget.courseModel.pdfId
-                                                      .contains(",")
-                                                  ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
-                                                  : "${widget.courseModel.title}.pdf",
-                                            );
-                                            if (mounted) {
-                                              await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) => PdfPage(
-                                                    volume: widget
-                                                        .courseModel.pdfNum,
-                                                    path: path,
-                                                    courseModel:
-                                                        widget.courseModel,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          } else {
-                                            if (mounted) {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) => CourseDetail(
-                                                    cm: widget.courseModel,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          }
-                                        }
-                                        // if (mounted) {
-                                        //   bool isPDFDownloded = await ref
-                                        //       .read(cdNotifierProvider.notifier)
-                                        //       .isDownloaded(
-                                        //           "${widget.courseModel.title}.pdf",
-                                        //           "PDF",
-                                        //           context);
-                                        //   if (widget.courseModel.pdfId
-                                        //           .trim()
-                                        //           .isEmpty ||
-                                        //       !isPDFDownloded) {
-                                        //     if (mounted) {
-                                        //   Navigator.push(
-                                        //     context,
-                                        //     MaterialPageRoute(
-                                        //       builder: (_) => CourseDetail(
-                                        //         cm: widget.courseModel,
-                                        //       ),
-                                        //     ),
-                                        //   );
-                                        // }
-                                        //   } else {
-                                        //     String path = await getPath('PDF',
-                                        //         "${widget.courseModel.title}.pdf");
-                                        //     if (mounted) {
-                                        //       Navigator.push(
-                                        //         context,
-                                        //         MaterialPageRoute(
-                                        //           builder: (_) => PdfPage(
-                                        //             volume: widget
-                                        //                 .courseModel.pdfNum,
-                                        //             path: path,
-                                        //             courseModel:
-                                        //                 widget.courseModel,
-                                        //           ),
-                                        //         ),
-                                        //       );
-                                        //     }
-                                        //   }
-                                        // }
-                                      }
-                                    },
-                                    icon: const Icon(
-                                      Icons.play_arrow_rounded,
-                                      color: cardColor,
-                                      size: 33,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : widget.courseModel.isFinished == 1
-                            ? Container(
-                                padding: const EdgeInsets.all(23),
-                                decoration: BoxDecoration(
-                                  color: Colors.black38,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: const Align(
-                                  child: Icon(
-                                    Icons.check_circle_outline,
-                                    color: cardColor,
-                                    size: 51,
-                                  ),
-                                ),
-                              )
-                            : null,
-                  ),
-                  Positioned.fill(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Stack(
-                        children: [
-                          Container(
-                            width: 100,
-                            padding: const EdgeInsets.all(1),
-                            decoration: const BoxDecoration(
-                              color: Colors.black45,
-                              borderRadius: BorderRadius.vertical(
-                                bottom: Radius.circular(15),
+                            child: const Align(
+                              child: Icon(
+                                Icons.check_circle_outline,
+                                color: cardColor,
+                                size: 51,
                               ),
                             ),
-                            child: widget.courseModel.isStarted == 1
-                                ? Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          "${(percentage * 100).toStringAsFixed(1)}%",
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: whiteColor,
-                                          ),
-                                        ),
-                                        Text(
-                                          widget.courseModel.title,
-                                          textAlign: TextAlign.center,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: whiteColor,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        widget.courseModel.title,
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: whiteColor,
-                                        ),
-                                      ),
-                                      // Row(
-                                      //   mainAxisAlignment: MainAxisAlignment.center,
-                                      //   children: [
-                                      //     const Icon(
-                                      //       Icons.music_note_rounded,
-                                      //       color: whiteColor,
-                                      //       size: 19,
-                                      //     ),
-                                      //     Text(
-                                      //       "${widget.courseModel.noOfRecord}",
-                                      //       style: const TextStyle(
-                                      //         color: whiteColor,
-                                      //       ),
-                                      //     ),
-                                      //   ],
-                                      // ),
-                                    ],
-                                  ),
-                          ),
-                          widget.courseModel.isStarted == 1 &&
-                                  widget.courseModel.isScheduleOn == 1
-                              ? const Positioned(
-                                  right: 0,
-                                  child: Icon(
-                                    Icons.notifications_active,
-                                    size: 20,
-                                  ),
-                                )
-                              : const SizedBox()
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Positioned.fill(
-                  // child:
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.black45,
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(15),
-                        ),
-                      ),
-                      width: 100,
-                      padding: const EdgeInsets.all(3),
-                      child: Text(
-                        widget.courseModel.ustaz,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: whiteColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // )
-                ],
+                          )
+                        : null,
               ),
-            ),
-            // const SizedBox(
-            //   height: 2,
-            // ),
-            // Text(
-            //   widget.courseModel.title,
-            //   overflow: TextOverflow.ellipsis,
-            // ),
-            //   ]
-            // )
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 100,
+                        padding: const EdgeInsets.all(1),
+                        decoration: const BoxDecoration(
+                          color: Colors.black45,
+                          borderRadius: BorderRadius.vertical(
+                            bottom: Radius.circular(15),
+                          ),
+                        ),
+                        child: widget.courseModel.isStarted == 1
+                            ? Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "${(percentage * 100).toStringAsFixed(1)}%",
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: whiteColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      widget.courseModel.ustaz
+                                          .replaceAll("ኡስታዝ", "ኡ")
+                                          .replaceAll("ሸይኽ", "ሸ"),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: whiteColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    widget.courseModel.ustaz
+                                        .replaceAll("ኡስታዝ", "ኡ")
+                                        .replaceAll("ሸይኽ", "ሸ"),
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: whiteColor,
+                                    ),
+                                  ),
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.center,
+                                  //   children: [
+                                  //     const Icon(
+                                  //       Icons.music_note_rounded,
+                                  //       color: whiteColor,
+                                  //       size: 19,
+                                  //     ),
+                                  //     Text(
+                                  //       "${widget.courseModel.noOfRecord}",
+                                  //       style: const TextStyle(
+                                  //         color: whiteColor,
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                ],
+                              ),
+                      ),
+                      widget.courseModel.isStarted == 1 &&
+                              widget.courseModel.isScheduleOn == 1
+                          ? const Positioned(
+                              right: 0,
+                              child: Icon(
+                                Icons.notifications_active,
+                                size: 20,
+                              ),
+                            )
+                          : const SizedBox()
+                    ],
+                  ),
+                ),
+              ),
+              // Positioned.fill(
+              // child:
+              Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.black45,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(15),
+                    ),
+                  ),
+                  width: 100,
+                  padding: const EdgeInsets.all(3),
+                  child: Text(
+                    widget.courseModel.title,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: whiteColor,
+                    ),
+                  ),
+                ),
+              ),
+              // )
+            ],
           ),
-        );
-      },
+        ),
+        // const SizedBox(
+        //   height: 2,
+        // ),
+        // Text(
+        //   widget.courseModel.title,
+        //   overflow: TextOverflow.ellipsis,
+        // ),
+        //   ]
+        // )
+      ),
     );
   }
 }

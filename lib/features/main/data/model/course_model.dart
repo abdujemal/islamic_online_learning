@@ -11,6 +11,7 @@ class CourseModel extends CourseEntity {
   final int? id;
   final String category;
   final String courseIds;
+  final String audioSizes;
   final int noOfRecord;
   final String pdfId;
   final String title;
@@ -28,6 +29,7 @@ class CourseModel extends CourseEntity {
   final String scheduleDates;
   final String image;
   final int totalDuration;
+  final int isCompleted;
 
   const CourseModel({
     required this.courseId,
@@ -35,6 +37,7 @@ class CourseModel extends CourseEntity {
     required this.id,
     required this.category,
     required this.courseIds,
+    required this.audioSizes,
     required this.noOfRecord,
     required this.pdfId,
     required this.title,
@@ -52,6 +55,7 @@ class CourseModel extends CourseEntity {
     required this.pdfNum,
     required this.image,
     required this.totalDuration,
+    required this.isCompleted,
   }) : super(
           id: id,
           courseId: courseId,
@@ -75,6 +79,8 @@ class CourseModel extends CourseEntity {
           pdfNum: pdfNum,
           image: image,
           totalDuration: totalDuration,
+          audioSizes: audioSizes,
+          isCompleted: isCompleted,
         );
 
   Map<String, dynamic> toMap() {
@@ -84,6 +90,7 @@ class CourseModel extends CourseEntity {
       'author': author,
       'category': category,
       'courseIds': courseIds,
+      "audioSizes": audioSizes,
       'noOfRecord': noOfRecord,
       'pdfId': pdfId,
       'title': title,
@@ -100,7 +107,8 @@ class CourseModel extends CourseEntity {
       'isScheduleOn': isScheduleOn,
       'pdfPage': pdfPage,
       'pdfNum': pdfNum,
-      'totalDuration': totalDuration
+      'totalDuration': totalDuration,
+      "isCompleted": isCompleted,
     };
   }
 
@@ -110,12 +118,14 @@ class CourseModel extends CourseEntity {
       'author': author,
       'category': category,
       'courseIds': courseIds,
+      'audioSizes': audioSizes,
       'noOfRecord': noOfRecord,
       'pdfId': pdfId,
       'title': title,
       'ustaz': ustaz,
       'image': image,
-      'totalDuration': totalDuration
+      'totalDuration': totalDuration,
+      "isCompleted": isCompleted,
     };
   }
 
@@ -126,6 +136,9 @@ class CourseModel extends CourseEntity {
       author: map['author'] as String,
       category: map['category'] as String,
       courseIds: map['courseIds'] as String,
+      audioSizes: map['audioSizes'] ??
+          List.generate(map['courseIds'].toString().split(",").length,
+              (index) => index).join(","),
       noOfRecord: map['noOfRecord'] as int,
       pdfId: map['pdfId'] as String,
       title: map['title'] as String,
@@ -151,6 +164,7 @@ class CourseModel extends CourseEntity {
       pdfNum: map['pdfNum'] ?? (copyFrom != null ? copyFrom.pdfNum : 1),
       image: map['image'],
       totalDuration: map["totalDuration"] ?? 0,
+      isCompleted: map['isCompleted'] ?? 1,
     );
   }
 
@@ -176,6 +190,8 @@ class CourseModel extends CourseEntity {
       double? pdfPage,
       double? pdfNum,
       String? image,
+      String? audioSizes,
+      int? isCompleted,
       int? totalDuration}) {
     return CourseModel(
       courseId: courseId ?? this.courseId,
@@ -183,6 +199,7 @@ class CourseModel extends CourseEntity {
       id: id ?? this.id,
       category: category ?? this.category,
       courseIds: courseIds ?? this.courseIds,
+      audioSizes: audioSizes ?? this.audioSizes,
       noOfRecord: noOfRecord ?? this.noOfRecord,
       pdfId: pdfId ?? this.pdfId,
       title: title ?? this.title,
@@ -200,6 +217,7 @@ class CourseModel extends CourseEntity {
       pdfNum: pdfNum ?? this.pdfNum,
       image: image ?? this.image,
       totalDuration: totalDuration ?? this.totalDuration,
+      isCompleted: isCompleted ?? this.isCompleted,
     );
   }
 

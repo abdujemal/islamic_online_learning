@@ -38,7 +38,8 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
       });
 
       ref.read(sharedPrefProvider).then((pref) {
-        bool show = pref.getBool("showGuide") ?? true;
+        bool show = pref.getString("showGuide") == "true,true";
+
         setState(() {
           guide = show;
         });
@@ -188,7 +189,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   return ListTile(
                     leading: const Icon(Icons.font_download_rounded),
                     title: Text(
-                      "የጹሁፍ መጠን",
+                      "የፅሁፍ መጠን",
                       style: TextStyle(
                         fontSize: fnt,
                       ),
@@ -227,7 +228,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                 child: ListTile(
                   leading: const Icon(Icons.help_rounded),
                   title: Text(
-                    "የአፑን አጠቃቅም አሳየኝ",
+                    "የአፑን አጠቃቀም አሳየኝ",
                     style: TextStyle(
                       fontSize: fnt,
                     ),
@@ -240,7 +241,8 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                         guide = v;
                       });
                       final pref = await ref.read(sharedPrefProvider);
-                      pref.setBool("showGuide", v);
+                      pref.setString(
+                          "showGuide", v ? "true,true" : "false,false");
                     },
                   ),
                 ),
@@ -294,7 +296,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                 child: ListTile(
                   leading: const Icon(Icons.notifications_rounded),
                   title: Text(
-                    "አዲስ ደርስ ሲገባ መልክት ይግባልኝ",
+                    "አዲስ ደርስ ሲገባ መልእክት ይግባልኝ",
                     style: TextStyle(
                       fontSize: fnt,
                     ),
@@ -398,7 +400,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   },
                   leading: const Icon(Icons.info_rounded),
                   title: Text(
-                    "ስለ እኛ",
+                    "ስለ አፑ",
                     style: TextStyle(
                       fontSize: fnt,
                     ),

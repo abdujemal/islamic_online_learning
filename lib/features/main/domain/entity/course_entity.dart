@@ -6,13 +6,14 @@ class CourseEntity extends Equatable {
   final String author;
   final String category;
   final String courseIds;
+  final String audioSizes;
+
   final String courseId;
   final int noOfRecord;
   final String pdfId;
   final String title;
   final String ustaz;
   final String lastViewed;
-
   final int isFav;
   final int isStarted;
   final int isFinished;
@@ -25,12 +26,14 @@ class CourseEntity extends Equatable {
   final double pdfNum;
   final String image;
   final int totalDuration;
+  final int isCompleted;
 
   const CourseEntity({
     required this.id,
     required this.author,
     required this.category,
     required this.courseIds,
+    required this.audioSizes,
     required this.courseId,
     required this.noOfRecord,
     required this.pdfId,
@@ -49,6 +52,7 @@ class CourseEntity extends Equatable {
     required this.pdfNum,
     required this.image,
     required this.totalDuration,
+    required this.isCompleted,
   });
 
   @override
@@ -58,6 +62,7 @@ class CourseEntity extends Equatable {
         author,
         category,
         courseIds,
+        audioSizes,
         noOfRecord,
         pdfId,
         title,
@@ -75,5 +80,6 @@ class CourseEntity extends Equatable {
         pdfNum,
         image,
         totalDuration,
+        isCompleted,
       ];
 }

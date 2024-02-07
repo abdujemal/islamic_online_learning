@@ -127,14 +127,14 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                 )
                 .then(
               (value) {
-                ref.read(mainNotifierProvider.notifier).updateCourse(
-                      courseModel.copyWith(
-                        isStarted: 1,
-                        pdfPage: currentPage! + 1,
-                        pdfNum: widget.volume,
-                        lastViewed: DateTime.now().toString(),
-                      ),
-                    );
+                // ref.read(mainNotifierProvider.notifier).updateCourse(
+                //       courseModel.copyWith(
+                //         isStarted: 1,
+                //         pdfPage: currentPage! + 1,
+                //         pdfNum: widget.volume,
+                //         lastViewed: DateTime.now().toString(),
+                //       ),
+                //     );
 
                 Navigator.pop(context);
               },

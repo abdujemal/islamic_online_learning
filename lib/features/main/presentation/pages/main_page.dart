@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:animated_search_bar/animated_search_bar.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,7 +36,9 @@ class _MainPageState extends ConsumerState<MainPage>
   int i = 0;
 
   final GlobalKey _searchIconKey = GlobalKey();
-  final GlobalKey _ustazsKey = GlobalKey();
+  final GlobalKey _courseTitleKey = GlobalKey();
+  final GlobalKey _courseCategoryKey = GlobalKey();
+  final GlobalKey _courseUstazKey = GlobalKey();
 
   final GlobalKey _menuKey = GlobalKey();
   // final GlobalKey _courseNameKey = GlobalKey();
@@ -51,15 +52,11 @@ class _MainPageState extends ConsumerState<MainPage>
 
   bool showTopAudio = false;
 
-  ScrollController _scrollController = ScrollController();
-
   Timer? searchTimer;
 
   @override
   void initState() {
     super.initState();
-
-    
 
     tabController = TabController(length: 3, vsync: this);
 
@@ -82,8 +79,12 @@ class _MainPageState extends ConsumerState<MainPage>
       ref.read(sharedPrefProvider).then((pref) {
         ref.read(showGuideProvider.notifier).update(
           (state) {
-            show = pref.getBool("showGuide") ?? true;
-            return show;
+            show = bool.parse(
+                pref.getString("showGuide")?.split(",").first ?? "true");
+            return [
+              show,
+              bool.parse(pref.getString("showGuide")?.split(",").last ?? "true")
+            ];
           },
         );
       });
@@ -157,11 +158,25 @@ class _MainPageState extends ConsumerState<MainPage>
         subtitle: "ይህንን ቁልፍ ነክተው የተለያዩ ማስተከያዎችን ማግኘት ይችላሉ።",
       ),
       getTutorial(
-        key: _ustazsKey,
-        identify: "UstazsButton",
-        align: ContentAlign.right,
-        title: "የኡስታዞች ቁልፍ",
-        subtitle: "ይህንን ቁልፍ ነክተው ኡስታዞችን ዝርዝር ማግኘት ይችላሉ።",
+        key: _courseTitleKey,
+        identify: "CourseTitle",
+        align: ContentAlign.bottom,
+        title: "የደርሱ ስም",
+        subtitle: "የደርሱን ስም ጫን ካሉት ተመሳሳይ ስም ያላቸውን ደርሶች ያመጣሎታል።",
+      ),
+      getTutorial(
+        key: _courseUstazKey,
+        identify: "CourseUstaz",
+        align: ContentAlign.bottom,
+        title: "የደርሱ ኡስታዝ",
+        subtitle: "የደርሱን ኡስታዝ ስም ጫን ካሉት ተመሳሳይ ኡስታዝ ስም ያላቸውን ደርሶች ያመጣሎታል።",
+      ),
+      getTutorial(
+        key: _courseCategoryKey,
+        identify: "CourseCategory",
+        align: ContentAlign.bottom,
+        title: "የደርሱ ምድብ",
+        subtitle: "የደርሱን ምድብ ጫን ካሉት ተመሳሳይ ምድብ የሆኑ ደርሶች ያመጣሎታል።",
       ),
     ];
 
@@ -169,9 +184,20 @@ class _MainPageState extends ConsumerState<MainPage>
       TutorialCoachMark(
           targets: targets,
           colorShadow: primaryColor,
+          onFinish: () {
+            ref.read(sharedPrefProvider).then((pref) {
+              final show2 = bool.parse(
+                  pref.getString("showGuide")?.split(",").last ?? "true");
+
+              pref.setString("showGuide", 'false,$show2');
+            });
+          },
           onSkip: () {
             ref.read(sharedPrefProvider).then((pref) {
-              pref.setBool("showGuide", false);
+              final show2 = bool.parse(
+                  pref.getString("showGuide")?.split(",").last ?? "true");
+
+              pref.setString("showGuide", 'false,$show2');
             });
             return true;
           }).show(context: context);
@@ -304,7 +330,9 @@ class _MainPageState extends ConsumerState<MainPage>
                 controller: tabController,
                 children: [
                   Home(
-                    ustazKey: _ustazsKey,
+                    courseTitle: _courseTitleKey,
+                    courseUstaz: _courseUstazKey,
+                    courseCategory: _courseCategoryKey,
                   ),
                   const Fav(),
                   const Started(),

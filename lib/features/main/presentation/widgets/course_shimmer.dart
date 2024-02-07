@@ -43,6 +43,7 @@ class CourseShimmer extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: whiteColor,
                       borderRadius: BorderRadius.circular(15),
+                      
                     ),
                   ),
                 ),

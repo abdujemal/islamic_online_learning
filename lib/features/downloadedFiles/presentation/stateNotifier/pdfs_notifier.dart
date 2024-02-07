@@ -40,7 +40,7 @@ class PdfsNotifier extends StateNotifier<PdfsState> {
         toast(l.toString(), ToastType.error, context);
       },
       (r) {
-        toast("ሁሉም ፋይሎች ጠፍትዋል", ToastType.success, context);
+        toast("ሁሉም ፋይሎች ጠፍቷል", ToastType.success, context);
       },
     );
   }

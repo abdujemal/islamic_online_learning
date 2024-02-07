@@ -51,34 +51,30 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
                     padding: const EdgeInsets.all(10),
                     height: 195,
                     width: 200,
-                    child: Column(
-                      children: [
-                        ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: 10,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) => Shimmer.fromColors(
-                            baseColor: Theme.of(context)
-                                .chipTheme
-                                .backgroundColor!
-                                .withAlpha(150),
-                            highlightColor:
-                                Theme.of(context).chipTheme.backgroundColor ??
-                                    Colors.white30,
-                            child: Container(
-                              height: 140,
-                              width: 100,
-                              margin: const EdgeInsets.only(
-                                right: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: whiteColor,
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                            ),
+                    child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: 10,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) => Shimmer.fromColors(
+                        baseColor: Theme.of(context)
+                            .chipTheme
+                            .backgroundColor!
+                            .withAlpha(150),
+                        highlightColor:
+                            Theme.of(context).chipTheme.backgroundColor ??
+                                Colors.white30,
+                        child: Container(
+                          height: 140,
+                          width: 100,
+                          margin: const EdgeInsets.only(
+                            right: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: whiteColor,
+                            borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
                   loaded: (_) => Container(

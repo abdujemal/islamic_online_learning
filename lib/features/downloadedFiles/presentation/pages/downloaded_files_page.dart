@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/downloadedFiles/presentation/pages/d_audios_page.dart';
-import 'package:islamic_online_learning/features/downloadedFiles/presentation/pages/d_images_page.dart';
 import 'package:islamic_online_learning/features/downloadedFiles/presentation/pages/d_pdfs_page.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -27,7 +26,7 @@ class _DownloadedFilesPageState extends ConsumerState<DownloadedFilesPage>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -76,12 +75,6 @@ class _DownloadedFilesPageState extends ConsumerState<DownloadedFilesPage>
                             style: TextStyle(color: primaryColor),
                           ),
                         ),
-                        Tab(
-                          child: Text(
-                            'ምስሎች',
-                            style: TextStyle(color: primaryColor),
-                          ),
-                        ),
                       ],
                     ),
                     if (showTopAudio) CurrentAudioView(metaData as MediaItem)
@@ -94,7 +87,6 @@ class _DownloadedFilesPageState extends ConsumerState<DownloadedFilesPage>
               children: const [
                 DPdfsPage(),
                 DAudiosPage(),
-                DImagesPage(),
               ],
             ),
           );

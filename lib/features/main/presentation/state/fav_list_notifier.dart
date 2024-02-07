@@ -40,7 +40,7 @@ class FavListNotifier extends StateNotifier<FavListState> {
           toast(l.messege, ToastType.error, context);
         },
         (r) {
-          toast("በተሳካ ሁኔታ ጠፍትዋ", ToastType.success, context);
+          toast("በተሳካ ሁኔታ ጠፍቷል", ToastType.success, context);
           getCourse();
           ref.read(mainNotifierProvider.notifier).updateCourses();
           ref.read(startedNotifierProvider.notifier).getCouses();

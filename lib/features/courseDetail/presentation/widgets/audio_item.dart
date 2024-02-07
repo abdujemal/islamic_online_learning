@@ -156,7 +156,14 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                             ? Text(
                                 "${downLoadProg.progress.toStringAsFixed(1)}%",
                               )
-                            : null,
+                            : Text(
+                                formatFileSize(
+                                  int.parse(
+                                    widget.courseModel.audioSizes
+                                        .split(",")[widget.index - 1],
+                                  ),
+                                ),
+                              ),
                     leading: GestureDetector(
                       onTap: () async {
                         if (isLoading) {

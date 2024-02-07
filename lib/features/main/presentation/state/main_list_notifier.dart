@@ -73,15 +73,15 @@ class MainListNotifier extends StateNotifier<MainListState> {
     }
   }
 
-  Future<void> updateCourse(CourseModel courseModel) async {
-    courses =
-        courses.map((e) => e.id == courseModel.id ? courseModel : e).toList();
-    state = MainListState.loaded(
-      courses: courses,
-      noMoreToLoad: false,
-      isLoadingMore: true,
-    );
-  }
+  // Future<void> updateCourse(CourseModel courseModel) async {
+  //   courses =
+  //       courses.map((e) => e.id == courseModel.id ? courseModel : e).toList();
+  //   state = MainListState.loaded(
+  //     courses: courses,
+  //     noMoreToLoad: false,
+  //     isLoadingMore: true,
+  //   );
+  // }
 
   Future<CourseModel?> getSingleCourse(
     String courseId,
@@ -135,7 +135,9 @@ class MainListNotifier extends StateNotifier<MainListState> {
     List<CourseModel> newList = [];
 
     for (CourseModel cm in courses) {
-      final matchings = savedCourses.where((e) => e.courseId == cm.courseId);
+      final matchings =
+          savedCourses.where((e) => e.ustaz == cm.ustaz && e.title == cm.title);
+      print(" matchings ${matchings.length}");
       if (matchings.isNotEmpty) {
         CourseModel savedCourse = matchings.first;
         newList.add(
@@ -146,19 +148,14 @@ class MainListNotifier extends StateNotifier<MainListState> {
           ),
         );
       } else {
-        newList.add(
-          CourseModel.fromMap(
-            cm.toOriginalMap(),
-            cm.courseId,
-          ),
-        );
+        newList.add(cm);
       }
     }
 
     courses = newList;
     await Future.delayed(const Duration(seconds: 1));
     state = MainListState.loaded(
-      courses: newList,
+      courses: courses,
       isLoadingMore: false,
       noMoreToLoad: false,
     );

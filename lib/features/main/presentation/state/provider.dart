@@ -30,8 +30,8 @@ final fontScaleProvider = StateProvider<double>((ref) {
   return 1.0;
 });
 
-final showGuideProvider = StateProvider<bool>((ref) {
-  return false;
+final showGuideProvider = StateProvider<List<bool>>((ref) {
+  return [false, false];
 });
 
 // final isSubedProvider = StateProvider<bool>((ref) {

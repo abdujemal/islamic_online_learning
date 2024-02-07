@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +22,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:text_scroll/text_scroll.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
@@ -47,6 +49,10 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
   late ConcatenatingAudioSource playList;
 
+  final GlobalKey _shareKey = GlobalKey();
+  final GlobalKey _downloadKey = GlobalKey();
+  final GlobalKey _alarmKey = GlobalKey();
+
   bool showTopAudio = false;
 
   late CourseModel courseModel;
@@ -56,6 +62,65 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   double percentage = 0;
 
   bool isConnected = true;
+
+  bool show = false;
+
+  bool showOnes = true;
+
+  showTutorial() {
+    List<TargetFocus> targets = [
+      getTutorial(
+        key: _shareKey,
+        identify: "ShareButton",
+        align: ContentAlign.bottom,
+        title: "የእጋራ ቁልፍ",
+        subtitle: "ይህንን ቁልፍ ነክተው ደርሱን ለጓደኛ ወይም ለዘመድ ማጋራት ይችላሉ።",
+      ),
+      getTutorial(
+        key: _downloadKey,
+        identify: "DownloadButton",
+        align: ContentAlign.bottom,
+        title: "የዳውንሎድ ቁልፍ",
+        subtitle: "ይህንን ቁልፍ ነክተው ድምፆችንና ፒዲኤፍ ዳውሎድ ማድረግ ይችላሉ።",
+      ),
+      getTutorial(
+        key: _alarmKey,
+        identify: "AlarmButton",
+        align: ContentAlign.bottom,
+        title: "የአስታዋሽ መመዝጋቢያ ቁልፍ",
+        subtitle: "ይህንን ቁልፍ ነክተው የደርሱን አስታዋሽ መመዝጋብ ወይም ማስተካከል ይችላሉ።",
+      ),
+    ];
+
+    if (show) {
+      TutorialCoachMark(
+          targets: targets,
+          colorShadow: primaryColor,
+          onFinish: () {
+            ref.read(sharedPrefProvider).then((pref) {
+              final show1 = bool.parse(
+                  pref.getString("showGuide")?.split(",").first ?? "true");
+
+              pref.setString("showGuide", '$show1,false');
+
+              show = false;
+              setState(() {});
+            });
+          },
+          onSkip: () {
+            ref.read(sharedPrefProvider).then((pref) {
+              final show1 = bool.parse(
+                  pref.getString("showGuide")?.split(",").first ?? "true");
+
+              pref.setString("showGuide", '$show1,false');
+
+              show = false;
+              setState(() {});
+            });
+            return true;
+          }).show(context: context);
+    }
+  }
 
   @override
   void initState() {
@@ -67,6 +132,33 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
     if (mounted) {
       createPlayList();
+
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        ref.read(sharedPrefProvider).then((pref) {
+          ref.read(showGuideProvider.notifier).update(
+            (state) {
+              show = bool.parse(
+                  pref.getString("showGuide")?.split(",").last ?? "true");
+
+              print("${pref.getString("showGuide")}");
+
+              if (show) {
+                if (showOnes) {
+                  print("goooo");
+                  showTutorial();
+                  showOnes = false;
+                }
+              }
+
+              return [
+                bool.parse(
+                    pref.getString("showGuide")?.split(",").first ?? "true"),
+                show,
+              ];
+            },
+          );
+        });
+      });
     }
 
     for (int i = 1; i <= courseModel.pdfId.split(",").length; i++) {
@@ -110,7 +202,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
               title: "${courseModel.title} $i",
               artist: courseModel.ustaz,
               album: courseModel.category,
-              artUri: Uri.file("${dir.path}/Images/${courseModel.title}.jpg"),
+              artUri: Uri.parse(courseModel.image),
               extras: courseModel.toMap(),
             ),
           ),
@@ -137,8 +229,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                   title: "${courseModel.title} $i",
                   artist: courseModel.ustaz,
                   album: courseModel.category,
-                  artUri:
-                      Uri.file("${dir.path}/Images/${courseModel.title}.jpg"),
+                  artUri: Uri.parse(courseModel.image),
                   extras: courseModel.toMap(),
                 ),
               ),
@@ -152,9 +243,10 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     if (mounted) {
       setState(() {});
     }
-    if (kDebugMode) {
-      print("playlist itams: ${playList.length}");
-    }
+  }
+
+  String getFileName() {
+    return courseModel.category == "ተፍሲር" ? "ተፍሲር" : courseModel.title;
   }
 
   Future<bool> checkFile(int index) async {
@@ -214,124 +306,582 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
     percentage = getPersentage(courseModel);
 
-    return StreamBuilder(
-      stream: myAudioStream(audioPlayer),
-      builder: (context, snap) {
-        final state = snap.data?.sequenceState;
-        final processState = snap.data?.processingState;
+    return PopScope(
+      canPop: !show,
+      child: StreamBuilder(
+        stream: myAudioStream(audioPlayer),
+        builder: (context, snap) {
+          final state = snap.data?.sequenceState;
+          final processState = snap.data?.processingState;
 
-        if (state?.sequence.isEmpty ?? true) {
-          showTopAudio = false;
-        }
-        MediaItem? metaData = state?.currentSource?.tag;
+          if (state?.sequence.isEmpty ?? true) {
+            showTopAudio = false;
+          }
+          MediaItem? metaData = state?.currentSource?.tag;
 
-        if (metaData != null &&
-            "${metaData.extras?["courseId"]}" != courseModel.courseId) {
-          showTopAudio = true;
-        }
+          if (metaData != null &&
+              "${metaData.extras?["courseId"]}" != courseModel.courseId) {
+            showTopAudio = true;
+          }
 
-        if (processState == ProcessingState.idle) {
-          showTopAudio = false;
-        }
-        return Scaffold(
-          bottomNavigationBar: AudioBottomView(
-            courseModel.courseId,
-            () {
-              if (courseModel.isFinished == 0) {
-                courseModel = courseModel.copyWith(
-                  isStarted: 1,
-                  pausedAtAudioNum: audioPlayer.currentIndex,
-                  pausedAtAudioSec: audioPlayer.position.inSeconds,
-                  lastViewed: DateTime.now().toString(),
-                );
+          if (processState == ProcessingState.idle) {
+            showTopAudio = false;
+          }
+          return Scaffold(
+            bottomNavigationBar: AudioBottomView(
+              courseModel.courseId,
+              () {
+                if (courseModel.isFinished == 0) {
+                  courseModel = courseModel.copyWith(
+                    isStarted: 1,
+                    pausedAtAudioNum: audioPlayer.currentIndex,
+                    pausedAtAudioSec: audioPlayer.position.inSeconds,
+                    lastViewed: DateTime.now().toString(),
+                  );
 
-                setState(() {});
-              }
-            },
-          ),
-          body: SafeArea(
-            child: RefreshIndicator(
-              color: primaryColor,
-              onRefresh: () async {
-                await refresh();
+                  setState(() {});
+                }
               },
-              child: CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight: MediaQuery.of(context).size.height * 0.40,
-                    collapsedHeight: 60,
-                    title: TextScroll(
-                      pauseBetween: const Duration(seconds: 1),
-                      velocity: const Velocity(pixelsPerSecond: Offset(30, 0)),
-                      courseModel.title,
-                    ),
-                    floating: false,
-                    pinned: true,
-                    snap: false,
-                    actions: [
-                      IconButton(
-                        onPressed: () {
-                          ref.read(mainNotifierProvider.notifier).saveCourse(
-                              courseModel,
-                              courseModel.isFav == 1 ? 0 : 1,
-                              context);
-                          courseModel = courseModel.copyWith(
-                            isFav: courseModel.isFav == 1 ? 0 : 1,
-                          );
-                          setState(() {});
-                        },
-                        icon: courseModel.isFav == 1
-                            ? const Icon(
-                                Icons.bookmark_rounded,
-                                size: 30,
-                                color: primaryColor,
-                              )
-                            : const Icon(
-                                Icons.bookmark_border_outlined,
-                                size: 30,
-                              ),
+            ),
+            body: SafeArea(
+              child: RefreshIndicator(
+                color: primaryColor,
+                onRefresh: () async {
+                  await refresh();
+                },
+                child: CustomScrollView(
+                  slivers: [
+                    SliverAppBar(
+                      expandedHeight: MediaQuery.of(context).size.height * 0.40,
+                      collapsedHeight: 60,
+                      title: TextScroll(
+                        pauseBetween: const Duration(seconds: 1),
+                        velocity:
+                            const Velocity(pixelsPerSecond: Offset(30, 0)),
+                        courseModel.title,
                       ),
-                      IconButton(
-                        onPressed: () {
-                          ref.read(mainNotifierProvider.notifier).saveCourse(
-                                courseModel.copyWith(
-                                  isStarted: 1,
+                      floating: false,
+                      pinned: true,
+                      snap: false,
+                      actions: [
+                        IconButton(
+                          onPressed: () {
+                            ref.read(mainNotifierProvider.notifier).saveCourse(
+                                courseModel,
+                                courseModel.isFav == 1 ? 0 : 1,
+                                context);
+                            courseModel = courseModel.copyWith(
+                              isFav: courseModel.isFav == 1 ? 0 : 1,
+                            );
+                            setState(() {});
+                          },
+                          icon: courseModel.isFav == 1
+                              ? const Icon(
+                                  Icons.bookmark_rounded,
+                                  size: 30,
+                                  color: primaryColor,
+                                )
+                              : const Icon(
+                                  Icons.bookmark_border_outlined,
+                                  size: 30,
                                 ),
-                                null,
-                                context,
-                                showMsg: false,
-                              );
-                          courseModel = courseModel.copyWith(
-                            isStarted: 1,
-                          );
-                          setState(() {});
+                        ),
+                        IconButton(
+                          key: _downloadKey,
+                          onPressed: () {
+                            ref.read(mainNotifierProvider.notifier).saveCourse(
+                                  courseModel.copyWith(
+                                    isStarted: 1,
+                                  ),
+                                  null,
+                                  context,
+                                  showMsg: false,
+                                );
+                            courseModel = courseModel.copyWith(
+                              isStarted: 1,
+                            );
+                            setState(() {});
 
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (context) => DownloadAllFiles(
-                              courseModel: courseModel,
-                              onSingleDownloadDone: (filePath) async {
-                                if (kDebugMode) {
-                                  print("Dwonload done $filePath");
-                                }
-                                int index = int.parse(filePath
-                                    .replaceAll(".mp3", "")
-                                    .split(" ")
-                                    .last);
-                                Directory dir =
-                                    await getApplicationSupportDirectory();
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => DownloadAllFiles(
+                                courseModel: courseModel,
+                                onSingleDownloadDone: (filePath) async {
+                                  if (kDebugMode) {
+                                    print("Dwonload done $filePath");
+                                  }
+                                  int index = int.parse(filePath
+                                      .replaceAll(".mp3", "")
+                                      .split(" ")
+                                      .last);
+                                  Directory dir =
+                                      await getApplicationSupportDirectory();
 
-                                if (playList.children.isEmpty ||
-                                    index >= audios.length) {
-                                  createPlayList();
-                                  return;
-                                }
-                                if (isPlayingCourseThisCourse(
-                                  courseModel.courseId,
-                                  ref,
-                                  alsoIsNotIdle: true,
-                                )) {
+                                  // if (playList.children.isEmpty ||
+                                  //     index >= audios.length) {
+                                  //   createPlayList();
+                                  //   return;
+                                  // }
+                                  if (isPlayingCourseThisCourse(
+                                    courseModel.courseId, //1, 9, 2,3
+                                    ref,
+                                    alsoIsNotIdle: true,
+                                  )) {
+                                    playList.insert(
+                                      index - 1,
+                                      AudioSource.file(
+                                        filePath,
+                                        tag: MediaItem(
+                                          id: audios[index - 1],
+                                          title: "${courseModel.title} $index",
+                                          artist: courseModel.ustaz,
+                                          album: courseModel.category,
+                                          artUri: Uri.file(
+                                              "${dir.path}/Images/${courseModel.title}.jpg"),
+                                          extras: courseModel.toMap(),
+                                        ),
+                                      ),
+                                    );
+                                    playList.removeAt(index);
+
+                                    // ref.read(audioProvider).setAudioSource(
+                                    //       ConcatenatingAudioSource(
+                                    //         children: playList,
+                                    //       ),
+                                    //       initialIndex: ref
+                                    //           .read(audioProvider)
+                                    //           .currentIndex,
+                                    //       initialPosition:
+                                    //           ref.read(audioProvider).position,
+                                    //       // preload: false,
+                                    //     );
+
+                                    // ref.read(audioProvider).play();
+                                  }
+                                },
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.download_rounded),
+                        ),
+                        IconButton(
+                          key: _shareKey,
+                          onPressed: () async {
+                            final url = await ref
+                                .read(cdNotifierProvider.notifier)
+                                .createDynamicLink(courseModel, context);
+
+                            if (url.isNotEmpty) {
+                              await Share.share(url, subject: "ይህንን ደርስ ይመልከቱ");
+                            }
+                          },
+                          icon: const Icon(Icons.share),
+                        )
+                      ],
+                      bottom: PreferredSize(
+                        preferredSize: Size(
+                          MediaQuery.of(context).size.width,
+                          showTopAudio ? 40 : 0,
+                        ),
+                        child: showTopAudio
+                            ? CurrentAudioView(metaData as MediaItem)
+                            : const SizedBox(),
+                      ),
+                      flexibleSpace: FlexibleSpaceBar(
+                        stretchModes: const [StretchMode.zoomBackground],
+                        collapseMode: CollapseMode.parallax,
+                        centerTitle: true,
+                        background: Stack(
+                          children: [
+                            SizedBox(
+                              child: CachedNetworkImage(
+                                imageUrl: courseModel.image,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.40,
+                                width: MediaQuery.of(context).size.width,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.40,
+                              width: MediaQuery.of(context).size.width,
+                              color: Theme.of(context)
+                                  .chipTheme
+                                  .backgroundColor!
+                                  .withOpacity(0.3),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  MainBtn(
+                                    key: _alarmKey,
+                                    title: courseModel.scheduleDates.isNotEmpty
+                                        ? "ማስታወሻውን አስተካክል"
+                                        : "አስታዋሽ መዝግብ",
+                                    icon: courseModel.scheduleDates.isNotEmpty
+                                        ? Icons.access_alarms
+                                        : Icons.alarm_add_rounded,
+                                    onTap: () async {
+                                      // final int? i = await ref
+                                      //     .read(mainNotifierProvider.notifier)
+                                      //     .saveCourse(
+                                      //       courseModel.copyWith(
+                                      //         isStarted: 1,
+                                      //       ),
+                                      //       null,
+                                      //       context,
+                                      //       showMsg: false,
+                                      //     );
+                                      // courseModel = courseModel.copyWith(
+                                      //   isStarted: 1,
+                                      //   id: i,
+                                      // );
+                                      // print(i);
+                                      setState(() {});
+                                      if (mounted) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (ctx) => ScheduleView(
+                                            courseModel: courseModel,
+                                            onSave: (scheduleDates,
+                                                scheduleTime,
+                                                isScheduleOn) async {
+                                              await ref
+                                                  .read(mainNotifierProvider
+                                                      .notifier)
+                                                  .saveCourse(
+                                                    courseModel.copyWith(
+                                                      isStarted: 1,
+                                                      scheduleDates:
+                                                          scheduleDates,
+                                                      scheduleTime:
+                                                          scheduleTime,
+                                                      isScheduleOn:
+                                                          isScheduleOn,
+                                                    ),
+                                                    null,
+                                                    context,
+                                                    showMsg: false,
+                                                  );
+                                              courseModel =
+                                                  courseModel.copyWith(
+                                                isStarted: 1,
+                                                scheduleDates: scheduleDates,
+                                                scheduleTime: scheduleTime,
+                                                isScheduleOn: isScheduleOn,
+                                              );
+
+                                              if (mounted) {
+                                                final res = await ref
+                                                    .read(mainNotifierProvider
+                                                        .notifier)
+                                                    .getSingleCourse(
+                                                        widget.cm.courseId,
+                                                        context);
+                                                return res?.id;
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  if (courseModel.isStarted == 1 &&
+                                      courseModel.isFinished == 0)
+                                    MainBtn(
+                                      title: "ካቆምኩበት ቀጥል",
+                                      icon: Icons.play_arrow_rounded,
+                                      onTap: () async {
+                                        await createPlayList();
+                                        if (playList.children.isNotEmpty) {
+                                          await audioPlayer.setAudioSource(
+                                            playList,
+                                            initialIndex:
+                                                courseModel.pausedAtAudioNum < 0
+                                                    ? 0
+                                                    : courseModel
+                                                        .pausedAtAudioNum,
+                                            initialPosition: Duration(
+                                              seconds:
+                                                  courseModel.pausedAtAudioSec,
+                                            ),
+                                          );
+                                          audioPlayer.play();
+
+                                          if (mounted) {
+                                            bool isPDFDownloded = await ref
+                                                .read(
+                                                    cdNotifierProvider.notifier)
+                                                .isDownloaded(
+                                                  courseModel.pdfId
+                                                          .contains(",")
+                                                      ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                      : "${courseModel.title}.pdf",
+                                                  "PDF",
+                                                  context,
+                                                );
+                                            print(
+                                                "isPDFDownloded:- $isPDFDownloded");
+                                            print(courseModel.pdfId
+                                                    .contains(",")
+                                                ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                : "${courseModel.title}.pdf");
+                                            if (courseModel.pdfId
+                                                    .trim()
+                                                    .isNotEmpty &&
+                                                isPDFDownloded) {
+                                              String path = await getPath(
+                                                'PDF',
+                                                courseModel.pdfId.contains(",")
+                                                    ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                    : "${courseModel.title}.pdf",
+                                              );
+                                              if (mounted) {
+                                                await Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) => PdfPage(
+                                                      volume:
+                                                          courseModel.pdfNum,
+                                                      path: path,
+                                                      courseModel: courseModel,
+                                                    ),
+                                                  ),
+                                                );
+                                                refresh();
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                    ),
+                                  if (courseModel.isFinished == 1)
+                                    MainBtn(
+                                      title: "ደጋሚ ጀምር",
+                                      icon: Icons.refresh,
+                                      onTap: () {
+                                        ref
+                                            .read(mainNotifierProvider.notifier)
+                                            .saveCourse(
+                                              courseModel.copyWith(
+                                                isFinished: 0,
+                                                pdfPage: 0,
+                                                pausedAtAudioNum: 0,
+                                                pausedAtAudioSec: 0,
+                                                lastViewed:
+                                                    DateTime.now().toString(),
+                                              ),
+                                              null,
+                                              context,
+                                              showMsg: false,
+                                            );
+                                        courseModel = courseModel.copyWith(
+                                          isFinished: 0,
+                                          pdfPage: 0,
+                                          pausedAtAudioNum: 0,
+                                          pausedAtAudioSec: 0,
+                                        );
+                                        setState(() {});
+                                        createPlayList();
+                                      },
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          if (index == 0) {
+                            return Column(
+                              children: [
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                if (courseModel.isStarted == 1)
+                                  const Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: ListTitle(
+                                      title: "እርስዎ የተማሩት መጠን",
+                                    ),
+                                  ),
+                                if (courseModel.isStarted == 1)
+                                  ListTile(
+                                    leading: const Icon(Icons.percent),
+                                    title: Column(
+                                      children: [
+                                        LinearProgressIndicator(
+                                          value: percentage,
+                                          color: primaryColor,
+                                          backgroundColor: Theme.of(context)
+                                              .chipTheme
+                                              .backgroundColor,
+                                        ),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                              "${(percentage * 100).toStringAsFixed(2)}% ጨርሰዋል"),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: ListTitle(
+                                    title: "ኪታቡን ያቀራው ኡስታዝ",
+                                  ),
+                                ),
+                                ListTile(
+                                  title: Text(courseModel.ustaz),
+                                  leading: const Icon(Icons.mic_rounded),
+                                ),
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: ListTitle(
+                                    title: "ምድብ",
+                                  ),
+                                ),
+                                ListTile(
+                                  title: Text(courseModel.category),
+                                  leading: const Icon(Icons.category_rounded),
+                                ),
+                                if (courseModel.author.trim().isNotEmpty)
+                                  const Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: ListTitle(
+                                      title: "የኪታቡ ፀሀፊ",
+                                    ),
+                                  ),
+                                if (courseModel.author.trim().isNotEmpty)
+                                  ListTile(
+                                    title: Text(courseModel.author),
+                                    leading: const Icon(Icons.edit_document),
+                                  ),
+                                if (courseModel.pdfId.trim() != "")
+                                  const Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: ListTitle(
+                                      title: "ኪታቡ በሶፍት ኮፒ",
+                                    ),
+                                  ),
+                                if (courseModel.pdfId.trim() != "" &&
+                                    pdfPaths.isNotEmpty)
+                                  // ...List.generate(courseModel.pdfId.split(",").length, (index) =>
+                                  for (int i = 1;
+                                      i <= courseModel.pdfId.split(",").length;
+                                      i++)
+                                    PdfItem(
+                                      fileId:
+                                          courseModel.pdfId.split(",")[i - 1],
+                                      path: pdfPaths[i - 1],
+                                      volume: i.toDouble(),
+                                      courseModel: courseModel,
+                                      title: courseModel.pdfId.contains(",")
+                                          ? "${courseModel.title} $i"
+                                          : courseModel.title,
+                                      whenPop: () {
+                                        refresh();
+                                      },
+                                    ),
+                                //),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Row(
+                                    children: [
+                                      const ListTitle(
+                                        title: "ድምፆች",
+                                      ),
+                                      const Spacer(),
+                                      Consumer(builder: (context, wref, _) {
+                                        final loadAudios =
+                                            wref.watch(loadAudiosProvider);
+                                        return Text(
+                                            "$loadAudios / ${audios.length} ድምፆች ዝግጁ ሆነዋል");
+                                      }),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      if (isLoadingAudio)
+                                        const SizedBox(
+                                          width: 30,
+                                          height: 30,
+                                          child: CircularProgressIndicator(
+                                            color: primaryColor,
+                                          ),
+                                        ),
+                                      if (!isLoadingAudio)
+                                        GestureDetector(
+                                          onTap: () {
+                                            createPlayList();
+                                          },
+                                          child:
+                                              const Icon(Icons.refresh_rounded),
+                                        ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                )
+                              ],
+                            );
+                          } else if (index > 0 && index - 1 < audios.length) {
+                            if (state?.sequence.isNotEmpty ?? false) {
+                              final mediaItem =
+                                  state!.currentSource!.tag as MediaItem;
+
+                              return AudioItem(
+                                isPlaying: mediaItem.id == audios[index - 1] &&
+                                    audioPlayer.processingState !=
+                                        ProcessingState.idle,
+                                canAudioPlay: true,
+                                canNeverPlay: false,
+                                audioId: audios[index - 1],
+                                title: courseModel.title,
+                                index: index,
+                                courseModel: courseModel,
+                                isFromPDF: false,
+                                onDownloadDone: (String filePath) async {
+                                  Directory dir =
+                                      await getApplicationSupportDirectory();
+
+                                  if (playList.children.isEmpty ||
+                                      index >= audios.length) {
+                                    createPlayList();
+                                    return;
+                                  }
+
+                                  // playList[index - 1] = AudioSource.file(
+                                  //   filePath,
+                                  //   tag: MediaItem(
+                                  //     id: audios[index - 1],
+                                  //     title: "${courseModel.title} $index",
+                                  //     artist: courseModel.ustaz,
+                                  //     album: courseModel.category,
+                                  //     artUri: Uri.file(
+                                  //         "${dir.path}/Images/${courseModel.title}.jpg"),
+                                  //     extras: courseModel.toMap(),
+                                  //   ),
+                                  // );
+
+                                  // if (isPlayingCourseThisCourse(
+                                  //   courseModel.courseId,
+                                  //   ref,
+                                  //   alsoIsNotIdle: true,
+                                  // )) {
                                   playList.removeAt(index - 1);
                                   playList.insert(
                                     index - 1,
@@ -343,12 +893,11 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                         artist: courseModel.ustaz,
                                         album: courseModel.category,
                                         artUri: Uri.file(
-                                            "${dir.path}/Images/${courseModel.title}.jpg"),
+                                            "${dir.path}/Images/${getFileName()}.jpg"),
                                         extras: courseModel.toMap(),
                                       ),
                                     ),
                                   );
-
                                   // ref.read(audioProvider).setAudioSource(
                                   //       ConcatenatingAudioSource(
                                   //         children: playList,
@@ -362,426 +911,66 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   //     );
 
                                   // ref.read(audioProvider).play();
-                                }
-                              },
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.download_rounded),
-                      ),
-                      IconButton(
-                        onPressed: () async {
-                          final url = await ref
-                              .read(cdNotifierProvider.notifier)
-                              .createDynamicLink(courseModel, context);
-
-                          if (url.isNotEmpty) {
-                            await Share.share(url, subject: "ይህንን ደርስ ይመልከቱ");
-                          }
-                        },
-                        icon: const Icon(Icons.share),
-                      )
-                    ],
-                    bottom: PreferredSize(
-                      preferredSize: Size(
-                        MediaQuery.of(context).size.width,
-                        showTopAudio ? 40 : 0,
-                      ),
-                      child: showTopAudio
-                          ? CurrentAudioView(metaData as MediaItem)
-                          : const SizedBox(),
-                    ),
-                    flexibleSpace: FlexibleSpaceBar(
-                      stretchModes: const [StretchMode.zoomBackground],
-                      collapseMode: CollapseMode.parallax,
-                      centerTitle: true,
-                      background: Stack(
-                        children: [
-                          FutureBuilder(
-                            future: displayImage(
-                              courseModel.image,
-                              courseModel.category == "ተፍሲር"
-                                  ? "ተፍሲር"
-                                  : courseModel.title,
-                              ref,
-                            ),
-                            builder: (context, snap) {
-                              return snap.data == null
-                                  ? SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.40,
-                                      width: MediaQuery.of(context).size.width,
-                                      child: const Center(
-                                        child: CircularProgressIndicator(
-                                          color: primaryColor,
-                                        ),
-                                      ),
-                                    )
-                                  : snap.data!.path.isEmpty
-                                      ? SizedBox(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.40,
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          child: const Center(
-                                            child: Icon(Icons.error_rounded),
-                                          ),
-                                        )
-                                      : SizedBox(
-                                          child: Image.file(
-                                            snap.data!,
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.40,
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            fit: BoxFit.fill,
-                                          ),
-                                        );
-                            },
-                          ),
-                          Container(
-                            height: MediaQuery.of(context).size.height * 0.40,
-                            width: MediaQuery.of(context).size.width,
-                            color: Theme.of(context)
-                                .chipTheme
-                                .backgroundColor!
-                                .withOpacity(0.3),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                MainBtn(
-                                  title: courseModel.scheduleDates.isNotEmpty
-                                      ? "ማስታወሻውን አስተካክል"
-                                      : "አስታዋሽ መዝግብ",
-                                  icon: courseModel.scheduleDates.isNotEmpty
-                                      ? Icons.access_alarms
-                                      : Icons.alarm_add_rounded,
-                                  onTap: () async {
-                                    // final int? i = await ref
-                                    //     .read(mainNotifierProvider.notifier)
-                                    //     .saveCourse(
-                                    //       courseModel.copyWith(
-                                    //         isStarted: 1,
-                                    //       ),
-                                    //       null,
-                                    //       context,
-                                    //       showMsg: false,
-                                    //     );
-                                    // courseModel = courseModel.copyWith(
-                                    //   isStarted: 1,
-                                    //   id: i,
-                                    // );
-                                    // print(i);
+                                  // }
+                                },
+                                onPlayTabed: () async {
+                                  // updating the model if the currently playing course is this course
+                                  if (isPlayingCourseThisCourse(
+                                          courseModel.courseId, ref) &&
+                                      processState != ProcessingState.idle) {
+                                    print("clicked");
+                                    courseModel = courseModel.copyWith(
+                                      isStarted: 1,
+                                      pausedAtAudioNum:
+                                          audioPlayer.currentIndex,
+                                      pausedAtAudioSec:
+                                          audioPlayer.position.inSeconds,
+                                      lastViewed: DateTime.now().toString(),
+                                    );
                                     setState(() {});
-                                    if (mounted) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (ctx) => ScheduleView(
-                                          courseModel: courseModel,
-                                          onSave: (scheduleDates, scheduleTime,
-                                              isScheduleOn) async {
-                                            await ref
-                                                .read(mainNotifierProvider
-                                                    .notifier)
-                                                .saveCourse(
-                                                  courseModel.copyWith(
-                                                    isStarted: 1,
-                                                    scheduleDates:
-                                                        scheduleDates,
-                                                    scheduleTime: scheduleTime,
-                                                    isScheduleOn: isScheduleOn,
-                                                  ),
-                                                  null,
-                                                  context,
-                                                  showMsg: false,
-                                                );
-                                            courseModel = courseModel.copyWith(
-                                              isStarted: 1,
-                                              scheduleDates: scheduleDates,
-                                              scheduleTime: scheduleTime,
-                                              isScheduleOn: isScheduleOn,
-                                            );
+                                    int destinationIndex = index - 1;
+                                    int currentIndex =
+                                        audioPlayer.currentIndex ?? 0;
 
-                                            if (mounted) {
-                                              final res = await ref
-                                                  .read(mainNotifierProvider
-                                                      .notifier)
-                                                  .getSingleCourse(
-                                                      widget.cm.courseId,
-                                                      context);
-                                              return res?.id;
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      );
-                                    }
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                if (courseModel.isStarted == 1 &&
-                                    courseModel.isFinished == 0)
-                                  MainBtn(
-                                    title: "ካቆምኩበት ቀጥል",
-                                    icon: Icons.play_arrow_rounded,
-                                    onTap: () async {
-                                      await createPlayList();
-                                      if (playList.children.isNotEmpty) {
-                                        await audioPlayer.setAudioSource(
-                                          playList,
-                                          initialIndex:
-                                              courseModel.pausedAtAudioNum < 0
-                                                  ? 0
-                                                  : courseModel
-                                                      .pausedAtAudioNum,
-                                          initialPosition: Duration(
-                                            seconds:
-                                                courseModel.pausedAtAudioSec,
-                                          ),
-                                        );
-                                        audioPlayer.play();
+                                    int dnc =
+                                        (destinationIndex - currentIndex).abs();
 
-                                        if (mounted) {
-                                          bool isPDFDownloded = await ref
-                                              .read(cdNotifierProvider.notifier)
-                                              .isDownloaded(
-                                                courseModel.pdfId.contains(",")
-                                                    ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
-                                                    : "${courseModel.title}.pdf",
-                                                "PDF",
-                                                context,
-                                              );
-                                          print(
-                                              "isPDFDownloded:- $isPDFDownloded");
-                                          print(courseModel.pdfId.contains(",")
-                                              ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
-                                              : "${courseModel.title}.pdf");
-                                          if (courseModel.pdfId
-                                                  .trim()
-                                                  .isNotEmpty &&
-                                              isPDFDownloded) {
-                                            String path = await getPath(
-                                              'PDF',
-                                              courseModel.pdfId.contains(",")
-                                                  ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
-                                                  : "${courseModel.title}.pdf",
-                                            );
-                                            if (mounted) {
-                                              await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) => PdfPage(
-                                                    volume: courseModel.pdfNum,
-                                                    path: path,
-                                                    courseModel: courseModel,
-                                                  ),
-                                                ),
-                                              );
-                                              refresh();
-                                            }
-                                          }
-                                        }
+                                    for (int i = 0; i < dnc; i++) {
+                                      print("it works");
+                                      await Future.delayed(
+                                          const Duration(milliseconds: 50));
+                                      if (destinationIndex > currentIndex) {
+                                        print(">");
+                                        ref.read(audioProvider).seekToNext();
+                                      } else {
+                                        print("<");
+                                        ref
+                                            .read(audioProvider)
+                                            .seekToPrevious();
                                       }
-                                    },
-                                  ),
-                                if (courseModel.isFinished == 1)
-                                  MainBtn(
-                                    title: "ደጋሚ ጀምር",
-                                    icon: Icons.refresh,
-                                    onTap: () {
-                                      ref
-                                          .read(mainNotifierProvider.notifier)
-                                          .saveCourse(
-                                            courseModel.copyWith(
-                                              isFinished: 0,
-                                              pdfPage: 0,
-                                              pausedAtAudioNum: 0,
-                                              pausedAtAudioSec: 0,
-                                              lastViewed:
-                                                  DateTime.now().toString(),
-                                            ),
-                                            null,
-                                            context,
-                                            showMsg: false,
-                                          );
-                                      courseModel = courseModel.copyWith(
-                                        isFinished: 0,
-                                        pdfPage: 0,
-                                        pausedAtAudioNum: 0,
-                                        pausedAtAudioSec: 0,
-                                      );
-                                      setState(() {});
-                                      createPlayList();
-                                    },
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        if (index == 0) {
-                          return Column(
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              if (courseModel.isStarted == 1)
-                                const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: ListTitle(
-                                    title: "እርስዎ የተማሩት መጠን",
-                                  ),
-                                ),
-                              if (courseModel.isStarted == 1)
-                                ListTile(
-                                  leading: const Icon(Icons.percent),
-                                  title: Column(
-                                    children: [
-                                      LinearProgressIndicator(
-                                        value: percentage,
-                                        color: primaryColor,
-                                        backgroundColor: Theme.of(context)
-                                            .chipTheme
-                                            .backgroundColor,
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                            "${(percentage * 100).toStringAsFixed(2)}% ጨርሰዋል"),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              const Align(
-                                alignment: Alignment.centerLeft,
-                                child: ListTitle(
-                                  title: "ኪታብን ያቀራው ኡስታዝ",
-                                ),
-                              ),
-                              ListTile(
-                                title: Text(courseModel.ustaz),
-                                leading: const Icon(Icons.mic_rounded),
-                              ),
-                              const Align(
-                                alignment: Alignment.centerLeft,
-                                child: ListTitle(
-                                  title: "ምድብ",
-                                ),
-                              ),
-                              ListTile(
-                                title: Text(courseModel.category),
-                                leading: const Icon(Icons.category_rounded),
-                              ),
-                              if (courseModel.author.trim().isNotEmpty)
-                                const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: ListTitle(
-                                    title: "የኪታቡ ጸሃፊ",
-                                  ),
-                                ),
-                              if (courseModel.author.trim().isNotEmpty)
-                                ListTile(
-                                  title: Text(courseModel.author),
-                                  leading: const Icon(Icons.edit_document),
-                                ),
-                              if (courseModel.pdfId.trim() != "")
-                                const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: ListTitle(
-                                    title: "ኪታብ በሶፍት ኮፒ",
-                                  ),
-                                ),
-                              if (courseModel.pdfId.trim() != "" &&
-                                  pdfPaths.isNotEmpty)
-                                // ...List.generate(courseModel.pdfId.split(",").length, (index) =>
-                                for (int i = 1;
-                                    i <= courseModel.pdfId.split(",").length;
-                                    i++)
-                                  PdfItem(
-                                    fileId: courseModel.pdfId.split(",")[i - 1],
-                                    path: pdfPaths[i - 1],
-                                    volume: i.toDouble(),
-                                    courseModel: courseModel,
-                                    title: courseModel.pdfId.contains(",")
-                                        ? "${courseModel.title} $i"
-                                        : courseModel.title,
-                                    whenPop: () {
-                                      refresh();
-                                    },
-                                  ),
-                              //),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Row(
-                                  children: [
-                                    const ListTitle(
-                                      title: "ድምጾች",
-                                    ),
-                                    const Spacer(),
-                                    Consumer(builder: (context, wref, _) {
-                                      final loadAudios =
-                                          wref.watch(loadAudiosProvider);
-                                      return Text(
-                                          "$loadAudios / ${audios.length} ድምጾች ዝግጁ ሆኗል");
-                                    }),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    if (isLoadingAudio)
-                                      const SizedBox(
-                                        width: 30,
-                                        height: 30,
-                                        child: CircularProgressIndicator(
-                                          color: primaryColor,
-                                        ),
-                                      ),
-                                    if (!isLoadingAudio)
-                                      GestureDetector(
-                                        onTap: () {
-                                          createPlayList();
-                                        },
-                                        child:
-                                            const Icon(Icons.refresh_rounded),
-                                      ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              )
-                            ],
-                          );
-                        } else if (index > 0 && index - 1 < audios.length) {
-                          if (state?.sequence.isNotEmpty ?? false) {
-                            final mediaItem =
-                                state!.currentSource!.tag as MediaItem;
-
+                                    }
+                                  } else {
+                                    ref.read(audioProvider).setAudioSource(
+                                          playList,
+                                          initialIndex: index - 1,
+                                          // preload: false,
+                                        );
+                                    try {
+                                      await ref.read(audioProvider).play();
+                                    } catch (e) {
+                                      if (kDebugMode) {
+                                        print(e.toString());
+                                      }
+                                      await ref.read(audioProvider).stop();
+                                    }
+                                  }
+                                },
+                              );
+                            }
                             return AudioItem(
-                              isPlaying: mediaItem.id == audios[index - 1] &&
-                                  audioPlayer.processingState !=
-                                      ProcessingState.idle,
-                              canAudioPlay: playList.children.isNotEmpty,
-                              canNeverPlay:
-                                  !isLoadingAudio && playList.children.isEmpty,
+                              isPlaying: false,
+                              canAudioPlay: true,
+                              canNeverPlay: false,
                               audioId: audios[index - 1],
                               title: courseModel.title,
                               index: index,
@@ -797,131 +986,11 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   return;
                                 }
 
-                                // playList[index - 1] = AudioSource.file(
-                                //   filePath,
-                                //   tag: MediaItem(
-                                //     id: audios[index - 1],
-                                //     title: "${courseModel.title} $index",
-                                //     artist: courseModel.ustaz,
-                                //     album: courseModel.category,
-                                //     artUri: Uri.file(
-                                //         "${dir.path}/Images/${courseModel.title}.jpg"),
-                                //     extras: courseModel.toMap(),
-                                //   ),
-                                // );
-
-                                if (isPlayingCourseThisCourse(
-                                  courseModel.courseId,
-                                  ref,
-                                  alsoIsNotIdle: true,
-                                )) {
-                                  playList.removeAt(index - 1);
-                                  playList.insert(
-                                    index - 1,
-                                    AudioSource.file(
-                                      filePath,
-                                      tag: MediaItem(
-                                        id: audios[index - 1],
-                                        title: "${courseModel.title} $index",
-                                        artist: courseModel.ustaz,
-                                        album: courseModel.category,
-                                        artUri: Uri.file(
-                                            "${dir.path}/Images/${courseModel.title}.jpg"),
-                                        extras: courseModel.toMap(),
-                                      ),
-                                    ),
-                                  );
-                                  // ref.read(audioProvider).setAudioSource(
-                                  //       ConcatenatingAudioSource(
-                                  //         children: playList,
-                                  //       ),
-                                  //       initialIndex: ref
-                                  //           .read(audioProvider)
-                                  //           .currentIndex,
-                                  //       initialPosition:
-                                  //           ref.read(audioProvider).position,
-                                  //       // preload: false,
-                                  //     );
-
-                                  // ref.read(audioProvider).play();
-                                }
-                              },
-                              onPlayTabed: () async {
-                                // updating the model if the currently playing course is this course
-                                if (isPlayingCourseThisCourse(
-                                        courseModel.courseId, ref) &&
-                                    processState != ProcessingState.idle) {
-                                  print("clicked");
-                                  courseModel = courseModel.copyWith(
-                                    isStarted: 1,
-                                    pausedAtAudioNum: audioPlayer.currentIndex,
-                                    pausedAtAudioSec:
-                                        audioPlayer.position.inSeconds,
-                                    lastViewed: DateTime.now().toString(),
-                                  );
-                                  setState(() {});
-                                  int destinationIndex = index - 1;
-                                  int currentIndex =
-                                      audioPlayer.currentIndex ?? 0;
-
-                                  int dnc =
-                                      (destinationIndex - currentIndex).abs();
-
-                                  for (int i = 0; i < dnc; i++) {
-                                    print("it works");
-                                    await Future.delayed(
-                                        const Duration(milliseconds: 50));
-                                    if (destinationIndex > currentIndex) {
-                                      print(">");
-                                      ref.read(audioProvider).seekToNext();
-                                    } else {
-                                      print("<");
-                                      ref.read(audioProvider).seekToPrevious();
-                                    }
-                                  }
-                                } else {
-                                  ref.read(audioProvider).setAudioSource(
-                                        playList,
-                                        initialIndex: index - 1,
-                                        // preload: false,
-                                      );
-                                  try {
-                                    await ref.read(audioProvider).play();
-                                  } catch (e) {
-                                    if (kDebugMode) {
-                                      print(e.toString());
-                                    }
-                                    await ref.read(audioProvider).stop();
-                                  }
-                                }
-                              },
-                            );
-                          }
-                          return AudioItem(
-                            isPlaying: false,
-                            canAudioPlay: playList.children.isNotEmpty,
-                            canNeverPlay:
-                                !isLoadingAudio && playList.children.isEmpty,
-                            audioId: audios[index - 1],
-                            title: courseModel.title,
-                            index: index,
-                            courseModel: courseModel,
-                            isFromPDF: false,
-                            onDownloadDone: (String filePath) async {
-                              Directory dir =
-                                  await getApplicationSupportDirectory();
-
-                              if (playList.children.isEmpty ||
-                                  index >= audios.length) {
-                                createPlayList();
-                                return;
-                              }
-
-                              if (isPlayingCourseThisCourse(
-                                courseModel.courseId,
-                                ref,
-                                alsoIsNotIdle: true,
-                              )) {
+                                // if (isPlayingCourseThisCourse(
+                                //   courseModel.courseId,
+                                //   ref,
+                                //   alsoIsNotIdle: true,
+                                // )) {
                                 playList.removeAt(index - 1);
                                 playList.insert(
                                   index - 1,
@@ -933,7 +1002,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       artist: courseModel.ustaz,
                                       album: courseModel.category,
                                       artUri: Uri.file(
-                                          "${dir.path}/Images/${courseModel.title}.jpg"),
+                                          "${dir.path}/Images/${getFileName()}.jpg"),
                                       extras: courseModel.toMap(),
                                     ),
                                   ),
@@ -950,48 +1019,47 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                 //     );
 
                                 // ref.read(audioProvider).play();
-                              }
-                            },
-                            onPlayTabed: () {
-                              if (isPlayingCourseThisCourse(
-                                  courseModel.courseId, ref)) {
-                                courseModel = courseModel.copyWith(
-                                  isStarted: 1,
-                                  pausedAtAudioNum: audioPlayer.currentIndex,
-                                  pausedAtAudioSec:
-                                      audioPlayer.position.inSeconds,
-                                  lastViewed: DateTime.now().toString(),
-                                );
-                                setState(() {});
-                              }
-                              ref
-                                  .read(audioProvider.notifier)
-                                  .update((state) => AudioPlayer());
-                              ref.read(audioProvider).setAudioSource(
-                                    playList,
-                                    initialIndex: index - 1,
-                                    // preload: false,
+                                // }
+                              },
+                              onPlayTabed: () {
+                                if (isPlayingCourseThisCourse(
+                                    courseModel.courseId, ref)) {
+                                  courseModel = courseModel.copyWith(
+                                    isStarted: 1,
+                                    pausedAtAudioNum: audioPlayer.currentIndex,
+                                    pausedAtAudioSec:
+                                        audioPlayer.position.inSeconds,
+                                    lastViewed: DateTime.now().toString(),
                                   );
-                              ref.read(audioProvider).play();
-                            },
-                          );
-                        } else if (index == audios.length + 1) {
-                          return const SizedBox(
-                            height: 400,
-                          );
-                        } else {
-                          return const SizedBox();
-                        }
-                      },
-                      childCount: audios.length + 2,
-                    ),
-                  )
-                ],
+                                  setState(() {});
+                                }
+
+                                ref.read(audioProvider).setAudioSource(
+                                      playList,
+                                      initialIndex: index - 1,
+                                      // preload: false,
+                                    );
+                                ref.read(audioProvider).play();
+                              },
+                            );
+                          } else if (index == audios.length + 1) {
+                            return const SizedBox(
+                              height: 400,
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
+                        childCount: audios.length + 2,
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

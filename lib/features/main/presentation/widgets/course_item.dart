@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,8 +23,20 @@ import '../pages/filtered_courses.dart';
 
 class CourseItem extends ConsumerStatefulWidget {
   final CourseModel courseModel;
+  final GlobalKey? courseTitle;
+  final GlobalKey? courseUstaz;
+  final GlobalKey? courseCategory;
+  final int index;
   final bool fromHome;
-  const CourseItem(this.courseModel, {this.fromHome = true, super.key});
+  const CourseItem(
+    this.courseModel, {
+    this.index = 2,
+    this.fromHome = true,
+    this.courseCategory,
+    this.courseUstaz,
+    this.courseTitle,
+    super.key,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _CourseItemState();
@@ -160,240 +173,222 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                   children: [
                     Stack(
                       children: [
-                        FutureBuilder(
-                          future: displayImage(
-                            widget.courseModel.image,
-                            widget.courseModel.category == "ተፍሲር"
-                                ? "ተፍሲር"
-                                : widget.courseModel.title,
-                            ref,
-                          ),
-                          builder: (context, snap) {
-                            return Stack(
-                              children: [
-                                Container(
-                                  height: 80,
-                                  width: 80,
-                                  decoration: BoxDecoration(
-                                    image: snap.data == null
-                                        ? null
-                                        : snap.data!.path.isNotEmpty
-                                            ? DecorationImage(
-                                                image: FileImage(snap.data!),
-                                                fit: BoxFit.fill,
-                                              )
-                                            : null,
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: snap.data == null
-                                      ? Shimmer.fromColors(
-                                          baseColor: Theme.of(context)
-                                              .chipTheme
-                                              .backgroundColor!
-                                              .withAlpha(150),
-                                          highlightColor: Theme.of(context)
-                                              .chipTheme
-                                              .backgroundColor!,
-                                          child: Container(
-                                            height: 80,
-                                            width: 80,
-                                            decoration: BoxDecoration(
-                                              color: whiteColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: CachedNetworkImage(
+                                height: 80,
+                                width: 80,
+                                imageUrl: widget.courseModel.image,
+                                fit: BoxFit.fill,
+                                progressIndicatorBuilder:
+                                    (context, url, progress) {
+                                  return Shimmer.fromColors(
+                                    baseColor: Theme.of(context)
+                                        .chipTheme
+                                        .backgroundColor!
+                                        .withAlpha(150),
+                                    highlightColor: Theme.of(context)
+                                        .chipTheme
+                                        .backgroundColor!,
+                                    child: Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        color: whiteColor,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            Container(
+                              height: 80,
+                              width: 80,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: widget.courseModel.isStarted == 1 &&
+                                      widget.courseModel.isFinished == 0
+                                  ? Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black38,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          Align(
+                                            child: SizedBox(
+                                              height: 40,
+                                              width: 40,
+                                              child: CircularProgressIndicator(
+                                                color: cardColor,
+                                                value: percentage,
+                                                backgroundColor: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                          Align(
+                                            child: IconButton(
+                                              onPressed: () async {
+                                                await createPlayList();
+                                                if (playList.isNotEmpty) {
+                                                  await ref
+                                                      .read(audioProvider)
+                                                      .setAudioSource(
+                                                        ConcatenatingAudioSource(
+                                                          children: playList,
+                                                        ),
+                                                        initialIndex: widget
+                                                                    .courseModel
+                                                                    .pausedAtAudioNum <
+                                                                0
+                                                            ? 0
+                                                            : widget.courseModel
+                                                                .pausedAtAudioNum,
+                                                        initialPosition:
+                                                            Duration(
+                                                          seconds: widget
+                                                              .courseModel
+                                                              .pausedAtAudioSec,
+                                                        ),
+                                                      );
+                                                  ref
+                                                      .read(audioProvider)
+                                                      .play();
+
+                                                  if (mounted) {
+                                                    bool isPDFDownloded =
+                                                        await ref
+                                                            .read(
+                                                                cdNotifierProvider
+                                                                    .notifier)
+                                                            .isDownloaded(
+                                                              widget.courseModel
+                                                                      .pdfId
+                                                                      .contains(
+                                                                          ",")
+                                                                  ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
+                                                                  : "${widget.courseModel.title}.pdf",
+                                                              "PDF",
+                                                              context,
+                                                            );
+                                                    if (widget.courseModel.pdfId
+                                                            .trim()
+                                                            .isNotEmpty &&
+                                                        isPDFDownloded) {
+                                                      String path =
+                                                          await getPath(
+                                                        'PDF',
+                                                        widget.courseModel.pdfId
+                                                                .contains(",")
+                                                            ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
+                                                            : "${widget.courseModel.title}.pdf",
+                                                      );
+                                                      if (mounted) {
+                                                        await Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                PdfPage(
+                                                              volume: widget
+                                                                  .courseModel
+                                                                  .pdfNum,
+                                                              path: path,
+                                                              courseModel: widget
+                                                                  .courseModel,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    } else {
+                                                      if (mounted) {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                CourseDetail(
+                                                              cm: widget
+                                                                  .courseModel,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              icon: const Icon(
+                                                Icons.play_arrow_rounded,
+                                                color: cardColor,
+                                                size: 33,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : widget.courseModel.isFinished == 1
+                                      ? Container(
+                                          padding: const EdgeInsets.all(23),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black38,
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          child: const Align(
+                                            child: Icon(
+                                              Icons.check_circle_outline,
+                                              color: cardColor,
+                                              size: 39,
                                             ),
                                           ),
                                         )
-                                      : snap.data!.path.isEmpty
-                                          ? Container(
-                                              height: 80,
-                                              width: 80,
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context)
-                                                    .chipTheme
-                                                    .backgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
-                                              child: const Center(
-                                                child:
-                                                    Icon(Icons.error_rounded),
-                                              ),
-                                            )
-                                          : widget.courseModel.isStarted == 1 &&
-                                                  widget.courseModel
-                                                          .isFinished ==
-                                                      0
-                                              ? Container(
-                                                  height: 80,
-                                                  width: 80,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.black38,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: Stack(
-                                                    children: [
-                                                      Align(
-                                                        child: SizedBox(
-                                                          height: 40,
-                                                          width: 40,
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                            color: cardColor,
-                                                            value: percentage,
-                                                            backgroundColor:
-                                                                Colors.grey,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Align(
-                                                        child: IconButton(
-                                                          onPressed: () async {
-                                                            await createPlayList();
-                                                            if (playList
-                                                                .isNotEmpty) {
-                                                              await ref
-                                                                  .read(
-                                                                      audioProvider)
-                                                                  .setAudioSource(
-                                                                    ConcatenatingAudioSource(
-                                                                      children:
-                                                                          playList,
-                                                                    ),
-                                                                    initialIndex: widget.courseModel.pausedAtAudioNum <
-                                                                            0
-                                                                        ? 0
-                                                                        : widget
-                                                                            .courseModel
-                                                                            .pausedAtAudioNum,
-                                                                    initialPosition:
-                                                                        Duration(
-                                                                      seconds: widget
-                                                                          .courseModel
-                                                                          .pausedAtAudioSec,
-                                                                    ),
-                                                                  );
-                                                              ref
-                                                                  .read(
-                                                                      audioProvider)
-                                                                  .play();
-
-                                                              if (mounted) {
-                                                                bool isPDFDownloded = await ref
-                                                                    .read(cdNotifierProvider
-                                                                        .notifier)
-                                                                    .isDownloaded(
-                                                                      widget.courseModel
-                                                                              .pdfId
-                                                                              .contains(",")
-                                                                          ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
-                                                                          : "${widget.courseModel.title}.pdf",
-                                                                      "PDF",
-                                                                      context,
-                                                                    );
-                                                                if (widget
-                                                                        .courseModel
-                                                                        .pdfId
-                                                                        .trim()
-                                                                        .isNotEmpty &&
-                                                                    isPDFDownloded) {
-                                                                  String path =
-                                                                      await getPath(
-                                                                    'PDF',
-                                                                    widget.courseModel
-                                                                            .pdfId
-                                                                            .contains(",")
-                                                                        ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
-                                                                        : "${widget.courseModel.title}.pdf",
-                                                                  );
-                                                                  if (mounted) {
-                                                                    await Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                        builder:
-                                                                            (_) =>
-                                                                                PdfPage(
-                                                                          volume: widget
-                                                                              .courseModel
-                                                                              .pdfNum,
-                                                                          path:
-                                                                              path,
-                                                                          courseModel:
-                                                                              widget.courseModel,
-                                                                        ),
-                                                                      ),
-                                                                    );
-                                                                  }
-                                                                } else {
-                                                                  if (mounted) {
-                                                                    Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                        builder:
-                                                                            (_) =>
-                                                                                CourseDetail(
-                                                                          cm: widget
-                                                                              .courseModel,
-                                                                        ),
-                                                                      ),
-                                                                    );
-                                                                  }
-                                                                }
-                                                              }
-                                                            }
-                                                          },
-                                                          icon: const Icon(
-                                                            Icons
-                                                                .play_arrow_rounded,
-                                                            color: cardColor,
-                                                            size: 33,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              : widget.courseModel.isFinished ==
-                                                      1
-                                                  ? Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              23),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.black38,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                      ),
-                                                      child: const Align(
-                                                        child: Icon(
-                                                          Icons
-                                                              .check_circle_outline,
-                                                          color: cardColor,
-                                                          size: 39,
-                                                        ),
-                                                      ),
-                                                    )
-                                                  : null,
-                                ),
-                                widget.courseModel.isStarted == 1 &&
-                                        widget.courseModel.isScheduleOn == 1
-                                    ? const Positioned(
-                                        right: 0,
-                                        child: Icon(
-                                          Icons.notifications_active,
-                                          size: 20,
-                                        ),
-                                      )
-                                    : const SizedBox()
-                              ],
-                            );
-                          },
+                                      : null,
+                            ),
+                            widget.courseModel.isStarted == 1 &&
+                                    widget.courseModel.isScheduleOn == 1
+                                ? const Positioned(
+                                    right: 0,
+                                    child: Icon(
+                                      Icons.notifications_active,
+                                      size: 20,
+                                    ),
+                                  )
+                                : const SizedBox()
+                          ],
                         ),
+                        if (widget.courseModel.isCompleted != 1)
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            child: Container(
+                              margin: const EdgeInsets.only(
+                                bottom: 70,
+                              ),
+                              width: 80,
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(15),
+                                  topLeft: Radius.circular(15),
+                                ),
+                                color: Colors.black45,
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "አላለቀም",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         Positioned(
                           bottom: 0,
                           right: 0,
@@ -451,6 +446,8 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             GestureDetector(
+                              key:
+                                  widget.index == 0 ? widget.courseTitle : null,
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -533,8 +530,8 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                               }
                             },
                           )
-                        : GestureDetector(
-                            onTap: () async {
+                        : IconButton(
+                            onPressed: () async {
                               if (widget.courseModel.isFav == 1) {
                                 if (widget.courseModel.isStarted == 1) {
                                   await ref
@@ -553,7 +550,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                     .saveCourse(widget.courseModel, 1, context);
                               }
                             },
-                            child: widget.courseModel.isFav == 1
+                            icon: widget.courseModel.isFav == 1
                                 ? const Icon(
                                     Icons.bookmark_rounded,
                                     size: 30,
@@ -574,6 +571,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                 top: 0,
                 right: 0,
                 child: GestureDetector(
+                  key: widget.index == 0 ? widget.courseUstaz : null,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -618,6 +616,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                   bottom: 0,
                   right: 0,
                   child: GestureDetector(
+                    key: widget.index == 0 ? widget.courseCategory : null,
                     onTap: () {
                       Navigator.push(
                         context,

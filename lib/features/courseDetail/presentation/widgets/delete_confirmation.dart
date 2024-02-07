@@ -22,6 +22,7 @@ class _DeleteConfirmationState extends ConsumerState<DeleteConfirmation> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text("${widget.title}ን ማጥፋት ይፈልጋሉን?"),
+      titleTextStyle: TextStyle(fontSize: 19),
       alignment: Alignment.center,
       actions: [
         TextButton(

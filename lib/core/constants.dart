@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image/image.dart' as im;
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
@@ -91,6 +92,7 @@ TargetFocus getTutorial({
   return TargetFocus(
     identify: identify,
     keyTarget: key,
+    shape: ShapeLightFocus.RRect,
     contents: [
       TargetContent(
         align: align,
@@ -132,31 +134,39 @@ double getPersentage(CourseModel courseModel) {
   return percnt > 1 ? 1 : percnt;
 }
 
-Future<File?> displayImage(String? id, String name, WidgetRef ref) async {
-  final directory = await getApplicationSupportDirectory();
-  final filePath = "${directory.path}/Images/$name.jpg";
-  // print(filePath);
-  if (await File(filePath).exists()) {
-    // print("file exsists: ${filePath}");
-    return File(filePath);
-  } else if (id != null) {
-    try {
-      String url = await ref.read(cdDataSrcProvider).loadFileOnline(id, false);
+// Future<File?> displayImage(String? id, String name, WidgetRef ref) async {
+//   final directory = await getApplicationSupportDirectory();
+//   final filePath = "${directory.path}/Images/$name.jpg";
+//   // print(filePath);
+//   if (await File(filePath).exists() &&
+//       im.decodeImage(await File(filePath).readAsBytes()) != null) {
+//     // print("file exsists: ${filePath}");
+//     return File(filePath);
+//   } else if (id != null) {
+//     try {
+//       String url = await ref.read(cdDataSrcProvider).loadFileOnline(id, false);
 
-      await Dio().download(url, filePath);
+//       final response = await Dio().download(url, filePath);
 
-      // Return the downloaded file
-      return File(filePath);
-    } catch (e) {
-      if (kDebugMode) {
-        print("$e");
-      }
-      return File("");
-    }
-  } else {
-    return null;
-  }
-}
+//       if (im.decodeImage(await File(filePath).readAsBytes()) == null) {
+//         await File(filePath).delete();
+//         return File("");
+//       }
+
+//       print("statusCode ${response.statusCode}");
+
+//       // Return the downloaded file
+//       return File(filePath);
+//     } catch (e) {
+//       if (kDebugMode) {
+//         print("$e");
+//       }
+//       return File("");
+//     }
+//   } else {
+//     return null;
+//   }
+// }
 
 String formatFileSize(int sizeInBytes) {
   if (sizeInBytes < 1024) {

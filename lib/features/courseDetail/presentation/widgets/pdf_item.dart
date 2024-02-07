@@ -109,7 +109,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                 });
               },
               leading: const Icon(Icons.menu_book_rounded),
-              title: Text( widget.title),
+              title: Text(widget.title),
               subtitle: downLoadProg != null
                   ? Row(
                       children: [

@@ -26,14 +26,9 @@ Future<void> main() async {
   );
   await Schedule().init();
 
-  final PendingDynamicLinkData? initialLink =
-      await FirebaseDynamicLinks.instance.getInitialLink();
-
   runApp(
     ProviderScope(
-      child: Main(
-        initialLink: initialLink,
-      ),
+      child: Main(),
     ),
   );
 }
@@ -47,8 +42,8 @@ Future<void> main() async {
 // }
 
 class Main extends ConsumerStatefulWidget {
-  final PendingDynamicLinkData? initialLink;
-  const Main({required this.initialLink, super.key});
+  // final PendingDynamicLinkData? initialLink;
+  const Main({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _MainState();
@@ -61,21 +56,7 @@ class _MainState extends ConsumerState<Main> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      print("link:- ${widget.initialLink?.link}");
-      print("Segments: ${widget.initialLink?.link.pathSegments}");
-      if (widget.initialLink?.link.pathSegments.contains("courses") ?? false) {
-        String id = Uri.decodeFull(widget.initialLink?.link.toString() ?? "")
-            .split("/")
-            .last
-            .replaceAll("courses?id=", "")
-            .replaceAll("+", " ");
-        print("id: $id");
-        // String? id = widget.initialLink!.link.queryParameters["id"];
-
-        getCourseAndRedirect(id);
-      }
-    });
+   
 
     // firebaseDynamicLink.onLink.listen((event) {
     //   print("link:- ${event.link}");
@@ -100,31 +81,31 @@ class _MainState extends ConsumerState<Main> {
     // });
   }
 
-  getCourseAndRedirect(String? id) async {
-    print("course id:$id");
-    if (id == null) {
-      return;
-    }
-    if (id.isEmpty) {
-      return;
-    }
-    final res = await ref
-        .read(mainNotifierProvider.notifier)
-        .getSingleCourse(id, context, fromCloud: true);
-    print("wait ... ");
-    if (res != null) {
-      print("redirecting ... ");
-      if (mounted) {
-        print("go");
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => CourseDetail(cm: res),
-          ),
-        );
-      }
-    }
-  }
+  // getCourseAndRedirect(String? id) async {
+  //   print("course id:$id");
+  //   if (id == null) {
+  //     return;
+  //   }
+  //   if (id.isEmpty) {
+  //     return;
+  //   }
+  //   final res = await ref
+  //       .read(mainNotifierProvider.notifier)
+  //       .getSingleCourse(id, context, fromCloud: true);
+  //   print("wait ... ");
+  //   if (res != null) {
+  //     print("redirecting ... ");
+  //     if (mounted) {
+  //       print("go");
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (_) => CourseDetail(cm: res),
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -141,26 +122,43 @@ class _MainState extends ConsumerState<Main> {
           debugShowCheckedModeBanner: false,
           themeMode: themeMode,
           darkTheme: ThemeData.dark().copyWith(
-            chipTheme: ChipThemeData(
-              backgroundColor: Colors.grey.shade700,
-            ),
-            dividerColor: Colors.white38,
-            // cardColor: Theme.of(context).dialogTheme.backgroundColor,
-            colorScheme: const ColorScheme.dark(
-              primary: primaryColor,
-            ),
-            dialogTheme: const DialogTheme(
-              backgroundColor: darkCardColor,
-            ),
-            cardColor: darkCardColor,
-
-            listTileTheme: const ListTileThemeData(
-              titleTextStyle: TextStyle(
-                fontSize: 16,
+              chipTheme: ChipThemeData(
+                backgroundColor: Colors.grey.shade700,
               ),
-            ),
-            // colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
-          ),
+              dividerColor: Colors.white38,
+              // cardColor: Theme.of(context).dialogTheme.backgroundColor,
+              colorScheme: const ColorScheme.dark(
+                primary: primaryColor,
+                background: Color.fromARGB(255, 51, 51, 51),
+              ),
+              dialogTheme: const DialogTheme(
+                backgroundColor: darkCardColor,
+              ),
+              cardColor: darkCardColor,
+              listTileTheme: const ListTileThemeData(
+                titleTextStyle: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              appBarTheme: const AppBarTheme(
+                backgroundColor: darkCardColor,
+                titleTextStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                // primarySwatch: primaryColor,
+                // listTileTheme: const ListTileThemeData(
+                //   titleTextStyle: TextStyle(
+                //     fontSize: 16,
+                //   ),
+                // ),
+                // actionsIconTheme: IconThemeData(
+                //   color: primaryColor,
+                // ),
+                elevation: 2,
+              )
+              // colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
+              ),
           theme: ThemeData(
             dividerColor: Colors.black45,
             chipTheme: const ChipThemeData(
