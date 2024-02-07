@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
-import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,7 +15,6 @@ import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/constants.dart';
 import '../../../main/data/model/course_model.dart';
 import 'audio_item.dart';
-import 'download_all_files.dart';
 
 class PdfDrawer extends ConsumerStatefulWidget {
   final List<String> audios;
@@ -196,18 +194,12 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                   final state = snap.data?.sequenceState;
                   final processState = snap.data?.processingState;
 
-                  MediaItem? metaData = state?.currentSource?.tag;
+                  final mediaItem = state!.currentSource!.tag as MediaItem;
 
                   return ListView.builder(
-                    itemCount: widget.audios.length,
-                    itemBuilder: (context, index) => StreamBuilder(
-                      stream: audioPlayer.sequenceStateStream,
-                      builder: (context, snap) {
-                        final state = snap.data;
-                        if (state?.sequence.isNotEmpty ?? false) {
-                          final mediaItem =
-                              state!.currentSource!.tag as MediaItem;
-
+                      itemCount: widget.audios.length,
+                      itemBuilder: (context, index) {
+                        if (state.sequence.isNotEmpty) {
                           return AudioItem(
                             isPlaying: mediaItem.id == widget.audios[index],
                             canAudioPlay: true,
@@ -381,9 +373,7 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                             ref.read(audioProvider).play();
                           },
                         );
-                      },
-                    ),
-                  );
+                      });
                 }),
           ),
         ],
