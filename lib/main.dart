@@ -1,14 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
 import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/core/database_helper.dart';
-import 'package:islamic_online_learning/features/courseDetail/presentation/pages/course_detail.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/download_database.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:path_provider/path_provider.dart';
 import 'features/main/presentation/pages/main_page.dart';
 import 'firebase_options.dart';
 
@@ -20,14 +21,14 @@ Future<void> main() async {
     androidNotificationOngoing: true,
     androidNotificationIcon: 'mipmap/ic_launcher',
   );
-  await DatabaseHelper().initializeDatabase();
+  // await DatabaseHelper().initializeDatabase();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await Schedule().init();
 
   runApp(
-    ProviderScope(
+    const ProviderScope(
       child: Main(),
     ),
   );
@@ -55,8 +56,6 @@ class _MainState extends ConsumerState<Main> {
   @override
   void initState() {
     super.initState();
-
-   
 
     // firebaseDynamicLink.onLink.listen((event) {
     //   print("link:- ${event.link}");
@@ -192,13 +191,19 @@ class _MainState extends ConsumerState<Main> {
               ),
             ),
           ),
-          home: const MainPage(),
+          home: FutureBuilder(
+              future: checkDb(),
+              builder: (context, snap) {
+                if (snap.data == null) {
+                  return Container();
+                }
+                return snap.data! ? const MainPage() : const DownloadDatabase();
+              }),
         ),
       );
     });
   }
 }
-
 
 // overlay entry point
 // @pragma("vm:entry-point")
@@ -217,3 +222,9 @@ class _MainState extends ConsumerState<Main> {
 //     ),
 //   );
 // }
+
+Future<bool> checkDb() async {
+  Directory directory = await getApplicationDocumentsDirectory();
+  String path = '${directory.path}$dbPath';
+  return File(path).exists();
+}

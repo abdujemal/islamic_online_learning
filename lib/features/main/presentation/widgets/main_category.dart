@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/contents.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -82,7 +83,7 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
             ),
           ),
           loaded: (_) {
-            List<String> categories = ["ኡስታዞች", ..._.categories];
+            List<String> categories = ["ኡስታዞች", "ማውጫ", ..._.categories];
             return Stack(
               children: [
                 Padding(
@@ -112,6 +113,13 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
                                       builder: (ctx) => const Ustazs(),
                                     ),
                                   );
+                                } else if (index == 1) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (ctx) => const Contents(),
+                                    ),
+                                  );
                                 } else {
                                   Navigator.push(
                                     context,
@@ -130,13 +138,21 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
                                 side: BorderSide.none,
                                 avatar: index == 0
                                     ? Image.asset('assets/teacher.png')
+                                    : index == 1
+                                        ? const Icon(
+                                            Icons.content_paste_outlined,
+                                            color: whiteColor,
+                                          )
+                                        : null,
+                                backgroundColor: index == 0 || index == 1
+                                    ? primaryColor
                                     : null,
-                                backgroundColor:
-                                    index == 0 ? primaryColor : null,
                                 label: Text(
                                   categories[index],
                                   style: TextStyle(
-                                    color: index == 0 ? whiteColor : null,
+                                    color: index == 0 || index == 1
+                                        ? whiteColor
+                                        : null,
                                   ),
                                 ),
                               ),

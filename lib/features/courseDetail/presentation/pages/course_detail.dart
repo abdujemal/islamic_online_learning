@@ -73,7 +73,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
         key: _shareKey,
         identify: "ShareButton",
         align: ContentAlign.bottom,
-        title: "የእጋራ ቁልፍ",
+        title: "የአጋራ ቁልፍ",
         subtitle: "ይህንን ቁልፍ ነክተው ደርሱን ለጓደኛ ወይም ለዘመድ ማጋራት ይችላሉ።",
       ),
       getTutorial(

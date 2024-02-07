@@ -34,6 +34,8 @@ final showGuideProvider = StateProvider<List<bool>>((ref) {
   return [false, false];
 });
 
+
+
 // final isSubedProvider = StateProvider<bool>((ref) {
 //   return false;
 // });

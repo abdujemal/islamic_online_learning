@@ -1,18 +1,16 @@
-import 'dart:io';
-
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image/image.dart' as im;
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
-import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+
+const String databaseUrl =
+    "https://b2.ilmfelagi.com/file/ilm-Felagi2/Database/DB.db";
+
+const String dbPath = "/Islamic Online Learning/db/myDB.db";
 
 const int numOfDoc = 20;
 
@@ -79,7 +77,11 @@ class FirebaseConst {
 }
 
 class DatabaseConst {
-  static String savedCourses = "SavedCourses";
+  static String savedCourses = "Courses";
+  static String cateogry = "Category";
+  static String ustaz = "Ustaz";
+  static String faq = "FAQ";
+  static String content = "Content";
 }
 
 TargetFocus getTutorial({

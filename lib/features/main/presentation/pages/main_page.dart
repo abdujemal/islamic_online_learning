@@ -62,6 +62,8 @@ class _MainPageState extends ConsumerState<MainPage>
 
     tabController.addListener(_handleTabChange);
 
+
+
     if (FirebaseAuth.instance.currentUser == null) {
       FirebaseAuth.instance.signInAnonymously().then((value) {
         toast("እንኳን ደህና መጡ!", ToastType.success, context);

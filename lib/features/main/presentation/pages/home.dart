@@ -4,6 +4,7 @@
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/contents.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -221,30 +222,57 @@ class _HomeState extends ConsumerState<Home>
                                       ),
                                     ),
                                   )
-                                : Shimmer.fromColors(
-                                    baseColor: Theme.of(context)
-                                        .chipTheme
-                                        .backgroundColor!
-                                        .withAlpha(150),
-                                    highlightColor: Theme.of(context)
-                                        .chipTheme
-                                        .backgroundColor!,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (index == 0) {}
-                                      },
-                                      child: const Chip(
-                                        labelPadding: EdgeInsets.all(0),
-                                        side: BorderSide.none,
-                                        label: Text(
-                                          "_______",
-                                          style: TextStyle(
-                                            color: Colors.transparent,
+                                : index == 1
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (ctx) =>
+                                                  const Contents(),
+                                            ),
+                                          );
+                                        },
+                                        child: const Chip(
+                                          avatar: Icon(
+                                            Icons.content_paste_outlined,
+                                            color: whiteColor,
+                                          ),
+                                          backgroundColor: primaryColor,
+                                          labelPadding: EdgeInsets.all(0),
+                                          side: BorderSide.none,
+                                          label: Text(
+                                            "ማውጫ",
+                                            style: TextStyle(
+                                              color: whiteColor,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Shimmer.fromColors(
+                                        baseColor: Theme.of(context)
+                                            .chipTheme
+                                            .backgroundColor!
+                                            .withAlpha(150),
+                                        highlightColor: Theme.of(context)
+                                            .chipTheme
+                                            .backgroundColor!,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            if (index == 0) {}
+                                          },
+                                          child: const Chip(
+                                            labelPadding: EdgeInsets.all(0),
+                                            side: BorderSide.none,
+                                            label: Text(
+                                              "_______",
+                                              style: TextStyle(
+                                                color: Colors.transparent,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ),
                           ),
                         ),
                       );

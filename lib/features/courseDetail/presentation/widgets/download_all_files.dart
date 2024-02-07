@@ -13,10 +13,12 @@ import 'package:islamic_online_learning/features/courseDetail/presentation/state
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
 class DownloadAllFiles extends ConsumerStatefulWidget {
+  final bool isDb;
   final CourseModel courseModel;
   final void Function(String filePath) onSingleDownloadDone;
   const DownloadAllFiles({
     super.key,
+    this.isDb = false,
     required this.courseModel,
     required this.onSingleDownloadDone,
   });
@@ -150,17 +152,20 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
                         ),
                       ),
                     ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                  onPressed: () {
-                    breakIt = true;
-                    cancelToken.cancel();
-                    Navigator.pop(context);
-                  },
-                  child: const Text("አቁም"),
-                ),
-              ),
+              widget.isDb
+                  ? const SizedBox()
+                  : Align(
+                      alignment: Alignment.bottomRight,
+                      child: TextButton(
+                        onPressed: () {
+                          breakIt = true;
+                          cancelToken.cancel();
+                          Navigator
+                          .pop(context);
+                        },
+                        child: const Text("አቁም"),
+                      ),
+                    ),
             ],
           ),
         ),

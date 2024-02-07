@@ -1,10 +1,14 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:islamic_online_learning/features/main/data/main_data_src.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/faq_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../features/main/presentation/pages/faq.dart';
 import 'constants.dart';
 
 // import 'constants.dart';
@@ -23,12 +27,25 @@ class DatabaseHelper {
     await _database!.close();
   }
 
+  Future<int?> getFileSize(String audioUrl) async {
+    final request = await HttpClient().headUrl(Uri.parse(audioUrl));
+    final response = await request.close();
+    if (response.statusCode == HttpStatus.ok) {
+      final contentLength = response.contentLength;
+      return contentLength;
+    }
+    throw Exception('Failed to get audio file size');
+  }
+
   Future<Database> initializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = '${directory.path}/Islamic Online Learning/db/ilmfelagiData.db';
+    String path = '${directory.path}$dbPath';
 
-    var notesDatabase =
-        await openDatabase(path, version: 1, onCreate: _createDb);
+    var notesDatabase = await openDatabase(
+      path,
+      version: 1,
+      // onCreate: _createDb,
+    );
     if (kDebugMode) {
       print("db is ready");
     }
@@ -41,34 +58,34 @@ class DatabaseHelper {
   }
 
   //creating database
-  void _createDb(Database db, int newVersion) async {
-    await db.execute('CREATE TABLE ${DatabaseConst.savedCourses}('
-        'id INTEGER PRIMARY KEY AUTOINCREMENT,'
-        'courseId TEXT,'
-        'author TEXT,'
-        'category TEXT,'
-        'courseIds TEXT,'
-        'noOfRecord INTEGER,'
-        'pdfId TEXT,'
-        'title TEXT,'
-        'ustaz TEXT,'
-        'image TEXT,'
-        'lastViewed TEXT,'
-        'isFav INTEGER,'
-        'isStarted INTEGER,'
-        'isFinished INTEGER,'
-        'pausedAtAudioNum INTEGER,'
-        'pausedAtAudioSec INTEGER,'
-        "scheduleDates TEXT,"
-        "scheduleTime TEXT,"
-        'isScheduleOn INTEGER,'
-        'pdfPage DOUBLE,'
-        'pdfNum DOUBLE,'
-        'totalDuration INTEGER,'
-        'audioSizes TEXT,'
-        'isCompleted INTEGER'
-        ')');
-  }
+  // void _createDb(Database db, int newVersion) async {
+  //   await db.execute('CREATE TABLE ${DatabaseConst.savedCourses}('
+  //       'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+  //       'courseId TEXT,'
+  //       'author TEXT,'
+  //       'category TEXT,'
+  //       'courseIds TEXT,'
+  //       'noOfRecord INTEGER,'
+  //       'pdfId TEXT,'
+  //       'title TEXT,'
+  //       'ustaz TEXT,'
+  //       'image TEXT,'
+  //       'lastViewed TEXT,'
+  //       'isFav INTEGER,'
+  //       'isStarted INTEGER,'
+  //       'isFinished INTEGER,'
+  //       'pausedAtAudioNum INTEGER,'
+  //       'pausedAtAudioSec INTEGER,'
+  //       "scheduleDates TEXT,"
+  //       "scheduleTime TEXT,"
+  //       'isScheduleOn INTEGER,'
+  //       'pdfPage DOUBLE,'
+  //       'pdfNum DOUBLE,'
+  //       'totalDuration INTEGER,'
+  //       'audioSizes TEXT,'
+  //       'isCompleted INTEGER'
+  //       ')');
+  // }
 
   //check
   Future<bool> isCourseAvailable(String courseId) async {
@@ -80,6 +97,27 @@ class DatabaseHelper {
     } catch (e) {
       return false;
     }
+  }
+
+  Future<List<CourseModel>> searchCourses(String val) async {
+    final db = await database;
+    final searchQuery = '%$val%';
+
+    const String query = '''
+      SELECT * FROM courses
+      WHERE title LIKE ?
+      ORDER BY title
+    ''';
+
+    final List<Map<String, dynamic>> result =
+        await db!.rawQuery(query, [searchQuery]);
+
+    List<CourseModel> courses = [];
+    for (var d in result) {
+      courses.add(CourseModel.fromMap(d, d["courseId"]));
+    }
+
+    return courses;
   }
 
   //geting data
@@ -125,6 +163,84 @@ class DatabaseHelper {
     return courses.isEmpty ? null : courses.first;
   }
 
+  Future<List<Map<String, dynamic>>> getCouses(
+      String? key, dynamic val, SortingMethod method, int offset) async {
+    final orderByColumn =
+        method == SortingMethod.dateDSC ? 'dateTime' : 'title';
+    final orderByDescending = method == SortingMethod.dateDSC ? 1 : 0;
+
+    final db = await database;
+
+    String query = "";
+    List<Map<String, dynamic>> result = [];
+
+    if (key == null) {
+      query = '''
+      SELECT * FROM ${DatabaseConst.savedCourses}
+      ORDER BY $orderByColumn ${orderByDescending == 1 ? 'DESC' : 'ASC'}
+      LIMIT $numOfDoc OFFSET $offset
+      ''';
+      result = await db!.rawQuery(query);
+    } else {
+      query = '''
+      SELECT * FROM ${DatabaseConst.savedCourses}
+      WHERE $key = ?
+      ORDER BY $orderByColumn ${orderByDescending == 1 ? 'DESC' : 'ASC'}
+      ''';
+      result = await db!.rawQuery(query, [val]);
+    }
+
+    return result;
+  }
+
+  Future<List<String>> getCategories() async {
+    Database? db = await database;
+
+    var result = await db!.query(DatabaseConst.cateogry);
+    List<String> categories = [];
+    for (var cat in result) {
+      categories.add(cat['name'].toString());
+    }
+
+    return categories;
+  }
+
+  Future<List<String>> getUstazs() async {
+    Database? db = await database;
+
+    var result = await db!.query(DatabaseConst.ustaz);
+    List<String> categories = [];
+    for (var cat in result) {
+      categories.add(cat['name'].toString());
+    }
+
+    return categories;
+  }
+
+  Future<List<String>> getContent() async {
+    Database? db = await database;
+
+    var result = await db!.query(DatabaseConst.content, orderBy: "name");
+    List<String> contents = [];
+    for (var cat in result) {
+      contents.add(cat['name'].toString());
+    }
+
+    return contents;
+  }
+
+  Future<List<FAQModel>> getFaqs() async {
+    Database? db = await database;
+
+    var result = await db!.query(DatabaseConst.faq);
+    List<FAQModel> categories = [];
+    for (var d in result) {
+      categories.add(FAQModel.fromMap(d, ""));
+    }
+
+    return categories;
+  }
+
   Future<List<CourseModel>> getStartedCourses() async {
     Database? db = await database;
 
@@ -153,13 +269,13 @@ class DatabaseHelper {
   }
 
   //inserting data
-  Future<int> insertCourse(CourseModel courseModel) async {
-    Database? db = await database;
-    var result =
-        await db!.insert(DatabaseConst.savedCourses, courseModel.toMap());
+  // Future<int> insertCourse(CourseModel courseModel) async {
+  //   Database? db = await database;
+  //   var result =
+  //       await db!.insert(DatabaseConst.savedCourses, courseModel.toMap());
 
-    return result;
-  }
+  //   return result;
+  // }
 
   //update data
   Future<int> updateCourse(CourseModel courseModel) async {

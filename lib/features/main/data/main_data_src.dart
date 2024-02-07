@@ -23,101 +23,113 @@ abstract class MainDataSrc {
 
 class IMainDataSrc extends MainDataSrc {
   final FirebaseFirestore firebaseFirestore;
+
+  int page = 1;
   IMainDataSrc(this.firebaseFirestore);
 
-  DocumentSnapshot? lastCourse;
+  int? lastCourseIndex;
 
   @override
   Future<List<CourseModel>> getCourses(
     bool isNew,
     String? key,
-    String? val,
+    dynamic val,
     SortingMethod method,
   ) async {
-    late QuerySnapshot ds;
+    // late QuerySnapshot ds;
 
-    if (key == null) {
-      ds = isNew
-          ? await firebaseFirestore
-              .collection(FirebaseConst.courses)
-              .orderBy(
-                method == SortingMethod.dateDSC ? 'dateTime' : "title",
-                descending: method == SortingMethod.dateDSC,
-              )
-              .limit(numOfDoc)
-              .get()
+    // if (key == null) {
+    //   ds = isNew
+    //       ? await firebaseFirestore
+    //           .collection(FirebaseConst.courses)
+    //           .orderBy(
+    //             method == SortingMethod.dateDSC ? 'dateTime' : "title",
+    //             descending: method == SortingMethod.dateDSC,
+    //           )
+    //           .limit(numOfDoc)
+    //           .get()
+    //       : await firebaseFirestore
+    //           .collection(FirebaseConst.courses)
+    //           .orderBy(
+    //             method == SortingMethod.dateDSC ? 'dateTime' : "title",
+    //             descending: method == SortingMethod.dateDSC,
+    //           )
+    //           .startAfterDocument(lastCourse!)
+    //           .limit(numOfDoc)
+    //           .get();
+    // } else {
+    //   ds = isNew
+    //       ? await firebaseFirestore
+    //           .collection(FirebaseConst.courses)
+    //           .where(key, isEqualTo: val)
+    //           .orderBy(method == SortingMethod.dateDSC ? 'dateTime' : "title",
+    //               descending: method == SortingMethod.dateDSC)
+    //           .limit(numOfDoc)
+    //           .get()
 
-              
-          : await firebaseFirestore
-              .collection(FirebaseConst.courses)
-              .orderBy(
-                method == SortingMethod.dateDSC ? 'dateTime' : "title",
-                descending: method == SortingMethod.dateDSC,
-              )
-              .startAfterDocument(lastCourse!)
-              .limit(numOfDoc)
-              .get();
+    //       : await firebaseFirestore
+    //           .collection(FirebaseConst.courses)
+    //           .where(key, isEqualTo: val)
+    //           .orderBy(method == SortingMethod.dateDSC ? 'dateTime' : "title",
+    //               descending: method == SortingMethod.dateDSC)
+    //           .startAfterDocument(lastCourse!)
+    //           .limit(numOfDoc)
+    //           .get();
+    // }
+    if (isNew) {
+      page = 1;
     } else {
-      ds = isNew
-          ? await firebaseFirestore
-              .collection(FirebaseConst.courses)
-              .where(key, isEqualTo: val)
-              .orderBy(method == SortingMethod.dateDSC ? 'dateTime' : "title",
-                  descending: method == SortingMethod.dateDSC)
-              .limit(numOfDoc)
-              .get()
-          : await firebaseFirestore
-              .collection(FirebaseConst.courses)
-              .where(key, isEqualTo: val)
-              .orderBy(method == SortingMethod.dateDSC ? 'dateTime' : "title",
-                  descending: method == SortingMethod.dateDSC)
-              .startAfterDocument(lastCourse!)
-              .limit(numOfDoc)
-              .get();
+      page++;
     }
 
-    if (ds.docs.isNotEmpty) {
-      lastCourse = ds.docs[ds.docs.length - 1];
-    }
+    final res = await DatabaseHelper()
+        .getCouses(key, val, method, (page - 1) * numOfDoc);
 
-    List<CourseModel> savedCourses = await getSavedCourses();
+    // if (res.isNotEmpty) {
+    //   lastCourseIndex = ds.docs[ds.docs.length - 1];
+    // }
+
+    // List<CourseModel> savedCourses = await getSavedCourses();
 
     List<CourseModel> courses = [];
-    if (ds.docs.isNotEmpty) {
-      for (var d in ds.docs) {
-        if (d.data() != null) {
-          final matchings = savedCourses.where((e) => e.courseId == d.id);
-          if (matchings.isNotEmpty) {
-            CourseModel savedCourse = matchings.first;
-            courses.add(CourseModel.fromMap(d.data() as Map, d.id,
-                copyFrom: savedCourse));
-          } else {
-            courses.add(CourseModel.fromMap(d.data() as Map, d.id));
-          }
-        }
-      }
+    for (var d in res) {
+      courses.add(CourseModel.fromMap(d, d["courseId"]));
     }
+    // if (ds.docs.isNotEmpty) {
+    //   for (var d in ds.docs) {
+    //     if (d.data() != null) {
+    //       final matchings = savedCourses.where((e) => e.courseId == d.id);
+    //       if (matchings.isNotEmpty) {
+    //         CourseModel savedCourse = matchings.first;
+    //         courses.add(CourseModel.fromMap(d.data() as Map, d.id,
+    //             copyFrom: savedCourse));
+    //       } else {
+    //         courses.add(CourseModel.fromMap(d.data() as Map, d.id));
+    //       }
+    //     }
+    //   }
+    // }
 
     return courses;
   }
 
   @override
   Future<List<CourseModel>> searchCourses(String query, int? numOfelt) async {
-    final ds = await firebaseFirestore
-        .collection(FirebaseConst.courses)
-        .orderBy('title')
-        .startAfter([query])
-        .limit(numOfelt ?? numOfDoc)
-        .get();
+    // final ds = await firebaseFirestore
+    //     .collection(FirebaseConst.courses)
+    //     .orderBy('title')
+    //     .startAfter([query])
+    //     .limit(numOfelt ?? numOfDoc)
+    //     .get();
 
-    List<CourseModel> courses = [];
-    if (ds.docs.isNotEmpty) {
-      for (var d in ds.docs) {
-        courses.add(CourseModel.fromMap(d.data(), d.id));
-      }
-    }
+    // List<CourseModel> courses = [];
+    // if (ds.docs.isNotEmpty) {
+    //   for (var d in ds.docs) {
+    //     courses.add(CourseModel.fromMap(d.data(), d.id));
+    //   }
+    // }
 
-    return courses;
+    return DatabaseHelper().searchCourses(query);
   }
 
   @override
@@ -134,48 +146,55 @@ class IMainDataSrc extends MainDataSrc {
 
   @override
   Future<List<String>> getCategories() async {
-    final ds = await firebaseFirestore.collection(FirebaseConst.category).get();
-    List<String> categories = [];
-    for (var d in ds.docs) {
-      categories.add(d.data()['name']);
-    }
-    return categories;
+    return DatabaseHelper().getCategories();
+    // final ds = await firebaseFirestore.collection(FirebaseConst.category).get();
+    // List<String> categories = [];
+    // for (var d in ds.docs) {
+    //   categories.add(d.data()['name']);
+    // }
+    // return categories;
   }
 
   @override
   Future<List<CourseModel>> getBeginnerCourses() async {
-    final ds = await firebaseFirestore
-        .collection(FirebaseConst.courses)
-        .where(
-          "isBeginner",
-          isEqualTo: true,
-        )
-        .get();
-    List<CourseModel> courses = [];
-    for (var d in ds.docs) {
-      courses.add(CourseModel.fromMap(d.data(), d.id));
-    }
-    print(courses);
-    return courses;
+    return getCourses(
+      true,
+      "isBeginner",
+      1,
+      SortingMethod.nameDSC,
+    );
+    // final ds = await firebaseFirestore
+    //     .collection(FirebaseConst.courses)
+    //     .where(
+    //       "isBeginner",
+    //       isEqualTo: true,
+    //     )
+    //     .get();
+    // List<CourseModel> courses = [];
+    // for (var d in ds.docs) {
+    //   courses.add(CourseModel.fromMap(d.data(), d.id));
+    // }
+    // print(courses);
+    // return courses;
   }
 
   @override
   Future<List<String>> getUstazs() async {
-    final ds = await firebaseFirestore.collection(FirebaseConst.ustaz).get();
-    List<String> ustazs = [];
-    for (var d in ds.docs) {
-      ustazs.add(d['name']);
-    }
-    return ustazs;
+    return DatabaseHelper().getUstazs();
+    // final ds = await firebaseFirestore.collection(FirebaseConst.ustaz).get();
+    // List<String> ustazs = [];
+    // for (var d in ds.docs) {
+    //   ustazs.add(d['name']);
+    // }
+    // return ustazs;
   }
 
   @override
   Future<int> saveTheCourse(CourseModel courseModel) async {
     if (await DatabaseHelper().isCourseAvailable(courseModel.courseId)) {
       return await DatabaseHelper().updateCourse(courseModel);
-    } else {
-      return await DatabaseHelper().insertCourse(courseModel);
     }
+    throw Exception("Not found");
   }
 
   @override
@@ -185,12 +204,13 @@ class IMainDataSrc extends MainDataSrc {
 
   @override
   Future<List<FAQModel>> getFAQ() async {
-    final ds = await firebaseFirestore.collection(FirebaseConst.faq).get();
-    List<FAQModel> faq = [];
-    for (var d in ds.docs) {
-      faq.add(FAQModel.fromMap(d));
-    }
-    return faq;
+    return DatabaseHelper().getFaqs();
+    // final ds = await firebaseFirestore.collection(FirebaseConst.faq).get();
+    // List<FAQModel> faq = [];
+    // for (var d in ds.docs) {
+    //   faq.add(FAQModel.fromMap(d.data() , d.id));
+    // }
+    // return faq;
   }
 
   @override
@@ -201,24 +221,21 @@ class IMainDataSrc extends MainDataSrc {
 
   @override
   Future<CourseModel?> getSingleCourse(String courseId, bool fromCloud) async {
-    if (fromCloud) {
-      final res = await firebaseFirestore
-          .collection(FirebaseConst.courses)
-          .doc(courseId)
-          .get();
+    // if (fromCloud) {
+    //   final res = await firebaseFirestore
+    //       .collection(FirebaseConst.courses)
+    //       .doc(courseId)
+    //       .get();
 
-      if (res.exists) {
-        
-        return CourseModel.fromMap(res.data() as Map, res.id);
-      } else {
-        return null;
-      }
-    }
+    //   if (res.exists) {
+    //     return CourseModel.fromMap(res.data() as Map, res.id);
+    //   } else {
+    //     return null;
+    //   }
+    // }
     final res = await DatabaseHelper().getSingleCourse(courseId);
     return res;
   }
 }
-
-
 
 enum SortingMethod { nameDSC, dateDSC }

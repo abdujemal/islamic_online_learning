@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: annotate_overrides, overridden_fields
 
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:islamic_online_learning/features/main/domain/entity/faq_entity.dart';
 
@@ -27,10 +26,9 @@ class FAQModel extends FAQEntity {
     };
   }
 
-  factory FAQModel.fromMap(DocumentSnapshot doc) {
-    final map = doc.data() as Map;
+  factory FAQModel.fromMap(Map map, String id) {
     return FAQModel(
-      id: doc.id,
+      id: id,
       question: map['question'] as String,
       answer: map['answer'] as String,
     );

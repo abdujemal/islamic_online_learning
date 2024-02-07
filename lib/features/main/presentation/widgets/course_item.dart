@@ -513,9 +513,12 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                 );
                               } else {
                                 await ref
-                                    .read(favNotifierProvider.notifier)
-                                    .deleteCourse(
-                                        widget.courseModel.id, context);
+                                    .read(mainNotifierProvider.notifier)
+                                    .saveCourse(
+                                      widget.courseModel.copyWith(isStarted: 0),
+                                      widget.courseModel.isFav,
+                                      context,
+                                    );
 
                                 List<int> days = widget
                                     .courseModel.scheduleDates
@@ -539,10 +542,10 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                       .saveCourse(
                                           widget.courseModel, 0, context);
                                 } else {
-                                  ref
-                                      .read(favNotifierProvider.notifier)
-                                      .deleteCourse(
-                                          widget.courseModel.id, context);
+                                   await ref
+                                      .read(mainNotifierProvider.notifier)
+                                      .saveCourse(
+                                          widget.courseModel, 0, context);
                                 }
                               } else {
                                 await ref

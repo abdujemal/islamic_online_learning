@@ -1,0 +1,155 @@
+import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/database_helper.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/main_btn.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
+import 'package:path_provider/path_provider.dart';
+
+import '../../../../core/constants.dart';
+
+class DownloadDatabase extends ConsumerStatefulWidget {
+  const DownloadDatabase({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _DownloadDatabaseState();
+}
+
+class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
+  double progress = 0;
+  bool isDownloading = false;
+  CancelToken cancelToken = CancelToken();
+  downloadDb() async {
+    isDownloading = true;
+    setState(() {});
+
+    final connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      if (mounted) {
+        isDownloading = false;
+        setState(() {});
+        toast("እባክዎ ኢንተርኔት ያብሩ!", ToastType.error, context);
+      }
+      return;
+    }
+
+    Directory directory = await getApplicationDocumentsDirectory();
+    String path = '${directory.path}$dbPath';
+
+    try {
+      final response = await Dio().download(
+        databaseUrl,
+        path,
+        cancelToken: cancelToken,
+        onReceiveProgress: (count, total) {
+          if (total != -1) {
+            progress = (count / total) * 100;
+            setState(() {});
+          }
+        },
+      );
+
+      if (response.statusCode == 200) {
+        if (mounted) {
+          isDownloading = false;
+          setState(() {});
+          toast("በተሳካ ሁኒታ ዳውንሎድ ተደርጓል!", ToastType.success, context);
+          await DatabaseHelper().initializeDatabase();
+          if (mounted) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MainPage(),
+              ),
+              (route) => false,
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          isDownloading = false;
+          setState(() {});
+          toast("ችግር ተፈጥሯል!", ToastType.error, context);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        isDownloading = false;
+        setState(() {});
+        toast("ዳውንሎድ ቆሟል", ToastType.normal, context);
+      }
+      print(e.toString());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("ዳታዎችን ዳውንድ ማድረግያ"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "ሁሉንም ደርሶች መጠቀም እንዲያስችሎ የሁሉም ደርሶች ዳታዎች ማውረድ ይኖርቦታል።",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            isDownloading
+                ? Column(
+                    children: [
+                      LinearProgressIndicator(
+                        value: progress / 100,
+                        color: primaryColor,
+                        backgroundColor: primaryColor.withOpacity(0.2),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text("${progress.toStringAsFixed(2)}% "),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          progress = 0;
+                          setState(() {});
+                          cancelToken.cancel();
+                        },
+                        child: const Text(
+                          "አቁም",
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: Colors.red,
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                : MainBtn(
+                    icon: Icons.download,
+                    title: "ዳውንሎድ",
+                    onTap: () async {
+                      cancelToken = CancelToken();
+                      await downloadDb();
+                    },
+                  )
+          ],
+        ),
+      ),
+    );
+  }
+}
