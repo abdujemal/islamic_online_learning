@@ -88,15 +88,27 @@ class DatabaseHelper {
   // }
 
   //check
-  Future<bool> isCourseAvailable(String courseId) async {
+  Future<int?> isCourseAvailable(String courseId) async {
     Database? db = await database;
     try {
       var result = await db!.query(DatabaseConst.savedCourses,
           where: 'courseId = ?', whereArgs: [courseId]);
-      return result.isNotEmpty;
+      return result.isNotEmpty ? int.parse(result[0]['id'].toString()) : null;
     } catch (e) {
-      return false;
+      return null;
     }
+  }
+
+  Future<int> countColumnsInTable(String table) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> tableInfo = await db!.rawQuery(
+      'PRAGMA table_info($table)',
+    );
+
+    final columnCount = tableInfo.length;
+
+    return columnCount;
   }
 
   Future<List<CourseModel>> searchCourses(String val) async {
@@ -186,6 +198,7 @@ class DatabaseHelper {
       SELECT * FROM ${DatabaseConst.savedCourses}
       WHERE $key = ?
       ORDER BY $orderByColumn ${orderByDescending == 1 ? 'DESC' : 'ASC'}
+      LIMIT $numOfDoc OFFSET $offset
       ''';
       result = await db!.rawQuery(query, [val]);
     }
@@ -283,6 +296,23 @@ class DatabaseHelper {
     var result = await db!.update(
         DatabaseConst.savedCourses, courseModel.toMap(),
         where: 'id = ?', whereArgs: [courseModel.id]);
+
+    return result;
+  }
+
+  Future<int> updateCourseFromCloud(CourseModel courseModel) async {
+    var db = await database;
+    var result = await db!.update(
+        DatabaseConst.savedCourses, courseModel.toMap(),
+        where: 'courseId = ?', whereArgs: [courseModel.courseId]);
+
+    return result;
+  }
+
+  Future<int> insertCourse(CourseModel courseModel) async {
+    var db = await database;
+    var result =
+        await db!.insert(DatabaseConst.savedCourses, courseModel.toMap());
 
     return result;
   }

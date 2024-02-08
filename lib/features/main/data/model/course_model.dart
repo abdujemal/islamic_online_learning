@@ -30,6 +30,8 @@ class CourseModel extends CourseEntity {
   final String image;
   final int totalDuration;
   final int isCompleted;
+  final int isBeginner;
+  final String dateTime;
 
   const CourseModel({
     required this.courseId,
@@ -54,8 +56,10 @@ class CourseModel extends CourseEntity {
     required this.pdfPage,
     required this.pdfNum,
     required this.image,
+    required this.dateTime,
     required this.totalDuration,
     required this.isCompleted,
+    required this.isBeginner,
   }) : super(
           id: id,
           courseId: courseId,
@@ -81,6 +85,8 @@ class CourseModel extends CourseEntity {
           totalDuration: totalDuration,
           audioSizes: audioSizes,
           isCompleted: isCompleted,
+          isBeginner: isBeginner,
+          dateTime: dateTime,
         );
 
   Map<String, dynamic> toMap() {
@@ -109,6 +115,8 @@ class CourseModel extends CourseEntity {
       'pdfNum': pdfNum,
       'totalDuration': totalDuration,
       "isCompleted": isCompleted,
+      'isBeginner': isBeginner,
+      'dateTime': dateTime,
     };
   }
 
@@ -126,6 +134,8 @@ class CourseModel extends CourseEntity {
       'image': image,
       'totalDuration': totalDuration,
       "isCompleted": isCompleted,
+      'dateTime': dateTime,
+      'isBeginner': isBeginner,
     };
   }
 
@@ -158,6 +168,7 @@ class CourseModel extends CourseEntity {
           (copyFrom != null ? copyFrom.scheduleDates : ""),
       scheduleTime: map['scheduleTime'] ??
           (copyFrom != null ? copyFrom.scheduleTime : ""),
+      dateTime: map['dateTime'],
       isScheduleOn:
           map['isScheduleOn'] ?? (copyFrom != null ? copyFrom.isScheduleOn : 0),
       pdfPage: map['pdfPage'] ?? (copyFrom != null ? copyFrom.pdfPage : 0.0),
@@ -165,6 +176,12 @@ class CourseModel extends CourseEntity {
       image: map['image'],
       totalDuration: map["totalDuration"] ?? 0,
       isCompleted: map['isCompleted'] ?? 1,
+      isBeginner: 
+      map['isBeginner'] == null
+          ? 0
+          : map['isBeginner'] == true
+              ? 1
+              : 0,
     );
   }
 
@@ -192,33 +209,36 @@ class CourseModel extends CourseEntity {
       String? image,
       String? audioSizes,
       int? isCompleted,
+      String? dateTime,
+      int? isBeginner,
       int? totalDuration}) {
     return CourseModel(
-      courseId: courseId ?? this.courseId,
-      author: author ?? this.author,
-      id: id ?? this.id,
-      category: category ?? this.category,
-      courseIds: courseIds ?? this.courseIds,
-      audioSizes: audioSizes ?? this.audioSizes,
-      noOfRecord: noOfRecord ?? this.noOfRecord,
-      pdfId: pdfId ?? this.pdfId,
-      title: title ?? this.title,
-      ustaz: ustaz ?? this.ustaz,
-      lastViewed: lastViewed ?? this.lastViewed,
-      isFav: isFav ?? this.isFav,
-      isStarted: isStarted ?? this.isStarted,
-      isFinished: isFinished ?? this.isFinished,
-      pausedAtAudioNum: pausedAtAudioNum ?? this.pausedAtAudioNum,
-      pausedAtAudioSec: pausedAtAudioSec ?? this.pausedAtAudioSec,
-      scheduleDates: scheduleDates ?? this.scheduleDates,
-      scheduleTime: scheduleTime ?? this.scheduleTime,
-      isScheduleOn: isScheduleOn ?? this.isScheduleOn,
-      pdfPage: pdfPage ?? this.pdfPage,
-      pdfNum: pdfNum ?? this.pdfNum,
-      image: image ?? this.image,
-      totalDuration: totalDuration ?? this.totalDuration,
-      isCompleted: isCompleted ?? this.isCompleted,
-    );
+        courseId: courseId ?? this.courseId,
+        author: author ?? this.author,
+        id: id ?? this.id,
+        isBeginner: isBeginner ?? this.isBeginner,
+        category: category ?? this.category,
+        courseIds: courseIds ?? this.courseIds,
+        audioSizes: audioSizes ?? this.audioSizes,
+        noOfRecord: noOfRecord ?? this.noOfRecord,
+        pdfId: pdfId ?? this.pdfId,
+        title: title ?? this.title,
+        ustaz: ustaz ?? this.ustaz,
+        lastViewed: lastViewed ?? this.lastViewed,
+        isFav: isFav ?? this.isFav,
+        isStarted: isStarted ?? this.isStarted,
+        isFinished: isFinished ?? this.isFinished,
+        pausedAtAudioNum: pausedAtAudioNum ?? this.pausedAtAudioNum,
+        pausedAtAudioSec: pausedAtAudioSec ?? this.pausedAtAudioSec,
+        scheduleDates: scheduleDates ?? this.scheduleDates,
+        scheduleTime: scheduleTime ?? this.scheduleTime,
+        isScheduleOn: isScheduleOn ?? this.isScheduleOn,
+        pdfPage: pdfPage ?? this.pdfPage,
+        pdfNum: pdfNum ?? this.pdfNum,
+        image: image ?? this.image,
+        totalDuration: totalDuration ?? this.totalDuration,
+        isCompleted: isCompleted ?? this.isCompleted,
+        dateTime: dateTime ?? this.dateTime);
   }
 
   String toJsonString() => json.encode(toMap());

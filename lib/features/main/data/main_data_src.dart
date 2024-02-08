@@ -82,9 +82,44 @@ class IMainDataSrc extends MainDataSrc {
       page++;
     }
 
+    if (isNew && key == null) {
+      final res = await DatabaseHelper()
+          .getCouses(null, null, SortingMethod.dateDSC, (page - 1) * numOfDoc);
+
+      print(res.length);
+
+      print("dateTime for ${res.first["title"]}: ${res.first["dateTime"]}");
+
+      final qs = await firebaseFirestore
+          .collection(FirebaseConst.courses)
+          .orderBy(
+            'dateTime',
+            descending: false,
+          )
+          .startAfter([res.first["dateTime"]]).get();
+      print("New Docs ${qs.docs.length}");
+      if (qs.docs.isNotEmpty) {
+        for (var d in qs.docs) {
+          final id = await DatabaseHelper().isCourseAvailable(d.id);
+          if (id != null) {
+            print("updateing");
+
+            await DatabaseHelper().updateCourseFromCloud(
+                CourseModel.fromMap(d.data(), d.id).copyWith(id: id));
+          } else {
+            print("adding");
+
+            await DatabaseHelper()
+                .insertCourse(CourseModel.fromMap(d.data(), d.id));
+          }
+        }
+      }
+    }
+
+    // await Future.delayed(const Duration(seconds: 2));
+
     final res = await DatabaseHelper()
         .getCouses(key, val, method, (page - 1) * numOfDoc);
-
     // if (res.isNotEmpty) {
     //   lastCourseIndex = ds.docs[ds.docs.length - 1];
     // }
@@ -191,7 +226,8 @@ class IMainDataSrc extends MainDataSrc {
 
   @override
   Future<int> saveTheCourse(CourseModel courseModel) async {
-    if (await DatabaseHelper().isCourseAvailable(courseModel.courseId)) {
+    final id = await DatabaseHelper().isCourseAvailable(courseModel.courseId);
+    if (id != null) {
       return await DatabaseHelper().updateCourse(courseModel);
     }
     throw Exception("Not found");
