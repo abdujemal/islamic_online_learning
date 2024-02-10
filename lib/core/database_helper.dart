@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:islamic_online_learning/features/main/data/main_data_src.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
@@ -8,7 +7,6 @@ import 'package:islamic_online_learning/features/main/data/model/faq_model.dart'
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../features/main/presentation/pages/faq.dart';
 import 'constants.dart';
 
 // import 'constants.dart';
@@ -93,6 +91,17 @@ class DatabaseHelper {
     try {
       var result = await db!.query(DatabaseConst.savedCourses,
           where: 'courseId = ?', whereArgs: [courseId]);
+      return result.isNotEmpty ? int.parse(result[0]['id'].toString()) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<int?> isFAQAvailable(String question) async {
+    Database? db = await database;
+    try {
+      var result = await db!.query(DatabaseConst.faq,
+          where: 'question = ?', whereArgs: [question]);
       return result.isNotEmpty ? int.parse(result[0]['id'].toString()) : null;
     } catch (e) {
       return null;
@@ -216,6 +225,41 @@ class DatabaseHelper {
     }
 
     return categories;
+  }
+
+  Future<int> insertCategory(String category) async {
+    Database? db = await database;
+    var result = await db!.insert(DatabaseConst.cateogry, {'name': category});
+
+    return result;
+  }
+
+  Future<int> insertContent(String content) async {
+    Database? db = await database;
+    var result = await db!.insert(DatabaseConst.content, {'name': content});
+
+    return result;
+  }
+
+  Future<int> insertUstaz(String ustaz) async {
+    Database? db = await database;
+    var result = await db!.insert(DatabaseConst.ustaz, {'name': ustaz});
+
+    return result;
+  }
+
+  Future<int> insertFaq(FAQModel faq) async {
+    final db = await database;
+    var result = await db!.insert(DatabaseConst.faq, faq.toMap());
+
+    return result;
+  }
+
+  Future<int> updateFaq(FAQModel faq) async {
+    final db = await database;
+    var result = await db!.update(DatabaseConst.faq, faq.toMap());
+
+    return result;
   }
 
   Future<List<String>> getUstazs() async {

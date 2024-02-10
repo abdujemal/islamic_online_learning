@@ -511,188 +511,196 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   .backgroundColor!
                                   .withOpacity(0.3),
                             ),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  MainBtn(
-                                    key: _alarmKey,
-                                    title: courseModel.scheduleDates.isNotEmpty
-                                        ? "ማስታወሻውን አስተካክል"
-                                        : "አስታዋሽ መዝግብ",
-                                    icon: courseModel.scheduleDates.isNotEmpty
-                                        ? Icons.access_alarms
-                                        : Icons.alarm_add_rounded,
-                                    onTap: () async {
-                                      // final int? i = await ref
-                                      //     .read(mainNotifierProvider.notifier)
-                                      //     .saveCourse(
-                                      //       courseModel.copyWith(
-                                      //         isStarted: 1,
-                                      //       ),
-                                      //       null,
-                                      //       context,
-                                      //       showMsg: false,
-                                      //     );
-                                      // courseModel = courseModel.copyWith(
-                                      //   isStarted: 1,
-                                      //   id: i,
-                                      // );
-                                      // print(i);
-                                      setState(() {});
-                                      if (mounted) {
-                                        showDialog(
-                                          context: context,
-                                          builder: (ctx) => ScheduleView(
-                                            courseModel: courseModel,
-                                            onSave: (scheduleDates,
-                                                scheduleTime,
-                                                isScheduleOn) async {
-                                              await ref
-                                                  .read(mainNotifierProvider
-                                                      .notifier)
-                                                  .saveCourse(
-                                                    courseModel.copyWith(
-                                                      isStarted: 1,
-                                                      scheduleDates:
-                                                          scheduleDates,
-                                                      scheduleTime:
-                                                          scheduleTime,
-                                                      isScheduleOn:
-                                                          isScheduleOn,
-                                                    ),
-                                                    null,
-                                                    context,
-                                                    showMsg: false,
-                                                  );
-                                              courseModel =
-                                                  courseModel.copyWith(
-                                                isStarted: 1,
-                                                scheduleDates: scheduleDates,
-                                                scheduleTime: scheduleTime,
-                                                isScheduleOn: isScheduleOn,
-                                              );
-
-                                              if (mounted) {
-                                                final res = await ref
+                            Positioned(
+                              bottom: 8,
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    MainBtn(
+                                      key: _alarmKey,
+                                      title:
+                                          courseModel.scheduleDates.isNotEmpty
+                                              ? "ማስታወሻውን አስተካክል"
+                                              : "አስታዋሽ መዝግብ",
+                                      icon: courseModel.scheduleDates.isNotEmpty
+                                          ? Icons.access_alarms
+                                          : Icons.alarm_add_rounded,
+                                      onTap: () async {
+                                        // final int? i = await ref
+                                        //     .read(mainNotifierProvider.notifier)
+                                        //     .saveCourse(
+                                        //       courseModel.copyWith(
+                                        //         isStarted: 1,
+                                        //       ),
+                                        //       null,
+                                        //       context,
+                                        //       showMsg: false,
+                                        //     );
+                                        // courseModel = courseModel.copyWith(
+                                        //   isStarted: 1,
+                                        //   id: i,
+                                        // );
+                                        // print(i);
+                                        setState(() {});
+                                        if (mounted) {
+                                          showDialog(
+                                            context: context,
+                                            builder: (ctx) => ScheduleView(
+                                              courseModel: courseModel,
+                                              onSave: (scheduleDates,
+                                                  scheduleTime,
+                                                  isScheduleOn) async {
+                                                await ref
                                                     .read(mainNotifierProvider
                                                         .notifier)
-                                                    .getSingleCourse(
-                                                        widget.cm.courseId,
-                                                        context);
-                                                return res?.id;
-                                              }
-                                              return null;
-                                            },
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  if (courseModel.isStarted == 1 &&
-                                      courseModel.isFinished == 0)
-                                    MainBtn(
-                                      title: "ካቆምኩበት ቀጥል",
-                                      icon: Icons.play_arrow_rounded,
-                                      onTap: () async {
-                                        await createPlayList();
-                                        if (playList.children.isNotEmpty) {
-                                          await audioPlayer.setAudioSource(
-                                            playList,
-                                            initialIndex:
-                                                courseModel.pausedAtAudioNum < 0
-                                                    ? 0
-                                                    : courseModel
-                                                        .pausedAtAudioNum,
-                                            initialPosition: Duration(
-                                              seconds:
-                                                  courseModel.pausedAtAudioSec,
+                                                    .saveCourse(
+                                                      courseModel.copyWith(
+                                                        isStarted: 1,
+                                                        scheduleDates:
+                                                            scheduleDates,
+                                                        scheduleTime:
+                                                            scheduleTime,
+                                                        isScheduleOn:
+                                                            isScheduleOn,
+                                                      ),
+                                                      null,
+                                                      context,
+                                                      showMsg: false,
+                                                    );
+                                                courseModel =
+                                                    courseModel.copyWith(
+                                                  isStarted: 1,
+                                                  scheduleDates: scheduleDates,
+                                                  scheduleTime: scheduleTime,
+                                                  isScheduleOn: isScheduleOn,
+                                                );
+
+                                                if (mounted) {
+                                                  final res = await ref
+                                                      .read(mainNotifierProvider
+                                                          .notifier)
+                                                      .getSingleCourse(
+                                                          widget.cm.courseId,
+                                                          context);
+                                                  return res?.id;
+                                                }
+                                                return null;
+                                              },
                                             ),
                                           );
-                                          audioPlayer.play();
+                                        }
+                                      },
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    if (courseModel.isStarted == 1 &&
+                                        courseModel.isFinished == 0)
+                                      MainBtn(
+                                        title: "ካቆምኩበት ቀጥል",
+                                        icon: Icons.play_arrow_rounded,
+                                        onTap: () async {
+                                          await createPlayList();
+                                          if (playList.children.isNotEmpty) {
+                                            await audioPlayer.setAudioSource(
+                                              playList,
+                                              initialIndex:
+                                                  courseModel.pausedAtAudioNum <
+                                                          0
+                                                      ? 0
+                                                      : courseModel
+                                                          .pausedAtAudioNum,
+                                              initialPosition: Duration(
+                                                seconds: courseModel
+                                                    .pausedAtAudioSec,
+                                              ),
+                                            );
+                                            audioPlayer.play();
 
-                                          if (mounted) {
-                                            bool isPDFDownloded = await ref
-                                                .read(
-                                                    cdNotifierProvider.notifier)
-                                                .isDownloaded(
+                                            if (mounted) {
+                                              bool isPDFDownloded = await ref
+                                                  .read(cdNotifierProvider
+                                                      .notifier)
+                                                  .isDownloaded(
+                                                    courseModel.pdfId
+                                                            .contains(",")
+                                                        ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                        : "${courseModel.title}.pdf",
+                                                    "PDF",
+                                                    context,
+                                                  );
+                                              print(
+                                                  "isPDFDownloded:- $isPDFDownloded");
+                                              print(courseModel.pdfId
+                                                      .contains(",")
+                                                  ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                  : "${courseModel.title}.pdf");
+                                              if (courseModel.pdfId
+                                                      .trim()
+                                                      .isNotEmpty &&
+                                                  isPDFDownloded) {
+                                                String path = await getPath(
+                                                  'PDF',
                                                   courseModel.pdfId
                                                           .contains(",")
                                                       ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
                                                       : "${courseModel.title}.pdf",
-                                                  "PDF",
-                                                  context,
                                                 );
-                                            print(
-                                                "isPDFDownloded:- $isPDFDownloded");
-                                            print(courseModel.pdfId
-                                                    .contains(",")
-                                                ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
-                                                : "${courseModel.title}.pdf");
-                                            if (courseModel.pdfId
-                                                    .trim()
-                                                    .isNotEmpty &&
-                                                isPDFDownloded) {
-                                              String path = await getPath(
-                                                'PDF',
-                                                courseModel.pdfId.contains(",")
-                                                    ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
-                                                    : "${courseModel.title}.pdf",
-                                              );
-                                              if (mounted) {
-                                                await Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) => PdfPage(
-                                                      volume:
-                                                          courseModel.pdfNum,
-                                                      path: path,
-                                                      courseModel: courseModel,
+                                                if (mounted) {
+                                                  await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) => PdfPage(
+                                                        volume:
+                                                            courseModel.pdfNum,
+                                                        path: path,
+                                                        courseModel:
+                                                            courseModel,
+                                                      ),
                                                     ),
-                                                  ),
-                                                );
-                                                refresh();
+                                                  );
+                                                  refresh();
+                                                }
                                               }
                                             }
                                           }
-                                        }
-                                      },
-                                    ),
-                                  if (courseModel.isFinished == 1)
-                                    MainBtn(
-                                      title: "ደጋሚ ጀምር",
-                                      icon: Icons.refresh,
-                                      onTap: () {
-                                        ref
-                                            .read(mainNotifierProvider.notifier)
-                                            .saveCourse(
-                                              courseModel.copyWith(
-                                                isFinished: 0,
-                                                pdfPage: 0,
-                                                pausedAtAudioNum: 0,
-                                                pausedAtAudioSec: 0,
-                                                lastViewed:
-                                                    DateTime.now().toString(),
-                                              ),
-                                              null,
-                                              context,
-                                              showMsg: false,
-                                            );
-                                        courseModel = courseModel.copyWith(
-                                          isFinished: 0,
-                                          pdfPage: 0,
-                                          pausedAtAudioNum: 0,
-                                          pausedAtAudioSec: 0,
-                                        );
-                                        setState(() {});
-                                        createPlayList();
-                                      },
-                                    ),
-                                ],
+                                        },
+                                      ),
+                                    if (courseModel.isFinished == 1)
+                                      MainBtn(
+                                        title: "ደጋሚ ጀምር",
+                                        icon: Icons.refresh,
+                                        onTap: () {
+                                          ref
+                                              .read(
+                                                  mainNotifierProvider.notifier)
+                                              .saveCourse(
+                                                courseModel.copyWith(
+                                                  isFinished: 0,
+                                                  pdfPage: 0,
+                                                  pausedAtAudioNum: 0,
+                                                  pausedAtAudioSec: 0,
+                                                  lastViewed:
+                                                      DateTime.now().toString(),
+                                                ),
+                                                null,
+                                                context,
+                                                showMsg: false,
+                                              );
+                                          courseModel = courseModel.copyWith(
+                                            isFinished: 0,
+                                            pdfPage: 0,
+                                            pausedAtAudioNum: 0,
+                                            pausedAtAudioSec: 0,
+                                          );
+                                          setState(() {});
+                                          createPlayList();
+                                        },
+                                      ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],

@@ -107,12 +107,16 @@ TargetFocus getTutorial({
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20.0,
+                color: whiteColor,
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: Text(
                 subtitle,
+                style: const TextStyle(
+                  color: whiteColor,
+                ),
               ),
             )
           ],

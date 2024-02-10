@@ -124,6 +124,7 @@ class _ContentsState extends ConsumerState<Contents> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         dense: true,
+                        leading: Text("${index + 1}"),
                         onTap: () {
                           Navigator.push(
                             context,

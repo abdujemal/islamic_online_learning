@@ -296,7 +296,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                 child: ListTile(
                   leading: const Icon(Icons.notifications_rounded),
                   title: Text(
-                    "አዲስ ደርስ ሲገባ መልእክት ይግባልኝ",
+                    "አድስ ደርስ ሲገባ መልእክት ይግባልኝ",
                     style: TextStyle(
                       fontSize: fnt,
                     ),

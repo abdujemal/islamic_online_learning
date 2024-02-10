@@ -24,7 +24,7 @@ class _MainBtnState extends ConsumerState<MainBtn> {
       onTap: widget.onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        width: 250,
+        width: 180,
         margin: const EdgeInsets.all(3),
         decoration: BoxDecoration(
           color: Colors.black.withAlpha(90),
@@ -41,17 +41,21 @@ class _MainBtnState extends ConsumerState<MainBtn> {
                 ? Icon(
                     widget.icon,
                     color: Colors.white,
-                    size: 30,
+                    // size: 30,
                   )
                 : const SizedBox(),
             const SizedBox(
               width: 10,
             ),
-            Text(
-              widget.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
+            Expanded(
+              child: Text(
+                widget.title,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
             )
           ],

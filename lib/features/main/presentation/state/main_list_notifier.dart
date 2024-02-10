@@ -26,6 +26,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
     String? key,
     String? val,
     SortingMethod method = SortingMethod.dateDSC,
+    required BuildContext context,
   }) async {
     if (itreationCounter == 0) {
       if (isNew) {
@@ -43,6 +44,14 @@ class MainListNotifier extends StateNotifier<MainListState> {
       // print(itreationCounter);
 
       res.fold((l) {
+        // if (l.toString().contains("DatabaseException")) {
+        //   Navigator.pushAndRemoveUntil(
+        //     context,
+        //     MaterialPageRoute(builder: (c) => const DownloadDatabase()),
+        //     (route) => false,
+        //   );
+        //   return;
+        // }
         state = MainListState.error(error: l);
       }, (r) {
         if (isNew && r.isEmpty) {

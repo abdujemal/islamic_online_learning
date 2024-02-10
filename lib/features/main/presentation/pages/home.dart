@@ -62,8 +62,14 @@ class _HomeState extends ConsumerState<Home>
     scrollController.addListener(_scrollListener);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      mainNotifier.getCourses(isNew: true);
-      categoryNotifier.getCategories();
+      mainNotifier
+          .getCourses(
+        isNew: true,
+        context: context,
+      )
+          .then((value) {
+        categoryNotifier.getCategories();
+      });
       ref.read(beginnerListProvider.notifier).getCourses();
       ref.watch(startedNotifierProvider.notifier).getCouses();
 
@@ -171,7 +177,10 @@ class _HomeState extends ConsumerState<Home>
     if (scrollController.position.pixels ==
         scrollController.position.maxScrollExtent) {
       if (isSearching) {
-        await mainNotifier.getCourses(isNew: false);
+        await mainNotifier.getCourses(
+          context: context,
+          isNew: false,
+        );
       }
     }
   }
@@ -284,7 +293,7 @@ class _HomeState extends ConsumerState<Home>
                   return RefreshIndicator(
                     onRefresh: () async {
                       if (isSearching) {
-                        await mainNotifier.getCourses(isNew: true);
+                        await mainNotifier.getCourses(isNew: true,context: context,);
                         await categoryNotifier.getCategories();
                         await ref
                             .read(beginnerListProvider.notifier)
@@ -341,7 +350,7 @@ class _HomeState extends ConsumerState<Home>
                       const Text("እባክዎ ኢንተርኔት አብርተው ድጋሚ ይሞክሩ።"),
                       IconButton(
                         onPressed: () async {
-                          await mainNotifier.getCourses(isNew: true);
+                          await mainNotifier.getCourses(isNew: true, context: context,);
                           await categoryNotifier.getCategories();
                         },
                         icon: const Icon(Icons.refresh_rounded),

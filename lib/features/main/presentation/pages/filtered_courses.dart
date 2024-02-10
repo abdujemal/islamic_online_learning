@@ -49,6 +49,7 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
 
     Future.delayed(const Duration(microseconds: 1)).then((value) {
       mainNotifier.getCourses(
+        context: context,
         isNew: true,
         key: widget.keey,
         val: widget.value,
@@ -85,6 +86,7 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
     if (scrollController.position.pixels ==
         scrollController.position.maxScrollExtent) {
       await mainNotifier.getCourses(
+        context: context,
         isNew: false,
         key: widget.keey,
         val: widget.value,
@@ -100,7 +102,10 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
     final audioPlayer = ref.watch(audioProvider);
     return WillPopScope(
       onWillPop: () async {
-        mainNotifier.getCourses(isNew: true);
+        mainNotifier.getCourses(
+          context: context,
+          isNew: true,
+        );
         return true;
       },
       child: StreamBuilder(
@@ -150,6 +155,7 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                       loaded: (_) => RefreshIndicator(
                         onRefresh: () async {
                           await mainNotifier.getCourses(
+                            context: context,
                             isNew: true,
                             key: widget.keey,
                             val: widget.value,

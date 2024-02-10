@@ -83,36 +83,58 @@ class IMainDataSrc extends MainDataSrc {
     }
 
     if (isNew && key == null) {
-      final res = await DatabaseHelper()
-          .getCouses(null, null, SortingMethod.dateDSC, (page - 1) * numOfDoc);
+      try {
+        final res = await DatabaseHelper().getCouses(
+            null, null, SortingMethod.dateDSC, (page - 1) * numOfDoc);
 
-      print(res.length);
+        final categories = await DatabaseHelper().getCategories();
+        final ustazs = await DatabaseHelper().getUstazs();
+        final contents = await DatabaseHelper().getContent();
 
-      print("dateTime for ${res.first["title"]}: ${res.first["dateTime"]}");
+        final qs = await firebaseFirestore
+            .collection(FirebaseConst.courses)
+            .orderBy(
+              'dateTime',
+              descending: false,
+            )
+            .startAfter([res.first["dateTime"]]).get();
 
-      final qs = await firebaseFirestore
-          .collection(FirebaseConst.courses)
-          .orderBy(
-            'dateTime',
-            descending: false,
-          )
-          .startAfter([res.first["dateTime"]]).get();
-      print("New Docs ${qs.docs.length}");
-      if (qs.docs.isNotEmpty) {
-        for (var d in qs.docs) {
-          final id = await DatabaseHelper().isCourseAvailable(d.id);
-          if (id != null) {
-            print("updateing");
+        print("New Docs ${qs.docs.length}");
+        if (qs.docs.isNotEmpty) {
+          for (var d in qs.docs) {
+            if (!categories.contains(d.data()['category'])) {
+              print('adding cateogry');
+              await DatabaseHelper().insertCategory(d.data()['category']);
+            }
 
-            await DatabaseHelper().updateCourseFromCloud(
-                CourseModel.fromMap(d.data(), d.id).copyWith(id: id));
-          } else {
-            print("adding");
+            if (!ustazs.contains(d.data()['ustaz'])) {
+              print('adding ustaz');
 
-            await DatabaseHelper()
-                .insertCourse(CourseModel.fromMap(d.data(), d.id));
+              await DatabaseHelper().insertCategory(d.data()['ustaz']);
+            }
+
+            if (!contents.contains(d.data()['title'])) {
+              print('adding title');
+
+              await DatabaseHelper().insertContent(d.data()['title']);
+            }
+
+            final id = await DatabaseHelper().isCourseAvailable(d.id);
+            if (id != null) {
+              print("updateing");
+
+              await DatabaseHelper().updateCourseFromCloud(
+                  CourseModel.fromMap(d.data(), d.id).copyWith(id: id));
+            } else {
+              print("adding");
+
+              await DatabaseHelper()
+                  .insertCourse(CourseModel.fromMap(d.data(), d.id));
+            }
           }
         }
+      } catch (e) {
+        print(e.toString());
       }
     }
 
@@ -240,8 +262,35 @@ class IMainDataSrc extends MainDataSrc {
 
   @override
   Future<List<FAQModel>> getFAQ() async {
-    return DatabaseHelper().getFaqs();
-    // final ds = await firebaseFirestore.collection(FirebaseConst.faq).get();
+    List<FAQModel> faqdata = await DatabaseHelper().getFaqs();
+
+    try {
+      final aq =
+          await firebaseFirestore.collection(FirebaseConst.faq).count().get();
+      if (aq.count != null && faqdata.length < aq.count!) {
+        final qs = await firebaseFirestore.collection(FirebaseConst.faq).get();
+        for (var d in qs.docs) {
+          final id =
+              await DatabaseHelper().isFAQAvailable(d.data()['question']);
+          if (id != null) {
+            await DatabaseHelper().updateFaq(FAQModel(
+                id: id,
+                question: d.data()['question'],
+                answer: d.data()['answer']));
+          } else {
+            await DatabaseHelper().insertFaq(FAQModel(
+                id: null,
+                question: d.data()['question'],
+                answer: d.data()['answer']));
+          }
+        }
+        faqdata = await DatabaseHelper().getFaqs();
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    return faqdata;
     // List<FAQModel> faq = [];
     // for (var d in ds.docs) {
     //   faq.add(FAQModel.fromMap(d.data() , d.id));
