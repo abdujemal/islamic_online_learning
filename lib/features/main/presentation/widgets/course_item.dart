@@ -68,8 +68,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
               title: "${widget.courseModel.title} $i",
               artist: widget.courseModel.ustaz,
               album: widget.courseModel.category,
-              artUri: Uri.file(
-                  "${dir.path}/Images/${widget.courseModel.title}.jpg"),
+              artUri: Uri.parse(widget.courseModel.image),
               extras: widget.courseModel.toMap(),
             ),
           ),
@@ -90,8 +89,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                   title: "${widget.courseModel.title} $i",
                   artist: widget.courseModel.ustaz,
                   album: widget.courseModel.category,
-                  artUri: Uri.file(
-                      "${dir.path}/Images/${widget.courseModel.title}.jpg"),
+                  artUri: Uri.parse(widget.courseModel.image),
                   extras: widget.courseModel.toMap(),
                 ),
               ),
@@ -130,7 +128,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
 
   @override
   Widget build(BuildContext context) {
-    percentage = getPersentage(widget.courseModel);
+    percentage = getPersentage(widget.courseModel).isNaN
+        ? 1
+        : getPersentage(widget.courseModel);
 
     // if (widget.courseModel.isFinished == 0 && percentage == 1) {
     //   ref.read(mainNotifierProvider.notifier).saveCourse(
@@ -542,7 +542,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                       .saveCourse(
                                           widget.courseModel, 0, context);
                                 } else {
-                                   await ref
+                                  await ref
                                       .read(mainNotifierProvider.notifier)
                                       .saveCourse(
                                           widget.courseModel, 0, context);

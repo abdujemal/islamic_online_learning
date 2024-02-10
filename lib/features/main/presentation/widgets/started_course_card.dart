@@ -55,8 +55,7 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
               title: "${widget.courseModel.title} $i",
               artist: widget.courseModel.ustaz,
               album: widget.courseModel.category,
-              artUri: Uri.file(
-                  "${dir.path}/Images/${widget.courseModel.title}.jpg"),
+              artUri: Uri.parse(widget.courseModel.image),
               extras: widget.courseModel.toMap(),
             ),
           ),
@@ -77,8 +76,7 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                   title: "${widget.courseModel.title} $i",
                   artist: widget.courseModel.ustaz,
                   album: widget.courseModel.category,
-                  artUri: Uri.file(
-                      "${dir.path}/Images/${widget.courseModel.title}.jpg"),
+                  artUri: Uri.parse(widget.courseModel.image),
                   extras: widget.courseModel.toMap(),
                 ),
               ),
@@ -117,7 +115,9 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
 
   @override
   Widget build(BuildContext context) {
-    percentage = getPersentage(widget.courseModel);
+    percentage = getPersentage(widget.courseModel).isNaN
+        ? 1
+        : getPersentage(widget.courseModel);
 
     return Padding(
       padding: const EdgeInsets.only(

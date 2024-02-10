@@ -4,12 +4,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/widgets/list_title.dart';
+import 'package:islamic_online_learning/features/courseDetail/data/course_detail_data_src.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/pages/pdf_page.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_item.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/download_all_files.dart';
@@ -59,6 +61,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
   bool isLoadingAudio = false;
 
+  Timer? downloadTimer;
+
   double percentage = 0;
 
   bool isConnected = true;
@@ -66,6 +70,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   bool show = false;
 
   bool showOnes = true;
+
+  late StreamSubscription indexStream;
 
   showTutorial() {
     List<TargetFocus> targets = [
@@ -122,6 +128,52 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
   }
 
+  downloadCurrentIndex(int currentIndex) async {
+    final isDownloaded = await checkFile(currentIndex + 1);
+    final audioPath = await getPath('Audio',
+        "${courseModel.ustaz},${courseModel.title} ${currentIndex + 1}.mp3");
+
+    final downLoadProg =
+        ref.watch(downloadProgressCheckernProvider.call(audioPath));
+
+    print("index $isDownloaded");
+
+    if (!isDownloaded && downLoadProg?.filePath != audioPath) {
+      if (mounted) {
+        final file = await ref.read(cdNotifierProvider.notifier).downloadFile(
+              audios[currentIndex],
+              "${courseModel.ustaz},${courseModel.title} ${currentIndex + 1}.mp3",
+              'Audio',
+              CancelToken(),
+              context,
+            );
+        if (file != null) {
+          playList.removeAt(currentIndex);
+          playList.insert(
+            currentIndex,
+            AudioSource.file(
+              file.path,
+              tag: MediaItem(
+                id: audios[currentIndex],
+                title: "${courseModel.title} ${currentIndex + 1}",
+                artist: courseModel.ustaz,
+                album: courseModel.category,
+                artUri: Uri.parse(courseModel.image),
+                extras: courseModel.toMap(),
+              ),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    indexStream.cancel();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -134,6 +186,18 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
       createPlayList();
 
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        indexStream =
+            ref.read(audioProvider).currentIndexStream.listen((index) {
+          if (index != null) {
+            print("wait");
+            downloadTimer?.cancel();
+            downloadTimer = Timer(const Duration(seconds: 1), () {
+              print("go");
+              downloadCurrentIndex(index);
+            });
+          }
+        });
+
         ref.read(sharedPrefProvider).then((pref) {
           ref.read(showGuideProvider.notifier).update(
             (state) {
@@ -304,7 +368,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   Widget build(BuildContext context) {
     final audioPlayer = ref.watch(audioProvider);
 
-    percentage = getPersentage(courseModel);
+    percentage =
+        getPersentage(courseModel).isNaN ? 1 : getPersentage(courseModel);
 
     return PopScope(
       canPop: !show,
@@ -415,8 +480,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       .replaceAll(".mp3", "")
                                       .split(" ")
                                       .last);
-                                  Directory dir =
-                                      await getApplicationSupportDirectory();
+                                  // Directory dir =
+                                  //     await getApplicationSupportDirectory();
 
                                   // if (playList.children.isEmpty ||
                                   //     index >= audios.length) {
@@ -428,6 +493,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                     ref,
                                     alsoIsNotIdle: true,
                                   )) {
+                                    // Todo: asdkjnasdck
+                                    audioPlayer.setLoopMode(LoopMode.off);
+                                    playList.removeAt(index - 1);
                                     playList.insert(
                                       index - 1,
                                       AudioSource.file(
@@ -437,13 +505,12 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           title: "${courseModel.title} $index",
                                           artist: courseModel.ustaz,
                                           album: courseModel.category,
-                                          artUri: Uri.file(
-                                              "${dir.path}/Images/${courseModel.title}.jpg"),
+                                          artUri: Uri.parse(courseModel.image),
                                           extras: courseModel.toMap(),
                                         ),
                                       ),
                                     );
-                                    playList.removeAt(index);
+                                    audioPlayer.setLoopMode(LoopMode.all);
 
                                     // ref.read(audioProvider).setAudioSource(
                                     //       ConcatenatingAudioSource(
@@ -863,8 +930,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                 courseModel: courseModel,
                                 isFromPDF: false,
                                 onDownloadDone: (String filePath) async {
-                                  Directory dir =
-                                      await getApplicationSupportDirectory();
+                                  // Directory dir =
+                                  //     await getApplicationSupportDirectory();
 
                                   if (playList.children.isEmpty ||
                                       index >= audios.length) {
@@ -900,8 +967,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                         title: "${courseModel.title} $index",
                                         artist: courseModel.ustaz,
                                         album: courseModel.category,
-                                        artUri: Uri.file(
-                                            "${dir.path}/Images/${getFileName()}.jpg"),
+                                        artUri: Uri.parse(courseModel.image),
                                         extras: courseModel.toMap(),
                                       ),
                                     ),
@@ -985,8 +1051,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                               courseModel: courseModel,
                               isFromPDF: false,
                               onDownloadDone: (String filePath) async {
-                                Directory dir =
-                                    await getApplicationSupportDirectory();
+                                // Directory dir =
+                                //     await getApplicationSupportDirectory();
 
                                 if (playList.children.isEmpty ||
                                     index >= audios.length) {
@@ -1009,8 +1075,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       title: "${courseModel.title} $index",
                                       artist: courseModel.ustaz,
                                       album: courseModel.category,
-                                      artUri: Uri.file(
-                                          "${dir.path}/Images/${getFileName()}.jpg"),
+                                      artUri: Uri.parse(courseModel.image),
                                       extras: courseModel.toMap(),
                                     ),
                                   ),

@@ -123,10 +123,6 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
     }
   }
 
-  String getFileName() {
-    return courseModel.category == "ተፍሲር" ? "ተፍሲር" : courseModel.title;
-  }
-
   Future<bool> checkFile(int index) async {
     if (mounted) {
       final isDownloaded =
@@ -210,8 +206,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                             courseModel: courseModel,
                             isFromPDF: false,
                             onDownloadDone: (String filePath) async {
-                              Directory dir =
-                                  await getApplicationSupportDirectory();
+                              // Directory dir =
+                              //     await getApplicationSupportDirectory();
 
                               if (playList.children.isEmpty ||
                                   index >= widget.audios.length) {
@@ -234,8 +230,7 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                     title: "${courseModel.title} $index",
                                     artist: courseModel.ustaz,
                                     album: courseModel.category,
-                                    artUri: Uri.file(
-                                        "${dir.path}/Images/${getFileName()}.jpg"),
+                                    artUri: Uri.parse(courseModel.image),
                                     extras: courseModel.toMap(),
                                   ),
                                 ),
@@ -318,12 +313,12 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                           canNeverPlay: false,
                           audioId: widget.audios[index],
                           title: courseModel.title,
-                          index: index + 1,
+                          index: index,
                           courseModel: courseModel,
                           isFromPDF: false,
                           onDownloadDone: (String filePath) async {
-                            Directory dir =
-                                await getApplicationSupportDirectory();
+                            // Directory dir =
+                            //     await getApplicationSupportDirectory();
 
                             if (playList.children.isEmpty ||
                                 index >= widget.audios.length) {
@@ -346,8 +341,7 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                   title: "${courseModel.title} $index",
                                   artist: courseModel.ustaz,
                                   album: courseModel.category,
-                                  artUri: Uri.file(
-                                      "${dir.path}/Images/${getFileName()}.jpg"),
+                                  artUri: Uri.parse(courseModel.image),
                                   extras: courseModel.toMap(),
                                 ),
                               ),

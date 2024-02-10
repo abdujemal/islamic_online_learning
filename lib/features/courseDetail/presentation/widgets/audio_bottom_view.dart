@@ -160,7 +160,8 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                       ),
                       if (process == ProcessingState.buffering ||
                           process == ProcessingState.loading)
-                        Expanded(
+                        SizedBox(
+                          width: 90,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,

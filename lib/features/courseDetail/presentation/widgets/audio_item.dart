@@ -270,6 +270,31 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                             print(metaData.extras?["courseId"]);
                           }
                         }
+                        isDownloaded = await checkFile();
+                        if (!isDownloaded) {
+                          if (mounted) {
+                            isDownloading = true;
+                            ref
+                                .read(cdNotifierProvider.notifier)
+                                .downloadFile(
+                                  widget.audioId,
+                                  "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3",
+                                  'Audio',
+                                  cancelToken,
+                                  context,
+                                )
+                                .then((file) async {
+                              isDownloading = false;
+                              if (file != null) {
+                                isDownloaded = await checkFile();
+                                widget.onDownloadDone(file.path);
+                                if (mounted) {
+                                  setState(() {});
+                                }
+                              }
+                            });
+                          }
+                        }
                         widget.onPlayTabed();
                       },
                       child: Stack(

@@ -27,7 +27,7 @@ class _MainBtnState extends ConsumerState<MainBtn> {
         width: 180,
         margin: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-          color: Colors.black.withAlpha(90),
+          color: Colors.black.withAlpha(120),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: Colors.white,
