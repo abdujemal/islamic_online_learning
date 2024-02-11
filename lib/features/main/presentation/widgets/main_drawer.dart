@@ -72,7 +72,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
             color: primaryColor,
             image: DecorationImage(
               image: AssetImage(
-                'assets/bg.png',
+                'assets/bg.jpg',
               ),
               fit: BoxFit.fill,
               opacity: .4,

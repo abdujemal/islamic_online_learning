@@ -128,7 +128,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
   }
 
-  downloadCurrentIndex(int currentIndex) async {
+  downloadCurrentIndex(int currentIndex, AudioPlayer audioPlayer) async {
     final isDownloaded = await checkFile(currentIndex + 1);
     final audioPath = await getPath('Audio',
         "${courseModel.ustaz},${courseModel.title} ${currentIndex + 1}.mp3");
@@ -148,6 +148,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
               context,
             );
         if (file != null) {
+          audioPlayer.setLoopMode(LoopMode.off);
           playList.removeAt(currentIndex);
           playList.insert(
             currentIndex,
@@ -163,6 +164,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
               ),
             ),
           );
+          audioPlayer.setLoopMode(LoopMode.all);
         }
       }
     }
@@ -190,11 +192,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
             ref.read(audioProvider).currentIndexStream.listen((index) {
           if (index != null) {
             print("wait");
-            downloadTimer?.cancel();
-            downloadTimer = Timer(const Duration(seconds: 1), () {
-              print("go");
-              downloadCurrentIndex(index);
-            });
+
+            print("go");
+            // downloadCurrentIndex(index, ref.read(audioProvider));
           }
         });
 
@@ -271,36 +271,37 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
             ),
           ),
         );
-      } else {
-        if (mounted) {
-          String? url = await ref
-              .read(cdNotifierProvider.notifier)
-              .loadFileOnline(id, true, context, showError: false);
-          if (url != null) {
-            // url = url.replaceAll("botToken", botToken!);
-            if (mounted) {
-              ref
-                  .read(loadAudiosProvider.notifier)
-                  .update((state) => state + 1);
-            }
-            lst.add(
-              AudioSource.uri(
-                Uri.parse(
-                  url,
-                ),
-                tag: MediaItem(
-                  id: url,
-                  title: "${courseModel.title} $i",
-                  artist: courseModel.ustaz,
-                  album: courseModel.category,
-                  artUri: Uri.parse(courseModel.image),
-                  extras: courseModel.toMap(),
-                ),
-              ),
-            );
-          }
-        }
       }
+      // else {
+      //   if (mounted) {
+      //     String? url = await ref
+      //         .read(cdNotifierProvider.notifier)
+      //         .loadFileOnline(id, true, context, showError: false);
+      //     if (url != null) {
+      //       // url = url.replaceAll("botToken", botToken!);
+      //       if (mounted) {
+      //         ref
+      //             .read(loadAudiosProvider.notifier)
+      //             .update((state) => state + 1);
+      //       }
+      //       lst.add(
+      //         AudioSource.uri(
+      //           Uri.parse(
+      //             url,
+      //           ),
+      //           tag: MediaItem(
+      //             id: url,
+      //             title: "${courseModel.title} $i",
+      //             artist: courseModel.ustaz,
+      //             album: courseModel.category,
+      //             artUri: Uri.parse(courseModel.image),
+      //             extras: courseModel.toMap(),
+      //           ),
+      //         ),
+      //       );
+      //     }
+      //   }
+      // }
     }
     playList = ConcatenatingAudioSource(children: lst);
     isLoadingAudio = false;
@@ -495,21 +496,41 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   )) {
                                     // Todo: asdkjnasdck
                                     audioPlayer.setLoopMode(LoopMode.off);
-                                    playList.removeAt(index - 1);
-                                    playList.insert(
-                                      index - 1,
-                                      AudioSource.file(
-                                        filePath,
-                                        tag: MediaItem(
-                                          id: audios[index - 1],
-                                          title: "${courseModel.title} $index",
-                                          artist: courseModel.ustaz,
-                                          album: courseModel.category,
-                                          artUri: Uri.parse(courseModel.image),
-                                          extras: courseModel.toMap(),
+                                    if (index > playList.children.length - 1) {
+                                      playList.add(
+                                        AudioSource.file(
+                                          filePath,
+                                          tag: MediaItem(
+                                            id: audios[index - 1],
+                                            title:
+                                                "${courseModel.title} $index",
+                                            artist: courseModel.ustaz,
+                                            album: courseModel.category,
+                                            artUri:
+                                                Uri.parse(courseModel.image),
+                                            extras: courseModel.toMap(),
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    } else {
+                                      playList.removeAt(index - 1);
+                                      playList.insert(
+                                        index - 1,
+                                        AudioSource.file(
+                                          filePath,
+                                          tag: MediaItem(
+                                            id: audios[index - 1],
+                                            title:
+                                                "${courseModel.title} $index",
+                                            artist: courseModel.ustaz,
+                                            album: courseModel.category,
+                                            artUri:
+                                                Uri.parse(courseModel.image),
+                                            extras: courseModel.toMap(),
+                                          ),
+                                        ),
+                                      );
+                                    }
                                     audioPlayer.setLoopMode(LoopMode.all);
 
                                     // ref.read(audioProvider).setAudioSource(
@@ -957,6 +978,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   //   ref,
                                   //   alsoIsNotIdle: true,
                                   // )) {
+                                  audioPlayer.setLoopMode(LoopMode.off);
+
                                   playList.removeAt(index - 1);
                                   playList.insert(
                                     index - 1,
@@ -972,6 +995,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       ),
                                     ),
                                   );
+                                  audioPlayer.setLoopMode(LoopMode.all);
+
                                   // ref.read(audioProvider).setAudioSource(
                                   //       ConcatenatingAudioSource(
                                   //         children: playList,
@@ -1065,6 +1090,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                 //   ref,
                                 //   alsoIsNotIdle: true,
                                 // )) {
+                                audioPlayer.setLoopMode(LoopMode.off);
+
                                 playList.removeAt(index - 1);
                                 playList.insert(
                                   index - 1,
@@ -1080,6 +1107,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                     ),
                                   ),
                                 );
+
+                                audioPlayer.setLoopMode(LoopMode.all);
+
                                 // ref.read(audioProvider).setAudioSource(
                                 //       ConcatenatingAudioSource(
                                 //         children: playList,

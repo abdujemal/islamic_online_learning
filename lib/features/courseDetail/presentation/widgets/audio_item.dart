@@ -274,7 +274,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                         if (!isDownloaded) {
                           if (mounted) {
                             isDownloading = true;
-                            ref
+                            final file = await ref
                                 .read(cdNotifierProvider.notifier)
                                 .downloadFile(
                                   widget.audioId,
@@ -282,17 +282,15 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                   'Audio',
                                   cancelToken,
                                   context,
-                                )
-                                .then((file) async {
-                              isDownloading = false;
-                              if (file != null) {
-                                isDownloaded = await checkFile();
-                                widget.onDownloadDone(file.path);
-                                if (mounted) {
-                                  setState(() {});
-                                }
+                                );
+                            isDownloading = false;
+                            if (file != null) {
+                              isDownloaded = await checkFile();
+                              widget.onDownloadDone(file.path);
+                              if (mounted) {
+                                setState(() {});
                               }
-                            });
+                            }
                           }
                         }
                         widget.onPlayTabed();
