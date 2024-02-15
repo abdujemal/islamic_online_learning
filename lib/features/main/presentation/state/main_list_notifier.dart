@@ -18,6 +18,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
   ) : super(const MainListState.initial());
 
   List<CourseModel> courses = [];
+  List<CourseModel> filteredCourses = [];
 
   int itreationCounter = 0;
 
@@ -28,12 +29,13 @@ class MainListNotifier extends StateNotifier<MainListState> {
     SortingMethod method = SortingMethod.dateDSC,
     required BuildContext context,
   }) async {
+    final bool isKeyNull = key == null;
     if (itreationCounter == 0) {
       if (isNew) {
         state = const MainListState.loading();
       } else {
         state = MainListState.loaded(
-          courses: courses,
+          courses: isKeyNull ? courses : filteredCourses,
           noMoreToLoad: false,
           isLoadingMore: true,
         );
@@ -55,12 +57,21 @@ class MainListNotifier extends StateNotifier<MainListState> {
         state = MainListState.error(error: l);
       }, (r) {
         if (isNew && r.isEmpty) {
-          state = MainListState.empty(courses: r);
+          isKeyNull ? courses = r : filteredCourses = r;
+          state = MainListState.empty(
+              courses: isKeyNull ? courses : filteredCourses);
           return;
         } else if (isNew) {
-          courses = r;
+          if (isKeyNull) {
+            print("isKeyNull");
+            courses = r;
+          } else {
+            print("!isKeyNull");
+
+            filteredCourses = r;
+          }
           state = MainListState.loaded(
-            courses: courses,
+            courses: isKeyNull ? courses : filteredCourses,
             noMoreToLoad: false,
             isLoadingMore: false,
           );
@@ -68,12 +79,19 @@ class MainListNotifier extends StateNotifier<MainListState> {
           if (kDebugMode) {
             print(r.length);
           }
-          courses = [
-            ...courses,
-            ...r,
-          ];
+          if (isKeyNull) {
+            courses = [
+              ...courses,
+              ...r,
+            ];
+          } else {
+            filteredCourses = [
+              ...filteredCourses,
+              ...r,
+            ];
+          }
           state = MainListState.loaded(
-            courses: courses,
+            courses: isKeyNull ? courses : filteredCourses,
             noMoreToLoad: r.isEmpty,
             isLoadingMore: false,
           );

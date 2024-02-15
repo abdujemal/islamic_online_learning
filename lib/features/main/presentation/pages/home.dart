@@ -293,7 +293,10 @@ class _HomeState extends ConsumerState<Home>
                   return RefreshIndicator(
                     onRefresh: () async {
                       if (isSearching) {
-                        await mainNotifier.getCourses(isNew: true,context: context,);
+                        await mainNotifier.getCourses(
+                          isNew: true,
+                          context: context,
+                        );
                         await categoryNotifier.getCategories();
                         await ref
                             .read(beginnerListProvider.notifier)
@@ -325,7 +328,7 @@ class _HomeState extends ConsumerState<Home>
                           return !isSearching
                               ? const SizedBox()
                               : const BeginnerCoursesList();
-                        } else if (index <= _.courses.length + 2) {
+                        } else if (index <= _.courses.length + 1) {
                           return CourseItem(
                             _.courses[index < 5 ? index - 2 : index - 3],
                             index: index < 5 ? index - 2 : index - 3,
@@ -336,6 +339,9 @@ class _HomeState extends ConsumerState<Home>
                         } else if (_.noMoreToLoad) {
                           return const TheEnd();
                         } else {
+                          if (!isSearching) {
+                            return const SizedBox();
+                          }
                           return const CourseShimmer();
                         }
                       },
@@ -347,10 +353,13 @@ class _HomeState extends ConsumerState<Home>
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("እባክዎ ኢንተርኔት አብርተው ድጋሚ ይሞክሩ።"),
+                      const Text("ምንም የለም"),
                       IconButton(
                         onPressed: () async {
-                          await mainNotifier.getCourses(isNew: true, context: context,);
+                          await mainNotifier.getCourses(
+                            isNew: true,
+                            context: context,
+                          );
                           await categoryNotifier.getCategories();
                         },
                         icon: const Icon(Icons.refresh_rounded),

@@ -17,9 +17,13 @@ import '../widgets/the_end.dart';
 class FilteredCourses extends ConsumerStatefulWidget {
   final String keey;
   final String value;
+  final String? fromKey;
+  final String? fromVal;
   const FilteredCourses(
     this.keey,
     this.value, {
+    this.fromKey,
+    this.fromVal,
     super.key,
   });
 
@@ -102,10 +106,14 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
     final audioPlayer = ref.watch(audioProvider);
     return WillPopScope(
       onWillPop: () async {
+        // if (widget.fromKey != null && widget.fromVal != null) {
         mainNotifier.getCourses(
           context: context,
           isNew: true,
+          // key: widget.fromKey,
+          // val: widget.fromVal,
         );
+        // }
         return true;
       },
       child: StreamBuilder(

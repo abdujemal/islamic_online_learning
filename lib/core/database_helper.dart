@@ -21,20 +21,6 @@ class DatabaseHelper {
     return _databaseHelper!;
   }
 
-  closeDb() async {
-    await _database!.close();
-  }
-
-  Future<int?> getFileSize(String audioUrl) async {
-    final request = await HttpClient().headUrl(Uri.parse(audioUrl));
-    final response = await request.close();
-    if (response.statusCode == HttpStatus.ok) {
-      final contentLength = response.contentLength;
-      return contentLength;
-    }
-    throw Exception('Failed to get audio file size');
-  }
-
   Future<Database> initializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = '${directory.path}$dbPath';
@@ -55,6 +41,19 @@ class DatabaseHelper {
     return _database;
   }
 
+  closeDb() async {
+    await _database!.close();
+  }
+
+  Future<int?> getFileSize(String audioUrl) async {
+    final request = await HttpClient().headUrl(Uri.parse(audioUrl));
+    final response = await request.close();
+    if (response.statusCode == HttpStatus.ok) {
+      final contentLength = response.contentLength;
+      return contentLength;
+    }
+    throw Exception('Failed to get audio file size');
+  }
   //creating database
   // void _createDb(Database db, int newVersion) async {
   //   await db.execute('CREATE TABLE ${DatabaseConst.savedCourses}('

@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
+import '../../../../core/Audio Feature/playlist_helper.dart';
 import '../../../../core/Audio Feature/position_data_model.dart';
 import '../../../main/data/model/course_model.dart';
 import '../stateNotifier/providers.dart';
@@ -192,6 +193,11 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                       )
                                       .join(" "),
                                   onConfirm: () {
+                                    int id = int.parse(metaData.title
+                                            .split(" ")
+                                            .last
+                                            .replaceAll('.mp3', '')) -
+                                        1;
                                     ref
                                         .read(mainNotifierProvider.notifier)
                                         .saveCourse(
@@ -201,8 +207,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                           ).copyWith(
                                             isStarted: 1,
                                             isFinished: 1,
-                                            pausedAtAudioNum:
-                                                audioPlayer.currentIndex,
+                                            pausedAtAudioNum: id,
                                             pausedAtAudioSec:
                                                 audioPlayer.position.inSeconds,
                                             lastViewed:
@@ -215,6 +220,11 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                     Navigator.pop(context);
                                   },
                                   onDenied: () {
+                                    int id = int.parse(metaData.title
+                                            .split(" ")
+                                            .last
+                                            .replaceAll('.mp3', 'replace')) -
+                                        1;
                                     ref
                                         .read(mainNotifierProvider.notifier)
                                         .saveCourse(
@@ -223,8 +233,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                             metaData.extras?["courseId"],
                                           ).copyWith(
                                             isStarted: 1,
-                                            pausedAtAudioNum:
-                                                audioPlayer.currentIndex,
+                                            pausedAtAudioNum: id,
                                             pausedAtAudioSec:
                                                 audioPlayer.position.inSeconds,
                                             lastViewed:
@@ -240,6 +249,11 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                               );
                               ref.read(audioProvider).stop();
                             } else {
+                              int id = int.parse(metaData.title
+                                      .split(" ")
+                                      .last
+                                      .replaceAll('.mp3', '')) -
+                                  1;
                               ref
                                   .read(mainNotifierProvider.notifier)
                                   .saveCourse(
@@ -248,8 +262,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                       metaData.extras?["courseId"],
                                     ).copyWith(
                                       isStarted: 1,
-                                      pausedAtAudioNum:
-                                          audioPlayer.currentIndex,
+                                      pausedAtAudioNum: id,
                                       pausedAtAudioSec:
                                           audioPlayer.position.inSeconds,
                                       lastViewed: DateTime.now().toString(),
@@ -359,6 +372,12 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                 if (audioPlayer.playing) {
                                   widget.onClose();
                                   if (metaData.extras?["isFinished"] == 0) {
+                                    int id = int.parse(metaData.title
+                                            .split(" ")
+                                            .last
+                                            .replaceAll('.mp3', '')) -
+                                        1;
+                                    print("AudioIdFromBottom $id");
                                     await ref
                                         .read(mainNotifierProvider.notifier)
                                         .saveCourse(
@@ -367,8 +386,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                             metaData.extras?["courseId"],
                                           ).copyWith(
                                             isStarted: 1,
-                                            pausedAtAudioNum:
-                                                audioPlayer.currentIndex,
+                                            pausedAtAudioNum: id,
                                             pausedAtAudioSec:
                                                 audioPlayer.position.inSeconds,
                                             lastViewed:

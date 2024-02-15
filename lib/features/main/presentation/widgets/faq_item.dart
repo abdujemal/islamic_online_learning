@@ -25,12 +25,26 @@ class _FaqItemState extends ConsumerState<FaqItem> {
         title: Text(widget.faqModel.question),
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(
                 width: 20,
               ),
               const Icon(Icons.subdirectory_arrow_right_rounded),
-              Expanded(child: Text(widget.faqModel.answer)),
+              if (widget.faqModel.answer.split(",").length == 1)
+                Expanded(child: Text(widget.faqModel.answer)),
+              if (widget.faqModel.answer.split(",").length > 1)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: List.generate(
+                      widget.faqModel.answer.split(",").length,
+                      (index) => Text(
+                        widget.faqModel.answer.split(",")[index],
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
           const SizedBox(

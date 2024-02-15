@@ -293,10 +293,12 @@ class _PdfPageState extends ConsumerState<PdfPage> {
               bottomNavigationBar: AudioBottomView(
                 courseModel.courseId,
                 () {
+                  // audioPlayer.sequenceState.
+
                   if (courseModel.isFinished == 0) {
                     courseModel = courseModel.copyWith(
                       isStarted: 1,
-                      pausedAtAudioNum: audioPlayer.currentIndex,
+                      // pausedAtAudioNum: PlaylistHelper().playListIndexes[audioPlayer.currentIndex ?? 0],
                       pausedAtAudioSec: audioPlayer.position.inSeconds,
                       lastViewed: DateTime.now().toString(),
                     );

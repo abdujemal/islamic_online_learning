@@ -53,59 +53,7 @@ class Main extends ConsumerStatefulWidget {
 class _MainState extends ConsumerState<Main> {
   FirebaseDynamicLinks firebaseDynamicLink = FirebaseDynamicLinks.instance;
 
-  @override
-  void initState() {
-    super.initState();
-
-    // firebaseDynamicLink.onLink.listen((event) {
-    //   print("link:- ${event.link}");
-    //   print("Segments: ${event.link.pathSegments}");
-    //   if (event.link.pathSegments.contains("courses")) {
-    // String id = Uri.decodeFull(event.link.toString())
-    //     .split("/")
-    //     .last
-    //     .replaceAll("courses?id=", "")
-    //     .replaceAll("+", " ");
-    // print("id: $id");
-
-    //     getCourseAndRedirect(id);
-    //   }
-    // }).onError((e) {
-    //   toast(
-    //     e.toString(),
-    //     ToastType.error,
-    //     context,
-    //     isLong: true,
-    //   );
-    // });
-  }
-
-  // getCourseAndRedirect(String? id) async {
-  //   print("course id:$id");
-  //   if (id == null) {
-  //     return;
-  //   }
-  //   if (id.isEmpty) {
-  //     return;
-  //   }
-  //   final res = await ref
-  //       .read(mainNotifierProvider.notifier)
-  //       .getSingleCourse(id, context, fromCloud: true);
-  //   print("wait ... ");
-  //   if (res != null) {
-  //     print("redirecting ... ");
-  //     if (mounted) {
-  //       print("go");
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (_) => CourseDetail(cm: res),
-  //         ),
-  //       );
-  //     }
-  //   }
-  // }
-
+  
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {

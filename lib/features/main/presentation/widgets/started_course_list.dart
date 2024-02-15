@@ -79,9 +79,9 @@ class _StartedCourseListState extends ConsumerState<StartedCourseList> {
                     child: ListView.builder(
                       physics: const BouncingScrollPhysics(),
                       scrollDirection: Axis.horizontal,
-                      itemCount: _.courses.length < 6 ? _.courses.length : 6,
+                      itemCount: _.courses.length < 5 ? _.courses.length : 5,
                       itemBuilder: (context, index) {
-                        if (index < 5) {
+                        if (index < 4) {
                           return StartedCourseCard(
                             courseModel: _.courses[index],
                           );

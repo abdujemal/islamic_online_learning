@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
+import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -96,70 +97,20 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
               IconButton(
                 onPressed: () async {
                   if (widget.mediaItem.extras?["isFinished"] == 0) {
-                    // if (!audioPlayer.hasNext) {
-                    //   await showDialog(
-                    //     context: context,
-                    //     barrierDismissible: false,
-                    //     builder: (ctx) => FinishConfirmation(
-                    //       title: widget.mediaItem.title
-                    //           .split(" ")
-                    //           .sublist(
-                    //             0,
-                    //             widget.mediaItem.title.split(" ").length - 2,
-                    //           )
-                    //           .join(" "),
-                    //       onConfirm: () {
-                    //         if (mounted) {
-                    //           ref
-                    //               .read(mainNotifierProvider.notifier)
-                    //               .saveCourse(
-                    //                 CourseModel.fromMap(
-                    //                   widget.mediaItem.extras as Map,
-                    //                   widget.mediaItem.extras?["courseId"],
-                    //                 ).copyWith(
-                    //                   isStarted: 1,
-                    //                   isFinished: 1,
-                    //                   pausedAtAudioNum:
-                    //                       audioPlayer.currentIndex,
-                    //                   pausedAtAudioSec:
-                    //                       audioPlayer.position.inSeconds,
-                    //                   lastViewed: DateTime.now().toString(),
-                    //                 ),
-                    //                 null,
-                    //                 context,
-                    //                 showMsg: false,
-                    //               );
-                    //         }
-                    //         Navigator.pop(context);
-                    //       },
-                    //       onDenied: () {
-                    //         ref.read(mainNotifierProvider.notifier).saveCourse(
-                    //               CourseModel.fromMap(
-                    //                 widget.mediaItem.extras as Map,
-                    //                 widget.mediaItem.extras?["courseId"],
-                    //               ).copyWith(
-                    //                 isStarted: 1,
-                    //                 pausedAtAudioNum: audioPlayer.currentIndex,
-                    //                 pausedAtAudioSec:
-                    //                     audioPlayer.position.inSeconds,
-                    //                 lastViewed: DateTime.now().toString(),
-                    //               ),
-                    //               null,
-                    //               context,
-                    //               showMsg: false,
-                    //             );
-                    //         Navigator.pop(context);
-                    //       },
-                    //     ),
-                    //   );
-                    // } else {
+                    
+                    int id = int.parse(widget.mediaItem.title
+                            .split(" ")
+                            .last
+                            .replaceAll('.mp3', 'replace')) -
+                        1;
+                    print("Audio Id $id");
                     await ref.read(mainNotifierProvider.notifier).saveCourse(
                           CourseModel.fromMap(
                             widget.mediaItem.extras as Map,
                             widget.mediaItem.extras?["courseId"],
                           ).copyWith(
                             isStarted: 1,
-                            pausedAtAudioNum: audioPlayer.currentIndex,
+                            pausedAtAudioNum: id,
                             pausedAtAudioSec: audioPlayer.position.inSeconds,
                             lastViewed: DateTime.now().toString(),
                           ),

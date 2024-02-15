@@ -102,34 +102,36 @@ class IMainDataSrc extends MainDataSrc {
         print("New Docs ${qs.docs.length}");
         if (qs.docs.isNotEmpty) {
           for (var d in qs.docs) {
-            if (!categories.contains(d.data()['category'])) {
-              print('adding cateogry');
-              await DatabaseHelper().insertCategory(d.data()['category']);
-            }
+            if (d.data()["audioSizes"] != null) {
+              if (!categories.contains(d.data()['category'])) {
+                print('adding cateogry');
+                await DatabaseHelper().insertCategory(d.data()['category']);
+              }
 
-            if (!ustazs.contains(d.data()['ustaz'])) {
-              print('adding ustaz');
+              if (!ustazs.contains(d.data()['ustaz'])) {
+                print('adding ustaz');
 
-              await DatabaseHelper().insertCategory(d.data()['ustaz']);
-            }
+                await DatabaseHelper().insertCategory(d.data()['ustaz']);
+              }
 
-            if (!contents.contains(d.data()['title'])) {
-              print('adding title');
+              if (!contents.contains(d.data()['title'])) {
+                print('adding title');
 
-              await DatabaseHelper().insertContent(d.data()['title']);
-            }
+                await DatabaseHelper().insertContent(d.data()['title']);
+              }
 
-            final id = await DatabaseHelper().isCourseAvailable(d.id);
-            if (id != null) {
-              print("updateing");
+              final id = await DatabaseHelper().isCourseAvailable(d.id);
+              if (id != null) {
+                print("updateing");
 
-              await DatabaseHelper().updateCourseFromCloud(
-                  CourseModel.fromMap(d.data(), d.id).copyWith(id: id));
-            } else {
-              print("adding");
+                await DatabaseHelper().updateCourseFromCloud(
+                    CourseModel.fromMap(d.data(), d.id).copyWith(id: id));
+              } else {
+                print("adding");
 
-              await DatabaseHelper()
-                  .insertCourse(CourseModel.fromMap(d.data(), d.id));
+                await DatabaseHelper()
+                    .insertCourse(CourseModel.fromMap(d.data(), d.id));
+              }
             }
           }
         }
@@ -268,6 +270,7 @@ class IMainDataSrc extends MainDataSrc {
       final aq =
           await firebaseFirestore.collection(FirebaseConst.faq).count().get();
       if (aq.count != null && faqdata.length < aq.count!) {
+        print("get data from cloud");
         final qs = await firebaseFirestore.collection(FirebaseConst.faq).get();
         for (var d in qs.docs) {
           final id =

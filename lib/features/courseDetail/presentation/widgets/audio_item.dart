@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,6 +29,7 @@ class AudioItem extends ConsumerStatefulWidget {
   final bool isFromPDF;
   final void Function(String filePath) onDownloadDone;
   final VoidCallback onPlayTabed;
+  final VoidCallback onDeleteBtn;
   final bool isPlaying;
   final bool canAudioPlay;
   final bool canNeverPlay;
@@ -43,6 +45,7 @@ class AudioItem extends ConsumerStatefulWidget {
     required this.isPlaying,
     required this.canAudioPlay,
     required this.canNeverPlay,
+    required this.onDeleteBtn,
   });
 
   @override
@@ -140,6 +143,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                             context);
 
                                     isDownloaded = await checkFile();
+                                    widget.onDeleteBtn();
                                     if (mounted) {
                                       setState(() {});
                                     }
@@ -246,6 +250,11 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                 ),
                               );
                             } else {
+                              int id = int.parse(metaData.title
+                                      .split(" ")
+                                      .last
+                                      .replaceAll(".mp3", "")) -
+                                  1;
                               await ref
                                   .read(mainNotifierProvider.notifier)
                                   .saveCourse(
@@ -254,8 +263,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                       metaData.extras?["courseId"],
                                     ).copyWith(
                                       isStarted: 1,
-                                      pausedAtAudioNum:
-                                          audioPlayer.currentIndex,
+                                      pausedAtAudioNum: id,
                                       pausedAtAudioSec:
                                           audioPlayer.position.inSeconds,
                                       lastViewed: DateTime.now().toString(),
@@ -290,6 +298,9 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                               if (mounted) {
                                 setState(() {});
                               }
+                            } else {
+                              print("file is null idk why");
+                              return;
                             }
                           }
                         }

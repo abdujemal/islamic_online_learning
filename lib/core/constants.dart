@@ -14,6 +14,9 @@ const String dbPath = "/Islamic Online Learning/db/myDB.db";
 
 const int numOfDoc = 20;
 
+const String playStoreUrl =
+    "https://play.google.com/store/apps/details?id=com.aj.islamic_online_learning";
+
 const Color cardColor = Color(0xfffcffea);
 
 const Color darkCardColor = Color(0xff3f3f3d);
@@ -140,39 +143,6 @@ double getPersentage(CourseModel courseModel) {
   return percnt > 1 ? 1 : percnt;
 }
 
-// Future<File?> displayImage(String? id, String name, WidgetRef ref) async {
-//   final directory = await getApplicationSupportDirectory();
-//   final filePath = "${directory.path}/Images/$name.jpg";
-//   // print(filePath);
-//   if (await File(filePath).exists() &&
-//       im.decodeImage(await File(filePath).readAsBytes()) != null) {
-//     // print("file exsists: ${filePath}");
-//     return File(filePath);
-//   } else if (id != null) {
-//     try {
-//       String url = await ref.read(cdDataSrcProvider).loadFileOnline(id, false);
-
-//       final response = await Dio().download(url, filePath);
-
-//       if (im.decodeImage(await File(filePath).readAsBytes()) == null) {
-//         await File(filePath).delete();
-//         return File("");
-//       }
-
-//       print("statusCode ${response.statusCode}");
-
-//       // Return the downloaded file
-//       return File(filePath);
-//     } catch (e) {
-//       if (kDebugMode) {
-//         print("$e");
-//       }
-//       return File("");
-//     }
-//   } else {
-//     return null;
-//   }
-// }
 
 String formatFileSize(int sizeInBytes) {
   if (sizeInBytes < 1024) {
@@ -194,6 +164,7 @@ String formatFileSize(int sizeInBytes) {
 
 bool isPlayingCourseThisCourse(String courseId, WidgetRef ref,
     {bool alsoIsNotIdle = false}) {
+  print('isPlayingCourseThisCourse');
   final audioPlayer = ref.read(audioProvider);
   final metaData = audioPlayer.sequenceState?.currentSource?.tag;
   if (metaData == null) {

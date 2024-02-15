@@ -76,7 +76,7 @@ class _FAQState extends ConsumerState<FAQ> {
           }
           return Scaffold(
             appBar: AppBar(
-              title: const Text("ስለ አፑ የተጠየቁ ጥያቄዎች"),
+              title: const Text("ስለ መተግበሪያው የተጠየቁ ጥያቄዎች"),
               bottom: PreferredSize(
                 preferredSize: Size(
                   MediaQuery.of(context).size.width,

@@ -3,7 +3,6 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
@@ -18,6 +17,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../core/Audio Feature/playlist_helper.dart';
 import '../../../courseDetail/presentation/stateNotifier/providers.dart';
 import '../pages/filtered_courses.dart';
 
@@ -44,66 +44,68 @@ class CourseItem extends ConsumerStatefulWidget {
 
 class _CourseItemState extends ConsumerState<CourseItem> {
   double percentage = 0.0;
-  List<AudioSource> playList = [];
+
+  List<String> audios = [];
+  List<int> playListIndexes = [];
+
+  List<AudioSource> lst = [];
+  late CourseModel courseModel;
+
+  @override
+  initState() {
+    super.initState();
+    courseModel = widget.courseModel;
+    audios = widget.courseModel.courseIds.split(",");
+  }
 
   Future<void> createPlayList() async {
-    playList = [];
+    if (mounted) {
+      setState(() {});
+    }
+
     Directory dir = await getApplicationSupportDirectory();
-    List<String> audioIds = widget.courseModel.courseIds.split(",");
 
     int i = 0;
-    List<AudioSource> lst = [];
-
-    for (String id in audioIds) {
+    lst = [];
+    playListIndexes = [];
+    ref.read(loadAudiosProvider.notifier).update((state) => 0);
+    for (String id in audios) {
       i++;
       if (await checkFile(i)) {
-        String fileName =
-            "${widget.courseModel.ustaz},${widget.courseModel.title} $i.mp3";
+        String fileName = "${courseModel.ustaz},${courseModel.title} $i.mp3";
 
+        if (mounted) {
+          ref.read(loadAudiosProvider.notifier).update((state) => state + 1);
+        }
+        playListIndexes.add(i);
         lst.add(
           AudioSource.file(
             "${dir.path}/Audio/$fileName",
             tag: MediaItem(
               id: id,
-              title: "${widget.courseModel.title} $i",
-              artist: widget.courseModel.ustaz,
-              album: widget.courseModel.category,
-              artUri: Uri.parse(widget.courseModel.image),
-              extras: widget.courseModel.toMap(),
+              title: "${courseModel.title} $i",
+              artist: courseModel.ustaz,
+              album: courseModel.category,
+              artUri: Uri.parse(courseModel.image),
+              extras: courseModel.toMap(),
             ),
           ),
         );
-      } else {
-        if (mounted) {
-          final url = await ref
-              .read(cdNotifierProvider.notifier)
-              .loadFileOnline(id, true, showError: false, context);
-          if (url != null) {
-            lst.add(
-              AudioSource.uri(
-                Uri.parse(
-                  url,
-                ),
-                tag: MediaItem(
-                  id: id,
-                  title: "${widget.courseModel.title} $i",
-                  artist: widget.courseModel.ustaz,
-                  album: widget.courseModel.category,
-                  artUri: Uri.parse(widget.courseModel.image),
-                  extras: widget.courseModel.toMap(),
-                ),
-              ),
-            );
-          }
-        }
       }
     }
-    playList.addAll(lst);
+    if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
+      print("playlist updateing");
+      // int prevLen = PlaylistHelper().playList?.length ?? 0;
+      // PlaylistHelper().playList?.addAll(lst);
+      // PlaylistHelper().playList?.removeRange(0, prevLen - 1);
+      // ref.read(playlistProvider).addAll(lst);
+    } else {
+      print("playlist adding");
+
+      // myPlaylist = ConcatenatingAudioSource(children: lst);
+    }
     if (mounted) {
       setState(() {});
-    }
-    if (kDebugMode) {
-      print("playlist itams: ${playList.length}");
     }
   }
 
@@ -236,30 +238,62 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                             child: IconButton(
                                               onPressed: () async {
                                                 await createPlayList();
-                                                if (playList.isNotEmpty) {
+                                                final playList =
+                                                    PlaylistHelper().playList ??
+                                                        ConcatenatingAudioSource(
+                                                            children: []);
+                                                final audioPlayer =
+                                                    ref.read(audioProvider);
+
+                                                if (!playListIndexes.contains(
+                                                    courseModel
+                                                            .pausedAtAudioNum +
+                                                        1)) {
+                                                  if (mounted) {
+                                                    toast(
+                                                      "${courseModel.title} ${courseModel.pausedAtAudioNum + 1} ዳውንሎድ አልተደረገም.",
+                                                      ToastType.normal,
+                                                      context,
+                                                    );
+                                                  }
+                                                  return;
+                                                }
+                                                if (!isPlayingCourseThisCourse(
+                                                    courseModel.courseId,
+                                                    ref)) {
+                                                  PlaylistHelper()
+                                                      .playList
+                                                      ?.clear();
+                                                  PlaylistHelper()
+                                                      .playList
+                                                      ?.addAll(lst);
+                                                }
+                                                if (playList.length > 0) {
+                                                  int playableIndex =
+                                                      playListIndexes.indexOf(
+                                                          courseModel
+                                                                  .pausedAtAudioNum +
+                                                              1);
+                                                  print(
+                                                      "playListIndexes: $playListIndexes");
+                                                  print(
+                                                      "pausedAtAudioNum: $playableIndex");
                                                   await ref
                                                       .read(audioProvider)
                                                       .setAudioSource(
-                                                        ConcatenatingAudioSource(
-                                                          children: playList,
-                                                        ),
-                                                        initialIndex: widget
-                                                                    .courseModel
+                                                        playList,
+                                                        initialIndex: courseModel
                                                                     .pausedAtAudioNum <
                                                                 0
                                                             ? 0
-                                                            : widget.courseModel
-                                                                .pausedAtAudioNum,
+                                                            : playableIndex,
                                                         initialPosition:
                                                             Duration(
-                                                          seconds: widget
-                                                              .courseModel
+                                                          seconds: courseModel
                                                               .pausedAtAudioSec,
                                                         ),
                                                       );
-                                                  ref
-                                                      .read(audioProvider)
-                                                      .play();
+                                                  audioPlayer.play();
 
                                                   if (mounted) {
                                                     bool isPDFDownloded =
@@ -268,26 +302,31 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                                 cdNotifierProvider
                                                                     .notifier)
                                                             .isDownloaded(
-                                                              widget.courseModel
-                                                                      .pdfId
+                                                              courseModel.pdfId
                                                                       .contains(
                                                                           ",")
-                                                                  ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
-                                                                  : "${widget.courseModel.title}.pdf",
+                                                                  ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                                  : "${courseModel.title}.pdf",
                                                               "PDF",
                                                               context,
                                                             );
-                                                    if (widget.courseModel.pdfId
+                                                    print(
+                                                        "isPDFDownloded:- $isPDFDownloded");
+                                                    print(courseModel.pdfId
+                                                            .contains(",")
+                                                        ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                        : "${courseModel.title}.pdf");
+                                                    if (courseModel.pdfId
                                                             .trim()
                                                             .isNotEmpty &&
                                                         isPDFDownloded) {
                                                       String path =
                                                           await getPath(
                                                         'PDF',
-                                                        widget.courseModel.pdfId
+                                                        courseModel.pdfId
                                                                 .contains(",")
-                                                            ? "${widget.courseModel.title} ${widget.courseModel.pdfNum.toInt()}.pdf"
-                                                            : "${widget.courseModel.title}.pdf",
+                                                            ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                            : "${courseModel.title}.pdf",
                                                       );
                                                       if (mounted) {
                                                         await Navigator.push(
@@ -295,25 +334,24 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                           MaterialPageRoute(
                                                             builder: (_) =>
                                                                 PdfPage(
-                                                              volume: widget
-                                                                  .courseModel
-                                                                  .pdfNum,
+                                                              volume:
+                                                                  courseModel
+                                                                      .pdfNum,
                                                               path: path,
-                                                              courseModel: widget
-                                                                  .courseModel,
+                                                              courseModel:
+                                                                  courseModel,
                                                             ),
                                                           ),
                                                         );
                                                       }
                                                     } else {
                                                       if (mounted) {
-                                                        Navigator.push(
+                                                        await Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
                                                             builder: (_) =>
                                                                 CourseDetail(
-                                                              cm: widget
-                                                                  .courseModel,
+                                                              cm: courseModel,
                                                             ),
                                                           ),
                                                         );

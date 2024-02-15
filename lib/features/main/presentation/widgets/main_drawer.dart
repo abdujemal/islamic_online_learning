@@ -7,6 +7,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/aboutus.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/faq.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../downloadedFiles/presentation/pages/downloaded_files_page.dart';
 
@@ -228,7 +229,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                 child: ListTile(
                   leading: const Icon(Icons.help_rounded),
                   title: Text(
-                    "የአፑን አጠቃቀም አሳየኝ",
+                    "የመተግበሪያውን አጠቃቀም አሳየኝ",
                     style: TextStyle(
                       fontSize: fnt,
                     ),
@@ -342,6 +343,9 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   ),
                 ),
                 child: ListTile(
+                  onTap: () {
+                    Share.share(playStoreUrl, subject: "ይህንን መተግበሪያ ይመልከቱ");
+                  },
                   leading: const Icon(Icons.share_rounded),
                   title: Text(
                     "አጋራ",
@@ -372,7 +376,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   },
                   leading: const Icon(Icons.help_rounded),
                   title: Text(
-                    "ስለ አፑ የተጠየቁ ጥያቄዎች",
+                    "ስለ መተግበሪያው የተጠየቁ ጥያቄዎች",
                     style: TextStyle(
                       fontSize: fnt,
                     ),
@@ -400,7 +404,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   },
                   leading: const Icon(Icons.info_rounded),
                   title: Text(
-                    "ስለ አፑ",
+                    "ስለ መተግበሪያው",
                     style: TextStyle(
                       fontSize: fnt,
                     ),

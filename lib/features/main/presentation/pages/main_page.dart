@@ -14,6 +14,7 @@ import 'package:islamic_online_learning/features/main/presentation/pages/home.da
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_drawer.dart';
+import 'package:islamic_online_learning/features/main/presentation/widgets/rate_us_dailog.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -52,6 +53,8 @@ class _MainPageState extends ConsumerState<MainPage>
 
   bool showTopAudio = false;
 
+  bool? wantToRate;
+
   Timer? searchTimer;
 
   @override
@@ -59,6 +62,8 @@ class _MainPageState extends ConsumerState<MainPage>
     super.initState();
 
     tabController = TabController(length: 3, vsync: this);
+
+    FirebaseMessaging.instance.subscribeToTopic("v1.0.0");
 
     tabController.addListener(_handleTabChange);
 
@@ -71,6 +76,7 @@ class _MainPageState extends ConsumerState<MainPage>
     if (mounted) {
       ref.read(mainNotifierProvider.notifier).getTheme();
       ref.read(sharedPrefProvider).then((pref) {
+        wantToRate = pref.getBool("wantToRate");
         ref.read(fontScaleProvider.notifier).update(
               (state) => pref.getDouble("fontScale") ?? 1.0,
             );
@@ -162,21 +168,22 @@ class _MainPageState extends ConsumerState<MainPage>
         identify: "CourseTitle",
         align: ContentAlign.bottom,
         title: "የደርሱ ስም",
-        subtitle: "የደርሱን ስም ጫን ካሉት ተመሳሳይ ስም ያላቸውን ደርሶች ያመጣሎታል።",
+        subtitle: "የደርሱን ስም ለሁለት ሰከንድ ጫን ካሉት ተመሳሳይ ስም ያላቸውን ደርሶች ያመጣሎታል።",
       ),
       getTutorial(
         key: _courseUstazKey,
         identify: "CourseUstaz",
         align: ContentAlign.bottom,
         title: "የደርሱ ኡስታዝ",
-        subtitle: "የደርሱን ኡስታዝ ስም ጫን ካሉት ተመሳሳይ ኡስታዝ ስም ያላቸውን ደርሶች ያመጣሎታል።",
+        subtitle:
+            "የደርሱን ኡስታዝ ስም ለሁለት ሰከንድ ጫን ካሉት ተመሳሳይ ኡስታዝ ስም ያላቸውን ደርሶች ያመጣሎታል።",
       ),
       getTutorial(
         key: _courseCategoryKey,
         identify: "CourseCategory",
         align: ContentAlign.bottom,
         title: "የደርሱ ምድብ",
-        subtitle: "የደርሱን ምድብ ጫን ካሉት ተመሳሳይ ምድብ የሆኑ ደርሶች ያመጣሎታል።",
+        subtitle: "የደርሱን ምድብ ለሁለት ሰከንድ ጫን ካሉት ተመሳሳይ ምድብ የሆኑ ደርሶች ያመጣሎታል።",
       ),
     ];
 
@@ -234,6 +241,17 @@ class _MainPageState extends ConsumerState<MainPage>
           toast("እባክዎ ድጋሚ ይንኩት!", ToastType.normal, context);
           return false;
         } else {
+          if (wantToRate == null) {
+            final res = await showDialog<bool>(
+              context: context,
+              builder: (context) => const RateUsDailog(),
+            );
+            if (res == null) {
+              wantToRate = false;
+              return false;
+            }
+            return res;
+          }
           return true;
         }
       },
