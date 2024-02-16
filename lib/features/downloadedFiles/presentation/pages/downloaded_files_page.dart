@@ -8,6 +8,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
+import '../../../../core/Audio Feature/playlist_helper.dart';
 
 class DownloadedFilesPage extends ConsumerStatefulWidget {
   const DownloadedFilesPage({super.key});
@@ -31,7 +32,7 @@ class _DownloadedFilesPageState extends ConsumerState<DownloadedFilesPage>
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
 
     return StreamBuilder(
         stream: myAudioStream(audioPlayer),

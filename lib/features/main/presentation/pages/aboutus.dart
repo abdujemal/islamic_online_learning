@@ -7,6 +7,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/Audio Feature/current_audio_view.dart';
+import '../../../../core/Audio Feature/playlist_helper.dart';
 
 class AboutUs extends ConsumerStatefulWidget {
   const AboutUs({super.key});
@@ -20,7 +21,7 @@ class _AboutUsState extends ConsumerState<AboutUs> {
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
     return StreamBuilder(
         stream: myAudioStream(audioPlayer),
         builder: (context, snap) {

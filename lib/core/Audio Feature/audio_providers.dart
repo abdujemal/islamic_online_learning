@@ -1,12 +1,12 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'audio_model.dart';
 
-final audioProvider = StateProvider<AudioPlayer>((ref) {
-  return AudioPlayer();
-});
+// final audioProvider = StateProvider<AudioPlayer>((ref) {
+//   return AudioPlayer();
+// });
 
 Stream<AudioData> myAudioStream(AudioPlayer audioPlayer) =>
     Rx.combineLatest2<ProcessingState, SequenceState?, AudioData>(
@@ -45,7 +45,7 @@ Stream<AudioData> myAudioStream(AudioPlayer audioPlayer) =>
 
 // final audioPlayerPositionSubscriptionProvider =
 //     Provider.autoDispose<StreamSubscription<Duration>>((ref) {
-//   final audioPlayer = ref.read(audioProvider);
+//   final audioPlayer = PlaylistHelper.audioPlayer;
 //   final postionState = ref.read(audioPlayerPositionProvider.notifier);
 
 //   return audioPlayer.onPositionChanged.listen((Duration position) {
@@ -55,7 +55,7 @@ Stream<AudioData> myAudioStream(AudioPlayer audioPlayer) =>
 
 // final audioPlayerDurationSubscriptionProvider =
 //     Provider.autoDispose<StreamSubscription<Duration>>((ref) {
-//   final audioPlayer = ref.read(audioProvider);
+//   final audioPlayer = PlaylistHelper.audioPlayer;
 //   final durationState = ref.read(audioPlayerDurationProvider.notifier);
 
 //   return audioPlayer.onDurationChanged.listen((Duration duration) {
@@ -65,7 +65,7 @@ Stream<AudioData> myAudioStream(AudioPlayer audioPlayer) =>
 
 // final audioPlayerFinishedSubscriptionProvider =
 //     Provider.autoDispose<StreamSubscription<void>>((ref) {
-//   final audioPlayer = ref.read(audioProvider);
+//   final audioPlayer = PlaylistHelper.audioPlayer;
 //   final currentAudio = ref.watch(currentAudioProvider.notifier);
 //   final positionNotifier = ref.watch(audioPlayerPositionProvider.notifier);
 
@@ -78,7 +78,7 @@ Stream<AudioData> myAudioStream(AudioPlayer audioPlayer) =>
 
 // final checkAudioModelProvider = Provider.family<AudioState, String>((ref, id) {
 //   final currentAudio = ref.watch(currentAudioProvider);
-//   final audioPlayer = ref.watch(audioProvider);
+//   final audioPlayer = PlaylistHelper.audioPlayer;
 
   // audioPlayer.sequenceStateStream.listen((event) {
   //   if (event != null) {

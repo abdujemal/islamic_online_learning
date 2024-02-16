@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/pages/course_detail.dart';
@@ -95,6 +94,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
     }
     if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
       print("playlist updateing");
+      PlaylistHelper.mainPlayListIndexes = playListIndexes;
       // int prevLen = PlaylistHelper().playList?.length ?? 0;
       // PlaylistHelper().playList?.addAll(lst);
       // PlaylistHelper().playList?.removeRange(0, prevLen - 1);
@@ -239,11 +239,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                               onPressed: () async {
                                                 await createPlayList();
                                                 final playList =
-                                                    PlaylistHelper().playList ??
-                                                        ConcatenatingAudioSource(
-                                                            children: []);
+                                                    PlaylistHelper().playList;
                                                 final audioPlayer =
-                                                    ref.read(audioProvider);
+                                                    PlaylistHelper.audioPlayer;
 
                                                 if (!playListIndexes.contains(
                                                     courseModel
@@ -263,10 +261,10 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                     ref)) {
                                                   PlaylistHelper()
                                                       .playList
-                                                      ?.clear();
+                                                      .clear();
                                                   PlaylistHelper()
                                                       .playList
-                                                      ?.addAll(lst);
+                                                      .addAll(lst);
                                                 }
                                                 if (playList.length > 0) {
                                                   int playableIndex =
@@ -278,8 +276,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       "playListIndexes: $playListIndexes");
                                                   print(
                                                       "pausedAtAudioNum: $playableIndex");
-                                                  await ref
-                                                      .read(audioProvider)
+                                                  await PlaylistHelper.audioPlayer
                                                       .setAudioSource(
                                                         playList,
                                                         initialIndex: courseModel

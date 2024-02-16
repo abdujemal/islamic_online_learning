@@ -5,21 +5,19 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/stateNotifier/providers.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/download_icon.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
+import '../../../../core/Audio Feature/playlist_helper.dart';
 import '../../../main/presentation/state/provider.dart';
 import '../../data/course_detail_data_src.dart';
 import 'delete_confirmation.dart';
-import 'finish_confirmation.dart';
 
 class AudioItem extends ConsumerStatefulWidget {
   final String audioId;
@@ -103,7 +101,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
     final downLoadProg =
         ref.watch(downloadProgressCheckernProvider.call(audioPath));
 
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
     // checkFile();
 
     return FutureBuilder(
@@ -129,6 +127,9 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                             downLoadProg?.filePath != audioPath
                         ? IconButton(
                             onPressed: () async {
+                              if (widget.isPlaying) {
+                                return;
+                              }
                               showDialog(
                                 context: context,
                                 barrierDismissible: false,
@@ -184,12 +185,12 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                         }
 
                         if (snap.data == true && widget.isPlaying) {
-                          ref.read(audioProvider).pause();
+                          PlaylistHelper.audioPlayer.pause();
 
                           return;
                         }
                         if (snap.data != true && widget.isPlaying) {
-                          ref.read(audioProvider).play();
+                          PlaylistHelper.audioPlayer.play();
 
                           return;
                         }
@@ -201,54 +202,54 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                             if (!audioPlayer.hasNext &&
                                 audioPlayer.processingState ==
                                     ProcessingState.completed) {
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (ctx) => FinishConfirmation(
-                                  title: widget.courseModel.title,
-                                  onConfirm: () {
-                                    ref
-                                        .read(mainNotifierProvider.notifier)
-                                        .saveCourse(
-                                          widget.courseModel.copyWith(
-                                            isStarted: 1,
-                                            isFinished: 1,
-                                            lastViewed:
-                                                DateTime.now().toString(),
-                                            pausedAtAudioNum: widget
-                                                    .courseModel.courseIds
-                                                    .split(",")
-                                                    .length -
-                                                1,
-                                          ),
-                                          null,
-                                          context,
-                                          showMsg: false,
-                                        );
-                                    Navigator.pop(context);
-                                  },
-                                  onDenied: () {
-                                    ref
-                                        .read(mainNotifierProvider.notifier)
-                                        .saveCourse(
-                                          widget.courseModel.copyWith(
-                                            isStarted: 1,
-                                            lastViewed:
-                                                DateTime.now().toString(),
-                                            pausedAtAudioNum: widget
-                                                    .courseModel.courseIds
-                                                    .split(",")
-                                                    .length -
-                                                1,
-                                          ),
-                                          null,
-                                          context,
-                                          showMsg: false,
-                                        );
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              );
+                              // showDialog(
+                              //   context: context,
+                              //   barrierDismissible: false,
+                              //   builder: (ctx) => FinishConfirmation(
+                              //     title: widget.courseModel.title,
+                              //     onConfirm: () {
+                              //       ref
+                              //           .read(mainNotifierProvider.notifier)
+                              //           .saveCourse(
+                              //             widget.courseModel.copyWith(
+                              //               isStarted: 1,
+                              //               isFinished: 1,
+                              //               lastViewed:
+                              //                   DateTime.now().toString(),
+                              //               pausedAtAudioNum: widget
+                              //                       .courseModel.courseIds
+                              //                       .split(",")
+                              //                       .length -
+                              //                   1,
+                              //             ),
+                              //             null,
+                              //             context,
+                              //             showMsg: false,
+                              //           );
+                              //       Navigator.pop(context);
+                              //     },
+                              //     onDenied: () {
+                              //       ref
+                              //           .read(mainNotifierProvider.notifier)
+                              //           .saveCourse(
+                              //             widget.courseModel.copyWith(
+                              //               isStarted: 1,
+                              //               lastViewed:
+                              //                   DateTime.now().toString(),
+                              //               pausedAtAudioNum: widget
+                              //                       .courseModel.courseIds
+                              //                       .split(",")
+                              //                       .length -
+                              //                   1,
+                              //             ),
+                              //             null,
+                              //             context,
+                              //             showMsg: false,
+                              //           );
+                              //       Navigator.pop(context);
+                              //     },
+                              //   ),
+                              // );
                             } else {
                               int id = int.parse(metaData.title
                                       .split(" ")

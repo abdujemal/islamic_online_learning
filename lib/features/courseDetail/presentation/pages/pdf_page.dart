@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_bottom_view.dart';
@@ -69,7 +70,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
 
     ThemeMode theme = ref.read(themeProvider);
 

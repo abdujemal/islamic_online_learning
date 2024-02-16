@@ -183,7 +183,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
     await Future.delayed(const Duration(seconds: 1));
     state = MainListState.loaded(
       courses: courses,
-      isLoadingMore: false,
+      isLoadingMore: true,
       noMoreToLoad: false,
     );
   }

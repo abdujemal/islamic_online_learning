@@ -8,6 +8,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/Audio Feature/current_audio_view.dart';
+import '../../../../core/Audio Feature/playlist_helper.dart';
 import '../state/provider.dart';
 import 'filtered_courses.dart';
 
@@ -30,13 +31,11 @@ class _UstazsState extends ConsumerState<Ustazs> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ustazListNotifier.getUstaz();
     });
-
-   
   }
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
     return StreamBuilder(
         stream: myAudioStream(audioPlayer),
         builder: (context, snap) {

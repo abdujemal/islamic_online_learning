@@ -346,7 +346,7 @@ class DatabaseHelper {
   Future<int> updateCourseFromCloud(CourseModel courseModel) async {
     var db = await database;
     var result = await db!.update(
-        DatabaseConst.savedCourses, courseModel.toMap(),
+        DatabaseConst.savedCourses, courseModel.toOriginalMap(),
         where: 'courseId = ?', whereArgs: [courseModel.courseId]);
 
     return result;

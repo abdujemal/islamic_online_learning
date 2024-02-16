@@ -218,14 +218,10 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
     if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
       print("playlist updateing");
-      // int prevLen = PlaylistHelper().playList?.length ?? 0;
-      // PlaylistHelper().playList?.addAll(lst);
-      // PlaylistHelper().playList?.removeRange(0, prevLen - 1);
-      // ref.read(playlistProvider).addAll(lst);
+
+      PlaylistHelper.mainPlayListIndexes = playListIndexes;
     } else {
       print("playlist adding");
-
-      // myPlaylist = ConcatenatingAudioSource(children: lst);
     }
     isLoadingAudio = false;
     if (mounted) {
@@ -286,9 +282,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
-    final playList =
-        PlaylistHelper().playList ?? ConcatenatingAudioSource(children: []);
+    final audioPlayer = PlaylistHelper.audioPlayer;
+
+    ;
 
     percentage =
         getPersentage(courseModel).isNaN ? 1 : getPersentage(courseModel);
@@ -319,7 +315,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
               courseModel.courseId,
               () {
                 print("playListIndexes: $playListIndexes");
-                print("playlist: ${playList.children}");
+                print("playlist: ${PlaylistHelper().playList.children}");
                 print("index: ${audioPlayer.currentIndex}");
                 print(
                     'saveable index ${playListIndexes[audioPlayer.currentIndex != null ? audioPlayer.currentIndex! : 0] - 1}');
@@ -423,48 +419,56 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   }
                                   print("indexes: ${playListIndexes}");
                                   print("index : $index");
+                                  if (isPlayingCourseThisCourse(
+                                      courseModel.courseId, ref)) {
+                                    PlaylistHelper.mainPlayListIndexes =
+                                        playListIndexes;
+                                  }
+
                                   int insertableIndex =
                                       playListIndexes.indexOf(index);
 
                                   print("inserting at $insertableIndex");
                                   print(
-                                      'playlistNum: ${playList.children.length}');
+                                      'playlistNum: ${PlaylistHelper().playList.children.length}');
 
-                                  if (insertableIndex >=
-                                      playList.children.length) {
+                                  final audioSrc = AudioSource.file(
+                                    filePath,
+                                    tag: MediaItem(
+                                      id: audios[index - 1],
+                                      title: "${courseModel.title} $index",
+                                      artist: courseModel.ustaz,
+                                      album: courseModel.category,
+                                      artUri: Uri.parse(courseModel.image),
+                                      extras: courseModel.toMap(),
+                                    ),
+                                  );
+                                  if (insertableIndex >= PlaylistHelper().playList.length) {
                                     print("adding at $insertableIndex");
-                                    playList.add(
-                                      AudioSource.file(
-                                        filePath,
-                                        tag: MediaItem(
-                                          id: audios[index - 1],
-                                          title: "${courseModel.title} $index",
-                                          artist: courseModel.ustaz,
-                                          album: courseModel.category,
-                                          artUri: Uri.parse(courseModel.image),
-                                          extras: courseModel.toMap(),
-                                        ),
-                                      ),
-                                    );
+                                    if (isPlayingCourseThisCourse(
+                                        courseModel.courseId, ref)) {
+                                      PlaylistHelper().playList.add(audioSrc);
+                                    } else {
+                                      lst.add(audioSrc);
+                                    }
                                   } else {
                                     print("inserting at $insertableIndex");
 
-                                    playList.insert(
-                                      insertableIndex,
-                                      AudioSource.file(
-                                        filePath,
-                                        tag: MediaItem(
-                                          id: audios[index - 1],
-                                          title: "${courseModel.title} $index",
-                                          artist: courseModel.ustaz,
-                                          album: courseModel.category,
-                                          artUri: Uri.parse(courseModel.image),
-                                          extras: courseModel.toMap(),
-                                        ),
-                                      ),
-                                    );
+                                    if (isPlayingCourseThisCourse(
+                                        courseModel.courseId, ref)) {
+                                      PlaylistHelper().playList.insert(
+                                            insertableIndex,
+                                            audioSrc,
+                                          );
+                                    } else {
+                                      lst.insert(
+                                        insertableIndex,
+                                        audioSrc,
+                                      );
+                                    }
                                   }
-                                  print("num of index: ${playList.length}");
+                                  print(
+                                      "num of index: ${PlaylistHelper().playList.length}");
                                 },
                               ),
                             );
@@ -608,12 +612,13 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           }
                                           if (!isPlayingCourseThisCourse(
                                               courseModel.courseId, ref)) {
-                                            PlaylistHelper().playList?.clear();
+                                            PlaylistHelper().playList.clear();
                                             PlaylistHelper()
                                                 .playList
-                                                ?.addAll(lst);
+                                                .addAll(lst);
                                           }
-                                          if (playList.length > 0) {
+                                          if (PlaylistHelper().playList.length >
+                                              0) {
                                             int playableIndex = playListIndexes
                                                 .indexOf(courseModel
                                                         .pausedAtAudioNum +
@@ -623,7 +628,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                             print(
                                                 "pausedAtAudioNum: $playableIndex");
                                             await audioPlayer.setAudioSource(
-                                              playList,
+                                              PlaylistHelper().playList,
                                               initialIndex:
                                                   courseModel.pausedAtAudioNum <
                                                           0
@@ -889,56 +894,76 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   }
                                   print("indexes: ${playListIndexes}");
                                   print("index : $index");
+
+                                  if (isPlayingCourseThisCourse(
+                                      courseModel.courseId, ref)) {
+                                    PlaylistHelper.mainPlayListIndexes =
+                                        playListIndexes;
+                                  }
+                                  print("playListIndexes: $playListIndexes");
+                                  print(
+                                      "PlaylistHelper.mainPlayListIndexes: ${PlaylistHelper.mainPlayListIndexes}");
+
                                   int insertableIndex =
                                       playListIndexes.indexOf(index);
-
                                   print("inserting at $insertableIndex");
                                   print(
-                                      'playlistNum: ${playList.children.length}');
+                                      'playlistNum: ${PlaylistHelper().playList.children.length}');
 
-                                  if (insertableIndex >=
-                                      playList.children.length) {
+                                  final audioSrc = AudioSource.file(
+                                    filePath,
+                                    tag: MediaItem(
+                                      id: audios[index - 1],
+                                      title: "${courseModel.title} $index",
+                                      artist: courseModel.ustaz,
+                                      album: courseModel.category,
+                                      artUri: Uri.parse(courseModel.image),
+                                      extras: courseModel.toMap(),
+                                    ),
+                                  );
+                                  if (insertableIndex >= PlaylistHelper().playList.length) {
                                     print("adding at $insertableIndex");
-                                    playList.add(
-                                      AudioSource.file(
-                                        filePath,
-                                        tag: MediaItem(
-                                          id: audios[index - 1],
-                                          title: "${courseModel.title} $index",
-                                          artist: courseModel.ustaz,
-                                          album: courseModel.category,
-                                          artUri: Uri.parse(courseModel.image),
-                                          extras: courseModel.toMap(),
-                                        ),
-                                      ),
-                                    );
+                                    if (isPlayingCourseThisCourse(
+                                        courseModel.courseId, ref)) {
+                                      PlaylistHelper().playList.add(audioSrc);
+                                    } else {
+                                      lst.add(audioSrc);
+                                    }
                                   } else {
                                     print("inserting at $insertableIndex");
 
-                                    playList.insert(
-                                      insertableIndex,
-                                      AudioSource.file(
-                                        filePath,
-                                        tag: MediaItem(
-                                          id: audios[index - 1],
-                                          title: "${courseModel.title} $index",
-                                          artist: courseModel.ustaz,
-                                          album: courseModel.category,
-                                          artUri: Uri.parse(courseModel.image),
-                                          extras: courseModel.toMap(),
-                                        ),
-                                      ),
-                                    );
+                                    if (isPlayingCourseThisCourse(
+                                        courseModel.courseId, ref)) {
+                                      PlaylistHelper().playList.insert(
+                                            insertableIndex,
+                                            audioSrc,
+                                          );
+                                    } else {
+                                      lst.insert(
+                                        insertableIndex,
+                                        audioSrc,
+                                      );
+                                    }
                                   }
-                                  print("num of index: ${playList.length}");
+                                  print(
+                                      "num of index: ${PlaylistHelper().playList.length}");
                                 },
                                 onDeleteBtn: () async {
                                   int deleteableIndex =
                                       playListIndexes.indexOf(index);
                                   print("deleted index: $deleteableIndex");
                                   playListIndexes.removeAt(deleteableIndex);
-
-                                  playList.removeAt(deleteableIndex);
+                                  print("${PlaylistHelper().playList.length}");
+                                  if (isPlayingCourseThisCourse(
+                                      courseModel.courseId, ref)) {
+                                    PlaylistHelper.mainPlayListIndexes =
+                                        playListIndexes;
+                                    PlaylistHelper()
+                                        .playList
+                                        .removeAt(deleteableIndex);
+                                  } else {
+                                    lst.removeAt(deleteableIndex);
+                                  }
                                   if (mounted) {
                                     ref
                                         .read(loadAudiosProvider.notifier)
@@ -959,9 +984,12 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           audioPlayer.position.inSeconds,
                                       lastViewed: DateTime.now().toString(),
                                     );
-                                    setState(() {});
-                                    int destinationIndex =
-                                        playListIndexes.indexOf(index);
+                                    if (mounted) {
+                                      setState(() {});
+                                    }
+                                    int destinationIndex = PlaylistHelper
+                                        .mainPlayListIndexes
+                                        .indexOf(index);
                                     int currentIndex =
                                         audioPlayer.currentIndex ?? 0;
 
@@ -974,11 +1002,10 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                           const Duration(milliseconds: 50));
                                       if (destinationIndex > currentIndex) {
                                         print(">");
-                                        ref.read(audioProvider).seekToNext();
+                                        PlaylistHelper.audioPlayer.seekToNext();
                                       } else {
                                         print("<");
-                                        ref
-                                            .read(audioProvider)
+                                        PlaylistHelper.audioPlayer
                                             .seekToPrevious();
                                       }
                                     }
@@ -986,22 +1013,35 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                     print('playListIndexes: $playListIndexes');
                                     if (!isPlayingCourseThisCourse(
                                         courseModel.courseId, ref)) {
-                                      PlaylistHelper().playList?.clear();
-                                      PlaylistHelper().playList?.addAll(lst);
+                                      // PlaylistHelper().playList.clear();
+                                      // PlaylistHelper().playList.addAll(lst);
+                                      PlaylistHelper.nplayList =
+                                          ConcatenatingAudioSource(
+                                              children: lst);
+                                      PlaylistHelper.mainPlayListIndexes =
+                                          playListIndexes;
                                     }
-                                    ref.read(audioProvider).setAudioSource(
-                                          playList,
-                                          initialIndex:
-                                              playListIndexes.indexOf(index),
-                                          // preload: false,
-                                        );
+
+                                    print(
+                                        "playListNum: ${PlaylistHelper().playList.length}");
+                                    print("index: $index");
+                                    print(
+                                        "playingIndex: ${playListIndexes.indexOf(index)}");
+
+                                    PlaylistHelper.audioPlayer.setAudioSource(
+                                      PlaylistHelper().playList,
+                                      initialIndex: PlaylistHelper
+                                          .mainPlayListIndexes
+                                          .indexOf(index),
+                                      // preload: false,
+                                    );
                                     try {
-                                      await ref.read(audioProvider).play();
+                                      await PlaylistHelper.audioPlayer.play();
                                     } catch (e) {
                                       if (kDebugMode) {
                                         print(e.toString());
                                       }
-                                      await ref.read(audioProvider).stop();
+                                      await PlaylistHelper.audioPlayer.stop();
                                     }
                                   }
                                 },
@@ -1024,54 +1064,73 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       (state) => playListIndexes.length);
                                 }
                                 print("index : $index");
+
+                                if (isPlayingCourseThisCourse(
+                                    courseModel.courseId, ref)) {
+                                  PlaylistHelper.mainPlayListIndexes =
+                                      playListIndexes;
+                                }
                                 int insertableIndex =
                                     playListIndexes.indexOf(index);
 
                                 print("inserting at $insertableIndex");
 
-                                if (insertableIndex ==
-                                    playList.children.length) {
-                                  print("adding at $insertableIndex");
+                                final audioSrc = AudioSource.file(
+                                  filePath,
+                                  tag: MediaItem(
+                                    id: audios[index - 1],
+                                    title: "${courseModel.title} $index",
+                                    artist: courseModel.ustaz,
+                                    album: courseModel.category,
+                                    artUri: Uri.parse(courseModel.image),
+                                    extras: courseModel.toMap(),
+                                  ),
+                                );
 
-                                  playList.add(
-                                    AudioSource.file(
-                                      filePath,
-                                      tag: MediaItem(
-                                        id: audios[index - 1],
-                                        title: "${courseModel.title} $index",
-                                        artist: courseModel.ustaz,
-                                        album: courseModel.category,
-                                        artUri: Uri.parse(courseModel.image),
-                                        extras: courseModel.toMap(),
-                                      ),
-                                    ),
-                                  );
+                                if (insertableIndex >= PlaylistHelper().playList.length) {
+                                  print("adding at $insertableIndex");
+                                  if (isPlayingCourseThisCourse(
+                                      courseModel.courseId, ref)) {
+                                    PlaylistHelper().playList.add(audioSrc);
+                                  } else {
+                                    lst.add(audioSrc);
+                                  }
                                 } else {
                                   print("inserting at $insertableIndex");
 
-                                  playList.insert(
-                                    insertableIndex,
-                                    AudioSource.file(
-                                      filePath,
-                                      tag: MediaItem(
-                                        id: audios[index - 1],
-                                        title: "${courseModel.title} $index",
-                                        artist: courseModel.ustaz,
-                                        album: courseModel.category,
-                                        artUri: Uri.parse(courseModel.image),
-                                        extras: courseModel.toMap(),
-                                      ),
-                                    ),
-                                  );
+                                  if (isPlayingCourseThisCourse(
+                                      courseModel.courseId, ref)) {
+                                    PlaylistHelper().playList.insert(
+                                          insertableIndex,
+                                          audioSrc,
+                                        );
+                                  } else {
+                                    lst.insert(
+                                      insertableIndex,
+                                      audioSrc,
+                                    );
+                                  }
                                 }
-                                print("num of index: ${playList.length}");
+
+                                print(
+                                    "num of index: ${PlaylistHelper().playList.length}");
                               },
                               onDeleteBtn: () async {
                                 int deleteableIndex =
                                     playListIndexes.indexOf(index);
                                 print("deleted index: $deleteableIndex");
                                 playListIndexes.removeAt(deleteableIndex);
-                                playList.removeAt(deleteableIndex);
+
+                                if (isPlayingCourseThisCourse(
+                                    courseModel.courseId, ref)) {
+                                  PlaylistHelper.mainPlayListIndexes =
+                                      playListIndexes;
+                                  PlaylistHelper()
+                                      .playList
+                                      .removeAt(deleteableIndex);
+                                } else {
+                                  lst.removeAt(deleteableIndex);
+                                }
                                 if (mounted) {
                                   ref.read(loadAudiosProvider.notifier).update(
                                       (state) => playListIndexes.length);
@@ -1090,23 +1149,34 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                         audioPlayer.position.inSeconds,
                                     lastViewed: DateTime.now().toString(),
                                   );
-                                  setState(() {});
+                                  if (mounted) {
+                                    setState(() {});
+                                  }
                                 }
                                 if (!isPlayingCourseThisCourse(
                                     courseModel.courseId, ref)) {
-                                  PlaylistHelper().playList?.clear();
-                                  PlaylistHelper().playList?.addAll(lst);
+                                  print("changing playlist");
+                                  // PlaylistHelper().playList.clear();
+                                  print(lst.length);
+
+                                  PlaylistHelper.nplayList =
+                                      ConcatenatingAudioSource(children: lst);
+                                  PlaylistHelper.mainPlayListIndexes =
+                                      playListIndexes;
                                 }
 
                                 print('playListIndexes: $playListIndexes');
+                                print(
+                                    "playListNum: ${PlaylistHelper().playList.length}");
 
-                                ref.read(audioProvider).setAudioSource(
-                                      playList,
-                                      initialIndex:
-                                          playListIndexes.indexOf(index),
-                                      // preload: false,
-                                    );
-                                ref.read(audioProvider).play();
+                                PlaylistHelper.audioPlayer.setAudioSource(
+                                  PlaylistHelper().playList,
+                                  initialIndex: PlaylistHelper
+                                      .mainPlayListIndexes
+                                      .indexOf(index),
+                                  // preload: false,
+                                );
+                                PlaylistHelper.audioPlayer.play();
                               },
                             );
                           } else if (index == audios.length + 1) {

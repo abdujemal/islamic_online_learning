@@ -47,7 +47,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
 
     return StreamBuilder(
         stream: myAudioStream(audioPlayer),
@@ -70,59 +70,6 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
             return const SizedBox();
           }
 
-          // if (process == ProcessingState.completed) {
-          //   if (!audioPlayer.hasNext) {
-          //     showDialog(
-          //       context: context,
-          //       barrierDismissible: false,
-          //       builder: (ctx) => FinishConfirmation(
-          //         title: metaData.title
-          //             .split(" ")
-          //             .sublist(
-          //               0,
-          //               metaData.title.split(" ").length - 2,
-          //             )
-          //             .join(" "),
-          //         onConfirm: () {
-          //           ref.read(mainNotifierProvider.notifier).saveCourse(
-          //                 CourseModel.fromMap(
-          //                   metaData.extras as Map,
-          //                   metaData.extras?["courseId"],
-          //                 ).copyWith(
-          //                   isStarted: 1,
-          //                   isFinished: 1,
-          //                   pausedAtAudioNum: audioPlayer.currentIndex,
-          //                   pausedAtAudioSec: audioPlayer.position.inSeconds,
-          //                   lastViewed: DateTime.now().toString(),
-          //                 ),
-          //                 null,
-          //                 context,
-          //                 showMsg: false,
-          //               );
-          //           Navigator.pop(context);
-          //         },
-          //         onDenied: () {
-          //           ref.read(mainNotifierProvider.notifier).saveCourse(
-          //                 CourseModel.fromMap(
-          //                   metaData.extras as Map,
-          //                   metaData.extras?["courseId"],
-          //                 ).copyWith(
-          //                   isStarted: 1,
-          //                   pausedAtAudioNum: audioPlayer.currentIndex,
-          //                   pausedAtAudioSec: audioPlayer.position.inSeconds,
-          //                   lastViewed: DateTime.now().toString(),
-          //                 ),
-          //                 null,
-          //                 context,
-          //                 showMsg: false,
-          //               );
-          //           Navigator.pop(context);
-          //         },
-          //       ),
-          //     );
-          //     ref.read(audioProvider).stop();
-          //   }
-          // }
           return Container(
             height: 140,
             decoration: BoxDecoration(
@@ -177,9 +124,19 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                       GestureDetector(
                         onTap: () async {
                           widget.onClose();
-
+                          int audioLen = metaData.extras?["courseIds"]
+                                  .toString()
+                                  .split(",")
+                                  .length ??
+                              0;
+                          int currentPlayingIndex =
+                              int.parse(metaData.title.split(" ").last);
+                          print("audio len: $audioLen");
+                          print(
+                              "audioPlayer.currentIndex: $currentPlayingIndex");
+                          print("process: ${process.toString()}");
                           if (metaData.extras?["isFinished"] == 0) {
-                            if (!audioPlayer.hasNext &&
+                            if (audioLen == currentPlayingIndex &&
                                 process == ProcessingState.completed) {
                               showDialog(
                                 context: context,
@@ -189,7 +146,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                       .split(" ")
                                       .sublist(
                                         0,
-                                        metaData.title.split(" ").length - 2,
+                                        metaData.title.split(" ").length - 1,
                                       )
                                       .join(" "),
                                   onConfirm: () {
@@ -247,7 +204,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                   },
                                 ),
                               );
-                              ref.read(audioProvider).stop();
+                              PlaylistHelper.audioPlayer.stop();
                             } else {
                               int id = int.parse(metaData.title
                                       .split(" ")
@@ -277,7 +234,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                     .getSingleCourse(
                                         metaData.extras?["courseId"], context)
                                     .then((value) {
-                                  ref.read(audioProvider).stop();
+                                  PlaylistHelper.audioPlayer.stop();
                                 });
                               }).catchError((e) {
                                 if (kDebugMode) {
@@ -356,7 +313,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                       ),
                       IconButton(
                         onPressed: () async {
-                          ref.read(audioProvider).seekToPrevious();
+                          PlaylistHelper.audioPlayer.seekToPrevious();
                         },
                         icon: const Icon(Icons.skip_previous_rounded, size: 40),
                       ),
@@ -397,11 +354,11 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                           showMsg: false,
                                         );
                                   }
-                                  ref.read(audioProvider).pause();
+                                  PlaylistHelper.audioPlayer.pause();
                                   setState(() {});
                                   return;
                                 } else {
-                                  ref.read(audioProvider).play();
+                                  PlaylistHelper.audioPlayer.play();
                                   setState(() {});
                                   return;
                                 }
@@ -410,7 +367,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                           }),
                       IconButton(
                         onPressed: () async {
-                          ref.read(audioProvider).seekToNext();
+                          PlaylistHelper.audioPlayer.seekToNext();
                         },
                         icon: const Icon(Icons.skip_next_rounded, size: 40),
                       ),

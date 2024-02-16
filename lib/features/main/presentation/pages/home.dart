@@ -328,7 +328,9 @@ class _HomeState extends ConsumerState<Home>
                           return !isSearching
                               ? const SizedBox()
                               : const BeginnerCoursesList();
-                        } else if (index <= _.courses.length + 1) {
+                        } else if (isSearching &&
+                                index <= _.courses.length + 2 ||
+                            !isSearching && index <= _.courses.length + 1) {
                           return CourseItem(
                             _.courses[index < 5 ? index - 2 : index - 3],
                             index: index < 5 ? index - 2 : index - 3,

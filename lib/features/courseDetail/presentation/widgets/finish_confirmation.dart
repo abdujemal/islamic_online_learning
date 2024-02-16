@@ -105,7 +105,7 @@ class _FinishConfirmationState extends ConsumerState<FinishConfirmation> {
                       // ),
                       if (showCup)
                         const Text(
-                          "እንኳን ደስ አልዎት!!",
+                          "እንኳን ደስ አሎት!!",
                           style: TextStyle(
                             fontSize: 25,
                           ),

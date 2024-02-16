@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
+import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/started.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
@@ -227,7 +228,7 @@ class _MainPageState extends ConsumerState<MainPage>
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
     return WillPopScope(
       onWillPop: () async {
         if (tabController.index != 0) {

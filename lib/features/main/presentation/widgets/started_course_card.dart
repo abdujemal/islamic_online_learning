@@ -2,7 +2,6 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,7 +10,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/playlist_helper.dart';
 import '../../../../core/constants.dart';
 import '../../../courseDetail/presentation/pages/course_detail.dart';
@@ -83,6 +81,7 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
     }
     if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
       print("playlist updateing");
+      PlaylistHelper.mainPlayListIndexes = playListIndexes;
       // int prevLen = PlaylistHelper().playList?.length ?? 0;
       // PlaylistHelper().playList?.addAll(lst);
       // PlaylistHelper().playList?.removeRange(0, prevLen - 1);
@@ -183,9 +182,9 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                               child: IconButton(
                                 onPressed: () async {
                                   await createPlayList();
-                                  final playList = PlaylistHelper().playList ??
-                                      ConcatenatingAudioSource(children: []);
-                                  final audioPlayer = ref.watch(audioProvider);
+                                  final playList = PlaylistHelper().playList;
+                                  final audioPlayer =
+                                      PlaylistHelper.audioPlayer;
 
                                   if (!playListIndexes.contains(
                                       courseModel.pausedAtAudioNum + 1)) {
@@ -201,27 +200,25 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                   print("len: ${playList.length}");
                                   if (!isPlayingCourseThisCourse(
                                       courseModel.courseId, ref)) {
-                                    PlaylistHelper().playList?.clear();
-                                    PlaylistHelper().playList?.addAll(lst);
+                                    PlaylistHelper().playList.clear();
+                                    PlaylistHelper().playList.addAll(lst);
                                   }
                                   if (playList.length > 0) {
                                     int playableIndex = playListIndexes.indexOf(
                                         courseModel.pausedAtAudioNum + 1);
                                     print("playListIndexes: $playListIndexes");
                                     print("pausedAtAudioNum: $playableIndex");
-                                    await ref
-                                        .read(audioProvider)
+                                    await PlaylistHelper.audioPlayer
                                         .setAudioSource(
-                                          playList,
-                                          initialIndex:
-                                              courseModel.pausedAtAudioNum < 0
-                                                  ? 0
-                                                  : playableIndex,
-                                          initialPosition: Duration(
-                                            seconds:
-                                                courseModel.pausedAtAudioSec,
-                                          ),
-                                        );
+                                      playList,
+                                      initialIndex:
+                                          courseModel.pausedAtAudioNum < 0
+                                              ? 0
+                                              : playableIndex,
+                                      initialPosition: Duration(
+                                        seconds: courseModel.pausedAtAudioSec,
+                                      ),
+                                    );
                                     audioPlayer.play();
 
                                     if (mounted) {

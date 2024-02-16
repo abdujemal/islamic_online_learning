@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
@@ -22,8 +21,6 @@ class CurrentAudioView extends ConsumerStatefulWidget {
 class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
-
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -45,7 +42,7 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
           child: Row(
             children: [
               StreamBuilder(
-                stream: audioPlayer.playerStateStream,
+                stream: PlaylistHelper.audioPlayer.playerStateStream,
                 builder: (context, snap) {
                   if (snap.data == null) {
                     return const SizedBox();
@@ -61,10 +58,10 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                             color: whiteColor,
                           ),
                     onPressed: () {
-                      if (ref.read(audioProvider).playing) {
-                        ref.read(audioProvider).pause();
+                      if (PlaylistHelper.audioPlayer.playing) {
+                        PlaylistHelper.audioPlayer.pause();
                       } else {
-                        ref.read(audioProvider).play();
+                        PlaylistHelper.audioPlayer.play();
                       }
                     },
                   );
@@ -97,7 +94,6 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
               IconButton(
                 onPressed: () async {
                   if (widget.mediaItem.extras?["isFinished"] == 0) {
-                    
                     int id = int.parse(widget.mediaItem.title
                             .split(" ")
                             .last
@@ -111,7 +107,8 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                           ).copyWith(
                             isStarted: 1,
                             pausedAtAudioNum: id,
-                            pausedAtAudioSec: audioPlayer.position.inSeconds,
+                            pausedAtAudioSec:
+                                PlaylistHelper.audioPlayer.position.inSeconds,
                             lastViewed: DateTime.now().toString(),
                           ),
                           null,
@@ -120,7 +117,7 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                         );
                   }
                   // }
-                  ref.read(audioProvider).stop();
+                  PlaylistHelper.audioPlayer.stop();
                 },
                 icon: const Icon(
                   Icons.close_rounded,

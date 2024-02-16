@@ -10,6 +10,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 import '../../../../core/Audio Feature/current_audio_view.dart';
+import '../../../../core/Audio Feature/playlist_helper.dart';
 import '../../../../core/constants.dart';
 import '../widgets/course_item.dart';
 import '../widgets/the_end.dart';
@@ -103,7 +104,7 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
     return WillPopScope(
       onWillPop: () async {
         // if (widget.fromKey != null && widget.fromVal != null) {

@@ -9,8 +9,6 @@ import 'package:islamic_online_learning/features/courseDetail/domain/course_deta
 import 'package:islamic_online_learning/features/downloadedFiles/presentation/pages/downloaded_files_page.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
-import '../../../../core/Audio Feature/audio_providers.dart';
-
 class CDNotifier extends StateNotifier<bool> {
   final CourseDetailRepo courseDetailRepo;
   final Ref ref;
@@ -141,26 +139,26 @@ class CDNotifier extends StateNotifier<bool> {
     return url;
   }
 
-  playOffline(String audioPath, String title, CourseModel courseModel,
-      String audioId) async {
-    // ref.read(audioProvider).setFilePath(audioPath);
-    ref
-        .read(audioProvider.notifier)
-        .update((state) => state..setFilePath(audioPath));
+  // playOffline(String audioPath, String title, CourseModel courseModel,
+  //     String audioId) async {
+  //   // PlaylistHelper.audioPlayer.setFilePath(audioPath);
+  //   ref
+  //       .read(audioProvider.notifier)
+  //       .update((state) => state..setFilePath(audioPath));
 
-    ref.read(audioProvider).play();
-  }
+  //   PlaylistHelper.audioPlayer.play();
+  // }
 
-  Future<void> playOnline(
-      String url, String title, CourseModel courseModel, String audioId) async {
-    // ref.read(startListnersProvider);
-    ref.read(audioProvider.notifier).update(
-          (state) => state
-            ..setUrl(
-              url,
-            ),
-        );
+  // Future<void> playOnline(
+  //     String url, String title, CourseModel courseModel, String audioId) async {
+  //   // ref.read(startListnersProvider);
+  //   ref.read(audioProvider.notifier).update(
+  //         (state) => state
+  //           ..setUrl(
+  //             url,
+  //           ),
+  //       );
 
-    ref.read(audioProvider).play();
-  }
+  //   PlaylistHelper.audioPlayer.play();
+  // }
 }

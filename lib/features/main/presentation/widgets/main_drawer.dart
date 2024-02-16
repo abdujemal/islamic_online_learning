@@ -344,7 +344,8 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                 ),
                 child: ListTile(
                   onTap: () {
-                    Share.share(playStoreUrl, subject: "ይህንን መተግበሪያ ይመልከቱ");
+                    Share.share(playStoreUrl,
+                        subject: "የዒልም ፈላጊ መተግበሪያን ለማግኘት 👇👇👇👇");
                   },
                   leading: const Icon(Icons.share_rounded),
                   title: Text(

@@ -8,6 +8,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../core/Audio Feature/playlist_helper.dart';
+
 class Contents extends ConsumerStatefulWidget {
   const Contents({super.key});
 
@@ -36,7 +38,7 @@ class _ContentsState extends ConsumerState<Contents> {
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
 
     return StreamBuilder(
         stream: myAudioStream(audioPlayer),

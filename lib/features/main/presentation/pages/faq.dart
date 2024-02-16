@@ -9,6 +9,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/Audio Feature/current_audio_view.dart';
+import '../../../../core/Audio Feature/playlist_helper.dart';
 import '../../../../core/constants.dart';
 
 class FAQ extends ConsumerStatefulWidget {
@@ -56,7 +57,7 @@ class _FAQState extends ConsumerState<FAQ> {
   @override
   Widget build(BuildContext context) {
     // final currentAudio = ref.watch(currentAudioProvider);
-    final audioPlayer = ref.watch(audioProvider);
+    final audioPlayer = PlaylistHelper.audioPlayer;
     return StreamBuilder(
         stream: myAudioStream(audioPlayer),
         builder: (context, snap) {

@@ -96,10 +96,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
     }
     if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
       print("playlist updateing");
-      // int prevLen = PlaylistHelper().playList?.length ?? 0;
-      // PlaylistHelper().playList?.addAll(lst);
-      // PlaylistHelper().playList?.removeRange(0, prevLen - 1);
-      // ref.read(playlistProvider).addAll(lst);
+
+      PlaylistHelper.mainPlayListIndexes = playListIndexes;
     } else {
       print("playlist adding");
 
@@ -126,9 +124,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.watch(audioProvider);
-    final playList =
-        PlaylistHelper().playList ?? ConcatenatingAudioSource(children: []);
+    final audioPlayer = PlaylistHelper.audioPlayer;
+    // final playList = PlaylistHelper().playList;
     return Drawer(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.horizontal(
@@ -202,45 +199,53 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                 .update((state) => playListIndexes.length);
                           }
                           print("index : $index");
+                          if (isPlayingCourseThisCourse(
+                              courseModel.courseId, ref)) {
+                            PlaylistHelper.mainPlayListIndexes =
+                                playListIndexes;
+                          }
                           int insertableIndex = playListIndexes.indexOf(index);
 
                           print("inserting at $insertableIndex");
-                          print('playlistNum: ${playList.children.length}');
+                          print('playlistNum: ${PlaylistHelper().playList.children.length}');
 
-                          if (insertableIndex >= playList.children.length) {
+                          final audioSrc = AudioSource.file(
+                            filePath,
+                            tag: MediaItem(
+                              id: widget.audios[index - 1],
+                              title: "${courseModel.title} $index",
+                              artist: courseModel.ustaz,
+                              album: courseModel.category,
+                              artUri: Uri.parse(courseModel.image),
+                              extras: courseModel.toMap(),
+                            ),
+                          );
+                          if (insertableIndex >=
+                              PlaylistHelper().playList.length) {
                             print("adding at $insertableIndex");
-                            playList.add(
-                              AudioSource.file(
-                                filePath,
-                                tag: MediaItem(
-                                  id: widget.audios[index - 1],
-                                  title: "${courseModel.title} $index",
-                                  artist: courseModel.ustaz,
-                                  album: courseModel.category,
-                                  artUri: Uri.parse(courseModel.image),
-                                  extras: courseModel.toMap(),
-                                ),
-                              ),
-                            );
+                            if (isPlayingCourseThisCourse(
+                                courseModel.courseId, ref)) {
+                              PlaylistHelper().playList.add(audioSrc);
+                            } else {
+                              lst.add(audioSrc);
+                            }
                           } else {
                             print("inserting at $insertableIndex");
 
-                            playList.insert(
-                              insertableIndex,
-                              AudioSource.file(
-                                filePath,
-                                tag: MediaItem(
-                                  id: widget.audios[index - 1],
-                                  title: "${courseModel.title} $index",
-                                  artist: courseModel.ustaz,
-                                  album: courseModel.category,
-                                  artUri: Uri.parse(courseModel.image),
-                                  extras: courseModel.toMap(),
-                                ),
-                              ),
-                            );
+                            if (isPlayingCourseThisCourse(
+                                courseModel.courseId, ref)) {
+                              PlaylistHelper().playList.insert(
+                                insertableIndex,
+                                audioSrc,
+                              );
+                            } else {
+                              lst.insert(
+                                insertableIndex,
+                                audioSrc,
+                              );
+                            }
                           }
-                          print("num of index: ${playList.length}");
+                          print("num of index: ${PlaylistHelper().playList.length}");
                         },
                       ),
                     );
@@ -290,56 +295,68 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                               }
                               print("indexes: ${playListIndexes}");
                               print("index : $index");
+                              if (isPlayingCourseThisCourse(
+                                  courseModel.courseId, ref)) {
+                                PlaylistHelper.mainPlayListIndexes =
+                                    playListIndexes;
+                              }
                               int insertableIndex =
                                   playListIndexes.indexOf(index + 1);
 
                               print("inserting at $insertableIndex");
-                              print('playlistNum: ${playList.children.length}');
+                              print('playlistNum: ${PlaylistHelper().playList.children.length}');
 
-                              if (insertableIndex >= playList.children.length) {
+                              final audioSrc = AudioSource.file(
+                                filePath,
+                                tag: MediaItem(
+                                  id: widget.audios[index],
+                                  title: "${courseModel.title} ${index + 1}",
+                                  artist: courseModel.ustaz,
+                                  album: courseModel.category,
+                                  artUri: Uri.parse(courseModel.image),
+                                  extras: courseModel.toMap(),
+                                ),
+                              );
+                              if (insertableIndex >=
+                                  PlaylistHelper().playList.length) {
                                 print("adding at $insertableIndex");
-                                playList.add(
-                                  AudioSource.file(
-                                    filePath,
-                                    tag: MediaItem(
-                                      id: widget.audios[index],
-                                      title:
-                                          "${courseModel.title} ${index + 1}",
-                                      artist: courseModel.ustaz,
-                                      album: courseModel.category,
-                                      artUri: Uri.parse(courseModel.image),
-                                      extras: courseModel.toMap(),
-                                    ),
-                                  ),
-                                );
+                                if (isPlayingCourseThisCourse(
+                                    courseModel.courseId, ref)) {
+                                  PlaylistHelper().playList.add(audioSrc);
+                                } else {
+                                  lst.add(audioSrc);
+                                }
                               } else {
                                 print("inserting at $insertableIndex");
 
-                                playList.insert(
-                                  insertableIndex,
-                                  AudioSource.file(
-                                    filePath,
-                                    tag: MediaItem(
-                                      id: widget.audios[index],
-                                      title:
-                                          "${courseModel.title} ${index + 1}",
-                                      artist: courseModel.ustaz,
-                                      album: courseModel.category,
-                                      artUri: Uri.parse(courseModel.image),
-                                      extras: courseModel.toMap(),
-                                    ),
-                                  ),
-                                );
+                                if (isPlayingCourseThisCourse(
+                                    courseModel.courseId, ref)) {
+                                  PlaylistHelper().playList.insert(
+                                    insertableIndex,
+                                    audioSrc,
+                                  );
+                                } else {
+                                  lst.insert(
+                                    insertableIndex,
+                                    audioSrc,
+                                  );
+                                }
                               }
-                              print("num of index: ${playList.length}");
+                              print("num of index: ${PlaylistHelper().playList.length}");
                             },
                             onDeleteBtn: () async {
                               int deleteableIndex =
                                   playListIndexes.indexOf(index + 1);
                               print("deleted index: $deleteableIndex");
                               playListIndexes.removeAt(deleteableIndex);
-
-                              playList.removeAt(deleteableIndex);
+                              if (isPlayingCourseThisCourse(
+                                  courseModel.courseId, ref)) {
+                                PlaylistHelper.mainPlayListIndexes =
+                                    playListIndexes;
+                                PlaylistHelper().playList.removeAt(deleteableIndex);
+                              } else {
+                                lst.removeAt(deleteableIndex);
+                              }
                               if (mounted) {
                                 ref
                                     .read(loadAudiosProvider.notifier)
@@ -358,9 +375,12 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                       audioPlayer.position.inSeconds,
                                   lastViewed: DateTime.now().toString(),
                                 );
-                                setState(() {});
-                                int destinationIndex =
-                                    playListIndexes.indexOf(index + 1);
+                                if (mounted) {
+                                  setState(() {});
+                                }
+                                int destinationIndex = PlaylistHelper
+                                    .mainPlayListIndexes
+                                    .indexOf(index + 1);
                                 int currentIndex =
                                     audioPlayer.currentIndex ?? 0;
 
@@ -373,32 +393,35 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                       const Duration(milliseconds: 50));
                                   if (destinationIndex > currentIndex) {
                                     print(">");
-                                    ref.read(audioProvider).seekToNext();
+                                    PlaylistHelper.audioPlayer.seekToNext();
                                   } else {
                                     print("<");
-                                    ref.read(audioProvider).seekToPrevious();
+                                    PlaylistHelper.audioPlayer.seekToPrevious();
                                   }
                                 }
                               } else {
                                 print('playListIndexes: $playListIndexes');
                                 if (!isPlayingCourseThisCourse(
                                     courseModel.courseId, ref)) {
-                                  PlaylistHelper().playList?.clear();
-                                  PlaylistHelper().playList?.addAll(lst);
+                                  PlaylistHelper.nplayList =
+                                      ConcatenatingAudioSource(children: lst);
+                                  PlaylistHelper.mainPlayListIndexes =
+                                      playListIndexes;
                                 }
-                                ref.read(audioProvider).setAudioSource(
-                                      playList,
-                                      initialIndex:
-                                          playListIndexes.indexOf(index + 1),
-                                      // preload: false,
-                                    );
+                                PlaylistHelper.audioPlayer.setAudioSource(
+                                  PlaylistHelper().playList,
+                                  initialIndex: PlaylistHelper
+                                      .mainPlayListIndexes
+                                      .indexOf(index + 1),
+                                  // preload: false,
+                                );
                                 try {
-                                  await ref.read(audioProvider).play();
+                                  await PlaylistHelper.audioPlayer.play();
                                 } catch (e) {
                                   if (kDebugMode) {
                                     print(e.toString());
                                   }
-                                  await ref.read(audioProvider).stop();
+                                  await PlaylistHelper.audioPlayer.stop();
                                 }
                               }
                             },
@@ -423,53 +446,100 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                             }
                             print("indexes: ${playListIndexes}");
                             print("index : $index");
+                            if (isPlayingCourseThisCourse(
+                                courseModel.courseId, ref)) {
+                              PlaylistHelper.mainPlayListIndexes =
+                                  playListIndexes;
+                            }
                             int insertableIndex =
                                 playListIndexes.indexOf(index + 1);
 
                             print("inserting at $insertableIndex");
-                            print('playlistNum: ${playList.children.length}');
+                            print('playlistNum: ${PlaylistHelper().playList.children.length}');
 
-                            if (insertableIndex >= playList.children.length) {
+                            // if (insertableIndex >= playList.children.length) {
+                            //   print("adding at $insertableIndex");
+                            //   playList.add(
+                            //     AudioSource.file(
+                            //       filePath,
+                            //       tag: MediaItem(
+                            //         id: widget.audios[index],
+                            //         title: "${courseModel.title} ${index + 1}",
+                            //         artist: courseModel.ustaz,
+                            //         album: courseModel.category,
+                            //         artUri: Uri.parse(courseModel.image),
+                            //         extras: courseModel.toMap(),
+                            //       ),
+                            //     ),
+                            //   );
+                            // } else {
+                            //   print("inserting at $insertableIndex");
+                            //   playList.insert(
+                            //     insertableIndex,
+                            //     AudioSource.file(
+                            //       filePath,
+                            //       tag: MediaItem(
+                            //         id: widget.audios[index],
+                            //         title: "${courseModel.title} ${index + 1}",
+                            //         artist: courseModel.ustaz,
+                            //         album: courseModel.category,
+                            //         artUri: Uri.parse(courseModel.image),
+                            //         extras: courseModel.toMap(),
+                            //       ),
+                            //     ),
+                            //   );
+                            // }
+                            final audioSrc = AudioSource.file(
+                              filePath,
+                              tag: MediaItem(
+                                id: widget.audios[index],
+                                title: "${courseModel.title} ${index + 1}",
+                                artist: courseModel.ustaz,
+                                album: courseModel.category,
+                                artUri: Uri.parse(courseModel.image),
+                                extras: courseModel.toMap(),
+                              ),
+                            );
+                            if (insertableIndex >=
+                                PlaylistHelper().playList.length) {
                               print("adding at $insertableIndex");
-                              playList.add(
-                                AudioSource.file(
-                                  filePath,
-                                  tag: MediaItem(
-                                    id: widget.audios[index],
-                                    title: "${courseModel.title} ${index + 1}",
-                                    artist: courseModel.ustaz,
-                                    album: courseModel.category,
-                                    artUri: Uri.parse(courseModel.image),
-                                    extras: courseModel.toMap(),
-                                  ),
-                                ),
-                              );
+                              if (isPlayingCourseThisCourse(
+                                  courseModel.courseId, ref)) {
+                                PlaylistHelper().playList.add(audioSrc);
+                              } else {
+                                lst.add(audioSrc);
+                              }
                             } else {
                               print("inserting at $insertableIndex");
 
-                              playList.insert(
-                                insertableIndex,
-                                AudioSource.file(
-                                  filePath,
-                                  tag: MediaItem(
-                                    id: widget.audios[index],
-                                    title: "${courseModel.title} ${index + 1}",
-                                    artist: courseModel.ustaz,
-                                    album: courseModel.category,
-                                    artUri: Uri.parse(courseModel.image),
-                                    extras: courseModel.toMap(),
-                                  ),
-                                ),
-                              );
+                              if (isPlayingCourseThisCourse(
+                                  courseModel.courseId, ref)) {
+                                PlaylistHelper().playList.insert(
+                                  insertableIndex,
+                                  audioSrc,
+                                );
+                              } else {
+                                lst.insert(
+                                  insertableIndex,
+                                  audioSrc,
+                                );
+                              }
                             }
-                            print("num of index: ${playList.length}");
+                            print("num of index: ${PlaylistHelper().playList.length}");
                           },
                           onDeleteBtn: () async {
                             int deleteableIndex =
                                 playListIndexes.indexOf(index + 1);
                             print("deleted index: $deleteableIndex");
                             playListIndexes.removeAt(deleteableIndex);
-                            playList.removeAt(deleteableIndex);
+                            if (isPlayingCourseThisCourse(
+                                courseModel.courseId, ref)) {
+                              PlaylistHelper.mainPlayListIndexes =
+                                  playListIndexes;
+                              PlaylistHelper().playList.removeAt(deleteableIndex);
+                            } else {
+                              lst.removeAt(deleteableIndex);
+                            }
                             if (mounted) {
                               ref
                                   .read(loadAudiosProvider.notifier)
@@ -489,23 +559,27 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                     audioPlayer.position.inSeconds,
                                 lastViewed: DateTime.now().toString(),
                               );
-                              setState(() {});
+                              if (mounted) {
+                                setState(() {});
+                              }
                             }
                             if (!isPlayingCourseThisCourse(
                                 courseModel.courseId, ref)) {
-                              PlaylistHelper().playList?.clear();
-                              PlaylistHelper().playList?.addAll(lst);
+                              PlaylistHelper.nplayList =
+                                  ConcatenatingAudioSource(children: lst);
+                              PlaylistHelper.mainPlayListIndexes =
+                                  playListIndexes;
                             }
 
                             print('playListIndexes: $playListIndexes');
 
-                            ref.read(audioProvider).setAudioSource(
-                                  playList,
-                                  initialIndex:
-                                      playListIndexes.indexOf(index + 1),
-                                  // preload: false,
-                                );
-                            ref.read(audioProvider).play();
+                            PlaylistHelper.audioPlayer.setAudioSource(
+                              PlaylistHelper().playList,
+                              initialIndex: PlaylistHelper.mainPlayListIndexes
+                                  .indexOf(index + 1),
+                              // preload: false,
+                            );
+                            PlaylistHelper.audioPlayer.play();
                           },
                         );
                       });

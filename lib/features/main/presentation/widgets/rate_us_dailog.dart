@@ -17,7 +17,7 @@ class _RateUsDailogState extends ConsumerState<RateUsDailog> {
     return AlertDialog(
       title: const Text("ደረጃ ይስጡን"),
       content: const Text(
-          "⭐️⭐️⭐️⭐️⭐️ ዒልም ፈላጊ አፕ ከተመቾት፣ እባክዎ ትንሽ ደቂቃ ወስደው ደረጃ እና አስተያየት ይስጡን።"),
+          "ዒልም ፈላጊ አፕ ከተመቾት፣ እባክዎ ትንሽ ደቂቃ ወስደው ደረጃ እና አስተያየት ይስጡን።\n⭐️⭐️⭐️⭐️⭐️"),
       alignment: Alignment.center,
       actions: [
         TextButton(

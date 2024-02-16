@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
+import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -143,7 +143,6 @@ double getPersentage(CourseModel courseModel) {
   return percnt > 1 ? 1 : percnt;
 }
 
-
 String formatFileSize(int sizeInBytes) {
   if (sizeInBytes < 1024) {
     return '$sizeInBytes B';
@@ -162,23 +161,28 @@ String formatFileSize(int sizeInBytes) {
   }
 }
 
-bool isPlayingCourseThisCourse(String courseId, WidgetRef ref,
+bool isPlayingCourseThisCourse(String courseId, WidgetRef refp,
     {bool alsoIsNotIdle = false}) {
-  print('isPlayingCourseThisCourse');
-  final audioPlayer = ref.read(audioProvider);
+  final audioPlayer = PlaylistHelper.audioPlayer;
   final metaData = audioPlayer.sequenceState?.currentSource?.tag;
   if (metaData == null) {
+    print('!isPlayingCourseThisCourse');
     return false;
   }
   MediaItem mediaItem = metaData as MediaItem;
   if (mediaItem.extras?["courseId"] == courseId) {
     if (alsoIsNotIdle) {
       if (audioPlayer.processingState != ProcessingState.idle) {
+        print('isPlayingCourseThisCourse');
         return true;
       }
     } else {
+      print('isPlayingCourseThisCourse');
+
       return true;
     }
   }
+  print('!isPlayingCourseThisCourse');
+
   return false;
 }
