@@ -22,7 +22,7 @@ class DatabaseHelper {
   }
 
   Future<Database> initializeDatabase() async {
-    Directory directory = await getApplicationDocumentsDirectory();
+    Directory directory = await getApplicationSupportDirectory();
     String path = '${directory.path}$dbPath';
 
     var notesDatabase = await openDatabase(

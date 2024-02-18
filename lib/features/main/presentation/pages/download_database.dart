@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
@@ -39,11 +40,19 @@ class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
       return;
     }
 
-    Directory directory = await getApplicationDocumentsDirectory();
+    Directory directory = await getApplicationSupportDirectory();
     String path = '${directory.path}$dbPath';
 
     try {
-      final response = await Dio().download(
+      Dio dio = Dio();
+      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          (client) {
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        return client;
+      };
+
+      final response = await dio.download(
         databaseUrl,
         path,
         cancelToken: cancelToken,
@@ -59,16 +68,25 @@ class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
         if (mounted) {
           isDownloading = false;
           setState(() {});
-          toast("በተሳካ ሁኒታ ዳውንሎድ ተደርጓል!", ToastType.success, context);
-          await DatabaseHelper().initializeDatabase();
-          if (mounted) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MainPage(),
-              ),
-              (route) => false,
-            );
+          if (await File(path).exists()) {
+            if (mounted) {
+              toast("በተሳካ ሁኒታ ዳውንሎድ ተደርጓል!", ToastType.success, context);
+            }
+
+            await DatabaseHelper().initializeDatabase();
+            if (mounted) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MainPage(),
+                ),
+                (route) => false,
+              );
+            }
+          } else {
+            if (mounted) {
+              toast("ችግር ተፈጥሯል!", ToastType.error, context);
+            }
           }
         }
       } else {
@@ -82,7 +100,7 @@ class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
       if (mounted) {
         isDownloading = false;
         setState(() {});
-        toast("ዳውንሎድ ቆሟል", ToastType.normal, context);
+        toast(e.toString(), ToastType.normal, context);
       }
       print(e.toString());
     }

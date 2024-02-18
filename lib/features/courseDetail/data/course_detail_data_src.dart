@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,6 +45,10 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
     CancelToken cancelToken,
     Ref ref,
   ) async {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    return client;
+  };
     Directory dir = await getApplicationSupportDirectory();
 
     final filePath = "${dir.path}/$folderName/$fileName";

@@ -15,6 +15,7 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = MyHttpOverrides();
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
@@ -53,7 +54,6 @@ class Main extends ConsumerStatefulWidget {
 class _MainState extends ConsumerState<Main> {
   FirebaseDynamicLinks firebaseDynamicLink = FirebaseDynamicLinks.instance;
 
-  
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
@@ -172,7 +172,15 @@ class _MainState extends ConsumerState<Main> {
 // }
 
 Future<bool> checkDb() async {
-  Directory directory = await getApplicationDocumentsDirectory();
+  Directory directory = await getApplicationSupportDirectory();
   String path = '${directory.path}$dbPath';
   return File(path).exists();
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  }
 }

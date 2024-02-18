@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:animated_search_bar/animated_search_bar.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -64,7 +65,7 @@ class _MainPageState extends ConsumerState<MainPage>
 
     tabController = TabController(length: 3, vsync: this);
 
-    FirebaseMessaging.instance.subscribeToTopic("v1.0.0");
+    FirebaseMessaging.instance.subscribeToTopic("v1.0.1");
 
     tabController.addListener(_handleTabChange);
 
