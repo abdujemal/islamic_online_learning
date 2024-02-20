@@ -122,6 +122,37 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                           ),
                         ),
                       GestureDetector(
+                        onTap: () {
+                          if (PlaylistHelper.audioPlayer.speed == 1.0) {
+                            PlaylistHelper.audioPlayer.setSpeed(1.5);
+                          } else if (PlaylistHelper.audioPlayer.speed == 1.5) {
+                            PlaylistHelper.audioPlayer.setSpeed(2);
+                          } else if (PlaylistHelper.audioPlayer.speed == 2.0) {
+                            PlaylistHelper.audioPlayer.setSpeed(2.5);
+                          } else {
+                            PlaylistHelper.audioPlayer.setSpeed(1.0);
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: primaryColor),
+                          ),
+                          padding: const EdgeInsets.all(1),
+                          child: StreamBuilder<Object>(
+                              stream: PlaylistHelper.audioPlayer.speedStream,
+                              builder: (context, snapshot) {
+                                return Text(
+                                  "${snapshot.data}x",
+                                  style: const TextStyle(fontSize: 10),
+                                );
+                              }),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      GestureDetector(
                         onTap: () async {
                           widget.onClose();
                           int audioLen = metaData.extras?["courseIds"]
