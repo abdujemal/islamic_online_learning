@@ -68,6 +68,8 @@ class _StartedState extends ConsumerState<Started>
                   return CourseItem(
                     _.courses[index],
                     fromHome: false,
+                    keey: null,
+                    val: null,
                   );
                 },
               ),

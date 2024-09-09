@@ -155,13 +155,24 @@ class MainListNotifier extends StateNotifier<MainListState> {
     );
   }
 
-  updateCourses() async {
+  updateCourses({String? keey, String? val}) async {
+    print('keey: $keey');
+    print('val: $val');
     List<CourseModel> savedCourses =
         await ref.read(mainDataSrcProvider).getSavedCourses();
 
     List<CourseModel> newList = [];
 
-    for (CourseModel cm in courses) {
+    // List<CourseModel> fcourses = [];
+    // if (keey != null && val != null) {
+    //   fcourses = courses.where((e) {
+    //     final c = e.toMap();
+    //     return c[keey] == val;
+    //   }).toList();
+    //   print("fcourses len ${fcourses.length}");
+    // }
+
+    for (CourseModel cm in keey == null ? courses : filteredCourses) {
       final matchings =
           savedCourses.where((e) => e.ustaz == cm.ustaz && e.title == cm.title);
       print(" matchings ${matchings.length}");
@@ -178,11 +189,14 @@ class MainListNotifier extends StateNotifier<MainListState> {
         newList.add(cm);
       }
     }
-
-    courses = newList;
+    if (keey == null) {
+      filteredCourses = newList;
+    } else {
+      courses = newList;
+    }
     await Future.delayed(const Duration(seconds: 1));
     state = MainListState.loaded(
-      courses: courses,
+      courses: newList,
       isLoadingMore: true,
       noMoreToLoad: false,
     );
@@ -190,7 +204,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
 
   Future<int?> saveCourse(
       CourseModel courseModel, int? isFav, BuildContext context,
-      {bool showMsg = true}) async {
+      {bool showMsg = true, String? keey, String? val}) async {
     final res = await mainRepo.saveCourse(
       courseModel.copyWith(
         isFav: isFav,
@@ -211,7 +225,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
         if (showMsg) {
           toast("በተሳካ ሁኔታ ተመዝግብዋል", ToastType.success, context);
         }
-        updateCourses();
+        updateCourses(keey: keey, val: val);
         ref.read(favNotifierProvider.notifier).getCourse();
         ref.read(startedNotifierProvider.notifier).getCouses();
         print("real id : $r");

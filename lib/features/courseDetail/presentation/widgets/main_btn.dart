@@ -6,9 +6,11 @@ class MainBtn extends ConsumerStatefulWidget {
   final String title;
   final VoidCallback onTap;
   final IconData? icon;
+  final double w;
   const MainBtn({
     super.key,
     required this.title,
+    this.w = 180,
     required this.onTap,
     this.icon,
   });
@@ -24,7 +26,7 @@ class _MainBtnState extends ConsumerState<MainBtn> {
       onTap: widget.onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        width: 180,
+        width: widget.w,
         margin: const EdgeInsets.all(3),
         decoration: BoxDecoration(
           color: Colors.black.withAlpha(120),

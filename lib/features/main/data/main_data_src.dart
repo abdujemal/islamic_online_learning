@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
 import 'model/course_model.dart';
 import 'model/faq_model.dart';
+import 'package:http/http.dart' as http;
 
 abstract class MainDataSrc {
   Future<List<CourseModel>> getCourses(
@@ -85,52 +87,74 @@ class IMainDataSrc extends MainDataSrc {
     if (isNew && key == null) {
       try {
         final res = await DatabaseHelper().getCouses(
-            null, null, SortingMethod.dateDSC, (page - 1) * numOfDoc);
+          null,
+          null,
+          SortingMethod.dateDSC,
+          (page - 1) * numOfDoc,
+        );
 
         final categories = await DatabaseHelper().getCategories();
         final ustazs = await DatabaseHelper().getUstazs();
         final contents = await DatabaseHelper().getContent();
 
-        final qs = await firebaseFirestore
-            .collection(FirebaseConst.courses)
-            .orderBy(
-              'dateTime',
-              descending: false,
-            )
-            .startAfter([res.first["dateTime"]]).get();
+        // final qs = await firebaseFirestore
+        //     .collection(FirebaseConst.courses)
+        //     .orderBy(
+        //       'dateTime',
+        //       descending: false,
+        //     )
+        //     .startAfter([res.first["dateTime"]]).get();
 
-        print("New Docs ${qs.docs.length}");
-        if (qs.docs.isNotEmpty) {
-          for (var d in qs.docs) {
-            if (d.data()["audioSizes"] != null) {
-              if (!categories.contains(d.data()['category'])) {
-                print('adding cateogry');
-                await DatabaseHelper().insertCategory(d.data()['category']);
+        final qs = await http.get(
+            Uri.parse("$serverUrl/courses?dateTime=${res.first["dateTime"]}"));
+
+        List courses = jsonDecode(qs.body);
+
+        print("New Docs ${courses.length}");
+
+        if (courses.isNotEmpty) {
+          for (var d in courses) {
+            if (d["audioSizes"] != null) {
+              if (!categories.contains(d['category'])) {
+                print('adding cateogry ${d['category']} from ${d['title']} be ${d['ustaz']}');
+                await DatabaseHelper().insertCategory(d['category']);
               }
 
-              if (!ustazs.contains(d.data()['ustaz'])) {
+              if (!ustazs.contains(d['ustaz'])) {
                 print('adding ustaz');
 
-                await DatabaseHelper().insertCategory(d.data()['ustaz']);
+                await DatabaseHelper().insertUstaz(d['ustaz']);
               }
 
-              if (!contents.contains(d.data()['title'])) {
+              if (!contents.contains(d['title'])) {
                 print('adding title');
 
-                await DatabaseHelper().insertContent(d.data()['title']);
+                await DatabaseHelper().insertContent(d['title']);
               }
 
-              final id = await DatabaseHelper().isCourseAvailable(d.id);
+              final id =
+                  await DatabaseHelper().isCourseAvailable(d['courseId']);
               if (id != null) {
-                print("updateing");
+                if (d['isDeleted'] == true) {
+                  // final course = await getSingleCourse(d['courseId'], false);
+                  // if (course != null) {
+                  print("deleting course");
+                  await deleteCourse(id);
+                  // } else {
+                  //   print('course is null');
+                  // }
+                } else {
+                  print("updateing");
 
-                await DatabaseHelper().updateCourseFromCloud(
-                    CourseModel.fromMap(d.data(), d.id).copyWith(id: id));
+                  await DatabaseHelper().updateCourseFromCloud(
+                      CourseModel.fromMap(d, d['courseId']).copyWith(id: id));
+                }
               } else {
                 print("adding");
-
-                await DatabaseHelper()
-                    .insertCourse(CourseModel.fromMap(d.data(), d.id));
+                if (d['isDeleted'] != true) {
+                  await DatabaseHelper()
+                      .insertCourse(CourseModel.fromMap(d, d['courseId']));
+                }
               }
             }
           }

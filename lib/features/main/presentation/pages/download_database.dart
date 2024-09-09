@@ -27,6 +27,9 @@ class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
   int? dbSize;
 
   downloadDb() async {
+    if (dbSize == null) {
+      return;
+    }
     isDownloading = true;
     setState(() {});
 
@@ -56,9 +59,15 @@ class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
         databaseUrl,
         path,
         cancelToken: cancelToken,
+        // options: Options(
+        //   headers: {
+        //     'Range': 'bytes=${File(path).lengthSync()}-',
+        //   },
+        // ),
+
         onReceiveProgress: (count, total) {
           if (total != -1) {
-            progress = (count / total) * 100;
+            progress = (count / dbSize!) * 100;
             setState(() {});
           }
         },
@@ -68,7 +77,7 @@ class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
         if (mounted) {
           isDownloading = false;
           setState(() {});
-          if (await File(path).exists()) {
+          if (File(path).existsSync()) {
             if (mounted) {
               toast("በተሳካ ሁኒታ ዳውንሎድ ተደርጓል!", ToastType.success, context);
             }
@@ -84,12 +93,15 @@ class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
               );
             }
           } else {
+            print("file does not exist");
             if (mounted) {
               toast("ችግር ተፈጥሯል!", ToastType.error, context);
             }
           }
         }
       } else {
+        print("response code: ${response.statusCode}");
+
         if (mounted) {
           isDownloading = false;
           setState(() {});

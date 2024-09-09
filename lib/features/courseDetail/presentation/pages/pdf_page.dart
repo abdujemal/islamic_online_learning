@@ -1,11 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/note_helper.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/add_note.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_bottom_view.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/finish_confirmation.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/pdf_drawer.dart';
@@ -13,6 +16,7 @@ import 'package:islamic_online_learning/features/main/presentation/state/provide
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:text_scroll/text_scroll.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
@@ -51,6 +55,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
   late PDFViewController _controller;
 
   bool showTopAudio = false;
+  bool showNotes = false;
 
   final TextEditingController _pageTc = TextEditingController();
   final FocusNode _pageFocus = FocusNode();
@@ -277,14 +282,206 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                       : const SizedBox(),
                 ),
               ),
-              floatingActionButton: FloatingActionButton(
-                child: const Text(
-                  "ድምጾች",
-                  textAlign: TextAlign.center,
-                ),
-                onPressed: () {
-                  _scaffoldKey.currentState!.openDrawer();
-                },
+              floatingActionButton: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    height: MediaQuery.of(context).size.height * 0.53,
+                    child: Consumer(
+                      builder: (context, ref, child) {
+                        final int page = ref.watch(pdfPageProvider);
+
+                        // final notes =  NoteHiveHelper().getAllNoteOfAPage(
+                        //   page,
+                        //   widget.courseModel.id!,
+                        // );
+
+                        return FutureBuilder(
+                          builder: (context, snap) {
+                            if (snap.hasError) {
+                              return const SizedBox();
+                            }
+                            if (snap.data == null) {
+                              return const Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: CircularProgressIndicator());
+                            }
+                            if (!showNotes && snap.data!.isNotEmpty) {
+                              return Align(
+                                alignment: Alignment.bottomRight,
+                                child: FloatingActionButton(
+                                  child: const Text(
+                                    "ማስታወሻዎቼ",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: whiteColor,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    showNotes = true;
+                                    setState(() {});
+                                  },
+                                ),
+                              );
+                            }
+                            if (!showNotes) {
+                              return const SizedBox();
+                            }
+                            if (snap.data!.isEmpty) {
+                              return const SizedBox();
+                            }
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(110, 0, 0, 0),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(5),
+                                    decoration: const BoxDecoration(
+                                      color: primaryColor,
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(15),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Spacer(),
+                                        const Text(
+                                          "ማስታወሻዎች",
+                                          style: TextStyle(
+                                            color: whiteColor,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        GestureDetector(
+                                          onTap: () {
+                                            showNotes = false;
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            Icons.close,
+                                            color: whiteColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: snap.data!.length,
+                                      itemBuilder: (context, index) => Padding(
+                                        padding: const EdgeInsets.all(5),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                "${index + 1}. ${snap.data![index]['note']}",
+                                                style: const TextStyle(
+                                                  color: whiteColor,
+                                                ),
+                                              ),
+                                            ),
+                                            if (snap.data![index]['id'] != null)
+                                              GestureDetector(
+                                                onTap: () {
+                                                  NoteHiveHelper().deleteNote(
+                                                      snap.data![index]['id']);
+                                                  ref
+                                                      .read(pdfPageProvider
+                                                          .notifier)
+                                                      .update((i) => 0);
+                                                  ref
+                                                      .read(pdfPageProvider
+                                                          .notifier)
+                                                      .update((i) => page);
+                                                },
+                                                child: const Icon(
+                                                  Icons.delete,
+                                                  color: Colors.red,
+                                                ),
+                                              )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                          future: NoteHiveHelper().getAllNoteOfAPage(
+                            page,
+                            widget.courseModel.id!,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  FloatingActionButton(
+                    child: const Text(
+                      "ድምጾች",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: whiteColor,
+                      ),
+                    ),
+                    onPressed: () {
+                      _scaffoldKey.currentState!.openDrawer();
+                    },
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AddNote(
+                          page: currentPage ?? 0,
+                          courseId: courseModel.id!,
+                          ref: ref,
+                        ),
+                      );
+                    },
+                    child: const Card(
+                      color: primaryColor,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 10,
+                        ),
+                        child: SizedBox(
+                          width: 100,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.note_add,
+                                color: whiteColor,
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "ማስታወሻ ያዝ",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: whiteColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               drawer: PdfDrawer(
                 audios: courseModel.courseIds.split(","),
@@ -332,6 +529,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                 },
                 onPageChanged: (int? page, int? total) {
                   if (page != null && total != null) {
+                    ref.read(pdfPageProvider.notifier).update((i) => page);
                     currentPage = page;
                     toast("${page + 1} / $total", ToastType.normal, context);
                   }

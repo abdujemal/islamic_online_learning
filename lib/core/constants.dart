@@ -11,6 +11,9 @@ const String databaseUrl =
     "https://b2.ilmfelagi.com/file/ilm-Felagi2/Database/DB.db";
 
 const String dbPath = "/Islamic Online Learning/db/myDB.db";
+const String serverUrl = "https://ilmfelagi.com/api";
+
+const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 
 const int numOfDoc = 20;
 

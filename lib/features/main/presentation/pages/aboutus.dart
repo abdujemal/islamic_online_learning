@@ -152,9 +152,9 @@ class _AboutUsState extends ConsumerState<AboutUs> {
                       IconButton(
                         onPressed: () async {
                           final url = Uri.parse('https://t.me/AbduJKA');
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url);
-                          }
+                          // if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                          // }
                         },
                         icon: const Icon(
                           Icons.telegram,
@@ -165,9 +165,9 @@ class _AboutUsState extends ConsumerState<AboutUs> {
                       IconButton(
                         onPressed: () async {
                           final url = Uri.parse('mailto:ilmfelagi@gmail.com');
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url);
-                          }
+                          // if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                          // }
                         },
                         icon: const Icon(
                           Icons.email,

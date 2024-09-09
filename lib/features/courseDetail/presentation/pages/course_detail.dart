@@ -14,6 +14,7 @@ import 'package:islamic_online_learning/features/courseDetail/presentation/pages
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_item.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/download_all_files.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/main_btn.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/notes_view.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/schedule_veiw.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
@@ -33,10 +34,14 @@ import '../widgets/pdf_item.dart';
 
 class CourseDetail extends ConsumerStatefulWidget {
   final CourseModel cm;
+  final String? keey;
+  final String? val;
 
   const CourseDetail({
     super.key,
     required this.cm,
+    required this.keey,
+    required this.val,
   });
 
   @override
@@ -261,6 +266,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
               null,
               context,
               showMsg: false,
+              keey: widget.keey,
+              val: widget.val,
             );
         if (kDebugMode) {
           print(Duration(seconds: courseModel.pausedAtAudioSec).inMinutes);
@@ -283,8 +290,6 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   @override
   Widget build(BuildContext context) {
     final audioPlayer = PlaylistHelper.audioPlayer;
-
-    ;
 
     percentage =
         getPersentage(courseModel).isNaN ? 1 : getPersentage(courseModel);
@@ -311,6 +316,25 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
             showTopAudio = false;
           }
           return Scaffold(
+            floatingActionButton: courseModel.pdfId.trim() != ""
+                ? FloatingActionButton(
+                    child: const Text(
+                      "ማስታወሻዎቼ",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: whiteColor,
+                      ),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => NotesView(
+                          courseId: widget.cm.id!,
+                        ),
+                      );
+                    },
+                  )
+                : null,
             bottomNavigationBar: AudioBottomView(
               courseModel.courseId,
               () {
@@ -359,9 +383,12 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                         IconButton(
                           onPressed: () {
                             ref.read(mainNotifierProvider.notifier).saveCourse(
-                                courseModel,
-                                courseModel.isFav == 1 ? 0 : 1,
-                                context);
+                                  courseModel,
+                                  courseModel.isFav == 1 ? 0 : 1,
+                                  context,
+                                  keey: widget.keey,
+                                  val: widget.val,
+                                );
                             courseModel = courseModel.copyWith(
                               isFav: courseModel.isFav == 1 ? 0 : 1,
                             );
@@ -388,6 +415,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   null,
                                   context,
                                   showMsg: false,
+                                  keey: widget.keey,
+                                  val: widget.val,
                                 );
                             courseModel = courseModel.copyWith(
                               isStarted: 1,
@@ -443,7 +472,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       extras: courseModel.toMap(),
                                     ),
                                   );
-                                  if (insertableIndex >= PlaylistHelper().playList.length) {
+                                  if (insertableIndex >=
+                                      PlaylistHelper().playList.length) {
                                     print("adding at $insertableIndex");
                                     if (isPlayingCourseThisCourse(
                                         courseModel.courseId, ref)) {
@@ -505,12 +535,15 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                         background: Stack(
                           children: [
                             SizedBox(
-                              child: CachedNetworkImage(
-                                imageUrl: courseModel.image,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.40,
-                                width: MediaQuery.of(context).size.width,
-                                fit: BoxFit.fill,
+                              child: Hero(
+                                tag: courseModel.id!,
+                                child: CachedNetworkImage(
+                                  imageUrl: courseModel.image,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.40,
+                                  width: MediaQuery.of(context).size.width,
+                                  fit: BoxFit.fill,
+                                ),
                               ),
                             ),
                             Container(
@@ -563,6 +596,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                                       null,
                                                       context,
                                                       showMsg: false,
+                                                      keey: widget.keey,
+                                                      val: widget.val,
                                                     );
                                                 courseModel =
                                                     courseModel.copyWith(
@@ -710,6 +745,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                                 null,
                                                 context,
                                                 showMsg: false,
+                                                keey: widget.keey,
+                                                val: widget.val,
                                               );
                                           courseModel = courseModel.copyWith(
                                             isFinished: 0,
@@ -768,7 +805,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                 const Align(
                                   alignment: Alignment.centerLeft,
                                   child: ListTitle(
-                                    title: "ኪታቡን ያቀራው ኡስታዝ",
+                                    title: "ኪታቡን ያቀራው",
                                   ),
                                 ),
                                 ListTile(
@@ -789,7 +826,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   const Align(
                                     alignment: Alignment.centerLeft,
                                     child: ListTitle(
-                                      title: "የኪታቡ ፀሀፊ",
+                                      title: "የኪታቡ አዘጋጅ",
                                     ),
                                   ),
                                 if (courseModel.author.trim().isNotEmpty)
@@ -824,41 +861,90 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                     ),
                                 Align(
                                   alignment: Alignment.centerLeft,
-                                  child: Row(
-                                    children: [
-                                      const ListTitle(
-                                        title: "ድምፆች",
-                                      ),
-                                      const Spacer(),
-                                      Consumer(builder: (context, wref, _) {
-                                        final loadAudios =
-                                            wref.watch(loadAudiosProvider);
-                                        return Text(
-                                            "$loadAudios / ${audios.length} ድምፆች ዝግጁ ሆነዋል");
-                                      }),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      if (isLoadingAudio)
-                                        const SizedBox(
-                                          width: 30,
-                                          height: 30,
-                                          child: CircularProgressIndicator(
-                                            color: primaryColor,
+                                  child: Consumer(
+                                    builder: (context, wref, _) {
+                                      final loadAudios =
+                                          wref.watch(loadAudiosProvider);
+
+                                      return Column(
+                                        children: [
+                                          MainBtn(
+                                            w: 250,
+                                            icon: Icons.share,
+                                            title: "ፋይሎቹን በቀጥታ አጋራ",
+                                            onTap: () async {
+                                              final isDownload = await ref
+                                                  .read(cdNotifierProvider
+                                                      .notifier)
+                                                  .isDownloaded(
+                                                      "${courseModel.title}.pdf",
+                                                      "PDF",
+                                                      context);
+
+                                              Directory dir =
+                                                  await getApplicationSupportDirectory();
+                                              List<XFile> files = playListIndexes
+                                                  .map((i) => XFile(
+                                                      "${dir.path}/Audio/${courseModel.ustaz},${courseModel.title} $i.mp3"))
+                                                  .toList();
+
+                                              if (!isDownload &&
+                                                  playListIndexes.isEmpty) {
+                                                if (mounted) {
+                                                  toast("ምንም ዳውንሎድ አልተደረገም",
+                                                      ToastType.error, context);
+                                                }
+                                                return;
+                                              }
+
+                                              await Share.shareXFiles(
+                                                isDownload
+                                                    ? [
+                                                        ...files,
+                                                        XFile(
+                                                            "${dir.path}/PDF/${courseModel.title}.pdf")
+                                                      ]
+                                                    : files,
+                                              );
+                                              // print("res: ${res.raw}");
+                                            },
                                           ),
-                                        ),
-                                      if (!isLoadingAudio)
-                                        GestureDetector(
-                                          onTap: () {
-                                            createPlayList();
-                                          },
-                                          child:
-                                              const Icon(Icons.refresh_rounded),
-                                        ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                    ],
+                                          Row(
+                                            children: [
+                                              const ListTitle(
+                                                title: "ድምፆች",
+                                              ),
+                                              const Spacer(),
+                                              Text(
+                                                  "$loadAudios / ${audios.length} ድምፆች ዝግጁ ሆነዋል"),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              if (isLoadingAudio)
+                                                const SizedBox(
+                                                  width: 30,
+                                                  height: 30,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: primaryColor,
+                                                  ),
+                                                ),
+                                              if (!isLoadingAudio)
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    createPlayList();
+                                                  },
+                                                  child: const Icon(
+                                                      Icons.refresh_rounded),
+                                                ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   ),
                                 ),
                                 const SizedBox(
@@ -921,7 +1007,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       extras: courseModel.toMap(),
                                     ),
                                   );
-                                  if (insertableIndex >= PlaylistHelper().playList.length) {
+                                  if (insertableIndex >=
+                                      PlaylistHelper().playList.length) {
                                     print("adding at $insertableIndex");
                                     if (isPlayingCourseThisCourse(
                                         courseModel.courseId, ref)) {
@@ -1087,7 +1174,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   ),
                                 );
 
-                                if (insertableIndex >= PlaylistHelper().playList.length) {
+                                if (insertableIndex >=
+                                    PlaylistHelper().playList.length) {
                                   print("adding at $insertableIndex");
                                   if (isPlayingCourseThisCourse(
                                       courseModel.courseId, ref)) {

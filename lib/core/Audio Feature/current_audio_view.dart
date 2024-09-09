@@ -11,7 +11,12 @@ import '../../features/main/presentation/state/provider.dart';
 
 class CurrentAudioView extends ConsumerStatefulWidget {
   final MediaItem mediaItem;
-  const CurrentAudioView(this.mediaItem, {super.key});
+  final String? keey;
+  final String? val;
+  const CurrentAudioView(this.mediaItem, {
+     this.keey,
+     this.val,
+    super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -27,6 +32,8 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
           context,
           MaterialPageRoute(
             builder: (ctx) => CourseDetail(
+              keey: widget.keey,
+              val: widget.val,
               cm: CourseModel.fromMap(
                 widget.mediaItem.extras as Map,
                 widget.mediaItem.extras!["courseId"],

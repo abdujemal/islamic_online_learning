@@ -145,7 +145,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Text(
-                                "ኪታቡን ከፈት",
+                                "ኪታቡን ክፈት",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,

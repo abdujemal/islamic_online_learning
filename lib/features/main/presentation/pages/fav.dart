@@ -51,7 +51,11 @@ class _FavState extends ConsumerState<Fav>
                 padding: const EdgeInsets.only(bottom: 20),
                 itemCount: _.courses.length,
                 itemBuilder: (context, index) {
-                  return CourseItem(_.courses[index]);
+                  return CourseItem(
+                    _.courses[index],
+                    keey: null,
+                    val: null,
+                  );
                 },
               ),
             ),

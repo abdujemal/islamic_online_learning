@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
@@ -20,6 +21,30 @@ class MainCategories extends ConsumerStatefulWidget {
 class _MainCategoriesState extends ConsumerState<MainCategories> {
   bool seeMore = false;
   double height = 0.0;
+
+  int? noOfCourses;
+
+  @override
+  void initState() {
+    super.initState();
+    getNoOfCourses();
+  }
+
+  getNoOfCourses({String? ustaz, String? category}) async {
+    final aq = await FirebaseFirestore.instance
+        .collection("Courses")
+        .where('isDeleted', isEqualTo: true)
+        .count()
+        .get();
+
+    final aq1 =
+        await FirebaseFirestore.instance.collection("Courses").count().get();
+    if (aq1.count != null && aq.count != null) {
+      noOfCourses = aq1.count! - aq.count!;
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ref.watch(categoryNotifierProvider).map(
@@ -88,7 +113,7 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(
-                    bottom: 30,
+                    bottom: 40,
                   ),
                   child: SizedBox(
                     height: seeMore ? null : 50,
@@ -164,6 +189,19 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
                   ),
                 ),
                 Positioned(
+                  bottom: 15,
+                  left: 7,
+                  child: Text(
+                    "${noOfCourses ?? "..."} ደርሶች",
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey
+                        // fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+                Positioned(
                   bottom: 0,
                   right: 0,
                   child: TextButton(
@@ -179,7 +217,22 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
                         seeMore = !seeMore;
                       });
                     },
-                    child: Text(seeMore ? "መልሰው" : "ሁሉንም እሳይ"),
+                    child: Row(
+                      children: [
+                        Icon(
+                          !seeMore
+                              ? Icons.keyboard_arrow_down
+                              : Icons.keyboard_arrow_up,
+                          color: Colors.blue,
+                        ),
+                        Text(
+                          seeMore ? "መልሰው" : "ሁሉንም አሳይ",
+                          style: const TextStyle(
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               ],

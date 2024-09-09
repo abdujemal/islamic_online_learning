@@ -138,6 +138,8 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
               MaterialPageRoute(
                 builder: (_) => CourseDetail(
                   cm: widget.courseModel,
+                  keey: null,
+                  val: null,
                 ),
               ),
             );
@@ -262,6 +264,8 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                             MaterialPageRoute(
                                               builder: (_) => CourseDetail(
                                                 cm: courseModel,
+                                                keey: null,
+                                                val: null,
                                               ),
                                             ),
                                           );

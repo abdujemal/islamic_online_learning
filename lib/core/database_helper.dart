@@ -125,12 +125,12 @@ class DatabaseHelper {
 
     const String query = '''
       SELECT * FROM courses
-      WHERE title LIKE ?
+      WHERE title LIKE ? OR category LIKE ? OR ustaz LIKE ?
       ORDER BY title
     ''';
 
     final List<Map<String, dynamic>> result =
-        await db!.rawQuery(query, [searchQuery]);
+        await db!.rawQuery(query, [searchQuery, searchQuery, searchQuery]);
 
     List<CourseModel> courses = [];
     for (var d in result) {

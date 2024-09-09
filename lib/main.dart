@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ Future<void> main() async {
     androidNotificationOngoing: true,
     androidNotificationIcon: 'mipmap/ic_launcher',
   );
-  // await DatabaseHelper().initializeDatabase();
+  //await DatabaseHelper().initializeDatabase();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -143,7 +144,24 @@ class _MainState extends ConsumerState<Main> {
               future: checkDb(),
               builder: (context, snap) {
                 if (snap.data == null) {
-                  return Container();
+                  return Scaffold(
+                    body: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/logo.png',
+                            height: 100,
+                            width: 100,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const CircularProgressIndicator()
+                        ],
+                      ),
+                    ),
+                  );
                 }
                 return snap.data! ? const MainPage() : const DownloadDatabase();
               }),
@@ -171,16 +189,39 @@ class _MainState extends ConsumerState<Main> {
 //   );
 // }
 
+Future<int?> getFileSize(String url) async {
+  final request = await HttpClient().headUrl(Uri.parse(url));
+  final response = await request.close();
+  if (response.statusCode == HttpStatus.ok) {
+    final contentLength = response.contentLength;
+    return contentLength;
+  }
+  throw Exception('Failed to get audio file size');
+}
+
 Future<bool> checkDb() async {
   Directory directory = await getApplicationSupportDirectory();
   String path = '${directory.path}$dbPath';
-  return File(path).exists();
+  if (File(path).existsSync()) {
+    // print("file exists");
+    // print("local len: ${File(path).lengthSync()}");
+    // int? size = await getFileSize(databaseUrl);
+    // print(size);
+    // if (size == null) {
+    //   return false;
+    // }
+
+    return true; //size == File(path).lengthSync();
+  } else {
+    return false;
+  }
 }
 
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }

@@ -52,7 +52,7 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
 
     scrollController.addListener(_scrollListener);
 
-    Future.delayed(const Duration(microseconds: 1)).then((value) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       mainNotifier.getCourses(
         context: context,
         isNew: true,
@@ -149,7 +149,11 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                     showTopAudio ? 40 : 0,
                   ),
                   child: showTopAudio
-                      ? CurrentAudioView(metaData as MediaItem)
+                      ? CurrentAudioView(
+                          metaData as MediaItem,
+                          keey: widget.keey,
+                          val: widget.value,
+                        )
                       : const SizedBox(),
                 ),
               ),
@@ -183,7 +187,8 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                               itemCount: _.courses.length + 1,
                               itemBuilder: (context, index) {
                                 if (index <= _.courses.length - 1) {
-                                  return CourseItem(_.courses[index]);
+                                  return CourseItem(_.courses[index],
+                                      keey: widget.keey, val: widget.value);
                                 } else if (_.noMoreToLoad) {
                                   return const TheEnd();
                                 } else {

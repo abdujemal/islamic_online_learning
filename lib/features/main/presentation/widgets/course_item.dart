@@ -25,6 +25,8 @@ class CourseItem extends ConsumerStatefulWidget {
   final GlobalKey? courseTitle;
   final GlobalKey? courseUstaz;
   final GlobalKey? courseCategory;
+  final String? keey;
+  final String? val;
   final int index;
   final bool fromHome;
   const CourseItem(
@@ -34,6 +36,8 @@ class CourseItem extends ConsumerStatefulWidget {
     this.courseCategory,
     this.courseUstaz,
     this.courseTitle,
+    required this.keey,
+    required this.val,
     super.key,
   });
 
@@ -149,6 +153,8 @@ class _CourseItemState extends ConsumerState<CourseItem> {
           MaterialPageRoute(
             builder: (_) => CourseDetail(
               cm: widget.courseModel,
+              keey: widget.keey,
+              val: widget.val,
             ),
           ),
         );
@@ -177,33 +183,37 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                       children: [
                         Stack(
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: CachedNetworkImage(
-                                height: 80,
-                                width: 80,
-                                imageUrl: widget.courseModel.image,
-                                fit: BoxFit.fill,
-                                progressIndicatorBuilder:
-                                    (context, url, progress) {
-                                  return Shimmer.fromColors(
-                                    baseColor: Theme.of(context)
-                                        .chipTheme
-                                        .backgroundColor!
-                                        .withAlpha(150),
-                                    highlightColor: Theme.of(context)
-                                        .chipTheme
-                                        .backgroundColor!,
-                                    child: Container(
-                                      height: 80,
-                                      width: 80,
-                                      decoration: BoxDecoration(
-                                        color: whiteColor,
-                                        borderRadius: BorderRadius.circular(15),
+                            Hero(
+                              tag: widget.courseModel.id!,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: CachedNetworkImage(
+                                  height: 80,
+                                  width: 80,
+                                  imageUrl: widget.courseModel.image,
+                                  fit: BoxFit.fill,
+                                  progressIndicatorBuilder:
+                                      (context, url, progress) {
+                                    return Shimmer.fromColors(
+                                      baseColor: Theme.of(context)
+                                          .chipTheme
+                                          .backgroundColor!
+                                          .withAlpha(150),
+                                      highlightColor: Theme.of(context)
+                                          .chipTheme
+                                          .backgroundColor!,
+                                      child: Container(
+                                        height: 80,
+                                        width: 80,
+                                        decoration: BoxDecoration(
+                                          color: whiteColor,
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             Container(
@@ -276,20 +286,20 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       "playListIndexes: $playListIndexes");
                                                   print(
                                                       "pausedAtAudioNum: $playableIndex");
-                                                  await PlaylistHelper.audioPlayer
+                                                  await PlaylistHelper
+                                                      .audioPlayer
                                                       .setAudioSource(
-                                                        playList,
-                                                        initialIndex: courseModel
-                                                                    .pausedAtAudioNum <
-                                                                0
-                                                            ? 0
-                                                            : playableIndex,
-                                                        initialPosition:
-                                                            Duration(
-                                                          seconds: courseModel
-                                                              .pausedAtAudioSec,
-                                                        ),
-                                                      );
+                                                    playList,
+                                                    initialIndex: courseModel
+                                                                .pausedAtAudioNum <
+                                                            0
+                                                        ? 0
+                                                        : playableIndex,
+                                                    initialPosition: Duration(
+                                                      seconds: courseModel
+                                                          .pausedAtAudioSec,
+                                                    ),
+                                                  );
                                                   audioPlayer.play();
 
                                                   if (mounted) {
@@ -349,6 +359,8 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                             builder: (_) =>
                                                                 CourseDetail(
                                                               cm: courseModel,
+                                                              keey: widget.keey,
+                                                              val: widget.val,
                                                             ),
                                                           ),
                                                         );
@@ -489,6 +501,8 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                   MaterialPageRoute(
                                     builder: (_) => CourseDetail(
                                       cm: widget.courseModel,
+                                      keey: widget.keey,
+                                      val: widget.val,
                                     ),
                                   ),
                                 );
@@ -616,6 +630,8 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                       MaterialPageRoute(
                         builder: (_) => CourseDetail(
                           cm: widget.courseModel,
+                          keey: widget.keey,
+                          val: widget.val,
                         ),
                       ),
                     );
@@ -661,6 +677,8 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                         MaterialPageRoute(
                           builder: (_) => CourseDetail(
                             cm: widget.courseModel,
+                            keey: widget.keey,
+                            val: widget.val,
                           ),
                         ),
                       );

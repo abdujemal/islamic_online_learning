@@ -1,10 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: must_call_super
 
+import 'dart:io';
+
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/contents.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/download_database.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -135,7 +139,11 @@ class _HomeState extends ConsumerState<Home>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => CourseDetail(cm: res),
+            builder: (_) => CourseDetail(
+              cm: res,
+              keey: null,
+              val: null,
+            ),
           ),
         );
       }
@@ -337,6 +345,8 @@ class _HomeState extends ConsumerState<Home>
                             courseCategory: widget.courseCategory,
                             courseTitle: widget.courseTitle,
                             courseUstaz: widget.courseUstaz,
+                            keey: null,
+                            val: null,
                           );
                         } else if (_.noMoreToLoad) {
                           return const TheEnd();
@@ -370,7 +380,28 @@ class _HomeState extends ConsumerState<Home>
                   ),
                 ),
                 error: (_) => Center(
-                  child: Text(_.error.messege),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(_.error.messege),
+                      ElevatedButton(
+                        onPressed: () async {
+                          Directory directory =
+                              await getApplicationSupportDirectory();
+                          String path = '${directory.path}$dbPath';
+                          await File(path).delete();
+                          if (mounted) {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const DownloadDatabase()),
+                                (n) => false);
+                          }
+                        },
+                        child: const Text("ደጋሚ ይሞክሩት"),
+                      )
+                    ],
+                  ),
                 ),
               ),
         ),

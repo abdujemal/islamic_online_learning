@@ -171,6 +171,15 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                               ),
                     leading: GestureDetector(
                       onTap: () async {
+                        if (isDownloading ||
+                            downLoadProg?.filePath == audioPath &&
+                                downLoadProg != null &&
+                                downLoadProg.progress < 100)
+                        // if (downLoadProg?.filePath ==
+                        //     "Audio/${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3")
+                        {
+                          return;
+                        }
                         if (isLoading) {
                           return;
                         }
