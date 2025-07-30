@@ -207,7 +207,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                           int insertableIndex = playListIndexes.indexOf(index);
 
                           print("inserting at $insertableIndex");
-                          print('playlistNum: ${PlaylistHelper().playList.children.length}');
+                          print(
+                              'playlistNum: ${PlaylistHelper().playList.length}');
 
                           final audioSrc = AudioSource.file(
                             filePath,
@@ -226,6 +227,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                             if (isPlayingCourseThisCourse(
                                 courseModel.courseId, ref)) {
                               PlaylistHelper().playList.add(audioSrc);
+                              PlaylistHelper.audioPlayer
+                                  .addAudioSource(audioSrc);
                             } else {
                               lst.add(audioSrc);
                             }
@@ -235,6 +238,10 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                             if (isPlayingCourseThisCourse(
                                 courseModel.courseId, ref)) {
                               PlaylistHelper().playList.insert(
+                                    insertableIndex,
+                                    audioSrc,
+                                  );
+                              PlaylistHelper.audioPlayer.insertAudioSource(
                                 insertableIndex,
                                 audioSrc,
                               );
@@ -245,7 +252,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                               );
                             }
                           }
-                          print("num of index: ${PlaylistHelper().playList.length}");
+                          print(
+                              "num of index: ${PlaylistHelper().playList.length}");
                         },
                       ),
                     );
@@ -304,7 +312,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                   playListIndexes.indexOf(index + 1);
 
                               print("inserting at $insertableIndex");
-                              print('playlistNum: ${PlaylistHelper().playList.children.length}');
+                              print(
+                                  'playlistNum: ${PlaylistHelper().playList.length}');
 
                               final audioSrc = AudioSource.file(
                                 filePath,
@@ -323,6 +332,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                 if (isPlayingCourseThisCourse(
                                     courseModel.courseId, ref)) {
                                   PlaylistHelper().playList.add(audioSrc);
+                                  PlaylistHelper.audioPlayer
+                                      .addAudioSource(audioSrc);
                                 } else {
                                   lst.add(audioSrc);
                                 }
@@ -332,6 +343,10 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                 if (isPlayingCourseThisCourse(
                                     courseModel.courseId, ref)) {
                                   PlaylistHelper().playList.insert(
+                                        insertableIndex,
+                                        audioSrc,
+                                      );
+                                  PlaylistHelper.audioPlayer.insertAudioSource(
                                     insertableIndex,
                                     audioSrc,
                                   );
@@ -342,7 +357,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                   );
                                 }
                               }
-                              print("num of index: ${PlaylistHelper().playList.length}");
+                              print(
+                                  "num of index: ${PlaylistHelper().playList.length}");
                             },
                             onDeleteBtn: () async {
                               int deleteableIndex =
@@ -353,7 +369,11 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                   courseModel.courseId, ref)) {
                                 PlaylistHelper.mainPlayListIndexes =
                                     playListIndexes;
-                                PlaylistHelper().playList.removeAt(deleteableIndex);
+                                PlaylistHelper()
+                                    .playList
+                                    .removeAt(deleteableIndex);
+                                PlaylistHelper.audioPlayer
+                                    .removeAudioSourceAt(deleteableIndex);
                               } else {
                                 lst.removeAt(deleteableIndex);
                               }
@@ -381,34 +401,38 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                 int destinationIndex = PlaylistHelper
                                     .mainPlayListIndexes
                                     .indexOf(index + 1);
-                                int currentIndex =
-                                    audioPlayer.currentIndex ?? 0;
+                                // int currentIndex =
+                                //     audioPlayer.currentIndex ?? 0;
 
-                                int dnc =
-                                    (destinationIndex - currentIndex).abs();
+                                // int dnc =
+                                //     (destinationIndex - currentIndex).abs();
 
-                                for (int i = 0; i < dnc; i++) {
-                                  print("it works");
-                                  await Future.delayed(
-                                      const Duration(milliseconds: 50));
-                                  if (destinationIndex > currentIndex) {
-                                    print(">");
-                                    PlaylistHelper.audioPlayer.seekToNext();
-                                  } else {
-                                    print("<");
-                                    PlaylistHelper.audioPlayer.seekToPrevious();
-                                  }
-                                }
+                                PlaylistHelper.audioPlayer.seek(
+                                  Duration.zero,
+                                  index: destinationIndex,
+                                );
+
+                                // for (int i = 0; i < dnc; i++) {
+                                //   print("it works");
+                                //   await Future.delayed(
+                                //       const Duration(milliseconds: 50));
+                                //   if (destinationIndex > currentIndex) {
+                                //     print(">");
+                                //     PlaylistHelper.audioPlayer.seekToNext();
+                                //   } else {
+                                //     print("<");
+                                //     PlaylistHelper.audioPlayer.seekToPrevious();
+                                //   }
+                                // }
                               } else {
                                 print('playListIndexes: $playListIndexes');
                                 if (!isPlayingCourseThisCourse(
                                     courseModel.courseId, ref)) {
-                                  PlaylistHelper.nplayList =
-                                      ConcatenatingAudioSource(children: lst);
+                                  PlaylistHelper.nplayList = lst;
                                   PlaylistHelper.mainPlayListIndexes =
                                       playListIndexes;
                                 }
-                                PlaylistHelper.audioPlayer.setAudioSource(
+                                PlaylistHelper.audioPlayer.setAudioSources(
                                   PlaylistHelper().playList,
                                   initialIndex: PlaylistHelper
                                       .mainPlayListIndexes
@@ -455,7 +479,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                 playListIndexes.indexOf(index + 1);
 
                             print("inserting at $insertableIndex");
-                            print('playlistNum: ${PlaylistHelper().playList.children.length}');
+                            print(
+                                'playlistNum: ${PlaylistHelper().playList.length}');
 
                             // if (insertableIndex >= playList.children.length) {
                             //   print("adding at $insertableIndex");
@@ -515,9 +540,9 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                               if (isPlayingCourseThisCourse(
                                   courseModel.courseId, ref)) {
                                 PlaylistHelper().playList.insert(
-                                  insertableIndex,
-                                  audioSrc,
-                                );
+                                      insertableIndex,
+                                      audioSrc,
+                                    );
                               } else {
                                 lst.insert(
                                   insertableIndex,
@@ -525,7 +550,8 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                 );
                               }
                             }
-                            print("num of index: ${PlaylistHelper().playList.length}");
+                            print(
+                                "num of index: ${PlaylistHelper().playList.length}");
                           },
                           onDeleteBtn: () async {
                             int deleteableIndex =
@@ -536,7 +562,9 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                 courseModel.courseId, ref)) {
                               PlaylistHelper.mainPlayListIndexes =
                                   playListIndexes;
-                              PlaylistHelper().playList.removeAt(deleteableIndex);
+                              PlaylistHelper()
+                                  .playList
+                                  .removeAt(deleteableIndex);
                             } else {
                               lst.removeAt(deleteableIndex);
                             }
@@ -565,15 +593,14 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                             }
                             if (!isPlayingCourseThisCourse(
                                 courseModel.courseId, ref)) {
-                              PlaylistHelper.nplayList =
-                                  ConcatenatingAudioSource(children: lst);
+                              PlaylistHelper.nplayList = lst;
                               PlaylistHelper.mainPlayListIndexes =
                                   playListIndexes;
                             }
 
                             print('playListIndexes: $playListIndexes');
 
-                            PlaylistHelper.audioPlayer.setAudioSource(
+                            PlaylistHelper.audioPlayer.setAudioSources(
                               PlaylistHelper().playList,
                               initialIndex: PlaylistHelper.mainPlayListIndexes
                                   .indexOf(index + 1),

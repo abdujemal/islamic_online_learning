@@ -1,15 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-            <!-- <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /> -->
-            <!-- <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/> -->
-<uses-permission android:name="android.permission.WAKE_LOCK"/>
-<!-- For apps with targetSDK=31 (Android 12)-->
-<!-- <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>  -->
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
-
-
+    <!-- <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /> -->
+    <!-- <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/> -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- For apps with targetSDK=31 (Android 12)-->
+    <!-- <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>  -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
 
     <application
         android:label="ዒልም ፈላጊ"
@@ -31,7 +31,7 @@
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
 
-            <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
+            <!-- <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
 
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
@@ -39,8 +39,15 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:host="ilmfelagi.com" android:scheme="http"/>
                 <data android:host="ilmfelagi.com" android:scheme="https"/>
-            </intent-filter>
+            </intent-filter> -->
            
+            <intent-filter>
+              <action android:name="android.intent.action.VIEW" />
+              <category android:name="android.intent.category.DEFAULT" />
+              <category android:name="android.intent.category.BROWSABLE" />
+              <data android:scheme="ilmfelagi" android:host="details" />
+            </intent-filter>
+
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

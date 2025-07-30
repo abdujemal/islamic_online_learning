@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
@@ -153,23 +152,24 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
 
   @override
   Future<String> createDynamicLink(CourseModel courseModel) async {
-    final dynamicLinkParams = DynamicLinkParameters(
-      link:
-          Uri.parse("https://ilmfelagi.com/courses?id=${courseModel.courseId}"),
-      uriPrefix: "https://ilmfelagi.page.link",
-      androidParameters: const AndroidParameters(
-        packageName: "com.aj.islamic_online_learning",
-      ),
-      socialMetaTagParameters: SocialMetaTagParameters(
-        title: courseModel.title,
-        imageUrl: Uri.parse(courseModel.image),
-        description: "በ${courseModel.ustaz}",
-      ),
-    );
-    final dynamicLink =
-        await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
+    // final dynamicLinkParams = DynamicLinkParameters(
+    //   link:
+    //       Uri.parse("https://ilmfelagi.com/courses?id=${courseModel.courseId}"),
+    //   uriPrefix: "https://ilmfelagi.page.link",
+    //   androidParameters: const AndroidParameters(
+    //     packageName: "com.aj.islamic_online_learning",
+    //   ),
+    //   socialMetaTagParameters: SocialMetaTagParameters(
+    //     title: courseModel.title,
+    //     imageUrl: Uri.parse(courseModel.image),
+    //     description: "በ${courseModel.ustaz}",
+    //   ),
+    // );
+    // final dynamicLink =
+    //     await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
 
-    return dynamicLink.shortUrl.toString();
+    // return dynamicLink.shortUrl.toString();
+    throw Exception("Dynamic links are not implemented yet.");
   }
 }
 

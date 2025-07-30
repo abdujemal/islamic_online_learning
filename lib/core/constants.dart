@@ -20,9 +20,6 @@ const int numOfDoc = 20;
 const String playStoreUrl =
     "https://play.google.com/store/apps/details?id=com.aj.islamic_online_learning";
 
-const Color cardColor = Color(0xfffcffea);
-
-const Color darkCardColor = Color(0xff3f3f3d);
 
 const primaryColor = MaterialColor(
   0xFF2FA887,
@@ -39,6 +36,9 @@ const primaryColor = MaterialColor(
     900: Color(0xFF0F3D2B),
   },
 );
+const Color cardColor = Color(0xfffcffea);
+
+const Color darkCardColor = Color(0xff3f3f3d);
 
 void toast(String message, ToastType toastType, BuildContext context,
     {bool isLong = false}) {

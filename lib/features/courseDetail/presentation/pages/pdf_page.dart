@@ -496,7 +496,9 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                   if (courseModel.isFinished == 0) {
                     courseModel = courseModel.copyWith(
                       isStarted: 1,
-                      // pausedAtAudioNum: PlaylistHelper().playListIndexes[audioPlayer.currentIndex ?? 0],
+                      pausedAtAudioNum: PlaylistHelper.mainPlayListIndexes[
+                              audioPlayer.currentIndex ?? 0] -
+                          1,
                       pausedAtAudioSec: audioPlayer.position.inSeconds,
                       lastViewed: DateTime.now().toString(),
                     );

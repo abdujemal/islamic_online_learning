@@ -183,37 +183,33 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                       children: [
                         Stack(
                           children: [
-                            Hero(
-                              tag: widget.courseModel.id!,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: CachedNetworkImage(
-                                  height: 80,
-                                  width: 80,
-                                  imageUrl: widget.courseModel.image,
-                                  fit: BoxFit.fill,
-                                  progressIndicatorBuilder:
-                                      (context, url, progress) {
-                                    return Shimmer.fromColors(
-                                      baseColor: Theme.of(context)
-                                          .chipTheme
-                                          .backgroundColor!
-                                          .withAlpha(150),
-                                      highlightColor: Theme.of(context)
-                                          .chipTheme
-                                          .backgroundColor!,
-                                      child: Container(
-                                        height: 80,
-                                        width: 80,
-                                        decoration: BoxDecoration(
-                                          color: whiteColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: CachedNetworkImage(
+                                height: 80,
+                                width: 80,
+                                imageUrl: widget.courseModel.image,
+                                fit: BoxFit.fill,
+                                progressIndicatorBuilder:
+                                    (context, url, progress) {
+                                  return Shimmer.fromColors(
+                                    baseColor: Theme.of(context)
+                                        .chipTheme
+                                        .backgroundColor!
+                                        .withAlpha(150),
+                                    highlightColor: Theme.of(context)
+                                        .chipTheme
+                                        .backgroundColor!,
+                                    child: Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        color: whiteColor,
+                                        borderRadius: BorderRadius.circular(15),
                                       ),
-                                    );
-                                  },
-                                ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                             Container(
@@ -288,7 +284,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       "pausedAtAudioNum: $playableIndex");
                                                   await PlaylistHelper
                                                       .audioPlayer
-                                                      .setAudioSource(
+                                                      .setAudioSources(
                                                     playList,
                                                     initialIndex: courseModel
                                                                 .pausedAtAudioNum <
@@ -400,9 +396,11 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                             widget.courseModel.isStarted == 1 &&
                                     widget.courseModel.isScheduleOn == 1
                                 ? const Positioned(
-                                    right: 0,
+                                    top: 2,
+                                    right: 2,
                                     child: Icon(
                                       Icons.notifications_active,
+                                      color: whiteColor,
                                       size: 20,
                                     ),
                                   )

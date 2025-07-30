@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
@@ -21,6 +20,7 @@ Future<void> main() async {
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
+    // androidStopForegroundOnPause: false,
     androidNotificationIcon: 'mipmap/ic_launcher',
   );
   //await DatabaseHelper().initializeDatabase();
@@ -53,8 +53,8 @@ class Main extends ConsumerStatefulWidget {
 }
 
 class _MainState extends ConsumerState<Main> {
-  FirebaseDynamicLinks firebaseDynamicLink = FirebaseDynamicLinks.instance;
-
+  
+ 
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
@@ -79,7 +79,7 @@ class _MainState extends ConsumerState<Main> {
                 primary: primaryColor,
                 background: Color.fromARGB(255, 51, 51, 51),
               ),
-              dialogTheme: const DialogTheme(
+              dialogTheme: const DialogThemeData(
                 backgroundColor: darkCardColor,
               ),
               cardColor: darkCardColor,
@@ -112,7 +112,7 @@ class _MainState extends ConsumerState<Main> {
             chipTheme: const ChipThemeData(
               backgroundColor: Color.fromARGB(255, 207, 207, 207),
             ),
-            dialogTheme: const DialogTheme(
+            dialogTheme: const DialogThemeData(
               backgroundColor: cardColor,
             ),
             cardColor: cardColor,

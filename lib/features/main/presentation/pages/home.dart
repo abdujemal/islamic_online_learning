@@ -3,14 +3,14 @@
 
 import 'dart:io';
 
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:app_links/app_links.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/contents.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/download_database.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:uni_links/uni_links.dart';
 
 import 'package:islamic_online_learning/features/main/presentation/pages/ustazs.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/beginner_courses_list.dart';
@@ -56,6 +56,8 @@ class _HomeState extends ConsumerState<Home>
 
   bool showFloatingBtn = false;
 
+  final AppLinks _appLinks = AppLinks();
+
   @override
   initState() {
     super.initState();
@@ -77,47 +79,62 @@ class _HomeState extends ConsumerState<Home>
       ref.read(beginnerListProvider.notifier).getCourses();
       ref.watch(startedNotifierProvider.notifier).getCouses();
 
-      FirebaseDynamicLinks.instance.getInitialLink().then((value) {
-        print("link:- ${value?.link}");
-        print("Segments: ${value?.link.pathSegments}");
-        if (value?.link.pathSegments.contains("courses") ?? false) {
-          String id = Uri.decodeFull(value?.link.toString() ?? "")
-              .split("/")
-              .last
-              .replaceAll("courses?id=", "")
-              .replaceAll("+", " ");
-          print("id: $id");
-          // String? id = widget.initialLink!.link.queryParameters["id"];
+      // Listen to new incoming links
+      _appLinks.uriLinkStream.listen(_handleDeepLink);
 
-          getCourseAndRedirect(id);
-        }
-      });
+      // FirebaseDynamicLinks.instance.getInitialLink().then((value) {
+      //   print("link:- ${value?.link}");
+      //   print("Segments: ${value?.link.pathSegments}");
+      //   if (value?.link.pathSegments.contains("courses") ?? false) {
+      //     String id = Uri.decodeFull(value?.link.toString() ?? "")
+      //         .split("/")
+      //         .last
+      //         .replaceAll("courses?id=", "")
+      //         .replaceAll("+", " ");
+      //     print("id: $id");
+      //     // String? id = widget.initialLink!.link.queryParameters["id"];
+
+      //     getCourseAndRedirect(id);
+      //   }
+      // });
     });
 
-    linkStream.listen((event) {
-      if (event != null) {
-        Uri link = Uri.parse(event);
-        print("link:- ${link.toString()}");
-        print("Segments: ${link.pathSegments}");
-        if (link.pathSegments.contains("courses")) {
-          String id = Uri.decodeFull(link.toString())
-              .split("/")
-              .last
-              .replaceAll("courses?id=", "")
-              .replaceAll("+", " ");
-          print("id: $id");
+    //   linkStream.listen((event) {
+    //     if (event != null) {
+    //       Uri link = Uri.parse(event);
+    //       print("link:- ${link.toString()}");
+    //       print("Segments: ${link.pathSegments}");
+    //       if (link.pathSegments.contains("courses")) {
+    //         String id = Uri.decodeFull(link.toString())
+    //             .split("/")
+    //             .last
+    //             .replaceAll("courses?id=", "")
+    //             .replaceAll("+", " ");
+    //         print("id: $id");
 
-          getCourseAndRedirect(id);
-        }
-      }
-    }).onError((e) {
-      toast(
-        e.toString(),
-        ToastType.error,
-        context,
-        isLong: true,
-      );
-    });
+    //         getCourseAndRedirect(id);
+    //       }
+    //     }
+    //   }).onError((e) {
+    //     toast(
+    //       e.toString(),
+    //       ToastType.error,
+    //       context,
+    //       isLong: true,
+    //     );
+    //   });
+  }
+
+  void _handleDeepLink(Uri? uri) {
+    if (uri == null) return;
+
+    if (kDebugMode) {
+      print("Opening: ${uri.pathSegments}");
+    }
+
+    final courseId = uri.pathSegments.last;
+
+    getCourseAndRedirect(courseId);
   }
 
   getCourseAndRedirect(String? id) async {

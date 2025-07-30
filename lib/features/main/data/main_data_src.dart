@@ -93,9 +93,9 @@ class IMainDataSrc extends MainDataSrc {
           (page - 1) * numOfDoc,
         );
 
-        final categories = await DatabaseHelper().getCategories();
-        final ustazs = await DatabaseHelper().getUstazs();
-        final contents = await DatabaseHelper().getContent();
+        List<String> categories = await DatabaseHelper().getCategories();
+        List<String> ustazs = await DatabaseHelper().getUstazs();
+        List<String> contents = await DatabaseHelper().getContent();
 
         // final qs = await firebaseFirestore
         //     .collection(FirebaseConst.courses)
@@ -115,21 +115,26 @@ class IMainDataSrc extends MainDataSrc {
         if (courses.isNotEmpty) {
           for (var d in courses) {
             if (d["audioSizes"] != null) {
+              print("categories: ${categories.length}");
               if (!categories.contains(d['category'])) {
-                print('adding cateogry ${d['category']} from ${d['title']} be ${d['ustaz']}');
+                print(
+                    'adding cateogry ${d['category']} from ${d['title']} be ${d['ustaz']}');
                 await DatabaseHelper().insertCategory(d['category']);
+                categories.add(d['category']);
               }
 
               if (!ustazs.contains(d['ustaz'])) {
                 print('adding ustaz');
 
                 await DatabaseHelper().insertUstaz(d['ustaz']);
+                ustazs.add(d['ustaz']);
               }
 
               if (!contents.contains(d['title'])) {
                 print('adding title');
 
                 await DatabaseHelper().insertContent(d['title']);
+                contents.add(d['title']);
               }
 
               final id =
@@ -165,7 +170,6 @@ class IMainDataSrc extends MainDataSrc {
     }
 
     // await Future.delayed(const Duration(seconds: 2));
-
     final res = await DatabaseHelper()
         .getCouses(key, val, method, (page - 1) * numOfDoc);
     // if (res.isNotEmpty) {
