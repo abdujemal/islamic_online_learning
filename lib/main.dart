@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/update_checker.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/download_database.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -21,7 +22,7 @@ Future<void> main() async {
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
     // androidStopForegroundOnPause: false,
-    androidNotificationIcon: 'mipmap/ic_launcher',
+    androidNotificationIcon: 'mipmap/launcher_icon',
   );
   //await DatabaseHelper().initializeDatabase();
   await Firebase.initializeApp(
@@ -53,8 +54,6 @@ class Main extends ConsumerStatefulWidget {
 }
 
 class _MainState extends ConsumerState<Main> {
-  
- 
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {

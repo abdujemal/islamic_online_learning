@@ -295,6 +295,8 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       seconds: courseModel
                                                           .pausedAtAudioSec,
                                                     ),
+                                              preload: false,
+
                                                   );
                                                   audioPlayer.play();
 

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,11 +55,9 @@ final firebaseMessagingProvider = Provider<FirebaseMessaging>((ref) {
   return FirebaseMessaging.instance;
 });
 
-final firebaseFirestoreProvider =
-    Provider<FirebaseFirestore>((ref) => FirebaseFirestore.instance);
 
 final mainDataSrcProvider = Provider<MainDataSrc>((ref) {
-  return IMainDataSrc(ref.read(firebaseFirestoreProvider));
+  return IMainDataSrc();
 });
 
 final mainRepoProvider = Provider<MainRepo>((ref) {

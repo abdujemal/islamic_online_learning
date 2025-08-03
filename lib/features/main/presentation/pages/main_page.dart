@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:animated_search_bar/animated_search_bar.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/update_checker.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/started.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
@@ -227,6 +227,8 @@ class _MainPageState extends ConsumerState<MainPage>
     });
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
     final audioPlayer = PlaylistHelper.audioPlayer;
@@ -276,89 +278,91 @@ class _MainPageState extends ConsumerState<MainPage>
             if (process == ProcessingState.idle) {
               showTopAudio = false;
             }
-            return Scaffold(
-              appBar: AppBar(
-                title: AnimatedSearchBar(
-                  height: 50,
-                  label: "ዒልም ፈላጊ",
-                  controller: _searchController,
-                  labelStyle: const TextStyle(fontSize: 16),
-                  searchStyle: TextStyle(
-                    color: ref.read(themeProvider) == ThemeMode.dark
-                        ? Colors.white
-                        : Colors.black,
-                  ),
-                  cursorColor: primaryColor,
-                  searchIcon: Padding(
-                    padding: const EdgeInsets.only(top: 5.0),
-                    child: Icon(
-                      key: _searchIconKey,
-                      Icons.search_rounded,
+            return UpdateChecker(
+              child: Scaffold(
+                appBar: AppBar(
+                  title: AnimatedSearchBar(
+                    height: 50,
+                    label: "ዒልም ፈላጊ",
+                    controller: _searchController,
+                    labelStyle: const TextStyle(fontSize: 16),
+                    searchStyle: TextStyle(
+                      color: ref.read(themeProvider) == ThemeMode.dark
+                          ? Colors.white
+                          : Colors.black,
                     ),
-                  ),
-                  textInputAction: TextInputAction.search,
-                  searchDecoration: const InputDecoration(
-                    hintText: 'ፈልግ...',
-                    alignLabelWithHint: true,
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
-                    hintStyle: TextStyle(
-                      color: Colors.white70,
+                    cursorColor: primaryColor,
+                    searchIcon: Padding(
+                      padding: const EdgeInsets.only(top: 5.0),
+                      child: Icon(
+                        key: _searchIconKey,
+                        Icons.search_rounded,
+                      ),
                     ),
-                    border: InputBorder.none,
-                  ),
-                  onChanged: (value) {
-                    ref.read(queryProvider.notifier).update((state) => value);
-                    if (ref.watch(menuIndexProvider) != 0) {
-                      ref.read(menuIndexProvider.notifier).update((state) => 0);
-                      tabController.animateTo(0);
-                    }
-
-                    startSearchTimer(value);
-                  },
-                  onFieldSubmitted: (value) {
-                    ref
-                        .read(mainNotifierProvider.notifier)
-                        .searchCourses(value, 20);
-                  },
-                  onClose: () {
-                    ref.read(mainNotifierProvider.notifier).getCourses(
-                          context: context,
-                        );
-                  },
-                ),
-                bottom: PreferredSize(
-                  preferredSize: Size(
-                    MediaQuery.of(context).size.width,
-                    showTopAudio ? 40 : 0,
-                  ),
-                  child: showTopAudio
-                      ? CurrentAudioView(metaData as MediaItem)
-                      : const SizedBox(),
-                ),
-                leading: Builder(builder: (context) {
-                  return IconButton(
-                    key: _menuKey,
-                    icon: const Icon(Icons.menu_rounded),
-                    onPressed: () {
-                      Scaffold.of(context).openDrawer();
+                    textInputAction: TextInputAction.search,
+                    searchDecoration: const InputDecoration(
+                      hintText: 'ፈልግ...',
+                      alignLabelWithHint: true,
+                      fillColor: Colors.white,
+                      focusColor: Colors.white,
+                      hintStyle: TextStyle(
+                        color: Colors.white70,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (value) {
+                      ref.read(queryProvider.notifier).update((state) => value);
+                      if (ref.watch(menuIndexProvider) != 0) {
+                        ref.read(menuIndexProvider.notifier).update((state) => 0);
+                        tabController.animateTo(0);
+                      }
+              
+                      startSearchTimer(value);
                     },
-                  );
-                }),
-              ),
-              drawer: const MainDrawer(),
-              bottomNavigationBar: BottomNav(tabController),
-              body: TabBarView(
-                controller: tabController,
-                children: [
-                  Home(
-                    courseTitle: _courseTitleKey,
-                    courseUstaz: _courseUstazKey,
-                    courseCategory: _courseCategoryKey,
+                    onFieldSubmitted: (value) {
+                      ref
+                          .read(mainNotifierProvider.notifier)
+                          .searchCourses(value, 20);
+                    },
+                    onClose: () {
+                      ref.read(mainNotifierProvider.notifier).getCourses(
+                            context: context,
+                          );
+                    },
                   ),
-                  const Fav(),
-                  const Started(),
-                ],
+                  bottom: PreferredSize(
+                    preferredSize: Size(
+                      MediaQuery.of(context).size.width,
+                      showTopAudio ? 40 : 0,
+                    ),
+                    child: showTopAudio
+                        ? CurrentAudioView(metaData as MediaItem)
+                        : const SizedBox(),
+                  ),
+                  leading: Builder(builder: (context) {
+                    return IconButton(
+                      key: _menuKey,
+                      icon: const Icon(Icons.menu_rounded),
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                    );
+                  }),
+                ),
+                drawer: const MainDrawer(),
+                bottomNavigationBar: BottomNav(tabController),
+                body: TabBarView(
+                  controller: tabController,
+                  children: [
+                    Home(
+                      courseTitle: _courseTitleKey,
+                      courseUstaz: _courseUstazKey,
+                      courseCategory: _courseCategoryKey,
+                    ),
+                    const Fav(),
+                    const Started(),
+                  ],
+                ),
               ),
             );
           }),

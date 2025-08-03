@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:text_scroll/text_scroll.dart';
 
@@ -13,10 +14,7 @@ class CurrentAudioView extends ConsumerStatefulWidget {
   final MediaItem mediaItem;
   final String? keey;
   final String? val;
-  const CurrentAudioView(this.mediaItem, {
-     this.keey,
-     this.val,
-    super.key});
+  const CurrentAudioView(this.mediaItem, {this.keey, this.val, super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -24,6 +22,47 @@ class CurrentAudioView extends ConsumerStatefulWidget {
 }
 
 class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
+  AudioPlayer audioPlayer = PlaylistHelper.audioPlayer;
+
+  final List<double> _speeds = [0.5, 1.0, 1.2, 1.5, 1.7, 2.0];
+
+  final List<String> _speedsLabel = [
+    "Slow",
+    "Normal",
+    "Medium",
+    "Fast",
+    "Very Fast",
+    "Super Fast",
+  ];
+
+  void _showSpeedPopupMenu(
+      BuildContext context, double currentSpeed, Offset position) async {
+    final selected = await showMenu<double>(
+      context: context,
+      color: Theme.of(context).cardColor,
+      position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, 0),
+      items: _speeds
+          .map((speed) => PopupMenuItem<double>(
+                value: speed,
+                child: Text(
+                  '${speed}x   ${_speedsLabel[_speeds.indexOf(speed)]}',
+                  style: TextStyle(
+                    fontWeight: speed == currentSpeed
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: speed == currentSpeed ? primaryColor : null,
+                  ),
+                ),
+              ))
+          .toList(),
+    );
+
+    if (selected != null && selected != currentSpeed) {
+      setState(() => currentSpeed = selected);
+      PlaylistHelper.audioPlayer.setSpeed(selected);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -96,6 +135,35 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                   style: TextStyle(
                     color: Colors.grey.shade300,
                   ),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              GestureDetector(
+                onTapDown: (td) {
+                  double x, y;
+                  x = td.globalPosition.dx - 50;
+                  y = td.globalPosition.dy + 30;
+                  _showSpeedPopupMenu(context, audioPlayer.speed, Offset(x, y));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2),
+                    border: Border.all(
+                      color: whiteColor,
+                      width: 0.5,
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(1),
+                  child: StreamBuilder<Object>(
+                      stream: PlaylistHelper.audioPlayer.speedStream,
+                      builder: (context, snapshot) {
+                        return Text(
+                          "${snapshot.data}x",
+                          style: const TextStyle(fontSize: 10),
+                        );
+                      }),
                 ),
               ),
               IconButton(

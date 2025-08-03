@@ -437,7 +437,7 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
                                   initialIndex: PlaylistHelper
                                       .mainPlayListIndexes
                                       .indexOf(index + 1),
-                                  // preload: false,
+                                  preload: false,
                                 );
                                 try {
                                   await PlaylistHelper.audioPlayer.play();

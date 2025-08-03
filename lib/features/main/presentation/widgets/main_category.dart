@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/database_helper.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/contents.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -31,17 +31,21 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
   }
 
   getNoOfCourses({String? ustaz, String? category}) async {
-    final aq = await FirebaseFirestore.instance
-        .collection("Courses")
-        .where('isDeleted', isEqualTo: true)
-        .count()
-        .get();
+    try {
+      // final aq = await FirebaseFirestore.instance
+      //     .collection("Courses")
+      //     .where('isDeleted', isEqualTo: true)
+      //     .count()
+      //     .get();
 
-    final aq1 =
-        await FirebaseFirestore.instance.collection("Courses").count().get();
-    if (aq1.count != null && aq.count != null) {
-      noOfCourses = aq1.count! - aq.count!;
+      // final aq1 =
+      //     await FirebaseFirestore.instance.collection("Courses").count().get();
+      final num = await DatabaseHelper().getRowCount("Courses");
+
+      noOfCourses = num;
       setState(() {});
+    } catch (e) {
+      print("Error ${e.toString()}");
     }
   }
 

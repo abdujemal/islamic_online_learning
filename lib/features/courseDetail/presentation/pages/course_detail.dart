@@ -684,6 +684,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                                 seconds: courseModel
                                                     .pausedAtAudioSec,
                                               ),
+                                              preload: false,
                                             );
                                             PlaylistHelper.audioPlayer.play();
 

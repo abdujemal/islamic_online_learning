@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
 import 'model/course_model.dart';
@@ -24,10 +23,8 @@ abstract class MainDataSrc {
 }
 
 class IMainDataSrc extends MainDataSrc {
-  final FirebaseFirestore firebaseFirestore;
-
   int page = 1;
-  IMainDataSrc(this.firebaseFirestore);
+  IMainDataSrc();
 
   int? lastCourseIndex;
 
@@ -295,28 +292,7 @@ class IMainDataSrc extends MainDataSrc {
     List<FAQModel> faqdata = await DatabaseHelper().getFaqs();
 
     try {
-      final aq =
-          await firebaseFirestore.collection(FirebaseConst.faq).count().get();
-      if (aq.count != null && faqdata.length < aq.count!) {
-        print("get data from cloud");
-        final qs = await firebaseFirestore.collection(FirebaseConst.faq).get();
-        for (var d in qs.docs) {
-          final id =
-              await DatabaseHelper().isFAQAvailable(d.data()['question']);
-          if (id != null) {
-            await DatabaseHelper().updateFaq(FAQModel(
-                id: id,
-                question: d.data()['question'],
-                answer: d.data()['answer']));
-          } else {
-            await DatabaseHelper().insertFaq(FAQModel(
-                id: null,
-                question: d.data()['question'],
-                answer: d.data()['answer']));
-          }
-        }
-        faqdata = await DatabaseHelper().getFaqs();
-      }
+      faqdata = await DatabaseHelper().getFaqs();
     } catch (e) {
       print(e);
     }

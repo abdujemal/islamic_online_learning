@@ -224,6 +224,7 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                       initialPosition: Duration(
                                         seconds: courseModel.pausedAtAudioSec,
                                       ),
+                                      preload: false,
                                     );
                                     audioPlayer.play();
 
@@ -310,13 +311,10 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                   left: 2,
                   child: widget.courseModel.isStarted == 1 &&
                           widget.courseModel.isScheduleOn == 1
-                      ? const Positioned(
-                          right: 0,
-                          child: Icon(
-                            Icons.notifications_active,
-                            color: whiteColor,
-                            size: 20,
-                          ),
+                      ? Icon(
+                          Icons.notifications_active,
+                          color: whiteColor,
+                          size: 20,
                         )
                       : const SizedBox()),
               Positioned.fill(

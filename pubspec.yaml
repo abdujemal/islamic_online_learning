@@ -28,12 +28,11 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  app_links: ^6.4.0
   animated_search_bar: ^2.7.0
+  app_links: ^6.4.0
   audio_video_progress_bar: ^2.0.1
   awesome_notifications: ^0.10.1
   cached_network_image: ^3.3.1
-  cloud_firestore: any
   confetti: ^0.8.0
   connectivity_plus: ^6.1.4
   cupertino_icons: ^1.0.2
@@ -44,7 +43,6 @@ dependencies:
   firebase_auth: any
   firebase_core: any
   firebase_crashlytics: ^4.3.7
-  # firebase_dynamic_links: ^6.1.7
   firebase_messaging: any
   flutter:
     sdk: flutter
@@ -52,10 +50,12 @@ dependencies:
   flutter_riverpod: ^2.4.1
   fluttertoast: ^8.2.4
   freezed_annotation: ^3.0.0
-  # image: ^4.1.6
+  hive: ^2.2.3
+  http: ^1.4.0
   intl: ^0.20.2
   just_audio: ^0.10.4
   just_audio_background: ^0.0.1-beta.17
+  package_info_plus: ^8.3.0
   path_provider: ^2.0.15
   permission_handler: ^12.0.0+1
   rxdart: ^0.28.0
@@ -65,9 +65,7 @@ dependencies:
   sqflite: ^2.3.0
   text_scroll: ^0.2.0
   tutorial_coach_mark: ^1.2.11
-  # uni_links: ^0.5.1
   url_launcher: ^6.2.4
-  hive: ^2.2.3
 
 dev_dependencies:
   build_runner: ^2.4.6
