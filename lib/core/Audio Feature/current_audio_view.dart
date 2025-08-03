@@ -161,7 +161,7 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                       builder: (context, snapshot) {
                         return Text(
                           "${snapshot.data}x",
-                          style: const TextStyle(fontSize: 10),
+                          style: const TextStyle(fontSize: 10, color: whiteColor),
                         );
                       }),
                 ),
