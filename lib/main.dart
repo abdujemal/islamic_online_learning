@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
 import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/core/update_checker.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/download_database.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -20,8 +18,8 @@ Future<void> main() async {
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
-    androidNotificationOngoing: true,
-    // androidStopForegroundOnPause: false,
+    // androidNotificationOngoing: true,
+    androidStopForegroundOnPause: false,
     androidNotificationIcon: 'mipmap/launcher_icon',
   );
   //await DatabaseHelper().initializeDatabase();
