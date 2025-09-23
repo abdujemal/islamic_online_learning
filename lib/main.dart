@@ -23,6 +23,7 @@ Future<void> main() async {
     androidNotificationIcon: 'mipmap/launcher_icon',
   );
   //await DatabaseHelper().initializeDatabase();
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -142,20 +143,22 @@ class _MainState extends ConsumerState<Main> {
               builder: (context, snap) {
                 if (snap.data == null) {
                   return Scaffold(
-                    body: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/logo.png',
-                            height: 100,
-                            width: 100,
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const CircularProgressIndicator()
-                        ],
+                    body: SafeArea(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/logo.png',
+                              height: 100,
+                              width: 100,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const CircularProgressIndicator()
+                          ],
+                        ),
                       ),
                     ),
                   );

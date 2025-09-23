@@ -272,6 +272,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       .playList
                                                       .addAll(lst);
                                                 }
+                                                PlaylistHelper.mainPlayListIndexes = playListIndexes;
                                                 if (playList.length > 0) {
                                                   int playableIndex =
                                                       playListIndexes.indexOf(

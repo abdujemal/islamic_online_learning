@@ -50,8 +50,7 @@ class _UpdateCheckerState extends State<UpdateChecker> {
     List<int> latestParts = latest.split('.').map(int.parse).toList();
 
     for (int i = 0; i < latestParts.length; i++) {
-      if (i >= currentParts.length || currentParts[i] < latestParts[i])
-        return true;
+      if (i >= currentParts.length || currentParts[i] < latestParts[i]) return true;
       if (currentParts[i] > latestParts[i]) return false;
     }
 

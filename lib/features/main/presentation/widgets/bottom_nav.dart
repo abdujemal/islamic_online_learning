@@ -22,36 +22,38 @@ class _BottomNavState extends ConsumerState<BottomNav> {
   @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(menuIndexProvider);
-    return Container(
-      height: 60,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(20),
-            offset: const Offset(0, -6),
-            blurRadius: 5,
-            spreadRadius: 1,
+    return SafeArea(
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(20),
+              offset: const Offset(0, -6),
+              blurRadius: 5,
+              spreadRadius: 1,
+            ),
+          ],
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
           ),
-        ],
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(20),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(
-          icons.length,
-          (index) => InkWell(
-            onTap: () {
-              widget.tabController.animateTo(index);
-              ref.read(menuIndexProvider.notifier).update((state) => index);
-            },
-            child: Ink(
-              child: Icon(
-                icons[index],
-                color: index == currentIndex ? primaryColor : Colors.grey,
-                size: 30,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(
+            icons.length,
+            (index) => InkWell(
+              onTap: () {
+                widget.tabController.animateTo(index);
+                ref.read(menuIndexProvider.notifier).update((state) => index);
+              },
+              child: Ink(
+                child: Icon(
+                  icons[index],
+                  color: index == currentIndex ? primaryColor : Colors.grey,
+                  size: 30,
+                ),
               ),
             ),
           ),

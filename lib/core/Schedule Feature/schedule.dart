@@ -12,6 +12,7 @@ class Schedule {
           channelDescription: 'Ders app',
           defaultColor: primaryColor,
           ledColor: primaryColor,
+          // icon: 'mipmap/launcher_icon',
         ),
         NotificationChannel(
           channelKey: 'ilm_felagi_alarm',
@@ -23,7 +24,7 @@ class Schedule {
           // playSound: true,
           soundSource: "resource://raw/alarm",
           // onlyAlertOnce: false,
-          // icon: 'mipmap/book',
+          // icon: 'mipmap/launcher_icon',
           // defaultRingtoneType: DefaultRingtoneType.Alarm,
 
           enableVibration: true,

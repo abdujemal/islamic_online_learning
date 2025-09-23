@@ -351,17 +351,19 @@ class _MainPageState extends ConsumerState<MainPage>
                 ),
                 drawer: const MainDrawer(),
                 bottomNavigationBar: BottomNav(tabController),
-                body: TabBarView(
-                  controller: tabController,
-                  children: [
-                    Home(
-                      courseTitle: _courseTitleKey,
-                      courseUstaz: _courseUstazKey,
-                      courseCategory: _courseCategoryKey,
-                    ),
-                    const Fav(),
-                    const Started(),
-                  ],
+                body: SafeArea(
+                  child: TabBarView(
+                    controller: tabController,
+                    children: [
+                      Home(
+                        courseTitle: _courseTitleKey,
+                        courseUstaz: _courseUstazKey,
+                        courseCategory: _courseCategoryKey,
+                      ),
+                      const Fav(),
+                      const Started(),
+                    ],
+                  ),
                 ),
               ),
             );

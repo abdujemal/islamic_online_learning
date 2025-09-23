@@ -44,10 +44,12 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
     CancelToken cancelToken,
     Ref ref,
   ) async {
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
-    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-    return client;
-  };
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
     Directory dir = await getApplicationSupportDirectory();
 
     final filePath = "${dir.path}/$folderName/$fileName";
@@ -68,6 +70,8 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
         DownloadProgress(
           cancelToken: cancelToken,
           progress: 0,
+          receivedBytes: 0,
+          totalBytes: 0,
           filePath: filePath,
           title: fileName.split(",").last,
         ),
@@ -101,6 +105,8 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
                         ? e.copyWith(
                             progress: progress,
                             filePath: filePath,
+                            receivedBytes: receivedBytes,
+                            totalBytes: totalBytes,
                           )
                         : e,
                   )
@@ -175,11 +181,15 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
 
 class DownloadProgress {
   final double progress;
+  final int receivedBytes;
+  final int totalBytes;
   final String filePath;
   final String title;
   final CancelToken cancelToken;
   DownloadProgress({
     required this.progress,
+    required this.receivedBytes,
+    required this.totalBytes,
     required this.filePath,
     required this.title,
     required this.cancelToken,
@@ -187,12 +197,16 @@ class DownloadProgress {
 
   DownloadProgress copyWith({
     double? progress,
+    int? totalBytes,
+    int? receivedBytes,
     String? filePath,
     String? title,
     CancelToken? cancelToken,
   }) {
     return DownloadProgress(
       progress: progress ?? this.progress,
+      receivedBytes: receivedBytes ?? this.receivedBytes,
+      totalBytes: totalBytes ?? this.totalBytes,
       filePath: filePath ?? this.filePath,
       title: title ?? this.title,
       cancelToken: cancelToken ?? this.cancelToken,

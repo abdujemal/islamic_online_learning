@@ -507,35 +507,37 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                   }
                 },
               ),
-              body: PDFView(
-                filePath: widget.path,
-                defaultPage: courseModel.pdfPage.toInt() - 1,
-                pageSnap: false,
-                autoSpacing: false,
-                nightMode: theme == ThemeMode.dark,
-                pageFling: false,
-                onRender: (pgs) {
-                  setState(() {
-                    pages = pgs;
-                    isReady = true;
-                  });
-                },
-                onError: (error) {
-                  toast(error, ToastType.error, context);
-                },
-                onPageError: (page, error) {
-                  toast('$page: ${error.toString()}', ToastType.error, context);
-                },
-                onViewCreated: (PDFViewController pdfViewController) {
-                  _controller = pdfViewController;
-                },
-                onPageChanged: (int? page, int? total) {
-                  if (page != null && total != null) {
-                    ref.read(pdfPageProvider.notifier).update((i) => page);
-                    currentPage = page;
-                    toast("${page + 1} / $total", ToastType.normal, context);
-                  }
-                },
+              body: SafeArea(
+                child: PDFView(
+                  filePath: widget.path,
+                  defaultPage: courseModel.pdfPage.toInt() - 1,
+                  pageSnap: false,
+                  autoSpacing: false,
+                  nightMode: theme == ThemeMode.dark,
+                  pageFling: false,
+                  onRender: (pgs) {
+                    setState(() {
+                      pages = pgs;
+                      isReady = true;
+                    });
+                  },
+                  onError: (error) {
+                    toast(error, ToastType.error, context);
+                  },
+                  onPageError: (page, error) {
+                    toast('$page: ${error.toString()}', ToastType.error, context);
+                  },
+                  onViewCreated: (PDFViewController pdfViewController) {
+                    _controller = pdfViewController;
+                  },
+                  onPageChanged: (int? page, int? total) {
+                    if (page != null && total != null) {
+                      ref.read(pdfPageProvider.notifier).update((i) => page);
+                      currentPage = page;
+                      toast("${page + 1} / $total", ToastType.normal, context);
+                    }
+                  },
+                ),
               ),
             );
           }),

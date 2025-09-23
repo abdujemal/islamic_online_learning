@@ -88,96 +88,98 @@ class _FAQState extends ConsumerState<FAQ> {
                     : const SizedBox(),
               ),
             ),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: ref.watch(faqNotifierProvider).map(
-                    initial: (_) => const SizedBox(),
-                    loading: (_) => ListView.builder(
-                      itemCount: 10,
-                      itemBuilder: (context, index) => Shimmer.fromColors(
-                        baseColor: Theme.of(context)
-                            .chipTheme
-                            .backgroundColor!
-                            .withAlpha(150),
-                        highlightColor:
-                            Theme.of(context).chipTheme.backgroundColor!,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 15.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    height: 10,
-                                    width: 150,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      borderRadius: BorderRadius.circular(30),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: ref.watch(faqNotifierProvider).map(
+                      initial: (_) => const SizedBox(),
+                      loading: (_) => ListView.builder(
+                        itemCount: 10,
+                        itemBuilder: (context, index) => Shimmer.fromColors(
+                          baseColor: Theme.of(context)
+                              .chipTheme
+                              .backgroundColor!
+                              .withAlpha(150),
+                          highlightColor:
+                              Theme.of(context).chipTheme.backgroundColor!,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 15.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      height: 10,
+                                      width: 150,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    height: 10,
-                                    width: 100,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      borderRadius: BorderRadius.circular(30),
+                                    const SizedBox(
+                                      height: 10,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                height: 30,
-                                width: 30,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  shape: BoxShape.circle,
+                                    Container(
+                                      height: 10,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    loaded: (_) => RefreshIndicator(
-                      onRefresh: () async {
-                        await ref.read(faqNotifierProvider.notifier).getFAQs();
-                      },
-                      color: primaryColor,
-                      child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 0),
-                        itemCount: _.faqs.length,
-                        itemBuilder: (context, index) {
-                          return FaqItem(faqModel: _.faqs[index]);
+                      loaded: (_) => RefreshIndicator(
+                        onRefresh: () async {
+                          await ref.read(faqNotifierProvider.notifier).getFAQs();
                         },
+                        color: primaryColor,
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.only(bottom: 0),
+                          itemCount: _.faqs.length,
+                          itemBuilder: (context, index) {
+                            return FaqItem(faqModel: _.faqs[index]);
+                          },
+                        ),
+                      ),
+                      empty: (_) => Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("እባክዎ ኢንተርኔት አብርተው ድጋሚ ይሞክሩ።"),
+                            IconButton(
+                              onPressed: () async {
+                                await ref
+                                    .read(faqNotifierProvider.notifier)
+                                    .getFAQs();
+                              },
+                              icon: const Icon(Icons.refresh_rounded),
+                            )
+                          ],
+                        ),
+                      ),
+                      error: (_) => Center(
+                        child: Text(_.error.messege),
                       ),
                     ),
-                    empty: (_) => Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("እባክዎ ኢንተርኔት አብርተው ድጋሚ ይሞክሩ።"),
-                          IconButton(
-                            onPressed: () async {
-                              await ref
-                                  .read(faqNotifierProvider.notifier)
-                                  .getFAQs();
-                            },
-                            icon: const Icon(Icons.refresh_rounded),
-                          )
-                        ],
-                      ),
-                    ),
-                    error: (_) => Center(
-                      child: Text(_.error.messege),
-                    ),
-                  ),
+              ),
             ),
           );
         });

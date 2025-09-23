@@ -132,25 +132,43 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
                   ? const Text("ትንሽ ይጠብቁ...")
                   : Expanded(
                       child: ListView.builder(
-                        itemCount: progs.length,
-                        itemBuilder: (context, index) => ListTile(
-                          title: Text(progs[index].title),
-                          subtitle: Column(
-                            children: [
-                              LinearProgressIndicator(
-                                value: progs[index].progress / 100,
-                                color: primaryColor,
-                                backgroundColor: Theme.of(context).dividerColor,
+                          itemCount: progs.length,
+                          itemBuilder: (context, index) {
+                            final received = formatFileSize(
+                                progs[index].receivedBytes,
+                                toFixed: 1);
+                            final total = formatFileSize(
+                                progs[index].totalBytes,
+                                toFixed: 1);
+                            return ListTile(
+                              title: Text(progs[index].title),
+                              subtitle: Column(
+                                children: [
+                                  LinearProgressIndicator(
+                                    value: progs[index].progress / 100,
+                                    color: primaryColor,
+                                    backgroundColor:
+                                        Theme.of(context).dividerColor,
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text(progs[index].totalBytes == 0
+                                        ? "Loading..."
+                                        : "$received / $total",
+                                        style: TextStyle(
+                                          fontSize: 12
+                                        ),
+                                        ),
+                                  ),
+                                  // Align(
+                                  //   alignment: Alignment.centerRight,
+                                  //   child: Text(
+                                  //       "${progs[index].progress.toStringAsFixed(2)}% አልቋል"),
+                                  // )
+                                ],
                               ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                    "${progs[index].progress.toStringAsFixed(2)}% አልቋል"),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
+                            );
+                          }),
                     ),
               widget.isDb
                   ? const SizedBox()
@@ -160,8 +178,7 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
                         onPressed: () {
                           breakIt = true;
                           cancelToken.cancel();
-                          Navigator
-                          .pop(context);
+                          Navigator.pop(context);
                         },
                         child: const Text("አቁም"),
                       ),

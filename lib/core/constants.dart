@@ -146,28 +146,28 @@ double getPersentage(CourseModel courseModel) {
   return percnt > 1 ? 1 : percnt;
 }
 
-String formatFileSize(int sizeInBytes) {
+String formatFileSize(int sizeInBytes,{int toFixed = 2}) {
   if (sizeInBytes < 1024) {
     return '$sizeInBytes B';
   } else if (sizeInBytes < 1024 * 1024) {
     double sizeInKB = sizeInBytes / 1024;
-    return '${sizeInKB.toStringAsFixed(2)} KB';
+    return '${sizeInKB.toStringAsFixed(toFixed)} KB';
   } else if (sizeInBytes < 1024 * 1024 * 1024) {
     double sizeInMB = sizeInBytes / (1024 * 1024);
-    return '${sizeInMB.toStringAsFixed(2)} MB';
+    return '${sizeInMB.toStringAsFixed(toFixed)} MB';
   } else if (sizeInBytes < 1024 * 1024 * 1024 * 1024) {
     double sizeInGB = sizeInBytes / (1024 * 1024 * 1024);
-    return '${sizeInGB.toStringAsFixed(2)} GB';
+    return '${sizeInGB.toStringAsFixed(toFixed)} GB';
   } else {
     double sizeInTB = sizeInBytes / (1024 * 1024 * 1024 * 1024);
-    return '${sizeInTB.toStringAsFixed(2)} TB';
+    return '${sizeInTB.toStringAsFixed(toFixed)} TB';
   }
 }
 
 bool isPlayingCourseThisCourse(String courseId, WidgetRef refp,
     {bool alsoIsNotIdle = false}) {
   final audioPlayer = PlaylistHelper.audioPlayer;
-  final metaData = audioPlayer.sequenceState?.currentSource?.tag;
+  final metaData = audioPlayer.sequenceState.currentSource?.tag;
   if (metaData == null) {
     print('!isPlayingCourseThisCourse');
     return false;

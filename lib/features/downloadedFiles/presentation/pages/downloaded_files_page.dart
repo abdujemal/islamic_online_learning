@@ -83,12 +83,14 @@ class _DownloadedFilesPageState extends ConsumerState<DownloadedFilesPage>
                 ),
               ),
             ),
-            body: TabBarView(
-              controller: tabController,
-              children: const [
-                DPdfsPage(),
-                DAudiosPage(),
-              ],
+            body: SafeArea(
+              child: TabBarView(
+                controller: tabController,
+                children: const [
+                  DPdfsPage(),
+                  DAudiosPage(),
+                ],
+              ),
             ),
           );
         });

@@ -37,38 +37,39 @@ class _UstazsState extends ConsumerState<Ustazs> {
   Widget build(BuildContext context) {
     final audioPlayer = PlaylistHelper.audioPlayer;
     return StreamBuilder(
-        stream: myAudioStream(audioPlayer),
-        builder: (context, snap) {
-          final state = snap.data?.sequenceState;
-          final processState = snap.data?.processingState;
+      stream: myAudioStream(audioPlayer),
+      builder: (context, snap) {
+        final state = snap.data?.sequenceState;
+        final processState = snap.data?.processingState;
 
-          if (state?.sequence.isEmpty ?? true) {
-            showTopAudio = false;
-          }
+        if (state?.sequence.isEmpty ?? true) {
+          showTopAudio = false;
+        }
 
-          MediaItem? metaData = state?.currentSource?.tag;
+        MediaItem? metaData = state?.currentSource?.tag;
 
-          if (metaData != null) {
-            showTopAudio = true;
-          }
+        if (metaData != null) {
+          showTopAudio = true;
+        }
 
-          if (processState == ProcessingState.idle) {
-            showTopAudio = false;
-          }
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("የኡስታዞች ዝርዝር"),
-              bottom: PreferredSize(
-                preferredSize: Size(
-                  MediaQuery.of(context).size.width,
-                  showTopAudio ? 40 : 0,
-                ),
-                child: showTopAudio
-                    ? CurrentAudioView(metaData as MediaItem)
-                    : const SizedBox(),
+        if (processState == ProcessingState.idle) {
+          showTopAudio = false;
+        }
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("የኡስታዞች ዝርዝር"),
+            bottom: PreferredSize(
+              preferredSize: Size(
+                MediaQuery.of(context).size.width,
+                showTopAudio ? 40 : 0,
               ),
+              child: showTopAudio
+                  ? CurrentAudioView(metaData as MediaItem)
+                  : const SizedBox(),
             ),
-            body: ref.watch(ustazNotifierProvider).map(
+          ),
+          body: SafeArea(
+            child: ref.watch(ustazNotifierProvider).map(
                   initial: (_) => const SizedBox(),
                   loading: (_) => ListView.builder(
                     itemCount: 5,
@@ -184,7 +185,9 @@ class _UstazsState extends ConsumerState<Ustazs> {
                     child: Text(_.error.messege),
                   ),
                 ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }

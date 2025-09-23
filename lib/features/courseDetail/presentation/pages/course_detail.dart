@@ -221,6 +221,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
         );
       }
     }
+    print("playListIndexes ${playListIndexes.length}");
+    print("lst ${lst.length}");
+
     if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
       print("playlist updateing");
 
@@ -228,6 +231,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     } else {
       print("playlist adding");
     }
+    print("mainPlayListIndexes ${PlaylistHelper.mainPlayListIndexes.length}");
+    print("lst ${lst.length}");
     isLoadingAudio = false;
     if (mounted) {
       setState(() {});
@@ -659,6 +664,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                             PlaylistHelper()
                                                 .playList
                                                 .addAll(lst);
+                                            PlaylistHelper.mainPlayListIndexes = playListIndexes;
                                           }
                                           if (PlaylistHelper()
                                               .playList
@@ -1072,6 +1078,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   } else {
                                     lst.removeAt(deleteableIndex);
                                   }
+                                  
                                   if (mounted) {
                                     ref
                                         .read(loadAudiosProvider.notifier)
