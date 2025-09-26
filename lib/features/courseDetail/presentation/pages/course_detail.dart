@@ -7,10 +7,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/Audio%20Feature/audio_model.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/widgets/list_title.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/pages/pdf_page.dart';
+import 'package:islamic_online_learning/features/courseDetail/presentation/state/course_detail_controller.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_item.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/download_all_files.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/main_btn.dart';
@@ -52,6 +54,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   List<String> audios = [];
 
   List<String> pdfPaths = [];
+
+  List<AudioTrack> audioTracks = [];
 
   List<int> playListIndexes = [];
 
@@ -133,16 +137,41 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
   }
 
+  void loadAudioTracks() async {
+    audioTracks = [];
+    int i = 0;
+    for (String url in courseModel.courseIds.split(",")) {
+      audioTracks.add(
+        AudioTrack(
+          id: "${courseModel.courseId} $i",
+          courseId: courseModel.courseId,
+          title: courseModel.title,
+          ustaz: courseModel.ustaz,
+          url: url,
+          image: courseModel.image,
+          category: courseModel.category,
+        ),
+      );
+      i++;
+    }
+  }
+
+  void initialize() {
+    final notifier = ref.read(courseDetailProvider.notifier);
+    notifier.setCourseModel(courseModel);
+  }
+
   @override
   void initState() {
     super.initState();
+    loadAudioTracks();
     courseModel = widget.cm;
     audios = courseModel.courseIds.split(",");
 
     refresh();
 
     if (mounted) {
-      createPlayList();
+      // createPlayList();
 
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         ref.read(sharedPrefProvider).then((pref) {
@@ -185,70 +214,65 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
   }
 
-  Future<void> createPlayList() async {
-    isLoadingAudio = true;
-    if (mounted) {
-      setState(() {});
-    }
-
+  Future<String> getPath(String folderName, String fileName) async {
     Directory dir = await getApplicationSupportDirectory();
 
-    int i = 0;
-    lst = [];
-    playListIndexes = [];
-    ref.read(loadAudiosProvider.notifier).update((state) => 0);
-    for (String id in audios) {
-      i++;
-      if (await checkFile(i)) {
-        String fileName = "${courseModel.ustaz},${courseModel.title} $i.mp3";
-
-        if (mounted) {
-          ref.read(loadAudiosProvider.notifier).update((state) => state + 1);
-        }
-        playListIndexes.add(i);
-        lst.add(
-          AudioSource.file(
-            "${dir.path}/Audio/$fileName",
-            tag: MediaItem(
-              id: id,
-              title: "${courseModel.title} $i",
-              artist: courseModel.ustaz,
-              album: courseModel.category,
-              artUri: Uri.parse(courseModel.image),
-              extras: courseModel.toMap(),
-            ),
-          ),
-        );
-      }
-    }
-    print("playListIndexes ${playListIndexes.length}");
-    print("lst ${lst.length}");
-
-    if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
-      print("playlist updateing");
-
-      PlaylistHelper.mainPlayListIndexes = playListIndexes;
-    } else {
-      print("playlist adding");
-    }
-    print("mainPlayListIndexes ${PlaylistHelper.mainPlayListIndexes.length}");
-    print("lst ${lst.length}");
-    isLoadingAudio = false;
-    if (mounted) {
-      setState(() {});
-    }
+    return "${dir.path}/$folderName/$fileName";
   }
 
-  Future<bool> checkFile(int index) async {
-    if (mounted) {
-      final isDownloaded = await ref
-          .read(cdNotifierProvider.notifier)
-          .isDownloaded("${courseModel.ustaz},${courseModel.title} $index.mp3",
-              "Audio", context);
-      return isDownloaded;
-    }
-    return false;
-  }
+  // Future<void> createPlayList() async {
+  //   isLoadingAudio = true;
+  //   if (mounted) {
+  //     setState(() {});
+  //   }
+
+  //   Directory dir = await getApplicationSupportDirectory();
+
+  //   int i = 0;
+  //   lst = [];
+  //   playListIndexes = [];
+  //   ref.read(loadAudiosProvider.notifier).update((state) => 0);
+  //   for (String id in audios) {
+  //     i++;
+  //     if (await checkFile(i)) {
+  //       String fileName = "${courseModel.ustaz},${courseModel.title} $i.mp3";
+
+  //       if (mounted) {
+  //         ref.read(loadAudiosProvider.notifier).update((state) => state + 1);
+  //       }
+  //       playListIndexes.add(i);
+  //       lst.add(
+  //         AudioSource.file(
+  //           "${dir.path}/Audio/$fileName",
+  //           tag: MediaItem(
+  //             id: id,
+  //             title: "${courseModel.title} $i",
+  //             artist: courseModel.ustaz,
+  //             album: courseModel.category,
+  //             artUri: Uri.parse(courseModel.image),
+  //             extras: courseModel.toMap(),
+  //           ),
+  //         ),
+  //       );
+  //     }
+  //   }
+  //   print("playListIndexes ${playListIndexes.length}");
+  //   print("lst ${lst.length}");
+
+  //   if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
+  //     print("playlist updateing");
+
+  //     PlaylistHelper.mainPlayListIndexes = playListIndexes;
+  //   } else {
+  //     print("playlist adding");
+  //   }
+  //   print("mainPlayListIndexes ${PlaylistHelper.mainPlayListIndexes.length}");
+  //   print("lst ${lst.length}");
+  //   isLoadingAudio = false;
+  //   if (mounted) {
+  //     setState(() {});
+  //   }
+  // }
 
   Future<void> refresh() async {
     if (kDebugMode) {
@@ -286,18 +310,12 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
   }
 
-  Future<String> getPath(String folderName, String fileName) async {
-    Directory dir = await getApplicationSupportDirectory();
-
-    return "${dir.path}/$folderName/$fileName";
-  }
-
   @override
   Widget build(BuildContext context) {
     final audioPlayer = PlaylistHelper.audioPlayer;
 
     percentage =
-        getPersentage(courseModel).isNaN ? 1 : getPersentage(courseModel);
+        getPercentage(courseModel).isNaN ? 1 : getPercentage(courseModel);
 
     return PopScope(
       canPop: !show,
@@ -644,7 +662,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                         title: "ካቆምኩበት ቀጥል",
                                         icon: Icons.play_arrow_rounded,
                                         onTap: () async {
-                                          await createPlayList();
+                                          // await createPlayList();
                                           if (!playListIndexes.contains(
                                               courseModel.pausedAtAudioNum +
                                                   1)) {
@@ -664,7 +682,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                             PlaylistHelper()
                                                 .playList
                                                 .addAll(lst);
-                                            PlaylistHelper.mainPlayListIndexes = playListIndexes;
+                                            PlaylistHelper.mainPlayListIndexes =
+                                                playListIndexes;
                                           }
                                           if (PlaylistHelper()
                                               .playList
@@ -773,7 +792,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                             pausedAtAudioSec: 0,
                                           );
                                           setState(() {});
-                                          createPlayList();
+                                          // createPlayList();
                                         },
                                       ),
                                   ],
@@ -950,7 +969,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                               if (!isLoadingAudio)
                                                 GestureDetector(
                                                   onTap: () {
-                                                    createPlayList();
+                                                    // createPlayList();
                                                   },
                                                   child: const Icon(
                                                       Icons.refresh_rounded),
@@ -1078,7 +1097,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   } else {
                                     lst.removeAt(deleteableIndex);
                                   }
-                                  
+
                                   if (mounted) {
                                     ref
                                         .read(loadAudiosProvider.notifier)

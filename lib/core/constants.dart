@@ -132,7 +132,7 @@ TargetFocus getTutorial({
   );
 }
 
-double getPersentage(CourseModel courseModel) {
+double getPercentage(CourseModel courseModel) {
   // double percentage =
   //     (courseModel.pausedAtAudioNum + 1) / courseModel.noOfRecord;
   int numOfAudio = courseModel.courseIds.split(",").length;

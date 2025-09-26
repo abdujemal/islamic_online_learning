@@ -117,9 +117,9 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
 
   @override
   Widget build(BuildContext context) {
-    percentage = getPersentage(widget.courseModel).isNaN
+    percentage = getPercentage(widget.courseModel).isNaN
         ? 1
-        : getPersentage(widget.courseModel);
+        : getPercentage(widget.courseModel);
 
     return Padding(
       padding: const EdgeInsets.only(

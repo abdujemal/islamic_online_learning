@@ -134,9 +134,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
 
   @override
   Widget build(BuildContext context) {
-    percentage = getPersentage(widget.courseModel).isNaN
+    percentage = getPercentage(widget.courseModel).isNaN
         ? 1
-        : getPersentage(widget.courseModel);
+        : getPercentage(widget.courseModel);
 
     // if (widget.courseModel.isFinished == 0 && percentage == 1) {
     //   ref.read(mainNotifierProvider.notifier).saveCourse(
