@@ -1,17 +1,44 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/material.dart';
 
-import '../../../../core/failure.dart';
+class UstazListState {
+  final bool isLoading;
+  final List<String> ustazs;
+  final String? error;
 
-part 'ustaz_list_state.freezed.dart';
+  UstazListState({
+    this.isLoading = false,
+    this.ustazs = const [],
+    this.error,
+  });
 
-@freezed
-class UstazListState with _$UstazListState {
-  const factory UstazListState.initial() = _Initial;
-  const factory UstazListState.loading() = _Loading;
-  const factory UstazListState.loaded({
-    required List<String> ustazs,
-  }) = _Loaded;
-  const factory UstazListState.empty({required List<String> ustazs}) =
-      _Empty;
-  const factory UstazListState.error({required Failure error}) = _Error;
+  Widget map({
+    required Widget Function(UstazListState _) loading,
+    required Widget Function(UstazListState _) loaded,
+    required Widget Function(UstazListState _) empty,
+    required Widget Function(UstazListState _) error,
+  }) {
+    if (isLoading) {
+      return loading(this);
+    } else if (!isLoading && this.error != null) {
+      return error(this);
+    } else if (!isLoading && ustazs.isNotEmpty) {
+      return loaded(this);
+    } else if (!isLoading && ustazs.isEmpty) {
+      return empty(this);
+    } else {
+      return SizedBox();
+    }
+  }
+
+  UstazListState copyWith({
+    bool? isLoading,
+    List<String>? ustazs,
+    String? error,
+  }) {
+    return UstazListState(
+      isLoading: isLoading ?? this.isLoading,
+      ustazs: ustazs ?? this.ustazs,
+      error: error,
+    );
+  }
 }

@@ -1,20 +1,51 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/material.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
-import '../../../../core/failure.dart';
+class MainListState {
+  final bool isLoading;
+  final List<CourseModel> courses;
+  final bool noMoreToLoad, isLoadingMore;
+  final String? error;
 
-part 'main_list_state.freezed.dart';
+  MainListState({
+    this.isLoading = false,
+    this.courses = const [],
+    this.noMoreToLoad = false,
+    this.isLoadingMore = false,
+    this.error,
+  });
 
-@freezed
-class MainListState with _$MainListState {
-  const factory MainListState.initial() = _Initial;
-  const factory MainListState.loading() = _Loading;
-  const factory MainListState.loaded({
-    required List<CourseModel> courses,
-    required bool noMoreToLoad,
-    required bool isLoadingMore,
-  }) = _Loaded;
-  const factory MainListState.empty({required List<CourseModel> courses}) =
-      _Empty;
-  const factory MainListState.error({required Failure error}) = _Error;
+  Widget map({
+    required Widget Function(MainListState _) loading,
+    required Widget Function(MainListState _) loaded,
+    required Widget Function(MainListState _) empty,
+    required Widget Function(MainListState _) error,
+  }) {
+    if (isLoading) {
+      return loading(this);
+    } else if (!isLoading && this.error != null) {
+      return error(this);
+    } else if (!isLoading && courses.isNotEmpty) {
+      return loaded(this);
+    } else if (!isLoading && courses.isEmpty) {
+      return empty(this);
+    } else {
+      return SizedBox();
+    }
+  }
+
+  MainListState copyWith({
+    bool? isLoading,
+    List<CourseModel>? courses,
+    bool? noMoreToLoad, isLoadingMore,
+    String? error,
+  }) {
+    return MainListState(
+      isLoading: isLoading ?? this.isLoading,
+      courses: courses ?? this.courses,
+      noMoreToLoad: noMoreToLoad ?? this.noMoreToLoad,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      error: error,
+    );
+  }
 }

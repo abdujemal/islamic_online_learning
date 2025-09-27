@@ -70,7 +70,7 @@ class _UstazsState extends ConsumerState<Ustazs> {
           ),
           body: SafeArea(
             child: ref.watch(ustazNotifierProvider).map(
-                  initial: (_) => const SizedBox(),
+                  // initial: (_) => const SizedBox(),
                   loading: (_) => ListView.builder(
                     itemCount: 5,
                     scrollDirection: Axis.vertical,
@@ -182,7 +182,7 @@ class _UstazsState extends ConsumerState<Ustazs> {
                     ),
                   ),
                   error: (_) => Center(
-                    child: Text(_.error.messege),
+                    child: Text(_.error ?? ""),
                   ),
                 ),
           ),

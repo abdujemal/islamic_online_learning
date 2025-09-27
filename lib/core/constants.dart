@@ -13,13 +13,17 @@ const String databaseUrl =
 const String dbPath = "/Islamic Online Learning/db/myDB.db";
 const String serverUrl = "https://ilmfelagi.com/api";
 
+//new apis
+const String baseUrl = "https://ilmfelagi-pro-backend.onrender.com/api/v1";
+//sub apis
+const String curriculumApi = "$baseUrl/curriculums/all";
+
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 
 const int numOfDoc = 20;
 
 const String playStoreUrl =
-    "https://play.google.com/store/apps/details?id=com.aj.islamic_online_learning";
-
+    "https://play.google.com/store/apps/details?id=com.aj.islamic_online_learning_dev";
 
 const primaryColor = MaterialColor(
   0xFF2FA887,
@@ -146,7 +150,7 @@ double getPercentage(CourseModel courseModel) {
   return percnt > 1 ? 1 : percnt;
 }
 
-String formatFileSize(int sizeInBytes,{int toFixed = 2}) {
+String formatFileSize(int sizeInBytes, {int toFixed = 2}) {
   if (sizeInBytes < 1024) {
     return '$sizeInBytes B';
   } else if (sizeInBytes < 1024 * 1024) {

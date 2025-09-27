@@ -33,49 +33,65 @@ class _FavState extends ConsumerState<Fav>
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: ref.watch(favNotifierProvider).map(
-            initial: (_) => const SizedBox(),
-            loading: (_) => ListView.builder(
-              itemCount: 10,
-              itemBuilder: (index, context) => const CourseShimmer(),
-            ),
-            loaded: (_) => RefreshIndicator(
-              onRefresh: () async {
-                await ref.read(favNotifierProvider.notifier).getCourse();
-              },
-              color: primaryColor,
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 20),
-                itemCount: _.courses.length,
-                itemBuilder: (context, index) {
-                  return CourseItem(
-                    _.courses[index],
-                    keey: null,
-                    val: null,
-                  );
-                },
-              ),
-            ),
-            empty: (_) => Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("ምንም የለም"),
-                IconButton(
-                  onPressed: () async {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("የተመረጡ"),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Builder(
+            builder: (context) {
+              final state = ref.watch(favNotifierProvider);
+              if (state.isLoading) {
+                return ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (context, index) => const CourseShimmer(),
+                );
+              } else if (!state.isLoading && state.courses.isNotEmpty) {
+                return RefreshIndicator(
+                  onRefresh: () async {
                     await ref.read(favNotifierProvider.notifier).getCourse();
                   },
-                  icon: const Icon(Icons.refresh_rounded),
-                )
-              ],
-            ),
-            error: (_) => Center(
-              child: Text(_.error.messege),
-            ),
+                  color: primaryColor,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 20),
+                    itemCount: state.courses.length,
+                    itemBuilder: (context, index) {
+                      return CourseItem(
+                        state.courses[index],
+                        keey: null,
+                        val: null,
+                      );
+                    },
+                  ),
+                );
+              } else if (!state.isLoading && state.courses.isEmpty) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("ምንም የለም"),
+                    IconButton(
+                      onPressed: () async {
+                        await ref.read(favNotifierProvider.notifier).getCourse();
+                      },
+                      icon: const Icon(Icons.refresh_rounded),
+                    )
+                  ],
+                );
+              } else if (!state.isLoading && state.error != null) {
+                return Center(
+                  child: Text(state.error!),
+                );
+              } else {
+                return const SizedBox();
+              }
+            },
           ),
+        ),
+      ),
     );
   }
 

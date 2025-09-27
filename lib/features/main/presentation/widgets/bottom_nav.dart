@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
@@ -13,10 +12,10 @@ class BottomNav extends ConsumerStatefulWidget {
 }
 
 class _BottomNavState extends ConsumerState<BottomNav> {
-  List<IconData> icons = [
-    Icons.menu_book_rounded,
-    Icons.bookmark_rounded,
-    Icons.play_circle_rounded,
+  List<String> icons = [
+    "assets/grad.png",
+    "assets/book.png",
+    "assets/account.png",
   ];
 
   @override
@@ -49,10 +48,11 @@ class _BottomNavState extends ConsumerState<BottomNav> {
                 ref.read(menuIndexProvider.notifier).update((state) => index);
               },
               child: Ink(
-                child: Icon(
+                child: Image.asset(
                   icons[index],
                   color: index == currentIndex ? primaryColor : Colors.grey,
-                  size: 30,
+                  height: 30,
+                  width: 30,
                 ),
               ),
             ),

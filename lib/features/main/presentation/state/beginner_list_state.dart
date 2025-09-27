@@ -1,19 +1,25 @@
-// import 'package:islamic_online_learning/features/main/data/model/faq_model.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
-import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../../../core/failure.dart';
-import '../../data/model/course_model.dart';
+class BeginnerListState {
+  final bool isLoading;
+  final List<CourseModel> courses;
+  final String? error;
 
-part 'beginner_list_state.freezed.dart';
+  BeginnerListState({
+    this.isLoading = false,
+    this.courses = const [],
+    this.error,
+  });
 
-@freezed
-class BeginnerListState with _$BeginnerListState {
-  const factory BeginnerListState.initial() = _Initial;
-  const factory BeginnerListState.loading() = _Loading;
-  const factory BeginnerListState.loaded({
-    required List<CourseModel> courses,
-  }) = _Loaded;
-  const factory BeginnerListState.empty({required List<CourseModel> courses}) =
-      _Empty;
-  const factory BeginnerListState.error({required Failure error}) = _Error;
+  BeginnerListState copyWith({
+    bool? isLoading,
+    List<CourseModel>? courses,
+    String? error,
+  }) {
+    return BeginnerListState(
+      isLoading: isLoading ?? this.isLoading,
+      courses: courses ?? this.courses,
+      error: error,
+    );
+  }
 }

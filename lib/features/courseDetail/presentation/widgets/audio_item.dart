@@ -204,7 +204,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                           return;
                         }
                         final metaData =
-                            audioPlayer.sequenceState?.currentSource?.tag;
+                            audioPlayer.sequenceState.currentSource?.tag;
                         if (metaData != null) {
                           if ((metaData as MediaItem).extras?["isFinished"] ==
                               0) {

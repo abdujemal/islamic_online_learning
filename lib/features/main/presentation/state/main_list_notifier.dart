@@ -15,7 +15,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
   MainListNotifier(
     this.mainRepo,
     this.ref,
-  ) : super(const MainListState.initial());
+  ) : super(MainListState());
 
   List<CourseModel> courses = [];
   List<CourseModel> filteredCourses = [];
@@ -32,9 +32,10 @@ class MainListNotifier extends StateNotifier<MainListState> {
     final bool isKeyNull = key == null;
     if (itreationCounter == 0) {
       if (isNew) {
-        state = const MainListState.loading();
+        state = state.copyWith(isLoading: true);
       } else {
-        state = MainListState.loaded(
+        state = state.copyWith(
+          isLoading: false,
           courses: isKeyNull ? courses : filteredCourses,
           noMoreToLoad: false,
           isLoadingMore: true,
@@ -54,12 +55,15 @@ class MainListNotifier extends StateNotifier<MainListState> {
         //   );
         //   return;
         // }
-        state = MainListState.error(error: l);
+        state = state.copyWith(isLoading: false, error: l.messege);
       }, (r) {
         if (isNew && r.isEmpty) {
           isKeyNull ? courses = r : filteredCourses = r;
-          state = MainListState.empty(
-              courses: isKeyNull ? courses : filteredCourses);
+          state = state.copyWith(
+            isLoading: false,
+            courses: isKeyNull ? courses : filteredCourses,
+          );
+
           return;
         } else if (isNew) {
           if (isKeyNull) {
@@ -70,7 +74,8 @@ class MainListNotifier extends StateNotifier<MainListState> {
 
             filteredCourses = r;
           }
-          state = MainListState.loaded(
+          state = state.copyWith(
+            isLoading: false,
             courses: isKeyNull ? courses : filteredCourses,
             noMoreToLoad: false,
             isLoadingMore: false,
@@ -90,7 +95,8 @@ class MainListNotifier extends StateNotifier<MainListState> {
               ...r,
             ];
           }
-          state = MainListState.loaded(
+          state = state.copyWith(
+            isLoading: false,
             courses: isKeyNull ? courses : filteredCourses,
             noMoreToLoad: r.isEmpty,
             isLoadingMore: false,
@@ -133,19 +139,23 @@ class MainListNotifier extends StateNotifier<MainListState> {
   }
 
   searchCourses(String qwery, int? noOfElt) async {
-    state = const MainListState.loading();
+    state = state.copyWith(isLoading: true);
 
     final res = await mainRepo.searchCourses(qwery, noOfElt);
 
     res.fold(
       (l) {
-        state = MainListState.error(error: l);
+        state = state.copyWith(isLoading: false, error: l.messege);
       },
       (r) {
         if (r.isEmpty) {
-          state = MainListState.empty(courses: r);
+          state = state.copyWith(
+            isLoading: false,
+            courses: r,
+          );
         } else {
-          state = MainListState.loaded(
+          state = state.copyWith(
+            isLoading: false,
             courses: r,
             isLoadingMore: false,
             noMoreToLoad: false,
@@ -195,7 +205,8 @@ class MainListNotifier extends StateNotifier<MainListState> {
       courses = newList;
     }
     await Future.delayed(const Duration(seconds: 1));
-    state = MainListState.loaded(
+    state = state.copyWith(
+      isLoading: false,
       courses: newList,
       isLoadingMore: true,
       noMoreToLoad: false,

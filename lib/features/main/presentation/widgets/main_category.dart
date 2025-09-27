@@ -52,7 +52,7 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
   @override
   Widget build(BuildContext context) {
     return ref.watch(categoryNotifierProvider).map(
-          initial: (_) => const SizedBox(),
+          // initial: (_) => const SizedBox(),
           loading: (_) => Wrap(
             // height: 50,
             children: List.generate(
@@ -246,7 +246,7 @@ class _MainCategoriesState extends ConsumerState<MainCategories> {
             child: Text("እባክዎ ኢንተርኔት አብርተው ድጋሚ ይሞክሩ።"),
           ),
           error: (_) => Center(
-            child: Text(_.error.messege),
+            child: Text(_.error ?? ""),
           ),
         );
   }

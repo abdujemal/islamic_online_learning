@@ -41,102 +41,207 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
             padding: const EdgeInsets.only(
               top: 15,
             ),
-            child: ref.watch(beginnerListProvider).map(
-                  initial: (_) => const SizedBox(),
-                  loading: (_) => Container(
-                    decoration: BoxDecoration(
-                      color: primaryColor.withAlpha(230),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    height: 195,
-                    width: 200,
-                    child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: 10,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) => Shimmer.fromColors(
-                        baseColor: Theme.of(context)
-                            .chipTheme
-                            .backgroundColor!
-                            .withAlpha(150),
-                        highlightColor:
-                            Theme.of(context).chipTheme.backgroundColor ??
-                                Colors.white30,
-                        child: Container(
-                          height: 140,
-                          width: 100,
-                          margin: const EdgeInsets.only(
-                            right: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: whiteColor,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
+            child: Builder(builder: (context) {
+              final state = ref.watch(beginnerListProvider);
+              if (state.isLoading) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: primaryColor.withAlpha(230),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  height: 195,
+                  width: 200,
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: 10,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) => Shimmer.fromColors(
+                      baseColor: Theme.of(context)
+                          .chipTheme
+                          .backgroundColor!
+                          .withAlpha(150),
+                      highlightColor:
+                          Theme.of(context).chipTheme.backgroundColor ??
+                              Colors.white30,
+                      child: Container(
+                        height: 140,
+                        width: 100,
+                        margin: const EdgeInsets.only(
+                          right: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: whiteColor,
+                          borderRadius: BorderRadius.circular(15),
                         ),
                       ),
                     ),
                   ),
-                  loaded: (_) => Container(
-                    decoration: BoxDecoration(
-                      color: primaryColor.withAlpha(230),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    height: 195,
-                    width: 200,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "የጀማሪ ደርሶች",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: whiteColor,
-                              ),
+                );
+              } else if (!state.isLoading && state.error != null) {
+                return Center(
+                  child: Text(state.error!),
+                );
+              } else if (!state.isLoading && state.courses.isNotEmpty) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: primaryColor.withAlpha(230),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  height: 195,
+                  width: 200,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "የጀማሪ ደርሶች",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: whiteColor,
                             ),
-                            GestureDetector(
-                              onTap: () async {
-                                final pref = await ref.read(sharedPrefProvider);
-                                pref.setBool("showBeginner", false);
-                                ref
-                                    .read(showBeginnerProvider.notifier)
-                                    .update((state) => false);
-                                // check();
-                              },
-                              child: const Icon(
-                                Icons.close,
-                                color: whiteColor,
-                              ),
-                            )
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: _.courses.length,
-                            itemBuilder: (context, index) {
-                              return StartedCourseCard(
-                                  courseModel: _.courses[index]);
-                            },
                           ),
+                          GestureDetector(
+                            onTap: () async {
+                              final pref = await ref.read(sharedPrefProvider);
+                              pref.setBool("showBeginner", false);
+                              ref
+                                  .read(showBeginnerProvider.notifier)
+                                  .update((state) => false);
+                              // check();
+                            },
+                            child: const Icon(
+                              Icons.close,
+                              color: whiteColor,
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: state.courses.length,
+                          itemBuilder: (context, index) {
+                            return StartedCourseCard(
+                                courseModel: state.courses[index]);
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  empty: (_) => const SizedBox(),
-                  error: (_) => Center(
-                    child: Text(_.error.messege),
-                  ),
-                ),
-          );
+                );
+              } else if (!state.isLoading && state.courses.isEmpty) {
+                return const SizedBox();
+              } else {
+                return const SizedBox();
+              }
+            })
+
+            // ref.watch(beginnerListProvider).map(
+            //     initial: (_) => const SizedBox(),
+            // loading: (_) => Container(
+            // decoration: BoxDecoration(
+            //   color: primaryColor.withAlpha(230),
+            //   borderRadius: BorderRadius.circular(15),
+            // ),
+            // padding: const EdgeInsets.all(10),
+            // height: 195,
+            // width: 200,
+            // child: ListView.builder(
+            //   physics: const BouncingScrollPhysics(),
+            //   itemCount: 10,
+            //   scrollDirection: Axis.horizontal,
+            //   itemBuilder: (context, index) => Shimmer.fromColors(
+            //   baseColor: Theme.of(context)
+            //     .chipTheme
+            //     .backgroundColor!
+            //     .withAlpha(150),
+            //   highlightColor:
+            //     Theme.of(context).chipTheme.backgroundColor ??
+            //       Colors.white30,
+            //   child: Container(
+            //     height: 140,
+            //     width: 100,
+            //     margin: const EdgeInsets.only(
+            //     right: 10,
+            //     ),
+            //     decoration: BoxDecoration(
+            //     color: whiteColor,
+            //     borderRadius: BorderRadius.circular(15),
+            //     ),
+            //   ),
+            //   ),
+            // ),
+            // ),
+            // loaded: (_) => Container(
+            // decoration: BoxDecoration(
+            //   color: primaryColor.withAlpha(230),
+            //   borderRadius: BorderRadius.circular(15),
+            // ),
+            // padding: const EdgeInsets.all(10),
+            // height: 195,
+            // width: 200,
+            // child: Column(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //   Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //     const Text(
+            //       "የጀማሪ ደርሶች",
+            //       style: TextStyle(
+            //       fontSize: 16,
+            //       fontWeight: FontWeight.bold,
+            //       color: whiteColor,
+            //       ),
+            //     ),
+            //     GestureDetector(
+            //       onTap: () async {
+            //       final pref = await ref.read(sharedPrefProvider);
+            //       pref.setBool("showBeginner", false);
+            //       ref
+            //         .read(showBeginnerProvider.notifier)
+            //         .update((state) => false);
+            //       // check();
+            //       },
+            //       child: const Icon(
+            //       Icons.close,
+            //       color: whiteColor,
+            //       ),
+            //     )
+            //     ],
+            //   ),
+            //   const SizedBox(
+            //     height: 10,
+            //   ),
+            //   Expanded(
+            //     child: ListView.builder(
+            //     scrollDirection: Axis.horizontal,
+            //     physics: const BouncingScrollPhysics(),
+            //     itemCount: _.courses.length,
+            //     itemBuilder: (context, index) {
+            //       return StartedCourseCard(
+            //         courseModel: _.courses[index]);
+            //     },
+            //     ),
+            //   ),
+            //   ],
+            // ),
+            // ),
+            //     empty: (_) => const SizedBox(),
+            // error: (_) => Center(
+            // child: Text(_.error.messege),
+            // ),
+            //   ),
+
+            );
   }
 }

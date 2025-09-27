@@ -1,18 +1,45 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/material.dart';
+import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
-import '../../../../core/failure.dart';
-import '../../data/model/course_model.dart';
+class StartedListState {
+  final bool isLoading;
+  final List<CourseModel> courses;
+  final String? error;
 
-part 'started_list_state.freezed.dart';
+  StartedListState({
+    this.isLoading = false,
+    this.courses = const [],
+    this.error,
+  });
 
-@freezed
-class StartedListState with _$StartedListState {
-  const factory StartedListState.initial() = _Initial;
-  const factory StartedListState.loading() = _Loading;
-  const factory StartedListState.loaded({
-    required List<CourseModel> courses,
-  }) = _Loaded;
-  const factory StartedListState.empty({required List<CourseModel> courses}) =
-      _Empty;
-  const factory StartedListState.error({required Failure error}) = _Error;
+  Widget map({
+    required Widget Function(StartedListState _) loading,
+    required Widget Function(StartedListState _) loaded,
+    required Widget Function(StartedListState _) empty,
+    required Widget Function(StartedListState _) error,
+  }) {
+    if (isLoading) {
+      return loading(this);
+    } else if (!isLoading && this.error != null) {
+      return error(this);
+    } else if (!isLoading && courses.isNotEmpty) {
+      return loaded(this);
+    } else if (!isLoading && courses.isEmpty) {
+      return empty(this);
+    } else {
+      return SizedBox();
+    }
+  }
+
+  StartedListState copyWith({
+    bool? isLoading,
+    List<CourseModel>? courses,
+    String? error,
+  }) {
+    return StartedListState(
+      isLoading: isLoading ?? this.isLoading,
+      courses: courses ?? this.courses,
+      error: error,
+    );
+  }
 }

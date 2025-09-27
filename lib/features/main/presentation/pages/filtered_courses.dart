@@ -160,13 +160,19 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
               body: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: ref.watch(mainNotifierProvider).map(
-                        initial: (_) => const SizedBox(),
-                        loading: (_) => ListView.builder(
+                  child: Builder(
+                    builder: (context) {
+                      final state = ref.watch(mainNotifierProvider);
+                      if (state.isLoading) {
+                        return ListView.builder(
                           itemCount: 10,
-                          itemBuilder: (index, context) => const CourseShimmer(),
-                        ),
-                        loaded: (_) => RefreshIndicator(
+                          itemBuilder: (context, index) =>
+                              const CourseShimmer(),
+                        );
+                      } else if (!state.isLoading && state.courses.isNotEmpty) {
+                        final courses = state.courses;
+                        final noMoreToLoad = state.noMoreToLoad;
+                        return RefreshIndicator(
                           onRefresh: () async {
                             await mainNotifier.getCourses(
                               context: context,
@@ -185,15 +191,15 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 padding: const EdgeInsets.only(bottom: 20),
                                 controller: scrollController,
-                                itemCount: _.courses.length + 1,
+                                itemCount: courses.length + 1,
                                 itemBuilder: (context, index) {
-                                  if (index <= _.courses.length - 1) {
-                                    return CourseItem(_.courses[index],
+                                  if (index <= courses.length - 1) {
+                                    return CourseItem(courses[index],
                                         keey: widget.keey, val: widget.value);
-                                  } else if (_.noMoreToLoad) {
+                                  } else if (noMoreToLoad) {
                                     return const TheEnd();
                                   } else {
-                                    return maxExt < _.courses.length
+                                    return maxExt < courses.length
                                         ? const CourseShimmer()
                                         : const SizedBox();
                                   }
@@ -223,14 +229,20 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                               ),
                             ],
                           ),
-                        ),
-                        empty: (_) => const Center(
+                        );
+                      } else if (!state.isLoading && state.courses.isEmpty) {
+                        return const Center(
                           child: Text("ምንም የለም"),
-                        ),
-                        error: (_) => Center(
-                          child: Text(_.error.messege),
-                        ),
-                      ),
+                        );
+                      } else if (!state.isLoading && state.error != null) {
+                        return Center(
+                          child: Text(state.error!),
+                        );
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
                 ),
               ),
             );

@@ -163,7 +163,7 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
     //       Uri.parse("https://ilmfelagi.com/courses?id=${courseModel.courseId}"),
     //   uriPrefix: "https://ilmfelagi.page.link",
     //   androidParameters: const AndroidParameters(
-    //     packageName: "com.aj.islamic_online_learning",
+    //     packageName: "com.aj.islamic_online_learning_dev",
     //   ),
     //   socialMetaTagParameters: SocialMetaTagParameters(
     //     title: courseModel.title,

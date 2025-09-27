@@ -10,22 +10,22 @@ class StartedListNotifier extends StateNotifier<StartedListState> {
   StartedListNotifier(
     this.mainRepo,
     this.ref,
-  ) : super(const StartedListState.initial());
+  ) : super(StartedListState());
 
   Future<void> getCouses() async {
-    state = const StartedListState.loading();
+    state = state.copyWith(isLoading: true);
 
     final res = await mainRepo.getStartedCourses();
 
     res.fold(
       (l) {
-        state = StartedListState.error(error: l);
+        state = state.copyWith(isLoading: false, error: l.messege);
       },
       (r) {
         if (r.isEmpty) {
-          state = StartedListState.empty(courses: r);
+          state = state.copyWith(isLoading: false, courses: r);
         } else {
-          state = StartedListState.loaded(courses: r);
+          state = state.copyWith(isLoading: false, courses: r);
         }
       },
     );

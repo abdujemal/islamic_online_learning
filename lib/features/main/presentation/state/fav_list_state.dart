@@ -1,18 +1,26 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 
-import '../../../../core/failure.dart';
+class FavListState {
+  final bool isLoading;
+  final List<CourseModel> courses;
+  final String? error;
 
-part 'fav_list_state.freezed.dart';
+  FavListState({
+    this.isLoading = false,
+    this.courses = const [],
+    this.error,
+  });
 
-@freezed
-class FavListState with _$FavListState {
-  const factory FavListState.initial() = _Initial;
-  const factory FavListState.loading() = _Loading;
-  const factory FavListState.loaded({
-    required List<CourseModel> courses,
-  }) = _Loaded;
-  const factory FavListState.empty({required List<CourseModel> courses}) =
-      _Empty;
-  const factory FavListState.error({required Failure error}) = _Error;
+  FavListState copyWith({
+    bool? isLoading,
+    List<CourseModel>? courses,
+    String? error,
+  }) {
+    return FavListState(
+      isLoading: isLoading ?? this.isLoading,
+      courses: courses ?? this.courses,
+      error: error,
+    );
+  }
 }

@@ -4,25 +4,24 @@ import 'package:islamic_online_learning/features/main/presentation/state/categor
 
 class CategoryListNotifier extends StateNotifier<CategoryListState> {
   final MainRepo mainRepo;
-  CategoryListNotifier(this.mainRepo)
-      : super(const CategoryListState.initial());
+  CategoryListNotifier(this.mainRepo) : super(CategoryListState());
 
   Future<void> getCategories() async {
-    state = const CategoryListState.loading();
+    state = state.copyWith(isLoading: true);
 
     final res = await mainRepo.getCategories();
 
     res.fold(
       (l) {
-        state = CategoryListState.error(error: l);
+        state = state.copyWith(isLoading: false, error: l.messege);
       },
       (r) {
         if (r.isEmpty) {
-          state = CategoryListState.empty(courses: r);
+          state = state.copyWith(isLoading: false, categories: r);
+
           return;
         }
-        state = CategoryListState.loaded(categories: r);
-        
+        state = state.copyWith(isLoading: false, categories: r);
       },
     );
   }

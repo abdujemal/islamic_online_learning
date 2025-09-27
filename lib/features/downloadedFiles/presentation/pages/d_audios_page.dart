@@ -74,13 +74,17 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: ref.watch(audiosNotifierProvider).map(
-                initial: (_) => const SizedBox(),
-                loading: (_) => ListView.builder(
+          child: Builder(
+            builder: (context) {
+              final state = ref.watch(audiosNotifierProvider);
+              // Replace 'AudiosInitial' with the correct initial state class name if it was renamed, e.g. 'AudiosStateInitial'
+             if (state.isLoading) {
+                return ListView.builder(
                   itemCount: 10,
-                  itemBuilder: (index, context) => const CourseShimmer(),
-                ),
-                loaded: (_) => RefreshIndicator(
+                  itemBuilder: (context, index) => const CourseShimmer(),
+                );
+              } else if (!state.isLoading && state.audios.isNotEmpty) {
+                return RefreshIndicator(
                   onRefresh: () async {
                     await ref.read(audiosNotifierProvider.notifier).getAudios();
                   },
@@ -88,7 +92,7 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.only(bottom: 100),
-                    itemCount: _.audios.length,
+                    itemCount: state.audios.length,
                     itemBuilder: (context, index) {
                       return ListTile(
                         leading: SizedBox(
@@ -101,29 +105,30 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
                                 size: 30,
                               ),
                               Text(
-                                formatFileSize(_.audios[index].lengthSync()),
+                                formatFileSize(state.audios[index].lengthSync()),
                                 style: const TextStyle(fontSize: 13),
                               )
                             ],
                           ),
                         ),
-                        title: Text(getTitle(_.audios[index].path)),
-                        subtitle: Text(getUstaz(_.audios[index].path)),
+                        title: Text(getTitle(state.audios[index].path)),
+                        subtitle: Text(getUstaz(state.audios[index].path)),
                         trailing: IconButton(
                           icon: const Icon(
                             Icons.delete_rounded,
                             color: Colors.red,
                           ),
                           onPressed: () async {
-                            await _.audios[index].delete();
+                            await state.audios[index].delete();
                             audiosNotifier.getAudios();
                           },
                         ),
                       );
                     },
                   ),
-                ),
-                empty: (_) => Center(
+                );
+              } else if (!state.isLoading && state.audios.isEmpty) {
+                return Center(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -139,11 +144,16 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
                       )
                     ],
                   ),
-                ),
-                error: (_) => Center(
-                  child: Text(_.error.messege),
-                ),
-              ),
+                );
+              } else if (!state.isLoading && state.error != null) {
+                return Center(
+                  child: Text(state.error!),
+                );
+              } else {
+                return const SizedBox();
+              }
+            },
+          ),
         ),
       ),
     );

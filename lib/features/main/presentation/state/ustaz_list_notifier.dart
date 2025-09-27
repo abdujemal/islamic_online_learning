@@ -5,26 +5,29 @@ import 'package:islamic_online_learning/features/main/presentation/state/ustaz_l
 
 class UstazListNotifier extends StateNotifier<UstazListState> {
   final MainRepo mainRepo;
-  UstazListNotifier(this.mainRepo) : super(const UstazListState.initial());
+  UstazListNotifier(this.mainRepo) : super(UstazListState());
 
   Future<void> getUstaz() async {
-    state = const UstazListState.loading();
+    state = state.copyWith(isLoading: true);
 
     final res = await mainRepo.getUstazs();
 
     res.fold(
       (l) {
-        state = UstazListState.error(error: l);
+        state = state.copyWith(isLoading: false, error: l.messege);
+
+        // state = UstazListState.error(error: l);
       },
       (r) {
         if (kDebugMode) {
           print("loaded");
         }
         if (r.isEmpty) {
-          state = UstazListState.empty(ustazs: r);
+          state = state.copyWith(isLoading: false, ustazs: r);
+
           return;
         }
-        state = UstazListState.loaded(ustazs: r);
+        state = state.copyWith(isLoading: false, ustazs: r);
       },
     );
   }

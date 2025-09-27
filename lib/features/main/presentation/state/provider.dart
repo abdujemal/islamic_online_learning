@@ -85,7 +85,7 @@ final ustazNotifierProvider =
 });
 
 final faqNotifierProvider =
-    StateNotifierProvider<FaqListNotifier, FAQListState>((ref) {
+    StateNotifierProvider<FaqListNotifier, FaqListState>((ref) {
   return FaqListNotifier(ref.read(mainRepoProvider));
 });
 

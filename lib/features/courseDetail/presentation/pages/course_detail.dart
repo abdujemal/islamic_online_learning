@@ -164,8 +164,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
   @override
   void initState() {
     super.initState();
-    loadAudioTracks();
     courseModel = widget.cm;
+    loadAudioTracks();
     audios = courseModel.courseIds.split(",");
 
     refresh();
