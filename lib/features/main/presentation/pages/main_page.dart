@@ -376,6 +376,7 @@ class _MainPageState extends ConsumerState<MainPage>
                 ),
                 drawer: const MainDrawer(),
                 body: TabBarView(
+                  physics: NeverScrollableScrollPhysics(),
                   controller: tabController,
                   children: [
                     const CurriculumTab(),

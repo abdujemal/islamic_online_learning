@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/curriculum_provider.dart';
-import 'package:islamic_online_learning/features/main/presentation/widgets/course_shimmer.dart';
+import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_card.dart';
+import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_shimmer.dart';
 
 class CurriculumTab extends ConsumerStatefulWidget {
   const CurriculumTab({super.key});
@@ -25,6 +26,7 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab> {
         body: Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "ክፍሎች",
@@ -32,10 +34,9 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab> {
           ),
           Expanded(
             child: ref.watch(curriculumNotifierProvider).map(
-                  
                   loading: (_) => ListView.builder(
                     itemCount: 5,
-                    itemBuilder: (context, index) => CourseShimmer(),
+                    itemBuilder: (context, index) => CurriculumShimmer(),
                   ),
                   loaded: (_) => RefreshIndicator(
                     onRefresh: () async {
@@ -44,9 +45,10 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab> {
                           .getCurriculums();
                     },
                     child: ListView.builder(
+                      physics: AlwaysScrollableScrollPhysics(),
                       itemCount: _.curriculums.length,
                       itemBuilder: (context, i) {
-                        return Text("$i");
+                        return CurriculumCard(curriculum: _.curriculums[i]);
                       },
                     ),
                   ),

@@ -5,7 +5,7 @@ class Curriculum {
   final String id;
   final String title;
   final String description;
-  final bool active = true;
+  final bool active;
   final bool prerequisite;
   final int level;
   Curriculum({
@@ -14,6 +14,7 @@ class Curriculum {
     required this.description,
     required this.prerequisite,
     required this.level,
+    required this.active,
   });
 
   Curriculum copyWith({
@@ -21,15 +22,16 @@ class Curriculum {
     String? title,
     String? description,
     bool? prerequisite,
+    bool? active,
     int? level,
   }) {
     return Curriculum(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      prerequisite: prerequisite ?? this.prerequisite,
-      level: level ?? this.level,
-    );
+        id: id ?? this.id,
+        title: title ?? this.title,
+        description: description ?? this.description,
+        prerequisite: prerequisite ?? this.prerequisite,
+        level: level ?? this.level,
+        active: active ?? this.active);
   }
 
   Map<String, dynamic> toMap() {
@@ -39,17 +41,18 @@ class Curriculum {
       'description': description,
       'prerequisite': prerequisite,
       'level': level,
+      "active": active
     };
   }
 
   factory Curriculum.fromMap(Map<String, dynamic> map) {
     return Curriculum(
-      id: map['id'] as String,
-      title: map['title'] as String,
-      description: map['description'] as String,
-      prerequisite: map['prerequisite'] as bool,
-      level: map['level'] as int,
-    );
+        id: map['id'] as String,
+        title: map['title'] as String,
+        description: map['description'] as String,
+        prerequisite: map['prerequisite'] as bool,
+        level: map['level'] as int,
+        active: map["active"] as bool);
   }
 
   static List<Curriculum> listFromJson(String responseBody) {
@@ -59,31 +62,33 @@ class Curriculum {
 
   String toJson() => json.encode(toMap());
 
-  factory Curriculum.fromJson(String source) => Curriculum.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Curriculum.fromJson(String source) =>
+      Curriculum.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'Curriculum(id: $id, title: $title, description: $description, prerequisite: $prerequisite, level: $level)';
+    return 'Curriculum(id: $id, title: $title, description: $description, prerequisite: $prerequisite, active: $active, level: $level)';
   }
 
   @override
   bool operator ==(covariant Curriculum other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.title == title &&
-      other.description == description &&
-      other.prerequisite == prerequisite &&
-      other.level == level;
+
+    return other.id == id &&
+        other.title == title &&
+        other.description == description &&
+        other.prerequisite == prerequisite &&
+        other.level == level &&
+        other.active == active;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      title.hashCode ^
-      description.hashCode ^
-      prerequisite.hashCode ^
-      level.hashCode;
+        title.hashCode ^
+        description.hashCode ^
+        prerequisite.hashCode ^
+        level.hashCode ^
+        active.hashCode;
   }
 }

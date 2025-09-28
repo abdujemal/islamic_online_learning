@@ -12,7 +12,6 @@ class _AccountTabState extends ConsumerState<AccountTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: Container(),
     );
   }

@@ -21,8 +21,7 @@ class CurriculumState {
   }) {
     if (initial) {
       return SizedBox();
-    }
-    if (isLoading) {
+    }else if (isLoading) {
       return loading(this);
     } else if (!isLoading && this.error != null) {
       return error(this);
@@ -41,6 +40,7 @@ class CurriculumState {
     String? error,
   }) {
     return CurriculumState(
+      initial: false,
       isLoading: isLoading ?? this.isLoading,
       curriculums: curriculums ?? this.curriculums,
       error: error,

@@ -4,7 +4,7 @@ import 'package:islamic_online_learning/features/main/data/model/course_model.da
 class MainListState {
   final bool isLoading;
   final List<CourseModel> courses;
-  final bool noMoreToLoad, isLoadingMore;
+  final bool noMoreToLoad, isLoadingMore, initial;
   final String? error;
 
   MainListState({
@@ -13,6 +13,7 @@ class MainListState {
     this.noMoreToLoad = false,
     this.isLoadingMore = false,
     this.error,
+    this.initial = true,
   });
 
   Widget map({
@@ -21,7 +22,9 @@ class MainListState {
     required Widget Function(MainListState _) empty,
     required Widget Function(MainListState _) error,
   }) {
-    if (isLoading) {
+    if (initial) {
+      return SizedBox();
+    } else if (isLoading) {
       return loading(this);
     } else if (!isLoading && this.error != null) {
       return error(this);
@@ -37,10 +40,12 @@ class MainListState {
   MainListState copyWith({
     bool? isLoading,
     List<CourseModel>? courses,
-    bool? noMoreToLoad, isLoadingMore,
+    bool? noMoreToLoad,
+    isLoadingMore,
     String? error,
   }) {
     return MainListState(
+      initial: false,
       isLoading: isLoading ?? this.isLoading,
       courses: courses ?? this.courses,
       noMoreToLoad: noMoreToLoad ?? this.noMoreToLoad,

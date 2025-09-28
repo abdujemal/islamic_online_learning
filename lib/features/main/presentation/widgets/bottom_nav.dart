@@ -44,6 +44,10 @@ class _BottomNavState extends ConsumerState<BottomNav> {
             icons.length,
             (index) => InkWell(
               onTap: () {
+                if (index == 2) {
+                  toast("ይቅርታ አካውንት የሎትም!", ToastType.error, context);
+                  return;
+                }
                 widget.tabController.animateTo(index);
                 ref.read(menuIndexProvider.notifier).update((state) => index);
               },
