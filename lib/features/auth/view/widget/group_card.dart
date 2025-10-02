@@ -65,7 +65,7 @@ class _GroupCardState extends ConsumerState<GroupCard> {
                   style: TextStyle(fontSize: 15),
                 ),
                 Text(
-                  "አባላት፡ ${widget.group.members}",
+                  "አባላት፡ ${widget.group.noOfMembers}",
                   style: TextStyle(fontSize: 15),
                 ),
               ],

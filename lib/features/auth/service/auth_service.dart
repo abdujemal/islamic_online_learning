@@ -99,4 +99,19 @@ class AuthService {
       throw Exception('Failed to register');
     }
   }
+
+  Future<User> getMyInfo() async {
+    final response = await customGetRequest(
+      getMyInfoApi,
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      User user = User.fromJson(response.body);
+      return user; //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to get your profile');
+    }
+  }
 }

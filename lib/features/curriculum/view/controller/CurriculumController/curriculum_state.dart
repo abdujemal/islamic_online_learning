@@ -21,7 +21,7 @@ class CurriculumState {
   }) {
     if (initial) {
       return SizedBox();
-    }else if (isLoading) {
+    } else if (isLoading) {
       return loading(this);
     } else if (!isLoading && this.error != null) {
       return error(this);
@@ -47,3 +47,4 @@ class CurriculumState {
     );
   }
 }
+

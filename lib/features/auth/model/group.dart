@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:islamic_online_learning/features/auth/model/group_request.dart';
 
 class Group {
@@ -16,7 +18,8 @@ class Group {
   final String timeZone;
   final DateTime? startDate;
   final DateTime createdAt;
-  final int members;
+  final int? noOfMembers;
+  final List<Member>? members;
   final GroupRequest? groupUpdateRequest;
   Group({
     required this.id,
@@ -31,7 +34,8 @@ class Group {
     required this.timeZone,
     this.startDate,
     required this.createdAt,
-    required this.members,
+    this.noOfMembers,
+    this.members,
     this.groupUpdateRequest,
   });
 
@@ -48,7 +52,8 @@ class Group {
     String? timeZone,
     DateTime? startDate,
     DateTime? createdAt,
-    int? members,
+    int? noOfMembers,
+    List<Member>? members,
     GroupRequest? groupUpdateRequest,
   }) {
     return Group(
@@ -64,6 +69,7 @@ class Group {
       timeZone: timeZone ?? this.timeZone,
       startDate: startDate ?? this.startDate,
       createdAt: createdAt ?? this.createdAt,
+      noOfMembers: noOfMembers ?? this.noOfMembers,
       members: members ?? this.members,
       groupUpdateRequest: groupUpdateRequest ?? this.groupUpdateRequest,
     );
@@ -81,18 +87,17 @@ class Group {
       'discussionTime': discussionTime,
       'discussionDay': discussionDay,
       'timeZone': timeZone,
-      'startDate': startDate?.toString(),
-      'createdAt': createdAt.toString(),
-      'members': members,
+      'startDate': startDate?.millisecondsSinceEpoch,
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'noOfMembers': noOfMembers,
+      'members': members?.map((x) => x.toMap()).toList(),
       'groupUpdateRequest': groupUpdateRequest?.toMap(),
     };
   }
 
   static List<Group> listFromJson(String responseBody) {
     final parsed = jsonDecode(responseBody) as List<dynamic>;
-    final lst = parsed.map((json) => Group.fromMap(json)).toList();
-    lst.sort((a, b) => b.members.compareTo(a.members));
-    return lst;
+    return parsed.map((json) => Group.fromMap(json)).toList();
   }
 
   factory Group.fromMap(Map<String, dynamic> map) {
@@ -111,7 +116,15 @@ class Group {
           ? DateTime.parse(map['startDate'] as String)
           : null,
       createdAt: DateTime.parse(map['createdAt'] as String),
-      members: (map['_count'] as Map<String, dynamic>)["members"] as int,
+      noOfMembers:
+          map['_count'] != null ? map['_count']["members"] as int : null,
+      members: map['members'] != null
+          ? List<Member>.from(
+              (map['members'] as List<dynamic>).map<Member?>(
+                (x) => Member.fromMap(x as Map<String, dynamic>),
+              ),
+            )
+          : null,
       groupUpdateRequest: map['groupUpdateRequest'] != null
           ? GroupRequest.fromMap(
               map['groupUpdateRequest'] as Map<String, dynamic>)
@@ -126,7 +139,7 @@ class Group {
 
   @override
   String toString() {
-    return 'Group(id: $id, name: $name, lessonNum: $lessonNum, courseNum: $courseNum, curriculumId: $curriculumId, gender: $gender, ageGroup: $ageGroup, discussionTime: $discussionTime, discussionDay: $discussionDay, timeZone: $timeZone, startDate: $startDate, createdAt: $createdAt, members: $members, groupUpdateRequest: $groupUpdateRequest)';
+    return 'Group(id: $id, name: $name, lessonNum: $lessonNum, courseNum: $courseNum, curriculumId: $curriculumId, gender: $gender, ageGroup: $ageGroup, discussionTime: $discussionTime, discussionDay: $discussionDay, timeZone: $timeZone, startDate: $startDate, createdAt: $createdAt, noOfMembers: $noOfMembers, members: $members, groupUpdateRequest: $groupUpdateRequest)';
   }
 
   @override
@@ -145,7 +158,8 @@ class Group {
         other.timeZone == timeZone &&
         other.startDate == startDate &&
         other.createdAt == createdAt &&
-        other.members == members &&
+        other.noOfMembers == noOfMembers &&
+        listEquals(other.members, members) &&
         other.groupUpdateRequest == groupUpdateRequest;
   }
 
@@ -163,7 +177,59 @@ class Group {
         timeZone.hashCode ^
         startDate.hashCode ^
         createdAt.hashCode ^
+        noOfMembers.hashCode ^
         members.hashCode ^
         groupUpdateRequest.hashCode;
   }
+}
+
+class Member {
+  final String id;
+  final String name;
+  Member({
+    required this.id,
+    required this.name,
+  });
+
+  Member copyWith({
+    String? id,
+    String? name,
+  }) {
+    return Member(
+      id: id ?? this.id,
+      name: name ?? this.name,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+    };
+  }
+
+  factory Member.fromMap(Map<String, dynamic> map) {
+    return Member(
+      id: map['id'] as String,
+      name: map['name'] as String,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Member.fromJson(String source) =>
+      Member.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() => 'Member(id: $id, name: $name)';
+
+  @override
+  bool operator ==(covariant Member other) {
+    if (identical(this, other)) return true;
+
+    return other.id == id && other.name == name;
+  }
+
+  @override
+  int get hashCode => id.hashCode ^ name.hashCode;
 }

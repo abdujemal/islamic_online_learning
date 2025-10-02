@@ -21,6 +21,7 @@ const String requestOtpApi = "$baseUrl/auth/otp";
 const String verifyOtpApi = "$baseUrl/auth/otp/verify";
 const String similarGroupsApi = "$baseUrl/auth/user/groups";
 const String registerApi = "$baseUrl/auth/user";
+const String getMyInfoApi = "$baseUrl/auth/user/me";
 
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 
