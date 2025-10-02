@@ -190,6 +190,28 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                 width: 80,
                                 imageUrl: widget.courseModel.image,
                                 fit: BoxFit.fill,
+                                errorWidget: (context, url, error) => Container(
+                                  decoration: BoxDecoration(
+                                    color: whiteColor,
+                                    image: DecorationImage(
+                                      image: AssetImage('assets/bg1.png'),
+                                      fit: BoxFit.fill,
+                                      opacity: 0.6,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2),
+                                      child: Text(
+                                        widget.courseModel.title,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 progressIndicatorBuilder:
                                     (context, url, progress) {
                                   return Shimmer.fromColors(
@@ -272,7 +294,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       .playList
                                                       .addAll(lst);
                                                 }
-                                                PlaylistHelper.mainPlayListIndexes = playListIndexes;
+                                                PlaylistHelper
+                                                        .mainPlayListIndexes =
+                                                    playListIndexes;
                                                 if (playList.length > 0) {
                                                   int playableIndex =
                                                       playListIndexes.indexOf(
@@ -296,8 +320,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       seconds: courseModel
                                                           .pausedAtAudioSec,
                                                     ),
-                                              preload: false,
-
+                                                    preload: false,
                                                   );
                                                   audioPlayer.play();
 
