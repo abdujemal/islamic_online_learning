@@ -17,7 +17,7 @@ plugins {
 
 android {
     namespace = "com.aj.islamic_online_learning_dev"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36//flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
     compileOptions {

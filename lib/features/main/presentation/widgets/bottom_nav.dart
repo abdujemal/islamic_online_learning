@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class BottomNav extends ConsumerStatefulWidget {
@@ -43,11 +44,18 @@ class _BottomNavState extends ConsumerState<BottomNav> {
           children: List.generate(
             icons.length,
             (index) => InkWell(
-              onTap: () {
+              onTap: () async {
                 if (index == 2) {
-                  toast("ይቅርታ አካውንት የሎትም!", ToastType.error, context);
-                  return;
+                  final pref = await ref.read(sharedPrefProvider);
+                  final token = pref.getString(PrefConsts.token);
+                  if (token == null) {
+                    if (mounted) {
+                      toast("ይቅርታ አካውንት የሎትም!", ToastType.error, context);
+                    }
+                    return;
+                  }
                 }
+                if (!mounted) return;
                 widget.tabController.animateTo(index);
                 ref.read(menuIndexProvider.notifier).update((state) => index);
               },

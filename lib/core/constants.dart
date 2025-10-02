@@ -17,6 +17,11 @@ const String serverUrl = "https://ilmfelagi.com/api";
 const String baseUrl = "https://ilmfelagi-pro-backend.onrender.com/api/v1";
 //sub apis
 const String curriculumApi = "$baseUrl/curriculums/all";
+//auth
+const String requestOtpApi = "$baseUrl/auth/otp";
+const String verifyOtpApi = "$baseUrl/auth/otp/verify";
+const String similarGroupsApi = "$baseUrl/auth/user/groups";
+const String registerApi = "$baseUrl/auth/user";
 
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 
@@ -46,33 +51,36 @@ const Color darkCardColor = Color(0xff3f3f3d);
 
 void toast(String message, ToastType toastType, BuildContext context,
     {bool isLong = false}) {
-  // final snackbar = SnackBar(
-  //   content: Text(
-  //     message,
-  //     style: const TextStyle(color: whiteColor),
-  //   ),
-  //   duration: Duration(seconds: isLong ? 5 : 1),
-  //   backgroundColor: toastType == ToastType.error
-  //       ? Colors.red
-  //       : toastType == ToastType.success
-  //           ? primaryColor
-  //           : Colors.black,
-  // );
+  if (context.mounted) {
+    final snackbar = SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(color: whiteColor),
+      ),
+      dismissDirection: DismissDirection.down,
+      duration: Duration(milliseconds: isLong ? 3000 : 1200),
+      backgroundColor: toastType == ToastType.error
+          ? Colors.red
+          : toastType == ToastType.success
+              ? primaryColor
+              : Colors.black,
+    );
 
-  // // Show the snackbar
-  // ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  Fluttertoast.showToast(
-    msg: message,
-    toastLength: isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,
-    gravity: ToastGravity.BOTTOM,
-    backgroundColor: toastType == ToastType.error
-        ? Colors.red
-        : toastType == ToastType.success
-            ? Colors.green
-            : null,
-    textColor: Colors.white,
-    fontSize: 16.0,
-  );
+    // // Show the snackbar
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    // Fluttertoast.showToast(
+    //   msg: message,
+    //   toastLength: isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,
+    //   gravity: ToastGravity.BOTTOM,
+    //   backgroundColor: toastType == ToastType.error
+    //       ? Colors.red
+    //       : toastType == ToastType.success
+    //           ? Colors.green
+    //           : null,
+    //   textColor: Colors.white,
+    //   fontSize: 16.0,
+    // );
+  }
 }
 
 enum ToastType { success, error, normal }

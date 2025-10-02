@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/started_course_card.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -27,7 +28,7 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
 
   check() {
     ref.watch(sharedPrefProvider).then((pref) {
-      bool show = pref.getBool("showBeginner") ?? true;
+      bool show = pref.getBool(PrefConsts.showBeginner) ?? true;
       ref.read(showBeginnerProvider.notifier).update((state) => show);
     });
   }
@@ -108,7 +109,7 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
                           GestureDetector(
                             onTap: () async {
                               final pref = await ref.read(sharedPrefProvider);
-                              pref.setBool("showBeginner", false);
+                              pref.setBool(PrefConsts.showBeginner, false);
                               ref
                                   .read(showBeginnerProvider.notifier)
                                   .update((state) => false);
@@ -206,7 +207,7 @@ class _BeginnerCoursesListState extends ConsumerState<BeginnerCoursesList> {
             //     GestureDetector(
             //       onTap: () async {
             //       final pref = await ref.read(sharedPrefProvider);
-            //       pref.setBool("showBeginner", false);
+            //       pref.setBool(PrefConsts.showBeginner, false);
             //       ref
             //         .read(showBeginnerProvider.notifier)
             //         .update((state) => false);

@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/contents.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/download_database.dart';
 import 'package:just_audio/just_audio.dart';
@@ -124,9 +125,9 @@ class _HomeState extends ConsumerState<Home>
     if (mounted) {
       ref.read(mainNotifierProvider.notifier).getTheme();
       ref.read(sharedPrefProvider).then((pref) {
-        wantToRate = pref.getBool("wantToRate");
+        wantToRate = pref.getBool(PrefConsts.wantToRate);
         ref.read(fontScaleProvider.notifier).update(
-              (state) => pref.getDouble("fontScale") ?? 1.0,
+              (state) => pref.getDouble(PrefConsts.fontScale) ?? 1.0,
             );
       });
 
@@ -134,17 +135,17 @@ class _HomeState extends ConsumerState<Home>
         ref.read(showGuideProvider.notifier).update(
           (state) {
             show = bool.parse(
-                pref.getString("showGuide")?.split(",").first ?? "true");
+                pref.getString(PrefConsts.showGuide)?.split(",").first ?? "true");
             return [
               show,
-              bool.parse(pref.getString("showGuide")?.split(",").last ?? "true")
+              bool.parse(pref.getString(PrefConsts.showGuide)?.split(",").last ?? "true")
             ];
           },
         );
       });
 
       ref.read(sharedPrefProvider).then((pref) {
-        bool isSubed = pref.getBool("isSubed") ?? true;
+        bool isSubed = pref.getBool(PrefConsts.isSubed) ?? true;
         if (isSubed) {
           FirebaseMessaging.instance.subscribeToTopic("ders");
         }
@@ -245,17 +246,17 @@ class _HomeState extends ConsumerState<Home>
           onFinish: () {
             ref.read(sharedPrefProvider).then((pref) {
               final show2 = bool.parse(
-                  pref.getString("showGuide")?.split(",").last ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").last ?? "true");
 
-              pref.setString("showGuide", 'false,$show2');
+              pref.setString(PrefConsts.showGuide, 'false,$show2');
             });
           },
           onSkip: () {
             ref.read(sharedPrefProvider).then((pref) {
               final show2 = bool.parse(
-                  pref.getString("showGuide")?.split(",").last ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").last ?? "true");
 
-              pref.setString("showGuide", 'false,$show2');
+              pref.setString(PrefConsts.showGuide, 'false,$show2');
             });
             return true;
           }).show(context: context);

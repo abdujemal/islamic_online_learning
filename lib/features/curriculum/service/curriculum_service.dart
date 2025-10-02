@@ -9,6 +9,8 @@ class CurriculumService {
     if (response.statusCode == 200) {
       return Curriculum.listFromJson(response.body);
     } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
       throw Exception('Failed to load curriculum');
     }
   }

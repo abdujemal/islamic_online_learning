@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_model.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/core/widgets/list_title.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/pages/pdf_page.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/state/course_detail_controller.dart';
@@ -114,9 +115,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
           onFinish: () {
             ref.read(sharedPrefProvider).then((pref) {
               final show1 = bool.parse(
-                  pref.getString("showGuide")?.split(",").first ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").first ?? "true");
 
-              pref.setString("showGuide", '$show1,false');
+              pref.setString(PrefConsts.showGuide, '$show1,false');
 
               show = false;
               setState(() {});
@@ -125,9 +126,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
           onSkip: () {
             ref.read(sharedPrefProvider).then((pref) {
               final show1 = bool.parse(
-                  pref.getString("showGuide")?.split(",").first ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").first ?? "true");
 
-              pref.setString("showGuide", '$show1,false');
+              pref.setString(PrefConsts.showGuide, '$show1,false');
 
               show = false;
               setState(() {});
@@ -178,9 +179,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
           ref.read(showGuideProvider.notifier).update(
             (state) {
               show = bool.parse(
-                  pref.getString("showGuide")?.split(",").last ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").last ?? "true");
 
-              print("${pref.getString("showGuide")}");
+              print("${pref.getString(PrefConsts.showGuide)}");
 
               if (show) {
                 if (showOnes) {
@@ -192,7 +193,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
               return [
                 bool.parse(
-                    pref.getString("showGuide")?.split(",").first ?? "true"),
+                    pref.getString(PrefConsts.showGuide)?.split(",").first ?? "true"),
                 show,
               ];
             },

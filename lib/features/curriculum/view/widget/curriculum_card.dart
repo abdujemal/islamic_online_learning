@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/auth/view/pages/sign_in.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
 
 class CurriculumCard extends ConsumerStatefulWidget {
@@ -14,40 +15,57 @@ class CurriculumCard extends ConsumerStatefulWidget {
 class _CurriculumCardState extends ConsumerState<CurriculumCard> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 5),
-          )
-        ],
-      ),
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 10,
-        ),
-        leading: Container(
-          width: 70,
-          // height: 70,
-          padding: EdgeInsets.all(10),
+    return Padding(
+      padding: EdgeInsets.only(top: 12),
+      child: InkWell(
+        onTap: () {
+          if (!widget.curriculum.active) {
+            toast("ይህ ክፍል ገና አልተጀመረም።", ToastType.error, context);
+            return;
+          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => SignIn(
+                      curriculumId: widget.curriculum.id,
+                    )),
+          );
+        },
+        child: Ink(
           decoration: BoxDecoration(
-            color: primaryColor,
-            borderRadius: BorderRadius.circular(10),
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 5),
+              )
+            ],
           ),
-          child: Image.asset(
-            "assets/grad.png",
-            color: whiteColor,
+          child: ListTile(
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 15,
+              vertical: 10,
+            ),
+            leading: Container(
+              width: 70,
+              // height: 70,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Image.asset(
+                "assets/grad.png",
+                color: whiteColor,
+              ),
+            ),
+            title: Text(widget.curriculum.title),
+            subtitle: Text(widget.curriculum.description),
+            trailing: Text(widget.curriculum.active ? "" : "በቅርብ ቀን"),
           ),
         ),
-        title: Text(widget.curriculum.title),
-        subtitle: Text(widget.curriculum.description),
-        trailing: Text(widget.curriculum.active ? "" : "በቅርብ ቀን"),
       ),
     );
   }

@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/core/update_checker.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
@@ -35,7 +36,7 @@ class _MainPageState extends ConsumerState<MainPage>
     with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
 
-  late TabController tabController;
+  late TabController _tabController;
 
   int i = 0;
 
@@ -60,15 +61,21 @@ class _MainPageState extends ConsumerState<MainPage>
 
   Timer? searchTimer;
 
+  // StateController<int>? menuIndexWatch;
+
+  void refChangeHandler(int state) {
+    _tabController.animateTo(state);
+  }
+
   @override
   void initState() {
     super.initState();
 
-    tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     FirebaseMessaging.instance.subscribeToTopic("v1.0.1");
 
-    tabController.addListener(_handleTabChange);
+    _tabController.addListener(_handleTabChange);
 
     if (FirebaseAuth.instance.currentUser == null) {
       FirebaseAuth.instance.signInAnonymously().then((value) {
@@ -79,9 +86,9 @@ class _MainPageState extends ConsumerState<MainPage>
     if (mounted) {
       ref.read(mainNotifierProvider.notifier).getTheme();
       ref.read(sharedPrefProvider).then((pref) {
-        wantToRate = pref.getBool("wantToRate");
+        wantToRate = pref.getBool(PrefConsts.wantToRate);
         ref.read(fontScaleProvider.notifier).update(
-              (state) => pref.getDouble("fontScale") ?? 1.0,
+              (state) => pref.getDouble(PrefConsts.fontScale) ?? 1.0,
             );
       });
 
@@ -89,29 +96,29 @@ class _MainPageState extends ConsumerState<MainPage>
         ref.read(showGuideProvider.notifier).update(
           (state) {
             show = bool.parse(
-                pref.getString("showGuide")?.split(",").first ?? "true");
+                pref.getString(PrefConsts.showGuide)?.split(",").first ??
+                    "true");
             return [
               show,
-              bool.parse(pref.getString("showGuide")?.split(",").last ?? "true")
+              bool.parse(
+                  pref.getString(PrefConsts.showGuide)?.split(",").last ??
+                      "true")
             ];
           },
         );
       });
 
       ref.read(sharedPrefProvider).then((pref) {
-        bool isSubed = pref.getBool("isSubed") ?? true;
+        bool isSubed = pref.getBool(PrefConsts.isSubed) ?? true;
         if (isSubed) {
           FirebaseMessaging.instance.subscribeToTopic("ders");
         }
       });
 
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        ref.watch(menuIndexProvider.notifier).addListener(
-          (state) {
-            tabController.animateTo(state);
-          },
-        );
-      });
+      // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      //   menuIndexWatch = ref.watch(menuIndexProvider.notifier);
+      //   menuIndexWatch?.addListener(refChangeHandler);
+      // });
 
       AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
         if (!isAllowed) {
@@ -200,17 +207,19 @@ class _MainPageState extends ConsumerState<MainPage>
           onFinish: () {
             ref.read(sharedPrefProvider).then((pref) {
               final show2 = bool.parse(
-                  pref.getString("showGuide")?.split(",").last ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").last ??
+                      "true");
 
-              pref.setString("showGuide", 'false,$show2');
+              pref.setString(PrefConsts.showGuide, 'false,$show2');
             });
           },
           onSkip: () {
             ref.read(sharedPrefProvider).then((pref) {
               final show2 = bool.parse(
-                  pref.getString("showGuide")?.split(",").last ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").last ??
+                      "true");
 
-              pref.setString("showGuide", 'false,$show2');
+              pref.setString(PrefConsts.showGuide, 'false,$show2');
             });
             return true;
           }).show(context: context);
@@ -218,7 +227,9 @@ class _MainPageState extends ConsumerState<MainPage>
   }
 
   void _handleTabChange() {
-    ref.read(menuIndexProvider.notifier).update((state) => tabController.index);
+    ref
+        .read(menuIndexProvider.notifier)
+        .update((state) => _tabController.index);
   }
 
   void startSearchTimer(String searchQuery) {
@@ -232,12 +243,22 @@ class _MainPageState extends ConsumerState<MainPage>
   }
 
   @override
+  void dispose() {
+    _tabController.removeListener(_handleTabChange); // remove listener first
+    _tabController.dispose(); // dispose controller
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(menuIndexProvider);
+    if (currentIndex != _tabController.index) {
+      _tabController.animateTo(currentIndex);
+    }
     final audioPlayer = PlaylistHelper.audioPlayer;
     return WillPopScope(
       onWillPop: () async {
-        if (tabController.index != 0) {
+        if (_tabController.index != 0) {
           ref.read(menuIndexProvider.notifier).update((state) => 0);
           return false;
         } else if (i == 0) {
@@ -283,7 +304,7 @@ class _MainPageState extends ConsumerState<MainPage>
             }
             return UpdateChecker(
               child: Scaffold(
-                bottomNavigationBar: BottomNav(tabController),
+                bottomNavigationBar: BottomNav(_tabController),
                 appBar: AppBar(
                   title: currentIndex != 1
                       ? Text("ዒልም ፈላጊ")
@@ -377,7 +398,7 @@ class _MainPageState extends ConsumerState<MainPage>
                 drawer: const MainDrawer(),
                 body: TabBarView(
                   physics: NeverScrollableScrollPhysics(),
-                  controller: tabController,
+                  controller: _tabController,
                   children: [
                     const CurriculumTab(),
                     const Home(),

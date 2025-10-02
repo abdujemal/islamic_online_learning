@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/main_list_state.dart';
@@ -250,7 +251,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
   changeTheme(ThemeMode theme) async {
     final pref = await ref.read(sharedPrefProvider);
 
-    pref.setString("theme", theme == ThemeMode.dark ? 'dark' : 'light');
+    pref.setString(PrefConsts.theme, theme == ThemeMode.dark ? 'dark' : 'light');
 
     getTheme();
   }
@@ -258,7 +259,7 @@ class MainListNotifier extends StateNotifier<MainListState> {
   getTheme() async {
     final pref = await ref.read(sharedPrefProvider);
 
-    String currentTheme = pref.getString('theme') ?? 'light';
+    String currentTheme = pref.getString(PrefConsts.theme) ?? 'light';
 
     ref.read(themeProvider.notifier).update(
         (state) => currentTheme == 'dark' ? ThemeMode.dark : ThemeMode.light);
