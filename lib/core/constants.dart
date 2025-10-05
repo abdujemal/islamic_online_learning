@@ -15,7 +15,8 @@ const String serverUrl = "https://ilmfelagi.com/api";
 //new apis
 const String baseUrl = "https://ilmfelagi-pro-backend.onrender.com/api/v1";
 //sub apis
-const String curriculumApi = "$baseUrl/curriculums/all";
+const String curriculumsApi = "$baseUrl/curriculums/all";
+const String getCurriculumApi = "$baseUrl/curriculums";
 //auth
 const String requestOtpApi = "$baseUrl/auth/otp";
 const String verifyOtpApi = "$baseUrl/auth/otp/verify";
@@ -200,4 +201,12 @@ bool isPlayingCourseThisCourse(String courseId, WidgetRef refp,
   print('!isPlayingCourseThisCourse');
 
   return false;
+}
+
+void printMap(Map<String, dynamic> map) {
+  print("{");
+  for (var kv in map.entries) {
+    print("${kv.key}: ${kv.value}");
+  }
+  print("}");
 }

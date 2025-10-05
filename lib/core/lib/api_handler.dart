@@ -16,7 +16,7 @@ Future<http.Response> customGetRequest(String url,
 
   final token = await getToken();
 
-  return http.get(
+  final response = await http.get(
     Uri.parse(url),
     headers: {
       if (authorized) ...{
@@ -24,16 +24,35 @@ Future<http.Response> customGetRequest(String url,
       }
     },
   );
+  final parsed = jsonDecode(response.body);
+  if (response.statusCode == 403) {
+    if (parsed["type"] == "auth") {
+      throw AuthException("ይቅርታ መለያዎ ታግድዋል!");
+    } else {
+      throw PaymentException("ያልተሟላ ከፍያ አሎት!");
+    }
+  }
+
+  if (response.statusCode == 401) {
+    if (parsed["type"] == "auth") {
+      throw AuthException("መለያዎ ትክክላኛ አይደለም!");
+    } else {
+      throw PaymentException("ክፍያ የሎትም!");
+    }
+  }
+  handleErrors(response);
+
+  return response;
 }
 
-Future<http.Response> customPostRequest(String url, Map<String, dynamic> map,
+Future<http.Response> customPostRequest(String url, Map<String, dynamic>? map,
     {bool authorized = false}) async {
   print("POST $url");
   print("res body $map");
 
   final token = await getToken();
 
-  return http.post(
+  final response = await http.post(
     Uri.parse(url),
     headers: {
       "Content-Type": "application/json",
@@ -42,16 +61,74 @@ Future<http.Response> customPostRequest(String url, Map<String, dynamic> map,
         "authorization": "$token",
       }
     },
-    body: jsonEncode(map),
+    body: map != null ? jsonEncode(map): null,
   );
+  handleErrors(response);
+
+  return response;
+}
+
+void handleErrors(http.Response response) {
+  final parsed = jsonDecode(response.body);
+  if (response.statusCode == 403) {
+    if (parsed["type"] == "auth") {
+      throw AuthException("ይቅርታ መለያዎ ታግድዋል!");
+    } else {
+      throw PaymentException("ያልተሟላ ከፍያ አሎት!");
+    }
+  }
+
+  if (response.statusCode == 401) {
+    if (parsed["type"] == "auth") {
+      throw AuthException("መለያዎ ትክክላኛ አይደለም!");
+    } else {
+      throw PaymentException("ክፍያ የሎትም!");
+    }
+  }
 }
 
 Future<String?> getToken() async {
   final pref = await SharedPreferences.getInstance();
   final token = pref.getString(PrefConsts.token);
+  // print("token: $token");
   return token;
 }
 
 class ConnectivityException extends HttpException {
   ConnectivityException(super.message);
 }
+
+class AuthException extends HttpException {
+  AuthException(super.message);
+}
+
+class PaymentException extends HttpException {
+  PaymentException(super.message);
+}
+
+// T handleError<T>(Object err, T state) {
+//   if (err is ConnectivityException) {
+//     return state.copyWith(
+//       isLoading: false,
+//       error: err.message,
+//     );
+//   } else if (err is AuthException) {
+//     return state.copyWith(
+//       isLoading: false,
+//       isErrorAuth: true,
+//       error: err.message,
+//     );
+//   } else if (err is PaymentException) {
+//     return state.copyWith(
+//       isLoading: false,
+//       isErrorPayment: true,
+//       error: err.message,
+//     );
+//   } else {
+//     print("Error: $err");
+//     return state.copyWith(
+//       isLoading: false,
+//       error: "ደርሶቹን ማግኘት አልተቻለም።",
+//     );
+//   }
+// }

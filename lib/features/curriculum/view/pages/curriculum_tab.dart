@@ -2,15 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
-import 'package:islamic_online_learning/features/auth/view/pages/register_page.dart';
-import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_list.dart';
-import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_card.dart';
-import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_shimmer.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_list.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/group_members_status.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CurriculumTab extends ConsumerStatefulWidget {
   const CurriculumTab({super.key});
@@ -34,12 +29,7 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
         if (token != null && curriculumId != null) {
           ref
               .read(authNotifierProvider.notifier)
-              .checkIfTheCourseStarted(context)
-              .then((started) {
-            if (started) {
-              //get Assigned Courses
-            }
-          });
+              .checkIfTheCourseStarted(context);
         }
 
         ref.read(authNotifierProvider.notifier).unfinishedRegistration(
@@ -63,7 +53,8 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
         children: [
           CurriculumList(),
           if (!authState.courseStarted) GroupMembersStatus(),
-          if (authState.courseStarted) AssignedCourseList()
+          if (authState.courseStarted && authState.error == null)
+            AssignedCourseList()
         ],
       ),
     ));

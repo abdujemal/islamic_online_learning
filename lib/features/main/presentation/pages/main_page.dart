@@ -12,6 +12,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/core/update_checker.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
@@ -256,6 +257,7 @@ class _MainPageState extends ConsumerState<MainPage>
       _tabController.animateTo(currentIndex);
     }
     final audioPlayer = PlaylistHelper.audioPlayer;
+    final curriculumState = ref.watch(assignedCoursesNotifierProvider);
     return WillPopScope(
       onWillPop: () async {
         if (_tabController.index != 0) {
@@ -307,7 +309,9 @@ class _MainPageState extends ConsumerState<MainPage>
                 bottomNavigationBar: BottomNav(_tabController),
                 appBar: AppBar(
                   title: currentIndex != 1
-                      ? Text("ዒልም ፈላጊ")
+                      ? curriculumState.curriculum != null && currentIndex == 0
+                          ? Text(curriculumState.curriculum?.title ?? "")
+                          : Text("ዒልም ፈላጊ")
                       : AnimatedSearchBar(
                           height: 50,
                           label: "ዒልም ፈላጊ",

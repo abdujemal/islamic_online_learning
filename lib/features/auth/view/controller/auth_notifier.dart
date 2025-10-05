@@ -30,6 +30,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<bool> checkIfTheCourseStarted(BuildContext context) async {
     await getMyInfo(context);
     if (state.user?.group.startDate != null) {
+      ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum();
       state = state.copyWith(courseStarted: true);
       return true;
     } else {

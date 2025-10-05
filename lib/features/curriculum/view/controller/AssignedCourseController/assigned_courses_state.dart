@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
+import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
 
 class AssignedCoursesState {
-  final bool isLoading, initial;
-  final List<AssignedCourse> assignedCourses;
+  final bool isLoading, initial, isErrorAuth, isErrorPayment;
+  final Curriculum? curriculum;
   final String? error;
 
   AssignedCoursesState({
     this.initial = true,
     this.isLoading = false,
-    this.assignedCourses = const [],
+    this.isErrorAuth = false,
+    this.isErrorPayment = false,
+    this.curriculum,
     this.error,
   });
 
@@ -25,24 +27,35 @@ class AssignedCoursesState {
       return loading(this);
     } else if (!isLoading && this.error != null) {
       return error(this);
-    } else if (!isLoading && assignedCourses.isNotEmpty) {
-      return loaded(this);
-    } else if (!isLoading && assignedCourses.isEmpty) {
+    } else if (!isLoading &&
+        curriculum != null &&
+        curriculum!.assignedCourses != null &&
+        curriculum!.assignedCourses!.isEmpty) {
       return empty(this);
+    }else if (!isLoading &&
+        curriculum != null &&
+        curriculum!.assignedCourses != null &&
+        curriculum!.assignedCourses!.isNotEmpty) {
+      return loaded(this);
     } else {
+      print("yep");
       return SizedBox();
     }
   }
 
   AssignedCoursesState copyWith({
     bool? isLoading,
-    List<AssignedCourse>? assignedCourses,
+    bool? isErrorAuth,
+    bool? isErrorPayment,
+    Curriculum? curriculum,
     String? error,
   }) {
     return AssignedCoursesState(
       initial: false,
       isLoading: isLoading ?? this.isLoading,
-      assignedCourses: assignedCourses ?? this.assignedCourses,
+      curriculum: curriculum ?? this.curriculum,
+      isErrorAuth: isErrorAuth ?? false,
+      isErrorPayment: isErrorPayment ?? false,
       error: error,
     );
   }

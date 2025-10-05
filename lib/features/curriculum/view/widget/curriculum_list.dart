@@ -27,16 +27,10 @@ class _CurriculumListState extends ConsumerState<CurriculumList> {
           ),
           Expanded(
             child: ref.watch(curriculumNotifierProvider).map(
-                  loading: (_) => RefreshIndicator(
-                    onRefresh: () async {
-                      await ref
-                          .read(curriculumNotifierProvider.notifier)
-                          .getCurriculums();
-                    },
-                    child: ListView.builder(
+                  loading: (_) => ListView.builder(
                       itemCount: 5,
                       itemBuilder: (context, index) => CurriculumShimmer(),
-                    ),
+                    
                   ),
                   loaded: (_) => RefreshIndicator(
                     onRefresh: () async {

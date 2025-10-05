@@ -22,8 +22,8 @@ final curriculumNotifierProvider =
   return CurriculumNotifier(service);
 });
 
-final curriculumDetailNotifierProvider =
+final assignedCoursesNotifierProvider =
     StateNotifierProvider<AssignedCoursesNotifier, AssignedCoursesState>((ref) {
-  final service = ref.watch(assignedCourseServiceProvider);
+  final service = ref.watch(curriculumServiceProvider);
   return AssignedCoursesNotifier(service);
 });
