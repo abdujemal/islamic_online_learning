@@ -17,4 +17,7 @@ class Translations {
   static String get(String key) {
     return translation[key] ?? "";
   }
+  static String reverse(String value) {
+    return translation.keys.toList()[translation.values.toList().indexOf(value)];
+  }
 }

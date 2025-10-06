@@ -5,7 +5,6 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_card.dart';
-import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/course_shimmer.dart';
 
 class AssignedCourseList extends ConsumerStatefulWidget {
@@ -48,7 +47,7 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
   void _scrollToCurrentLesson(int currentLessonIndex, int currentCourseIndex) {
     if (_lessonScrollController.hasClients) {
       final offset = (currentCourseIndex * 104.0) +
-          (currentLessonIndex *  158.0); // approx ListTile height
+          (currentLessonIndex * 158.0); // approx ListTile height
       _lessonScrollController.animateTo(
         offset,
         duration: const Duration(milliseconds: 400),
@@ -67,13 +66,14 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
     // final theme = ref.watch(themeProvider);
     final state = ref.watch(assignedCoursesNotifierProvider);
     // print("${state.curriculum != null} && ${scrollingDone}");
-    
+
     if (state.curriculum != null && !scrollingDone) {
       Future.delayed(
         Duration(seconds: 5),
         () => _scrollToCurrentLesson(lessonIndex!, currentCourseIndex!),
       );
     }
+    
     return Expanded(
       child: ref.watch(assignedCoursesNotifierProvider).map(
             loading: (_) => ListView(
@@ -122,8 +122,13 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
                               ),
                               const SizedBox(height: 8),
                               LinearProgressIndicator(
-                                value: 1,
+                                value: ref
+                                    .read(assignedCoursesNotifierProvider
+                                        .notifier)
+                                    .getProgress(ref),
                                 minHeight: 16,
+                                color: primaryColor,
+                                backgroundColor: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               const SizedBox(height: 20),
@@ -153,7 +158,12 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(_.error ?? ""),
+                  Text(
+                    _.error ?? "",
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
                   IconButton(
                     onPressed: () async {
                       await ref
