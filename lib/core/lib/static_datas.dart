@@ -12,3 +12,9 @@ class StaticDatas {
     "Sunday",
   ];
 }
+
+class ScoreNames {
+  static String Lesson = "Lesson";
+  static String Discussion = "Discussion";
+  static String IndividualAssignment = "IndividualAssignment";
+}

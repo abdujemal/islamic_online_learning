@@ -3,6 +3,8 @@ import 'package:islamic_online_learning/features/curriculum/service/assigned_cou
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_service.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_state.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/past_lesson_notifier.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/past_lesson_state.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/CurriculumController/curriculum_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/CurriculumController/curriculum_state.dart';
 
@@ -26,4 +28,9 @@ final assignedCoursesNotifierProvider =
     StateNotifierProvider<AssignedCoursesNotifier, AssignedCoursesState>((ref) {
   final service = ref.watch(curriculumServiceProvider);
   return AssignedCoursesNotifier(service);
+});
+
+final pastLessonStateProvider = StateNotifierProvider<PastLessonNotifier, PastLessonState>((ref) {
+  final service = ref.watch(assignedCourseServiceProvider);
+  return PastLessonNotifier(service);
 });

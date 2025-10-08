@@ -4,33 +4,39 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/static_datas.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
-import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
-class LessonCard extends ConsumerStatefulWidget {
-  final bool isCurrentLesson;
-  final bool isPastLesson;
+class ExamCard extends ConsumerStatefulWidget {
+  final bool isLastExam;
   final bool isLocked;
-  final Lesson lesson;
-  const LessonCard({
-    required this.isCurrentLesson,
-    required this.isPastLesson,
-    required this.isLocked,
-    required this.lesson,
+  final bool isCurrent;
+  final ExamData examData;
+  final DiscussionData discussionData;
+  const ExamCard({
     super.key,
+    required this.examData,
+    required this.discussionData,
+    required this.isLocked,
+    required this.isCurrent,
+    required this.isLastExam,
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _LessonCardState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _ExamCardState();
 }
 
-class _LessonCardState extends ConsumerState<LessonCard> {
+class _ExamCardState extends ConsumerState<ExamCard> {
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
-    final score = Score.get(ScoreNames.Lesson, ref, authState.scores ?? []);
+    final score =
+        Score.get(ScoreNames.IndividualAssignment, ref, authState.scores ?? []);
+    
     return Container(
+      // key:_key,
       margin: EdgeInsets.only(
         top: 10,
       ),
@@ -52,8 +58,8 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                       spacing: 10,
                       children: [
                         Icon(
-                          Icons.book_outlined,
-                          color: primaryColor,
+                          Icons.question_mark_rounded,
+                          color: Colors.purple,
                           size: 40,
                         ),
                         Expanded(
@@ -64,13 +70,15 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                                 spacing: 3,
                                 children: [
                                   Text(
-                                    "ትምህርት",
+                                    "ፈተና",
                                     style: TextStyle(
                                       fontSize: 11,
                                     ),
                                   ),
                                   Text(
-                                    widget.lesson.title,
+                                    widget.isLastExam
+                                        ? "ሙሉ ኪታቡን"
+                                        : widget.examData.title,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
@@ -104,37 +112,24 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: widget.isCurrentLesson
+                      child: widget.isCurrent
                           ? ElevatedButton(
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
+                                backgroundColor: Colors.purple,
                                 shape: RoundedRectangleBorder(
                                     // borderRadius: BorderRadius.circular(12),
                                     ),
                               ),
                               child: const Text(
-                                "ጀምር",
+                                "ፈተናውን ጀምር",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: whiteColor,
                                 ),
                               ),
                             )
-                          : widget.isPastLesson
-                              ? OutlinedButton(
-                                  onPressed: () {},
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.all(0),
-                                    foregroundColor: primaryColor,
-                                    side: BorderSide(color: primaryColor),
-                                    shape: RoundedRectangleBorder(
-                                        // borderRadius: BorderRadius.circular(12),
-                                        ),
-                                  ),
-                                  child: const Text("ክፈት"),
-                                )
-                              : SizedBox(),
+                          : SizedBox(),
                     ),
                   ],
                 ),

@@ -5,6 +5,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_card.dart';
+import 'package:islamic_online_learning/features/curriculum/view/widget/lesson_shimmer.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/course_shimmer.dart';
 
 class AssignedCourseList extends ConsumerStatefulWidget {
@@ -29,6 +30,9 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
       final authState = ref.watch(authNotifierProvider);
       currentCourseIndex = authState.user?.group.courseNum ?? 0;
       lessonIndex = authState.user?.group.lessonNum ?? 0;
+      ref
+          .read(assignedCoursesNotifierProvider.notifier)
+          .changeExpandedCourse(currentCourseIndex!);
       setState(() {});
       // Scroll to current course
       // ref.listen<AssignedCoursesState>(
@@ -46,8 +50,18 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
 
   void _scrollToCurrentLesson(int currentLessonIndex, int currentCourseIndex) {
     if (_lessonScrollController.hasClients) {
+      final numOfDiscussions = ref
+          .read(assignedCoursesNotifierProvider.notifier)
+          .getNumOfDiscussionUpToIndex(currentLessonIndex, ref);
+      final numOfExams = ref
+          .read(assignedCoursesNotifierProvider.notifier)
+          .numOfExamsUpToIndex(currentLessonIndex, ref);
+      print("discussions: $numOfDiscussions");
+      print("exams: $numOfExams");
       final offset = (currentCourseIndex * 104.0) +
-          (currentLessonIndex * 158.0); // approx ListTile height
+          (currentLessonIndex * 123) +
+          (numOfDiscussions * 99.0) +
+          (numOfExams * 99.0);
       _lessonScrollController.animateTo(
         offset,
         duration: const Duration(milliseconds: 400),
@@ -73,7 +87,15 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
         () => _scrollToCurrentLesson(lessonIndex!, currentCourseIndex!),
       );
     }
-    
+
+    if (state.curriculum == null ||
+        state.curriculum!.assignedCourses == null ||
+        state.curriculum!.assignedCourses!.isEmpty) {
+      return Center(
+        child: Text("ምንም የለም"),
+      );
+    }
+
     return Expanded(
       child: ref.watch(assignedCoursesNotifierProvider).map(
             loading: (_) => ListView(
@@ -81,7 +103,7 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
                 Column(
                   children: List.generate(
                     10,
-                    (index) => CourseShimmer(),
+                    (index) => LessonShimmer(),
                   ),
                 ),
               ],
@@ -146,7 +168,7 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
                             isCurrentCourse: isCurrentCourse,
                             isFutureCourse: isFutureCourse,
                             assignedCourse:
-                                _.curriculum?.assignedCourses?[index - 1],
+                                _.curriculum!.assignedCourses![index - 1],
                           );
                         }
                       }),
@@ -166,9 +188,10 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
                   ),
                   IconButton(
                     onPressed: () async {
+                      scrollingDone = false;
                       await ref
-                          .read(curriculumNotifierProvider.notifier)
-                          .getCurriculums();
+                          .read(assignedCoursesNotifierProvider.notifier)
+                          .getCurriculum();
                     },
                     icon: Icon(Icons.refresh),
                   )

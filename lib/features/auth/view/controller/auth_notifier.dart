@@ -15,6 +15,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       state = state.copyWith(isLoading: true);
       final user = await authService.getMyInfo();
+      await getScores();
       state = state.copyWith(isLoading: false, user: user);
     } on ConnectivityException catch (err) {
       state = state.copyWith(isLoading: false, error: err.toString());
@@ -24,6 +25,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // toast("የእርስዎን መለያ ማግኘት አልተቻለም።", ToastType.error, context);
       state =
           state.copyWith(isLoading: false, error: "የእርስዎን መለያ ማግኘት አልተቻለም።");
+    }
+  }
+
+  Future<void> getScores() async {
+    try {
+      final scores = await authService.getScores();
+      state = state.copyWith(scores: scores);
+    } catch (err) {
+      print("Could not get scores");
+      print("err: ${err.toString()}");
     }
   }
 

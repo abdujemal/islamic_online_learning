@@ -4,6 +4,7 @@ import 'package:islamic_online_learning/features/curriculum/model/curriculum.dar
 class AssignedCoursesState {
   final bool isLoading, initial, isErrorAuth, isErrorPayment;
   final Curriculum? curriculum;
+  final int? expandedCourseOrder;
   final String? error;
 
   AssignedCoursesState({
@@ -12,6 +13,7 @@ class AssignedCoursesState {
     this.isErrorAuth = false,
     this.isErrorPayment = false,
     this.curriculum,
+    this.expandedCourseOrder,
     this.error,
   });
 
@@ -32,7 +34,7 @@ class AssignedCoursesState {
         curriculum!.assignedCourses != null &&
         curriculum!.assignedCourses!.isEmpty) {
       return empty(this);
-    }else if (!isLoading &&
+    } else if (!isLoading &&
         curriculum != null &&
         curriculum!.assignedCourses != null &&
         curriculum!.assignedCourses!.isNotEmpty) {
@@ -48,6 +50,7 @@ class AssignedCoursesState {
     bool? isErrorAuth,
     bool? isErrorPayment,
     Curriculum? curriculum,
+    int? expandedCourseOrder,
     String? error,
   }) {
     return AssignedCoursesState(
@@ -56,6 +59,7 @@ class AssignedCoursesState {
       curriculum: curriculum ?? this.curriculum,
       isErrorAuth: isErrorAuth ?? false,
       isErrorPayment: isErrorPayment ?? false,
+      expandedCourseOrder: expandedCourseOrder ?? this.expandedCourseOrder,
       error: error,
     );
   }

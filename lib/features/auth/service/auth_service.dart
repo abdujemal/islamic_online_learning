@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
+import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthService {
@@ -114,4 +115,20 @@ class AuthService {
       throw Exception('Failed to get your profile');
     }
   }
+
+  Future<List<Score>> getScores() async {
+    final response = await customGetRequest(
+      getScoresApi,
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      List<Score> score = Score.listFromJson(response.body);
+      return score; //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to get your profile');
+    }
+  }
+
 }

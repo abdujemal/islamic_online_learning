@@ -25,6 +25,7 @@ Future<http.Response> customGetRequest(String url,
     },
   );
   final parsed = jsonDecode(response.body);
+  print(parsed);
   if (response.statusCode == 403) {
     if (parsed["type"] == "auth") {
       throw AuthException("ይቅርታ መለያዎ ታግድዋል!");
@@ -61,7 +62,7 @@ Future<http.Response> customPostRequest(String url, Map<String, dynamic>? map,
         "authorization": "$token",
       }
     },
-    body: map != null ? jsonEncode(map): null,
+    body: map != null ? jsonEncode(map) : null,
   );
   handleErrors(response);
 

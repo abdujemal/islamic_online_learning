@@ -17,12 +17,15 @@ const String baseUrl = "https://ilmfelagi-pro-backend.onrender.com/api/v1";
 //sub apis
 const String curriculumsApi = "$baseUrl/curriculums/all";
 const String getCurriculumApi = "$baseUrl/curriculums";
+const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
 //auth
 const String requestOtpApi = "$baseUrl/auth/otp";
 const String verifyOtpApi = "$baseUrl/auth/otp/verify";
 const String similarGroupsApi = "$baseUrl/auth/user/groups";
 const String registerApi = "$baseUrl/auth/user";
 const String getMyInfoApi = "$baseUrl/auth/user/me";
+const String getScoresApi = "$baseUrl/auth/user/scores";
+
 
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 

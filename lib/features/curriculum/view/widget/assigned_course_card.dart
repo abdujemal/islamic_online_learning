@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/current_lesson_list.dart';
+import 'package:islamic_online_learning/features/curriculum/view/widget/past_lesson_list.dart';
 
 class AssignedCourseCard extends ConsumerStatefulWidget {
-  final AssignedCourse? assignedCourse;
+  final AssignedCourse assignedCourse;
   final bool isCurrentCourse;
   final bool isFutureCourse;
 
@@ -23,21 +25,23 @@ class AssignedCourseCard extends ConsumerStatefulWidget {
 }
 
 class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
-  
-
   @override
   Widget build(BuildContext context) {
-    if (widget.assignedCourse == null) {
-      return SizedBox();
-    }
+    // final coursesState = ref.watch(assignedCoursesNotifierProvider);
+
     return Column(
       children: [
         ExpansionTile(
+          enabled: true,
           shape: BeveledRectangleBorder(),
           onExpansionChanged: (value) {
-            if (widget.isFutureCourse) {
-            } else if (widget.isCurrentCourse) {
-            } else {}
+            if (!widget.isCurrentCourse && !widget.isFutureCourse) {
+              if (value) {
+                ref
+                    .read(pastLessonStateProvider.notifier)
+                    .getLessonForCourse(widget.assignedCourse.id);
+              }
+            }
           },
           initiallyExpanded: widget.isCurrentCourse,
           title: Padding(
@@ -79,7 +83,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                 SizedBox(
                   width: widget.isFutureCourse ? 16 : 5,
                 ),
-                if (widget.assignedCourse?.course?.image != null)
+                if (widget.assignedCourse.course?.image != null)
                   Container(
                     height: 50,
                     width: 50,
@@ -89,7 +93,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                       ),
                       image: DecorationImage(
                         image: CachedNetworkImageProvider(
-                          widget.assignedCourse!.course!.image,
+                          widget.assignedCourse.course!.image,
                         ),
                         fit: BoxFit.fill,
                       ),
@@ -101,7 +105,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                 ),
                 Expanded(
                   child: Text(
-                    widget.assignedCourse!.title,
+                    widget.assignedCourse.title,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -122,11 +126,9 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
               Text("ዝግ ነው! እዚህ ጋር ሲደርሱ ይከፈታል!"),
             ] else if (widget.isCurrentCourse) ...[
               CurrentLessonList()
-            ] else
-              ...[
-              
+            ] else ...[
+              PastLessonList()
             ]
-            
           ],
         ),
         Divider(

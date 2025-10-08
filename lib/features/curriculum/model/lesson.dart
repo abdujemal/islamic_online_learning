@@ -35,6 +35,11 @@ class Lesson {
     );
   }
 
+  static List<Lesson> listFromJson(String responseBody) {
+    final parsed = jsonDecode(responseBody) as List<dynamic>;
+    return parsed.map((json) => Lesson.fromMap(json)).toList();
+  }
+
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
@@ -59,7 +64,8 @@ class Lesson {
 
   String toJson() => json.encode(toMap());
 
-  factory Lesson.fromJson(String source) => Lesson.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Lesson.fromJson(String source) =>
+      Lesson.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -69,23 +75,22 @@ class Lesson {
   @override
   bool operator ==(covariant Lesson other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.order == order &&
-      other.title == title &&
-      other.audioUrl == audioUrl &&
-      other.assignedCourseId == assignedCourseId &&
-      other.curriculumId == curriculumId;
+
+    return other.id == id &&
+        other.order == order &&
+        other.title == title &&
+        other.audioUrl == audioUrl &&
+        other.assignedCourseId == assignedCourseId &&
+        other.curriculumId == curriculumId;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      order.hashCode ^
-      title.hashCode ^
-      audioUrl.hashCode ^
-      assignedCourseId.hashCode ^
-      curriculumId.hashCode;
+        order.hashCode ^
+        title.hashCode ^
+        audioUrl.hashCode ^
+        assignedCourseId.hashCode ^
+        curriculumId.hashCode;
   }
 }

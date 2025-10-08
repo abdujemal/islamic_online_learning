@@ -17,6 +17,8 @@ class Group {
   final String discussionDay;
   final String timeZone;
   final DateTime? startDate;
+  final DateTime? currStartDate;
+  final DateTime? courseStartDate;
   final DateTime createdAt;
   final int? noOfMembers;
   final List<Member>? members;
@@ -33,6 +35,8 @@ class Group {
     required this.discussionDay,
     required this.timeZone,
     this.startDate,
+    this.currStartDate,
+    this.courseStartDate,
     required this.createdAt,
     this.noOfMembers,
     this.members,
@@ -51,6 +55,8 @@ class Group {
     String? discussionDay,
     String? timeZone,
     DateTime? startDate,
+    DateTime? currStartDate,
+    DateTime? courseStartDate,
     DateTime? createdAt,
     int? noOfMembers,
     List<Member>? members,
@@ -68,11 +74,18 @@ class Group {
       discussionDay: discussionDay ?? this.discussionDay,
       timeZone: timeZone ?? this.timeZone,
       startDate: startDate ?? this.startDate,
+      currStartDate: currStartDate ?? this.currStartDate,
+      courseStartDate: courseStartDate ?? this.courseStartDate,
       createdAt: createdAt ?? this.createdAt,
       noOfMembers: noOfMembers ?? this.noOfMembers,
       members: members ?? this.members,
       groupUpdateRequest: groupUpdateRequest ?? this.groupUpdateRequest,
     );
+  }
+
+  static List<Group> listFromJson(String responseBody) {
+    final parsed = jsonDecode(responseBody) as List<dynamic>;
+    return parsed.map((json) => Group.fromMap(json)).toList();
   }
 
   Map<String, dynamic> toMap() {
@@ -87,17 +100,14 @@ class Group {
       'discussionTime': discussionTime,
       'discussionDay': discussionDay,
       'timeZone': timeZone,
-      'startDate': startDate?.millisecondsSinceEpoch,
-      'createdAt': createdAt.millisecondsSinceEpoch,
+      'startDate': startDate,
+      'currStartDate': currStartDate,
+      'courseStartDate': courseStartDate,
+      'createdAt': createdAt,
       'noOfMembers': noOfMembers,
       'members': members?.map((x) => x.toMap()).toList(),
       'groupUpdateRequest': groupUpdateRequest?.toMap(),
     };
-  }
-
-  static List<Group> listFromJson(String responseBody) {
-    final parsed = jsonDecode(responseBody) as List<dynamic>;
-    return parsed.map((json) => Group.fromMap(json)).toList();
   }
 
   factory Group.fromMap(Map<String, dynamic> map) {
@@ -115,9 +125,15 @@ class Group {
       startDate: map['startDate'] != null
           ? DateTime.parse(map['startDate'] as String)
           : null,
+      currStartDate: map['currStartDate'] != null
+          ? DateTime.parse(map['currStartDate'] as String)
+          : null,
+      courseStartDate: map['courseStartDate'] != null
+          ? DateTime.parse(map['courseStartDate'] as String)
+          : null,
       createdAt: DateTime.parse(map['createdAt'] as String),
       noOfMembers:
-          map['_count'] != null ? map['_count']["members"] as int : null,
+          map['noOfMembers'] != null ? map['noOfMembers'] as int : null,
       members: map['members'] != null
           ? List<Member>.from(
               (map['members'] as List<dynamic>).map<Member?>(
@@ -139,7 +155,7 @@ class Group {
 
   @override
   String toString() {
-    return 'Group(id: $id, name: $name, lessonNum: $lessonNum, courseNum: $courseNum, curriculumId: $curriculumId, gender: $gender, ageGroup: $ageGroup, discussionTime: $discussionTime, discussionDay: $discussionDay, timeZone: $timeZone, startDate: $startDate, createdAt: $createdAt, noOfMembers: $noOfMembers, members: $members, groupUpdateRequest: $groupUpdateRequest)';
+    return 'Group(id: $id, name: $name, lessonNum: $lessonNum, courseNum: $courseNum, curriculumId: $curriculumId, gender: $gender, ageGroup: $ageGroup, discussionTime: $discussionTime, discussionDay: $discussionDay, timeZone: $timeZone, startDate: $startDate, currStartDate: $currStartDate, courseStartDate: $courseStartDate, createdAt: $createdAt, noOfMembers: $noOfMembers, members: $members, groupUpdateRequest: $groupUpdateRequest)';
   }
 
   @override
@@ -157,6 +173,8 @@ class Group {
         other.discussionDay == discussionDay &&
         other.timeZone == timeZone &&
         other.startDate == startDate &&
+        other.currStartDate == currStartDate &&
+        other.courseStartDate == courseStartDate &&
         other.createdAt == createdAt &&
         other.noOfMembers == noOfMembers &&
         listEquals(other.members, members) &&
@@ -176,6 +194,8 @@ class Group {
         discussionDay.hashCode ^
         timeZone.hashCode ^
         startDate.hashCode ^
+        currStartDate.hashCode ^
+        courseStartDate.hashCode ^
         createdAt.hashCode ^
         noOfMembers.hashCode ^
         members.hashCode ^

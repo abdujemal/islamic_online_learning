@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthState {
   final bool isLoading, initial, courseStarted;
   final User? user;
+  final List<Score>? scores;
   final String? error;
 
   AuthState({
     this.isLoading = false,
     this.initial = true,
     this.courseStarted = false,
+    this.scores,
     this.user,
     this.error,
   });
@@ -32,11 +35,11 @@ class AuthState {
     }
   }
 
-
   AuthState copyWith({
     bool? isLoading,
     bool? courseStarted,
     User? user,
+    List<Score>? scores,
     String? error,
   }) {
     return AuthState(
@@ -44,6 +47,7 @@ class AuthState {
       courseStarted: courseStarted ?? this.courseStarted,
       isLoading: isLoading ?? this.isLoading,
       user: user ?? this.user,
+      scores: scores ?? this.scores,
       error: error,
     );
   }

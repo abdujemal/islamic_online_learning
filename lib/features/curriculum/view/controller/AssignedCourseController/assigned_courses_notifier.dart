@@ -25,6 +25,14 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     }
   }
 
+  void changeExpandedCourse(int order) {
+    if (state.expandedCourseOrder == order) {
+      state = state.copyWith(expandedCourseOrder: null);
+    } else {
+      state = state.copyWith(expandedCourseOrder: order);
+    }
+  }
+
   double getProgress(WidgetRef ref) {
     double progress = 0;
     final authState = ref.read(authNotifierProvider);
@@ -39,10 +47,64 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     return progress;
   }
 
+  int getNumOfDiscussionUpToIndex(int lessonIndex, WidgetRef ref) {
+    final authState = ref.read(authNotifierProvider);
+
+    DateTime startDate =
+        authState.user?.group.courseStartDate ?? DateTime.now();
+
+    DateTime lastLessonDay =
+        startDate.add(Duration(days: 4 - startDate.weekday));
+
+    int noOfLessonsIn1stWeek = lastLessonDay.difference(startDate).inDays + 1;
+
+    int totalNumOfLesson = lessonIndex + 1;
+
+    if (totalNumOfLesson == 0) {
+      return 0;
+    }
+
+    int withOutRemainder =
+        ((totalNumOfLesson - noOfLessonsIn1stWeek) / 4).floor();
+
+    bool hasRemainder = (totalNumOfLesson - noOfLessonsIn1stWeek) % 4 != 0;
+
+    // print("startDate: ${startDate.weekday}");
+    // print("lastLessonDay: ${lastLessonDay.weekday.toString()}");
+    // print("noOfLessonsIn1stWeek: $noOfLessonsIn1stWeek");
+    // print("remainderAtTheLast: $remainderAtTheLast");
+    // print("withOutRemainder: $withOutRemainder");
+    if (hasRemainder) {
+      return withOutRemainder + 1;
+    } else {
+      return withOutRemainder;
+    }
+  }
+
+  int numOfExamsUpToIndex(int index, WidgetRef ref) {
+    int numOfDiscussions = getNumOfDiscussionUpToIndex(index, ref);
+    return (numOfDiscussions / 4).floor();
+  }
+
+  bool isThisDiscussionHasExam(int discussionIndex, WidgetRef ref) {
+    int noOfDiscussions = getDiscussionNumOfCurrentCourse(ref);
+
+    int reminder = noOfDiscussions % 4;
+
+    if (discussionIndex % 4 == 0) {
+      return true;
+    } else if (reminder != 0 && discussionIndex == noOfDiscussions) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   bool isIndexDiscussion(int index, WidgetRef ref) {
     final authState = ref.read(authNotifierProvider);
 
-    DateTime startDate = authState.user?.group.startDate ?? DateTime.now();
+    DateTime startDate =
+        authState.user?.group.courseStartDate ?? DateTime.now();
 
     DateTime lastLessonDay =
         startDate.add(Duration(days: 4 - startDate.weekday));
@@ -89,6 +151,36 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     }
   }
 
+  bool isTodayExamDay() {
+    DateTime today = DateTime.now();
+    return today.weekday == DateTime.monday;
+  }
+
+  ExamData getExamData(List<DiscussionData> discussions, WidgetRef ref) {
+    //get exam data for the all the discussions that it holds
+    discussions.sort((a, b) => a.lessonFrom.compareTo(b.lessonFrom));
+    final lessons = state.curriculum?.lessons ?? [];
+
+    if (discussions.isEmpty || lessons.isEmpty) {
+      return ExamData(
+        title: "ምንም ውልውል የለም",
+        lessonFrom: 0,
+        lessonTo: 0,
+        discussionIndex: 0,
+      );
+    } else {
+      final startLesson = lessons[discussions[0].lessonFrom];
+      final endLesson = lessons[discussions.last.lessonTo];
+      return ExamData(
+        title:
+            "ከ${startLesson.title}${startLesson.order} እስክ ${endLesson.title}${endLesson.order} ድረስ",
+        lessonFrom: discussions[0].lessonFrom,
+        lessonTo: discussions.last.lessonTo,
+        discussionIndex: discussions.last.discussionIndex,
+      );
+    }
+  }
+
   DiscussionData getDiscussionData(int index, int realIndex, WidgetRef ref) {
     final lessons = state.curriculum?.lessons ?? [];
     if (realIndex < 5) {
@@ -109,7 +201,8 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     } else {
       final authState = ref.read(authNotifierProvider);
 
-      DateTime startDate = authState.user?.group.startDate ?? DateTime.now();
+      DateTime startDate =
+          authState.user?.group.courseStartDate ?? DateTime.now();
 
       DateTime lastLessonDay =
           startDate.add(Duration(days: 4 - startDate.weekday));
@@ -122,9 +215,11 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
       int firstLessonIndexOfLastWeek = remainderAtTheLast - 1;
 
+      int lessonIndex = realIndex - firstLessonIndexOfLastWeek;
+
       return DiscussionData(
         title:
-            "ከ${lessons[realIndex - firstLessonIndexOfLastWeek].title} እስክ ${lessons[realIndex].title}",
+            "ከ${lessons[lessonIndex > lessons.length ? lessons.length - 1 : lessonIndex].title} እስክ ${lessons[realIndex].title}",
         lessonFrom: realIndex - firstLessonIndexOfLastWeek,
         lessonTo: realIndex,
         discussionIndex: index,
@@ -135,7 +230,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
   int getDiscussionNumOfCurrentCourse(WidgetRef ref) {
     final authState = ref.read(authNotifierProvider);
 
-    DateTime startDate = authState.user?.group.startDate ?? DateTime.now();
+    DateTime startDate = authState.user!.group.courseStartDate!;
 
     DateTime lastLessonDay =
         startDate.add(Duration(days: 4 - startDate.weekday));
@@ -150,13 +245,16 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
     int withOutRemainder =
         ((totalNumOfLesson - noOfLessonsIn1stWeek) / 4).floor();
+
     int remainderAtTheLast = (totalNumOfLesson - noOfLessonsIn1stWeek) % 4;
 
-    // print("startDate: ${startDate.weekday}");
-    // print("lastLessonDay: ${lastLessonDay.weekday.toString()}");
-    // print("noOfLessonsIn1stWeek: $noOfLessonsIn1stWeek");
-    // print("remainderAtTheLast: $remainderAtTheLast");
-    // print("withOutRemainder: $withOutRemainder");
+    // print("_______________");
+    // print("startDate:: ${startDate.weekday}");
+    // print("lastLessonDay:: ${lastLessonDay.weekday.toString()}");
+    // print("noOfLessonsIn1stWeek:: $noOfLessonsIn1stWeek");
+    // print("remainderAtTheLast:: $remainderAtTheLast");
+    // print("withOutRemainder:: $withOutRemainder");
+    // print("_______________");
 
     if (remainderAtTheLast == 0) {
       return withOutRemainder + 1;
@@ -172,6 +270,19 @@ class DiscussionData {
   final int lessonTo;
   final int discussionIndex;
   DiscussionData({
+    required this.title,
+    required this.lessonFrom,
+    required this.lessonTo,
+    required this.discussionIndex,
+  });
+}
+
+class ExamData {
+  final String title;
+  final int lessonFrom;
+  final int lessonTo;
+  final int discussionIndex;
+  ExamData({
     required this.title,
     required this.lessonFrom,
     required this.lessonTo,
