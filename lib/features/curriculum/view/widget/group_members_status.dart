@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
-import 'package:islamic_online_learning/features/curriculum/view/widget/discussion_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/user_with_group_display.dart';
 
 class GroupMembersStatus extends ConsumerStatefulWidget {

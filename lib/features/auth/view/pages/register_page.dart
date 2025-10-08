@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/core/lib/pref_consts.dart';
-import 'package:islamic_online_learning/features/auth/model/user.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
-import 'package:islamic_online_learning/features/auth/view/controller/register_state.dart';
 import 'package:islamic_online_learning/features/auth/view/widget/add_new_group.dart';
 import 'package:islamic_online_learning/features/auth/view/widget/group_card.dart';
-import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   final String otpId;

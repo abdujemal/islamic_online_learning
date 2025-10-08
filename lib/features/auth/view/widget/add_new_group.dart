@@ -21,7 +21,7 @@ class _AddNewGroupState extends ConsumerState<AddNewGroup> {
   final GlobalKey<FormState> _groupKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(registerNotifierProvider);
+    // final state = ref.watch(registerNotifierProvider);
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 15,

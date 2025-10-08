@@ -6,7 +6,6 @@ import 'package:islamic_online_learning/features/auth/view/controller/provider.d
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/lesson_shimmer.dart';
-import 'package:islamic_online_learning/features/main/presentation/widgets/course_shimmer.dart';
 
 class AssignedCourseList extends ConsumerStatefulWidget {
   const AssignedCourseList({super.key});
