@@ -1,10 +1,16 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
+
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthState {
   final bool isLoading, initial, courseStarted;
   final User? user;
+  final CourseRelatedData? courseRelatedData;
   final List<Score>? scores;
   final String? error;
 
@@ -15,6 +21,7 @@ class AuthState {
     this.scores,
     this.user,
     this.error,
+    this.courseRelatedData,
   });
 
   Widget map({
@@ -41,6 +48,7 @@ class AuthState {
     User? user,
     List<Score>? scores,
     String? error,
+    CourseRelatedData? courseRelatedData,
   }) {
     return AuthState(
       initial: false,
@@ -49,6 +57,8 @@ class AuthState {
       user: user ?? this.user,
       scores: scores ?? this.scores,
       error: error,
+      courseRelatedData: courseRelatedData ?? this.courseRelatedData,
     );
   }
 }
+

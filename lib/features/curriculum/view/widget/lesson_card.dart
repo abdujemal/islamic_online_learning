@@ -25,12 +25,25 @@ class LessonCard extends ConsumerStatefulWidget {
 }
 
 class _LessonCardState extends ConsumerState<LessonCard> {
+   final GlobalKey _key = GlobalKey();
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     final box = _key.currentContext?.findRenderObject() as RenderBox?;
+  //     if (box != null) {
+  //       print("Lesson card: ${box.size.height}");
+  //     }
+  //   });
+  // }
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
     final score = Score.get(ScoreNames.Lesson, ref, authState.scores ?? []);
     return Container(
+      key: _key,
       margin: EdgeInsets.only(
         top: 10,
       ),
@@ -71,6 +84,7 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                                   ),
                                   Text(
                                     widget.lesson.title,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,

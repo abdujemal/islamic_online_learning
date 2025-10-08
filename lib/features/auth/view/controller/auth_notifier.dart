@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
@@ -38,15 +40,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> getMyCourseInfo() async {
+    try {
+      final courseRelatedData = await authService.getMyCourseInfo();
+      state = state.copyWith(courseRelatedData: courseRelatedData);
+    } catch (err) {
+      print("Could not get course data");
+      print("err: ${err.toString()}");
+    }
+  }
+
   Future<void> logout() async {
     state = state.copyWith(user: null);
   }
 
   Future<bool> checkIfTheCourseStarted(BuildContext context) async {
-    await getMyInfo(context);
-    if (state.user?.group.startDate != null) {
-      ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum();
+    getMyInfo(context);
+    await getMyCourseInfo();
+    if (state.courseRelatedData?.courseStartDate != null) {
       state = state.copyWith(courseStarted: true);
+      ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum();
       return true;
     } else {
       return false;

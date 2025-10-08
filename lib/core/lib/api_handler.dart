@@ -91,7 +91,7 @@ void handleErrors(http.Response response) {
 Future<String?> getToken() async {
   final pref = await SharedPreferences.getInstance();
   final token = pref.getString(PrefConsts.token);
-  // print("token: $token");
+  print("token: $token");
   return token;
 }
 

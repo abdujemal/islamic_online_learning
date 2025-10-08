@@ -25,6 +25,19 @@ class AssignedCourseCard extends ConsumerStatefulWidget {
 }
 
 class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
+  final GlobalKey _key = GlobalKey();
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     final box = _key.currentContext?.findRenderObject() as RenderBox?;
+  //     if (box != null) {
+  //       print("Course card: ${box.size.height}");
+  //     }
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     // final coursesState = ref.watch(assignedCoursesNotifierProvider);
@@ -35,6 +48,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
           enabled: true,
           shape: BeveledRectangleBorder(),
           onExpansionChanged: (value) {
+            // ref.read(assignedCoursesNotifierProvider.notifier).changeExpandedCourse(widget.assignedCourse!.order);
             if (!widget.isCurrentCourse && !widget.isFutureCourse) {
               if (value) {
                 ref
@@ -106,6 +120,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                 Expanded(
                   child: Text(
                     widget.assignedCourse.title,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,

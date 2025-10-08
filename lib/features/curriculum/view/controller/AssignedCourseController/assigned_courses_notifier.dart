@@ -173,7 +173,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       final endLesson = lessons[discussions.last.lessonTo];
       return ExamData(
         title:
-            "ከ${startLesson.title}${startLesson.order} እስክ ${endLesson.title}${endLesson.order} ድረስ",
+            "ከ${startLesson.title} እስክ ${endLesson.title} ድረስ",
         lessonFrom: discussions[0].lessonFrom,
         lessonTo: discussions.last.lessonTo,
         discussionIndex: discussions.last.discussionIndex,

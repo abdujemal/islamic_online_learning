@@ -33,7 +33,7 @@ class _ExamCardState extends ConsumerState<ExamCard> {
     final authState = ref.watch(authNotifierProvider);
     final score =
         Score.get(ScoreNames.IndividualAssignment, ref, authState.scores ?? []);
-    
+
     return Container(
       // key:_key,
       margin: EdgeInsets.only(
@@ -78,6 +78,7 @@ class _ExamCardState extends ConsumerState<ExamCard> {
                                     widget.isLastExam
                                         ? "ሙሉ ኪታቡን"
                                         : widget.examData.title,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,

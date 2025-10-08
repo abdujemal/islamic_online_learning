@@ -59,8 +59,8 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
       print("exams: $numOfExams");
       final offset = (currentCourseIndex * 104.0) +
           (currentLessonIndex * 123) +
-          (numOfDiscussions * 99.0) +
-          (numOfExams * 99.0);
+          (numOfDiscussions * 76.0) +
+          (numOfExams * 76.0);
       _lessonScrollController.animateTo(
         offset,
         duration: const Duration(milliseconds: 400),
@@ -87,13 +87,11 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
       );
     }
 
-    if (state.curriculum == null ||
-        state.curriculum!.assignedCourses == null ||
-        state.curriculum!.assignedCourses!.isEmpty) {
-      return Center(
-        child: Text("ምንም የለም"),
-      );
-    }
+    // if (state.i) {
+    //   return Center(
+    //     child: Text("ምንም የለም"),
+    //   );
+    // }
 
     return Expanded(
       child: ref.watch(assignedCoursesNotifierProvider).map(

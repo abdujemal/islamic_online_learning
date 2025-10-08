@@ -34,12 +34,26 @@ class DiscussionCard extends ConsumerStatefulWidget {
 }
 
 class _DiscussionCardState extends ConsumerState<DiscussionCard> {
+  final GlobalKey _key = GlobalKey();
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     final box = _key.currentContext?.findRenderObject() as RenderBox?;
+  //     if (box != null) {
+  //       print("Discussion card: ${box.size.height}");
+  //     }
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
     final score = Score.get(ScoreNames.Discussion, ref, authState.scores ?? []);
     return Column(
+      key: _key,
       children: [
         Container(
           // key:_key,
@@ -84,6 +98,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                                       ),
                                       Text(
                                         widget.discussionData.title,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
