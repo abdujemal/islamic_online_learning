@@ -29,7 +29,7 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
         if (token != null && curriculumId != null) {
           ref
               .read(authNotifierProvider.notifier)
-              .checkIfTheCourseStarted(context);
+              .checkIfTheCourseStarted(ref);
         }
 
         ref.read(authNotifierProvider.notifier).unfinishedRegistration(

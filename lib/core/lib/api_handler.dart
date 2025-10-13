@@ -8,7 +8,7 @@ import "package:shared_preferences/shared_preferences.dart";
 
 Future<http.Response> customGetRequest(String url,
     {bool authorized = false}) async {
-  print("GET $url");
+  print("GET ${Uri.parse(url)}");
   final connectivityResult = await (Connectivity().checkConnectivity());
   if (connectivityResult.contains(ConnectivityResult.none)) {
     throw ConnectivityException("እባክዎ ኢንተርኔት ያብሩ!");
@@ -49,7 +49,7 @@ Future<http.Response> customGetRequest(String url,
 Future<http.Response> customPostRequest(String url, Map<String, dynamic>? map,
     {bool authorized = false}) async {
   print("POST $url");
-  print("res body $map");
+  print("req body $map");
 
   final token = await getToken();
 
@@ -64,6 +64,8 @@ Future<http.Response> customPostRequest(String url, Map<String, dynamic>? map,
     },
     body: map != null ? jsonEncode(map) : null,
   );
+  print("res body ${response.body}");
+
   handleErrors(response);
 
   return response;

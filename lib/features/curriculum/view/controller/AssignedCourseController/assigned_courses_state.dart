@@ -40,7 +40,6 @@ class AssignedCoursesState {
         curriculum!.assignedCourses!.isNotEmpty) {
       return loaded(this);
     } else {
-      print("yep");
       return SizedBox();
     }
   }

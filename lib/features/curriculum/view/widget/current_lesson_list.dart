@@ -23,7 +23,7 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
     List<DiscussionData> discussionInUpToExam = [];
     final state = ref.watch(assignedCoursesNotifierProvider);
     final authState = ref.watch(authNotifierProvider);
-    final currentLessonIndex = authState.user?.group.lessonNum ?? 0;
+    final currentLessonIndex = authState.courseRelatedData?.lessonNum ?? 0;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(

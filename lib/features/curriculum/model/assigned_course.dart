@@ -7,6 +7,7 @@ class AssignedCourse {
   final String title;
   final int order;
   final String description;
+  final String curriculumId;
   final Course? course;
   AssignedCourse({
     required this.id,
@@ -14,6 +15,7 @@ class AssignedCourse {
     required this.title,
     required this.order,
     required this.description,
+    required this.curriculumId,
     this.course,
   });
 
@@ -23,11 +25,13 @@ class AssignedCourse {
     String? title,
     int? order,
     String? description,
+    String? curriculumId,
     Course? course,
   }) {
     return AssignedCourse(
       id: id ?? this.id,
       courseId: courseId ?? this.courseId,
+      curriculumId: curriculumId ?? this.curriculumId,
       title: title ?? this.title,
       order: order ?? this.order,
       description: description ?? this.description,
@@ -42,22 +46,26 @@ class AssignedCourse {
       'title': title,
       'order': order,
       'description': description,
-      'course': course?.toMap(),
+      "curriculumId": curriculumId,
+      'Course': course != null ? jsonEncode(course!.toMap()) : null,
     };
   }
 
-  factory AssignedCourse.fromMap(Map<String, dynamic> map) {
+  factory AssignedCourse.fromMap(Map<String, dynamic> map,
+      {bool fromDb = false}) {
     return AssignedCourse(
       id: map['id'] as String,
       courseId: map['courseId'] as int,
       title: map['title'] as String,
       order: map['order'] as int,
       description: map['description'] as String,
+      curriculumId: map["curriculumId"] as String,
       course: map['Course'] != null
-          ? Course.fromMap(
-              map['Course'] as Map<String, dynamic>,
-             
-            )
+          ? fromDb
+              ? Course.fromJson(map['Course'] as String)
+              : Course.fromMap(
+                  map['Course'] as Map<String, dynamic>,
+                )
           : null,
     );
   }
@@ -69,7 +77,7 @@ class AssignedCourse {
 
   @override
   String toString() {
-    return 'AssignedCourse(id: $id, courseId: $courseId, title: $title, order: $order, description: $description, course: $course)';
+    return 'AssignedCourse(id: $id, courseId: $courseId, curriculumId: $curriculumId, title: $title, order: $order, description: $description, course: $course)';
   }
 
   @override
@@ -81,6 +89,7 @@ class AssignedCourse {
         other.title == title &&
         other.order == order &&
         other.description == description &&
+        other.curriculumId == curriculumId&&
         other.course == course;
   }
 
@@ -90,6 +99,7 @@ class AssignedCourse {
         courseId.hashCode ^
         title.hashCode ^
         order.hashCode ^
+        curriculumId.hashCode ^
         description.hashCode ^
         course.hashCode;
   }
@@ -129,7 +139,8 @@ class Course {
 
   String toJson() => json.encode(toMap());
 
-  factory Course.fromJson(String source) => Course.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Course.fromJson(String source) =>
+      Course.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() => 'Course(pdfId: $pdfId, image: $image)';
@@ -137,10 +148,8 @@ class Course {
   @override
   bool operator ==(covariant Course other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.pdfId == pdfId &&
-      other.image == image;
+
+    return other.pdfId == pdfId && other.image == image;
   }
 
   @override

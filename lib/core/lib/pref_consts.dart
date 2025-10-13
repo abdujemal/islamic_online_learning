@@ -8,4 +8,5 @@ class PrefConsts {
   static final String isSubed = "isSubed";
   static final String theme = "theme";
   static final String showBeginner = "showBeginner";
+  static final String curriculumDate = "curriculum_date";
 }

@@ -1,12 +1,22 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
+import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
+import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
+import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
+import 'package:islamic_online_learning/features/curriculum/service/curriculum_db_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CurriculumService {
   Future<List<Curriculum>> fetchCurriculums() async {
-    final response = await customGetRequest(curriculumsApi);
+    final response = await customGetRequest(
+      curriculumsApi,
+      authorized: true,
+    );
 
     if (response.statusCode == 200) {
       return Curriculum.listFromJson(response.body);
@@ -17,19 +27,98 @@ class CurriculumService {
     }
   }
 
-  Future<Curriculum> fetchCurriculum() async {
-    final response = await customGetRequest(
+  // Future<void> loadDb() async {
+  //   final currsFromDb =
+  //       await CurriculumDbHelper.instance.getCurriculumWithDetails(
+  //     "cddc8507-fc3f-4e55-97a1-bca5aef0c93e",
+  //     0,
+  //   );
+  //   print("currsFromDb: $currsFromDb");
+  // }
+
+  Future<CurriculumNGroup> fetchCurriculum() async {
+    final pref = await SharedPreferences.getInstance();
+    // await pref.remove(PrefConsts.curriculumDate);
+    // loadDb();
+    final dateTime =
+        pref.getString(PrefConsts.curriculumDate) ?? DateTime(2017).toString();
+
+    final response = await customPostRequest(
       getCurriculumApi,
+      {
+        "date": dateTime,
+      },
       authorized: true,
     );
 
     if (response.statusCode == 200) {
-      final parsed = jsonDecode(response.body) as Map<String, dynamic>;
-      return Curriculum.fromMap(parsed["currentCurriculum"]);
+      final currNGroup = CurriculumNGroup.fromJson(response.body);
+      // return currNGroup;
+      if (currNGroup.curriculum != null) {
+        await pref.setString(
+            PrefConsts.curriculumDate, currNGroup.curriculum!.updatedOn);
+       
+        await CurriculumDbHelper.instance
+            .insertCurriculum(currNGroup.curriculum!.toMap());
+        for (AssignedCourse course
+            in currNGroup.curriculum!.assignedCourses ?? []) {
+          await CurriculumDbHelper.instance
+              .insertAssignedCourse(course.toMap());
+        }
+        for (Lesson lesson in currNGroup.curriculum!.lessons ?? []) {
+          await CurriculumDbHelper.instance.insertLesson(lesson.toMap());
+        }
+
+        return currNGroup;
+      } else {
+        final currsFromDb =
+            await CurriculumDbHelper.instance.getCurriculumWithDetails(
+          currNGroup.group.curriculumId,
+          currNGroup.group.courseNum,
+        );
+        print("currsFromDb: $currsFromDb");
+
+        return CurriculumNGroup(
+          curriculum: currsFromDb != null
+              ? Curriculum.fromMap(currsFromDb, fromDb: true)
+              : null,
+          group: currNGroup.group,
+        );
+      }
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
       throw Exception('Failed to load curriculum');
     }
   }
+}
+
+class CurriculumNGroup {
+  final Curriculum? curriculum;
+  final CourseRelatedData group;
+  CurriculumNGroup({
+    required this.curriculum,
+    required this.group,
+  });
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'curriculum': curriculum?.toMap(),
+      'group': group.toMap(),
+    };
+  }
+
+  factory CurriculumNGroup.fromMap(Map<String, dynamic> map) {
+    return CurriculumNGroup(
+      curriculum: map['currentCurriculum'] != null
+          ? Curriculum.fromMap(map['currentCurriculum'] as Map<String, dynamic>)
+          : null,
+      group: CourseRelatedData.fromMap(map['group'] as Map<String, dynamic>),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory CurriculumNGroup.fromJson(String source) =>
+      CurriculumNGroup.fromMap(json.decode(source) as Map<String, dynamic>);
 }

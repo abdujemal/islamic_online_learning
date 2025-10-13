@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
 import 'package:islamic_online_learning/features/auth/service/auth_service.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/register_page.dart';
@@ -40,13 +39,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> getMyCourseInfo() async {
+  void setCourseRelatedData(CourseRelatedData data) async {
+    print("Setting course related data: $data");
+    state = state.copyWith(courseRelatedData: data);
+  }
+
+  Future<bool?> hasCourseStarted() async {
     try {
-      final courseRelatedData = await authService.getMyCourseInfo();
-      state = state.copyWith(courseRelatedData: courseRelatedData);
+      final yes = await authService.hasCourseStarted();
+      return yes;
     } catch (err) {
       print("Could not get course data");
       print("err: ${err.toString()}");
+      return null;
     }
   }
 
@@ -54,12 +59,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(user: null);
   }
 
-  Future<bool> checkIfTheCourseStarted(BuildContext context) async {
-    getMyInfo(context);
-    await getMyCourseInfo();
-    if (state.courseRelatedData?.courseStartDate != null) {
+  Future<bool> checkIfTheCourseStarted(WidgetRef ref) async {
+    getMyInfo(ref.context);
+    final started = await hasCourseStarted();
+    if (started == true) {
       state = state.copyWith(courseStarted: true);
-      ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum();
+      ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum(ref);
       return true;
     } else {
       return false;

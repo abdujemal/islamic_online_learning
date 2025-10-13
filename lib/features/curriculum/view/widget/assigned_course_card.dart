@@ -43,6 +43,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
     // final coursesState = ref.watch(assignedCoursesNotifierProvider);
 
     return Column(
+      key: _key,
       children: [
         ExpansionTile(
           enabled: true,

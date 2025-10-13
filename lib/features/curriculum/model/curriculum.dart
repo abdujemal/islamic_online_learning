@@ -10,6 +10,7 @@ class Curriculum {
   final String id;
   final String title;
   final String description;
+  final String updatedOn;
   final bool active;
   final bool prerequisite;
   final int level;
@@ -22,6 +23,7 @@ class Curriculum {
     required this.active,
     required this.prerequisite,
     required this.level,
+    required this.updatedOn,
     this.assignedCourses,
     this.lessons,
   });
@@ -30,6 +32,7 @@ class Curriculum {
     String? id,
     String? title,
     String? description,
+    String? updatedOn,
     bool? active,
     bool? prerequisite,
     int? level,
@@ -40,6 +43,7 @@ class Curriculum {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
+      updatedOn: updatedOn ?? this.updatedOn,
       active: active ?? this.active,
       prerequisite: prerequisite ?? this.prerequisite,
       level: level ?? this.level,
@@ -53,31 +57,38 @@ class Curriculum {
       'id': id,
       'title': title,
       'description': description,
-      'active': active,
-      'prerequisite': prerequisite,
+      'active': active ? 1 : 0,
+      'prerequisite': prerequisite ? 1 : 0,
       'level': level,
-      'assignedCourses': assignedCourses?.map((x) => x.toMap()).toList(),
-      'lessons': lessons?.map((x) => x.toMap()).toList(),
+      'updatedOn': updatedOn,
+      // 'assignedCourses': assignedCourses?.map((x) => x.toMap()).toList(),
+      // 'lessons': lessons?.map((x) => x.toMap()).toList(),
     };
   }
 
-  static List<Curriculum> listFromJson(String responseBody) {
+  static List<Curriculum> listFromJson(String responseBody,
+      {bool fromDb = false}) {
     final parsed = jsonDecode(responseBody) as List<dynamic>;
     return parsed.map((json) => Curriculum.fromMap(json)).toList();
   }
 
-  factory Curriculum.fromMap(Map<String, dynamic> map) {
+  factory Curriculum.fromMap(Map<String, dynamic> map, {bool fromDb = false}) {
     return Curriculum(
       id: map['id'] as String,
       title: map['title'] as String,
       description: map['description'] as String,
-      active: map['active'] as bool,
-      prerequisite: map['prerequisite'] as bool,
+      updatedOn: map['updatedOn'] as String,
+      active:
+          fromDb ? (map["active"] == 1 ? true : false) : map['active'] as bool,
+      prerequisite: fromDb
+          ? (map["prerequisite"] == 1 ? true : false)
+          : map['prerequisite'] as bool,
       level: map['level'] as int,
       assignedCourses: map['assignedCourses'] != null
           ? List<AssignedCourse>.from(
               (map['assignedCourses'] as List<dynamic>).map<AssignedCourse>(
-                (x) => AssignedCourse.fromMap(x as Map<String, dynamic>),
+                (x) => AssignedCourse.fromMap(x as Map<String, dynamic>,
+                    fromDb: fromDb),
               ),
             )
           : null,
@@ -98,7 +109,7 @@ class Curriculum {
 
   @override
   String toString() {
-    return 'Curriculum(id: $id, title: $title, description: $description, active: $active, prerequisite: $prerequisite, level: $level, assignedCourses: $assignedCourses, lessons: $lessons)';
+    return 'Curriculum(id: $id, title: $title, updatedOn: $updatedOn, description: $description, active: $active, prerequisite: $prerequisite, level: $level, assignedCourses: $assignedCourses, lessons: $lessons)';
   }
 
   @override
@@ -111,6 +122,7 @@ class Curriculum {
         other.active == active &&
         other.prerequisite == prerequisite &&
         other.level == level &&
+        other.updatedOn == updatedOn &&
         listEquals(other.assignedCourses, assignedCourses) &&
         listEquals(other.lessons, lessons);
   }
@@ -124,6 +136,7 @@ class Curriculum {
         prerequisite.hashCode ^
         level.hashCode ^
         assignedCourses.hashCode ^
+        updatedOn.hashCode ^
         lessons.hashCode;
   }
 }

@@ -46,7 +46,7 @@ class _UserWithGroupDisplayState extends ConsumerState<UserWithGroupDisplay> {
                 onPressed: () {
                   ref
                       .read(authNotifierProvider.notifier)
-                      .checkIfTheCourseStarted(context);
+                      .checkIfTheCourseStarted(ref);
                 },
                 icon: Icon(Icons.refresh),
               ),

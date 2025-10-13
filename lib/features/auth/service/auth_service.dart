@@ -2,11 +2,9 @@ import 'dart:convert';
 
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
-import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
-import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 
 class AuthService {
   Future<void> sendOtpRequest(String phone) async {
@@ -118,14 +116,15 @@ class AuthService {
     }
   }
 
-  Future<CourseRelatedData> getMyCourseInfo() async {
+  Future<bool> hasCourseStarted() async {
     final response = await customGetRequest(
       getMyCourseInfoApi,
       authorized: true,
     );
     if (response.statusCode == 200) {
-      CourseRelatedData data = CourseRelatedData.fromJson(response.body);
-      return data;
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      print("course data $data");
+      return data["group"]["courseStartDate"] != null; //token
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
@@ -147,5 +146,4 @@ class AuthService {
       throw Exception('Failed to get your profile');
     }
   }
-
 }

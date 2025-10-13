@@ -10,11 +10,17 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
   AssignedCoursesNotifier(this.service) : super(AssignedCoursesState());
 
-  Future<void> getCurriculum() async {
+  Future<void> getCurriculum(WidgetRef ref) async {
     try {
       state = state.copyWith(isLoading: true);
-      final curriculum = await service.fetchCurriculum();
-      print(curriculum);
+      final curriculumNGroup = await service.fetchCurriculum();
+      final curriculum = curriculumNGroup.curriculum;
+      final group = curriculumNGroup.group;
+      if (curriculum == null) {
+        throw Exception("No curriculum assigned yet");
+      }
+      // print(curriculum);
+      ref.read(authNotifierProvider.notifier).setCourseRelatedData(group);
       state = state.copyWith(
         isLoading: false,
         curriculum: curriculum,
@@ -36,14 +42,21 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
   double getProgress(WidgetRef ref) {
     double progress = 0;
     final authState = ref.read(authNotifierProvider);
-    int lessonNum = (authState.user?.group.lessonNum ?? 0);
-    int courseNum = (authState.user?.group.courseNum ?? 0);
+    int lessonNum = (authState.courseRelatedData?.lessonNum ?? 0);
+    int courseNum = (authState.courseRelatedData?.courseNum ?? 0);
     int numOfCourses = (state.curriculum?.assignedCourses?.length ?? 1);
     int numOfLessons = (state.curriculum?.lessons?.length ?? 1);
 
     double prctLesson = (lessonNum / numOfLessons);
     progress = (courseNum + prctLesson) / numOfCourses;
-    // print("progress: $progress");
+    print("progress: $progress");
+    //check if is is nan and return 0 if it is
+    if (progress.isNaN) {
+      return 0;
+    }
+    if (progress.isInfinite) {
+      return 0;
+    }
     return progress;
   }
 
@@ -172,8 +185,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       final startLesson = lessons[discussions[0].lessonFrom];
       final endLesson = lessons[discussions.last.lessonTo];
       return ExamData(
-        title:
-            "ከ${startLesson.title} እስክ ${endLesson.title} ድረስ",
+        title: "ከ${startLesson.title} እስክ ${endLesson.title} ድረስ",
         lessonFrom: discussions[0].lessonFrom,
         lessonTo: discussions.last.lessonTo,
         discussionIndex: discussions.last.discussionIndex,
