@@ -8,6 +8,7 @@ class Lesson {
   final String audioUrl;
   final String assignedCourseId;
   final String curriculumId;
+  final int startPage;
   Lesson({
     required this.id,
     required this.order,
@@ -15,11 +16,13 @@ class Lesson {
     required this.audioUrl,
     required this.assignedCourseId,
     required this.curriculumId,
+    required this.startPage,
   });
 
   Lesson copyWith({
     String? id,
     int? order,
+    int? startPage,
     String? title,
     String? audioUrl,
     String? assignedCourseId,
@@ -30,6 +33,7 @@ class Lesson {
       order: order ?? this.order,
       title: title ?? this.title,
       audioUrl: audioUrl ?? this.audioUrl,
+      startPage: startPage ?? this.startPage,
       assignedCourseId: assignedCourseId ?? this.assignedCourseId,
       curriculumId: curriculumId ?? this.curriculumId,
     );
@@ -48,6 +52,7 @@ class Lesson {
       'audioUrl': audioUrl,
       'assignedCourseId': assignedCourseId,
       'curriculumId': curriculumId,
+      'startPage': startPage,
     };
   }
 
@@ -59,6 +64,7 @@ class Lesson {
       audioUrl: map['audioUrl'] as String,
       assignedCourseId: map['assignedCourseId'] as String,
       curriculumId: map['curriculumId'] as String,
+      startPage: map['startPage'] as int,
     );
   }
 
@@ -69,7 +75,7 @@ class Lesson {
 
   @override
   String toString() {
-    return 'Lesson(id: $id, order: $order, title: $title, audioUrl: $audioUrl, assignedCourseId: $assignedCourseId, curriculumId: $curriculumId)';
+    return 'Lesson(id: $id, order: $order, startPage: $startPage, title: $title, audioUrl: $audioUrl, assignedCourseId: $assignedCourseId, curriculumId: $curriculumId)';
   }
 
   @override
@@ -81,6 +87,7 @@ class Lesson {
         other.title == title &&
         other.audioUrl == audioUrl &&
         other.assignedCourseId == assignedCourseId &&
+        other.startPage == startPage &&
         other.curriculumId == curriculumId;
   }
 
@@ -90,6 +97,7 @@ class Lesson {
         order.hashCode ^
         title.hashCode ^
         audioUrl.hashCode ^
+        startPage.hashCode ^
         assignedCourseId.hashCode ^
         curriculumId.hashCode;
   }

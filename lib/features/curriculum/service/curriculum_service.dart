@@ -76,7 +76,7 @@ class CurriculumService {
           currNGroup.group.curriculumId,
           currNGroup.group.courseNum,
         );
-        print("currsFromDb: $currsFromDb");
+        // print("currsFromDb: $currsFromDb");
 
         return CurriculumNGroup(
           curriculum: currsFromDb != null

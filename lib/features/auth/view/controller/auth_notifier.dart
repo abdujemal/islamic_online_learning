@@ -40,7 +40,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   void setCourseRelatedData(CourseRelatedData data) async {
-    print("Setting course related data: $data");
+    // print("Setting course related data: $data");
     state = state.copyWith(courseRelatedData: data);
   }
 

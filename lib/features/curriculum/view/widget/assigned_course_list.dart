@@ -53,8 +53,8 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
       final numOfExams = ref
           .read(assignedCoursesNotifierProvider.notifier)
           .numOfExamsUpToIndex(currentLessonIndex, ref);
-      print("discussions: $numOfDiscussions");
-      print("exams: $numOfExams");
+      // print("discussions: $numOfDiscussions");
+      // print("exams: $numOfExams");
       final offset = (currentCourseIndex * 104.0) +
           (currentLessonIndex * 123) +
           (numOfDiscussions * 76.0) +

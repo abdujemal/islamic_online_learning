@@ -49,7 +49,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
     double prctLesson = (lessonNum / numOfLessons);
     progress = (courseNum + prctLesson) / numOfCourses;
-    print("progress: $progress");
+    // print("progress: $progress");
     //check if is is nan and return 0 if it is
     if (progress.isNaN) {
       return 0;
