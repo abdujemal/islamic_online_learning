@@ -8,7 +8,7 @@ class CurriculumDbHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('curriculumData.db');
+    _database = await _initDB('curriculumsDb.db');
     return _database!;
   }
 
@@ -56,6 +56,7 @@ class CurriculumDbHelper {
         i INTEGER PRIMARY KEY AUTOINCREMENT,
         id TEXT UNIQUE,
         "order" INTEGER,
+        "volume" INTEGER,
         "startPage" INTEGER,
         title TEXT,
         audioUrl TEXT,

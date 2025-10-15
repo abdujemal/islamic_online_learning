@@ -5,6 +5,7 @@ import 'package:islamic_online_learning/core/lib/static_datas.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class LessonCard extends ConsumerStatefulWidget {
@@ -25,7 +26,7 @@ class LessonCard extends ConsumerStatefulWidget {
 }
 
 class _LessonCardState extends ConsumerState<LessonCard> {
-   final GlobalKey _key = GlobalKey();
+  final GlobalKey _key = GlobalKey();
 
   // @override
   // void initState() {
@@ -42,6 +43,17 @@ class _LessonCardState extends ConsumerState<LessonCard> {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
     final score = Score.get(ScoreNames.Lesson, ref, authState.scores ?? []);
+    final assignedCourse = ref
+        .watch(assignedCoursesNotifierProvider)
+        .curriculum
+        ?.assignedCourses
+        ?.firstWhere((element) => element.id == widget.lesson.assignedCourseId);
+    final lessonState = ref.watch(lessonNotifierProvider);
+    // final downLoadProg =
+    //     ref.watch(downloadProgressCheckernProvider.call(audioPath));
+    final isDownloading = lessonState.isDownloading &&
+        lessonState.currentLesson?.id == widget.lesson.id;
+
     return Container(
       key: _key,
       margin: EdgeInsets.only(
@@ -120,15 +132,24 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                       width: double.infinity,
                       child: widget.isCurrentLesson
                           ? ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                if (assignedCourse == null) {
+                                  print("assignedCourse: null");
+                                  return;
+                                }
+                                ref
+                                    .read(lessonNotifierProvider.notifier)
+                                    .startLesson(
+                                        widget.lesson, assignedCourse, ref);
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: primaryColor,
                                 shape: RoundedRectangleBorder(
                                     // borderRadius: BorderRadius.circular(12),
                                     ),
                               ),
-                              child: const Text(
-                                "ጀምር",
+                              child: Text(
+                                isDownloading ? "ኪታቡን ዳውንሎድ በማረግ ላይ..." : "ጀምር",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: whiteColor,

@@ -12,6 +12,7 @@ import 'package:islamic_online_learning/features/courseDetail/presentation/widge
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_bottom_view.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/finish_confirmation.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/pdf_drawer.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -24,12 +25,14 @@ import '../../../main/data/model/course_model.dart';
 class PdfPage extends ConsumerStatefulWidget {
   final String path;
   final int pageNum;
+  final bool isFromPro;
   final CourseModel courseModel;
   final double volume;
   const PdfPage({
     super.key,
     required this.path,
     this.pageNum = 0,
+    this.isFromPro = false,
     required this.volume,
     required this.courseModel,
   });
@@ -62,6 +65,11 @@ class _PdfPageState extends ConsumerState<PdfPage> {
   @override
   void dispose() {
     super.dispose();
+    if (widget.isFromPro) {
+      PlaylistHelper.audioPlayer.playerStateStream
+          .listen(playerStreamListener)
+          .cancel();
+    }
     _pageTc.dispose();
     _pageFocus.dispose();
   }
@@ -70,6 +78,30 @@ class _PdfPageState extends ConsumerState<PdfPage> {
   void initState() {
     super.initState();
     courseModel = widget.courseModel;
+
+    if (widget.isFromPro) {
+      PlaylistHelper.audioPlayer.playerStateStream.listen(playerStreamListener);
+    }
+  }
+
+  void playerStreamListener(_) async {
+    if (_.processingState == ProcessingState.completed) {
+      final lessonN = ref.read(lessonNotifierProvider.notifier);
+      final response = await lessonN.showConfusionDialog(context);
+
+      if (response == 'yes') {
+        // ✅ Open a form or navigate to confusion submission screen
+        // Navigator.pushNamed(context, '/confusion', arguments: lesson);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Confusion ui is loading...')),
+        );
+      } else {
+        // 👌 Maybe show a “Thank you” snackbar or move to the next lesson
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Glad everything is clear!')),
+        );
+      }
+    }
   }
 
   @override
@@ -83,6 +115,10 @@ class _PdfPageState extends ConsumerState<PdfPage> {
         if (kDebugMode) {
           print("currentPage:$currentPage");
           print("totalPage:$pages");
+        }
+        if (widget.isFromPro) {
+          await PlaylistHelper.audioPlayer.stop();
+          return true;
         }
         if (currentPage != null && pages != null) {
           if ((currentPage! + 1) / pages! == 1) {
@@ -190,6 +226,14 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                               controller: _pageTc,
                               focusNode: _pageFocus,
                               keyboardType: TextInputType.number,
+                              onSubmitted: (value) {
+                                if (_pageTc.text.isNotEmpty) {
+                                  int pg = int.parse(_pageTc.text) - 1;
+                                  _controller.setPage(pg);
+                                  _pageFocus.unfocus();
+                                  _pageTc.text = "";
+                                }
+                              },
                               decoration: const InputDecoration(
                                 contentPadding: EdgeInsets.only(
                                   left: 10,
@@ -490,6 +534,9 @@ class _PdfPageState extends ConsumerState<PdfPage> {
               bottomNavigationBar: AudioBottomView(
                 courseModel.courseId,
                 () {
+                  if (widget.isFromPro) {
+                    return;
+                  }
                   // audioPlayer.sequenceState.
 
                   if (courseModel.isFinished == 0) {
@@ -524,7 +571,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                     toast(error, ToastType.error, context);
                   },
                   onPageError: (page, error) {
-                    toast('$page: ${error.toString()}', ToastType.error, context);
+                    toast(
+                        '$page: ${error.toString()}', ToastType.error, context);
                   },
                   onViewCreated: (PDFViewController pdfViewController) {
                     _controller = pdfViewController;

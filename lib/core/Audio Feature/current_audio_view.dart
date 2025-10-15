@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+// import 'package:islamic_online_learning/core/database_helper.dart';
+// import 'package:islamic_online_learning/features/courseDetail/presentation/pages/pdf_page.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -65,21 +68,41 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
 
   @override
   Widget build(BuildContext context) {
+    final lessonState = ref.watch(lessonNotifierProvider);
     return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (ctx) => CourseDetail(
-              keey: widget.keey,
-              val: widget.val,
-              cm: CourseModel.fromMap(
-                widget.mediaItem.extras as Map,
-                widget.mediaItem.extras!["courseId"],
+      onTap: () async {
+        if (lessonState.currentLesson == null &&
+            lessonState.currentCourse == null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (ctx) => CourseDetail(
+                keey: widget.keey,
+                val: widget.val,
+                cm: CourseModel.fromMap(
+                  widget.mediaItem.extras as Map,
+                  widget.mediaItem.extras!["courseId"],
+                ),
               ),
             ),
-          ),
-        );
+          );
+        } else {
+          // final courseModel = await DatabaseHelper()
+          //     .getSingleCourse(lessonState.currentCourse!.course!.courseId);
+          // if (courseModel == null) return;
+          // if (!ref.context.mounted) return;
+          // String?
+          // Navigator.push(
+          //   ref.context,
+          //   MaterialPageRoute(
+          //     builder: (_) => PdfPage(
+          //       path: lessonState.currentCourse!.course!.pdfId,
+          //       volume: lessonState.currentLesson!.volume.toDouble(),
+          //       courseModel: courseModel,
+          //     ),
+          //   ),
+          // );
+        }
       },
       child: Ink(
         color: primaryColor,
@@ -161,7 +184,8 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
                       builder: (context, snapshot) {
                         return Text(
                           "${snapshot.data}x",
-                          style: const TextStyle(fontSize: 10, color: whiteColor),
+                          style:
+                              const TextStyle(fontSize: 10, color: whiteColor),
                         );
                       }),
                 ),

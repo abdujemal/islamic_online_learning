@@ -89,7 +89,7 @@ class AssignedCourse {
         other.title == title &&
         other.order == order &&
         other.description == description &&
-        other.curriculumId == curriculumId&&
+        other.curriculumId == curriculumId &&
         other.course == course;
   }
 
@@ -106,52 +106,83 @@ class AssignedCourse {
 }
 
 class Course {
+  final String courseId;
   final String pdfId;
   final String image;
+  final String ustaz;
+  final String category;
   Course({
+    required this.courseId,
     required this.pdfId,
     required this.image,
+    required this.ustaz,
+    required this.category,
   });
+  
 
   Course copyWith({
+    String? courseId,
     String? pdfId,
     String? image,
+    String? ustaz,
+    String? category,
   }) {
     return Course(
+      courseId: courseId ?? this.courseId,
       pdfId: pdfId ?? this.pdfId,
       image: image ?? this.image,
+      ustaz: ustaz ?? this.ustaz,
+      category: category ?? this.category,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'courseId': courseId,
       'pdfId': pdfId,
       'image': image,
+      'ustaz': ustaz,
+      'category': category,
     };
   }
 
   factory Course.fromMap(Map<String, dynamic> map) {
     return Course(
+      courseId: map['courseId'] as String,
       pdfId: map['pdfId'] as String,
       image: map['image'] as String,
+      ustaz: map['ustaz'] as String,
+      category: map['category'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Course.fromJson(String source) =>
-      Course.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Course.fromJson(String source) => Course.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'Course(pdfId: $pdfId, image: $image)';
+  String toString() {
+    return 'Course(courseId: $courseId, pdfId: $pdfId, image: $image, ustaz: $ustaz, category: $category)';
+  }
 
   @override
   bool operator ==(covariant Course other) {
     if (identical(this, other)) return true;
-
-    return other.pdfId == pdfId && other.image == image;
+  
+    return 
+      other.courseId == courseId &&
+      other.pdfId == pdfId &&
+      other.image == image &&
+      other.ustaz == ustaz &&
+      other.category == category;
   }
 
   @override
-  int get hashCode => pdfId.hashCode ^ image.hashCode;
+  int get hashCode {
+    return courseId.hashCode ^
+      pdfId.hashCode ^
+      image.hashCode ^
+      ustaz.hashCode ^
+      category.hashCode;
+  }
 }

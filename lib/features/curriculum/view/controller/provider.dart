@@ -7,6 +7,8 @@ import 'package:islamic_online_learning/features/curriculum/view/controller/Assi
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/past_lesson_state.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/CurriculumController/curriculum_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/CurriculumController/curriculum_state.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/LessonController/lesson_notifier.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/LessonController/lesson_state.dart';
 
 // Provide the service instance
 final curriculumServiceProvider = Provider<CurriculumService>((ref) {
@@ -30,7 +32,14 @@ final assignedCoursesNotifierProvider =
   return AssignedCoursesNotifier(service);
 });
 
-final pastLessonStateProvider = StateNotifierProvider<PastLessonNotifier, PastLessonState>((ref) {
+final pastLessonStateProvider =
+    StateNotifierProvider<PastLessonNotifier, PastLessonState>((ref) {
   final service = ref.watch(assignedCourseServiceProvider);
   return PastLessonNotifier(service);
+});
+
+final lessonNotifierProvider = StateNotifierProvider<LessonNotifier, LessonState>((ref) {
+  // final service = ref.watch(assignedCourseServiceProvider);
+  // return LessonNotifier(service);
+  return LessonNotifier();
 });
