@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -8,6 +10,7 @@ import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dar
 
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/note_helper.dart';
+import 'package:islamic_online_learning/features/confussion/view/pages/add_confusion_page.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/add_note.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_bottom_view.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/finish_confirmation.dart';
@@ -61,15 +64,15 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
   final TextEditingController _pageTc = TextEditingController();
   final FocusNode _pageFocus = FocusNode();
+  StreamSubscription<PlayerState>? _playerStateSub;
 
   @override
   void dispose() {
-    super.dispose();
     if (widget.isFromPro) {
-      PlaylistHelper.audioPlayer.playerStateStream
-          .listen(playerStreamListener)
-          .cancel();
+      _playerStateSub?.cancel();
+      ref.read(lessonNotifierProvider.notifier).removeCurrentLesson();
     }
+    super.dispose();
     _pageTc.dispose();
     _pageFocus.dispose();
   }
@@ -80,13 +83,15 @@ class _PdfPageState extends ConsumerState<PdfPage> {
     courseModel = widget.courseModel;
 
     if (widget.isFromPro) {
-      PlaylistHelper.audioPlayer.playerStateStream.listen(playerStreamListener);
+      _playerStateSub = PlaylistHelper.audioPlayer.playerStateStream
+          .listen(playerStreamListener);
     }
   }
 
-  void playerStreamListener(_) async {
+  void playerStreamListener(PlayerState _) async {
     if (_.processingState == ProcessingState.completed) {
       final lessonN = ref.read(lessonNotifierProvider.notifier);
+      final lessonState = ref.read(lessonNotifierProvider);
       final response = await lessonN.showConfusionDialog(context);
 
       if (response == 'yes') {
@@ -94,6 +99,14 @@ class _PdfPageState extends ConsumerState<PdfPage> {
         // Navigator.pushNamed(context, '/confusion', arguments: lesson);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Confusion ui is loading...')),
+        );
+        print("Mounted ${context.mounted}");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                AddConfusionPage(lesson: lessonState.currentLesson!),
+          ),
         );
       } else {
         // 👌 Maybe show a “Thank you” snackbar or move to the next lesson

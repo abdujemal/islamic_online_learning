@@ -18,6 +18,7 @@ const String baseUrl = "https://ilmfelagi-pro-backend.onrender.com/api/v1";
 const String curriculumsApi = "$baseUrl/curriculums/all";
 const String getCurriculumApi = "$baseUrl/curriculums";
 const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
+const String confusionsApi = "$baseUrl/confusions";
 //auth
 const String requestOtpApi = "$baseUrl/auth/otp";
 const String verifyOtpApi = "$baseUrl/auth/otp/verify";
@@ -26,7 +27,6 @@ const String registerApi = "$baseUrl/auth/user";
 const String getMyInfoApi = "$baseUrl/auth/user/me";
 const String getMyCourseInfoApi = "$baseUrl/auth/user/courseData";
 const String getScoresApi = "$baseUrl/auth/user/scores";
-
 
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 

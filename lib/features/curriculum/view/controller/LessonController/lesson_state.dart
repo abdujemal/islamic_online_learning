@@ -7,6 +7,7 @@ class LessonState {
   final Lesson? currentLesson;
   final AssignedCourse? currentCourse;
   final bool isDownloading;
+  final bool isUploadingConfusion;
   final String? pdfPath;
   final CancelToken? cancelToken;
 
@@ -15,6 +16,7 @@ class LessonState {
     this.currentCourse,
     this.cancelToken,
     this.isDownloading = false,
+    this.isUploadingConfusion = false,
     this.pdfPath,
   });
 
@@ -22,6 +24,7 @@ class LessonState {
     Lesson? currentLesson,
     AssignedCourse? currentCourse,
     bool? isDownloading,
+    bool? isUploadingConfusion,
     String? pdfPath,
     CancelToken? cancelToken,
   }) {
@@ -31,6 +34,7 @@ class LessonState {
       isDownloading: isDownloading ?? this.isDownloading,
       pdfPath: pdfPath ?? this.pdfPath,
       cancelToken: cancelToken ?? this.cancelToken,
+      isUploadingConfusion: isUploadingConfusion ?? this.isUploadingConfusion,
     );
   }
 }

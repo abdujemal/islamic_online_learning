@@ -43,7 +43,7 @@ android {
         applicationId = "com.aj.islamic_online_learning_dev"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23
+        minSdk = 24
         targetSdk = 35//flutter.targetSdkVersion
         versionCode = 5//flutter.versionCode
         versionName = flutter.versionName

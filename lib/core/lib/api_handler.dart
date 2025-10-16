@@ -71,6 +71,48 @@ Future<http.Response> customPostRequest(String url, Map<String, dynamic>? map,
   return response;
 }
 
+Future<http.StreamedResponse> customPostWithForm(
+    String url, Map<String, dynamic>? map, File file,
+    {bool authorized = false}) async {
+  var uri = Uri.parse(url);
+  print("POST $url");
+  print("req body $map");
+  if (!file.existsSync()) {
+    print("⚠️ File not found: ${file.path}");
+    throw Exception("File does not exist");
+  }
+
+  var request = http.MultipartRequest('POST', uri);
+  if (map != null) {
+    for (var kv in map.entries) {
+      request.fields[kv.key] = kv.value;
+    }
+  }
+  request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+  // Optionally add headers (e.g., if your API needs auth)
+  if (authorized) {
+    final token = await getToken();
+    if (token == null) throw Exception("Token is null");
+    request.headers['Authorization'] = token;
+  }
+
+  // Send request
+  final res = await request.send();
+
+  return res;
+
+  // if (response.statusCode == 200 || response.statusCode == 201) {
+  //   print('✅ Upload successful!');
+  //   return true;
+  // } else {
+  //   print('❌ Upload failed with status: ${response.statusCode}');
+  //   final respStr = await response.stream.bytesToString();
+  //   print('Server response: $respStr');
+  //   return false;
+  // }
+}
+
 void handleErrors(http.Response response) {
   final parsed = jsonDecode(response.body);
   if (response.statusCode == 403) {
