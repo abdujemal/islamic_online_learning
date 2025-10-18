@@ -19,6 +19,9 @@ const String curriculumsApi = "$baseUrl/curriculums/all";
 const String getCurriculumApi = "$baseUrl/curriculums";
 const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
 const String confusionsApi = "$baseUrl/confusions";
+const String getQuizzesApi = "$baseUrl/curriculums/{lessonId}/quizzes";
+const String quizAttemptsApi = "$baseUrl/quizAttempts";
+const String addStreaksApi = "$baseUrl/streaks";
 //auth
 const String requestOtpApi = "$baseUrl/auth/otp";
 const String verifyOtpApi = "$baseUrl/auth/otp/verify";

@@ -91,9 +91,9 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
         stream: myAudioStream(audioPlayer),
         builder: (context, snp) {
           final state = snp.data?.sequenceState;
-          if (kDebugMode) {
-            print("wooooooooooooo");
-          }
+          // if (kDebugMode) {
+          //   print("wooooooooooooo");
+          // }
           if (state?.sequence.isEmpty ?? true) {
             return const SizedBox();
           }

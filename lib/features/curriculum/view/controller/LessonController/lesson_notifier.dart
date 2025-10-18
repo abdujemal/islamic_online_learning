@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart' as fs;
 import 'package:flutter_sound/public/flutter_sound_player.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/quiz/view/pages/quiz_page.dart';
 import 'package:lottie/lottie.dart'; // add lottie: ^2.6.0 (or latest) in pubspec.yaml
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -122,7 +122,12 @@ class LessonNotifier extends StateNotifier<LessonState> {
       if (res.statusCode == 200) {
         state = state.copyWith(isUploadingConfusion: false);
         //st
-        print("uploaded successfully.");
+        // print("uploaded successfully.");
+
+        toast("ጥያቄዎ ደርሶናል በ24 ሰአት ውስጥ እንመልሳለን።", ToastType.success, context);
+        if (state.currentLesson == null) return;
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => QuizPage(state.currentLesson!)));
       } else {
         print(res.statusCode);
         state = state.copyWith(isUploadingConfusion: false);
@@ -147,10 +152,9 @@ class LessonNotifier extends StateNotifier<LessonState> {
     bool isPlaying = false;
     String? recordedFilePath;
 
-    await player.openPlayer();
-
     // Initialize recorder
     Future<void> initRecorder() async {
+      await player.openPlayer();
       final micStatus = await Permission.microphone.request();
       if (!micStatus.isGranted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -168,10 +172,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
       final dir = await getTemporaryDirectory();
       final path =
           '${dir.path}/confusion_${DateTime.now().millisecondsSinceEpoch}.aac';
-      await recorder.startRecorder(
-        toFile: path,
-        codec: fs.Codec.mp3,
-      );
+      await recorder.startRecorder(toFile: path);
       recordedFilePath = path;
     }
 
@@ -289,6 +290,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
           ),
           GestureDetector(
             onTap: () async {
+              print(state.currentLesson?.id);
               await startRecording();
               setRecording(true);
             },
@@ -504,7 +506,14 @@ class LessonNotifier extends StateNotifier<LessonState> {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () => Navigator.pop(context, 'no'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => QuizPage(state.currentLesson!),
+                    ),
+                  );
+                },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: primaryColor),
                   padding: const EdgeInsets.symmetric(vertical: 12),

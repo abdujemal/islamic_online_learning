@@ -1,0 +1,430 @@
+import 'package:flutter/material.dart';
+import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
+import 'package:lottie/lottie.dart';
+
+class QuestionOption {
+  final String id;
+  final String text;
+  final bool isCorrect;
+  QuestionOption({
+    required this.id,
+    required this.text,
+    this.isCorrect = false,
+  });
+}
+
+class QuestionModel {
+  final String id;
+  final String question;
+  final List<QuestionOption> options;
+  final bool allowMultiple;
+  QuestionModel({
+    required this.id,
+    required this.question,
+    required this.options,
+    this.allowMultiple = false,
+  });
+}
+
+class MultipleQuestionQuiz extends StatefulWidget {
+  final List<QuestionModel> questions;
+  final void Function(int score, Map<String, List<String>> answers) onFinish;
+
+  const MultipleQuestionQuiz({
+    super.key,
+    required this.questions,
+    required this.onFinish,
+  });
+
+  @override
+  State<MultipleQuestionQuiz> createState() => _MultipleQuestionQuizState();
+}
+
+class _MultipleQuestionQuizState extends State<MultipleQuestionQuiz>
+    with SingleTickerProviderStateMixin {
+  int _currentIndex = 0;
+  final Map<String, List<String>> _answers = {};
+  int _score = 0;
+  bool _showReview = false;
+
+  late AnimationController _controller;
+  late Animation<double> _fadeAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _fadeAnim = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _calculateScore() {
+    int score = 0;
+    for (var q in widget.questions) {
+      final correct =
+          q.options.where((o) => o.isCorrect).map((e) => e.id).toList();
+      final selected = _answers[q.id] ?? [];
+      if (ListEquality().equals(correct, selected)) score++;
+    }
+    setState(() => _score = score);
+  }
+
+  void _goNext() {
+    if (_currentIndex < widget.questions.length - 1) {
+      _controller.reverse().then((_) {
+        setState(() {
+          _currentIndex++;
+        });
+        _controller.forward();
+      });
+    } else {
+      _calculateScore();
+      widget.onFinish(_score, _answers);
+      setState(() => _showReview = true);
+    }
+  }
+
+  void _goPrevious() {
+    if (_currentIndex > 0) {
+      _controller.reverse().then((_) {
+        setState(() {
+          _currentIndex--;
+        });
+        _controller.forward();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_showReview) return _buildReviewPage();
+
+    final current = widget.questions[_currentIndex];
+    final selectedAnswers = _answers[current.id] ?? [];
+
+    return FadeTransition(
+      opacity: _fadeAnim,
+      child: Container(
+        margin: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          // color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            LinearProgressIndicator(
+              value: (_currentIndex + 1) / widget.questions.length,
+              color: Colors.blueAccent,
+              backgroundColor: Colors.grey,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "ጥያቄ ${_currentIndex + 1} / ${widget.questions.length}",
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                // color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              current.question,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                // color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 18),
+            ...current.options.map((option) {
+              final selected = selectedAnswers.contains(option.id);
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                decoration: BoxDecoration(
+                  color: selected ? Colors.blueAccent.withOpacity(0.08) : null,
+                  border: Border.all(
+                    color: selected
+                        ? Colors.blueAccent
+                        : Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.grey,
+                    width: selected ? 2 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  onTap: () {
+                    setState(() {
+                      if (current.allowMultiple) {
+                        if (selectedAnswers.contains(option.id)) {
+                          selectedAnswers.remove(option.id);
+                        } else {
+                          selectedAnswers.add(option.id);
+                        }
+                      } else {
+                        selectedAnswers
+                          ..clear()
+                          ..add(option.id);
+                      }
+                      _answers[current.id] = List.from(selectedAnswers);
+                    });
+                  },
+                  title: Text(
+                    option.text,
+                    style: TextStyle(
+                      color: selected ? Colors.blueAccent.shade700 : null,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  trailing: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: selected
+                        ? const Icon(Icons.check_circle,
+                            color: Colors.blueAccent)
+                        : const Icon(Icons.circle_outlined, color: Colors.grey),
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              spacing: 10,
+              children: [
+                if (_currentIndex > 0)
+                  OutlinedButton(
+                    onPressed: _goPrevious,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: const BorderSide(color: Colors.blueAccent),
+                    ),
+                    child: const Text(
+                      "ቀዳሚ",
+                      style: TextStyle(color: Colors.blueAccent, fontSize: 16),
+                    ),
+                  ),
+                ElevatedButton(
+                  onPressed: _goNext,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    _currentIndex == widget.questions.length - 1
+                        ? "አስረክብ"
+                        : "ቀጣይ",
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReviewPage() {
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+                Lottie.asset(
+                  'assets/animations/success.json',
+                  height: 160,
+                  repeat: false,
+                ),
+                Text(
+                  "🎉 ጥያቄዎቹን አጠናቀዋል!",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "ያገኙት ነጥብ: ${_score + 1} / ${widget.questions.length}",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    // color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Theme.of(context).chipTheme.backgroundColor ??
+                            Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.circular(10)),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 5,
+                  ),
+                  child: Text(
+                    _getMotivationalMessage(
+                      ((_score + 1) / widget.questions.length) * 100,
+                    ),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      // color: Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ...widget.questions.map((q) {
+                  final selected = _answers[q.id] ?? [];
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      // color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).chipTheme.backgroundColor ??
+                            Colors.transparent,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          q.question,
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 8),
+                        ...q.options.map((o) {
+                          final isSelected = selected.contains(o.id);
+                          final isCorrect = o.isCorrect;
+                          final color = isCorrect
+                              ? Colors.green.shade600
+                              : (isSelected ? Colors.red.shade600 : null);
+                          return Row(
+                            children: [
+                              Icon(
+                                isCorrect
+                                    ? Icons.check_circle
+                                    : (isSelected
+                                        ? Icons.cancel
+                                        : Icons.circle_outlined),
+                                color: color,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  o.text,
+                                  style: TextStyle(
+                                    color: color,
+                                    fontSize: 15,
+                                    fontWeight: isCorrect
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MainPage(),
+                ),
+                (_) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              "ወደ ዋናው ገፅ ተመለስ",
+              style: TextStyle(
+                color: whiteColor,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getMotivationalMessage(double percent) {
+    if (percent >= 90) {
+      return "🌟ማሻአላህ! ጥሩ ስራ ሰርተዋል።\nለአላህ ብለው እውቀት መሻታትዎን ይቀጥሉ 'እውቀትን ለመፈለግ መንገድን የተከተለ አላህ የጀነት መንገድን ያቀላልለት' (ሙስሊም)";
+      //return "🌟 مَا شَاءَ اللهُ! You’ve done excellently.\nKeep seeking knowledge for the sake of Allah, for 'Whoever follows a path to seek knowledge, Allah will make easy for him a path to Paradise.' (Muslim)";
+    } else if (percent >= 70) {
+      return "💪 አልሀምዱሊላህ! ጥሩ እየሰሩ ነው።\nያታውሱ፡- 'ከእናንተ መካከል ምርጦች እውቀትን የሚማሩ እና የሚያስተምሩ ናቸው።' (ቡኻሪ)";
+      // return "💪 Alhamdulillah! You’re doing great.\nRemember: 'The best among you are those who learn and teach knowledge.' (Bukhari)";
+    } else if (percent >= 50) {
+      return "🌱 ጥሩ ጥረዋል! ደረጃ በደረጃ መማርዎን ይቀጥል።\nአላህ ለበጎ ነገር የሚተጉትን ይወዳል - እያንዳንዱ ጥረት ትልቅ ዋጋ አለው ኢንሻአላህ።";
+      // return "🌱 Good effort! Keep learning step by step.\nAllah loves those who strive for goodness — every bit of effort counts, insha’Allah.";
+    } else {
+      return "📖 ተስፋ አይቁረጡ! እውቀትን ለመሻት ትንሽ እርምጃዎች እንኳን ያሸለማሉ።\nነብዩ (ሶ.ዐ.ወ) እንዲህ ብለዋል፡- 'እውቀትን ፍለጋ መንገድን የያዘ ሰው አላህ የጀነትን መንገድ ያቀልለታል። (ቲርሚዚ)";
+      // return "📖 Don’t give up! Even small steps in seeking knowledge are rewarded.\nThe Prophet ﷺ said: 'Whoever takes a path in search of knowledge, Allah will make easy for him the path to Paradise.' (Tirmidhi)";
+    }
+  }
+}
+
+class ListEquality {
+  bool equals(List a, List b) {
+    if (a.length != b.length) return false;
+    for (var e in a) {
+      if (!b.contains(e)) return false;
+    }
+    return true;
+  }
+}
