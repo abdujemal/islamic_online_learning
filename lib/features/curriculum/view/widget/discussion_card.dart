@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/static_datas.dart';
-import 'package:islamic_online_learning/features/auth/model/score.dart';
+import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/exam_card.dart';
@@ -51,7 +51,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
-    final score = Score.get(ScoreNames.Discussion, ref, authState.scores ?? []);
+    final score = ConstScore.get(ScoreNames.Discussion, ref, authState.scores ?? []);
     return Column(
       key: _key,
       children: [

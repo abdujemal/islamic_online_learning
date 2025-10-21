@@ -1,133 +1,107 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 class Score {
-  final String type;
-  final int totalScore;
-  final List<ScoreSegment> scoreSegments;
+  final String id;
+  final String targetType;
+  final String targetId;
+  final int score;
+  final bool gradeWaiting;
+  final int outOf;
+  final String userId;
+  final DateTime date;
   Score({
-    required this.type,
-    required this.totalScore,
-    required this.scoreSegments,
+    required this.id,
+    required this.targetType,
+    required this.targetId,
+    required this.score,
+    required this.gradeWaiting,
+    required this.outOf,
+    required this.userId,
+    required this.date,
   });
 
   Score copyWith({
-    String? type,
-    int? totalScore,
-    List<ScoreSegment>? scoreSegments,
+    String? id,
+    String? targetType,
+    String? targetId,
+    int? score,
+    bool? gradeWaiting,
+    int? outOf,
+    String? userId,
+    DateTime? date,
   }) {
     return Score(
-      type: type ?? this.type,
-      totalScore: totalScore ?? this.totalScore,
-      scoreSegments: scoreSegments ?? this.scoreSegments,
+      id: id ?? this.id,
+      targetType: targetType ?? this.targetType,
+      targetId: targetId ?? this.targetId,
+      score: score ?? this.score,
+      gradeWaiting: gradeWaiting ?? this.gradeWaiting,
+      outOf: outOf ?? this.outOf,
+      userId: userId ?? this.userId,
+      date: date ?? this.date,
     );
-  }
-
-  static Score? get(String title, WidgetRef ref, List<Score> scores) {
-    if (scores.isEmpty) {
-      return null;
-    }
-    return scores.firstWhere((e) => e.type == title);
-  }
-
-  static List<Score> listFromJson(String responseBody) {
-    final parsed = jsonDecode(responseBody) as List<dynamic>;
-    return parsed.map((json) => Score.fromMap(json)).toList();
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'type': type,
-      'totalScore': totalScore,
-      'scoreSegments': scoreSegments.map((x) => x.toMap()).toList(),
+      'id': id,
+      'targetType': targetType,
+      'targetId': targetId,
+      'score': score,
+      'gradeWaiting': gradeWaiting,
+      'outOf': outOf,
+      'userId': userId,
+      'date': date.toString(),
     };
   }
 
   factory Score.fromMap(Map<String, dynamic> map) {
     return Score(
-      type: map['type'] as String,
-      totalScore: map['totalScore'] as int,
-      scoreSegments: List<ScoreSegment>.from(
-        (map['scoreSegments'] as List<dynamic>).map<ScoreSegment>(
-          (x) => ScoreSegment.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
+      id: map['id'] as String,
+      targetType: map['targetType'] as String,
+      targetId: map['targetId'] as String,
+      score: map['score'] as int,
+      gradeWaiting: map['gradeWaiting'] as bool,
+      outOf: map['outOf'] as int,
+      userId: map['userId'] as String,
+      date: DateTime.parse(map['date'] as String),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Score.fromJson(String source) =>
-      Score.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Score.fromJson(String source) => Score.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() =>
-      'Score(type: $type, totalScore: $totalScore, scoreSegments: $scoreSegments)';
+  String toString() {
+    return 'Score(id: $id, targetType: $targetType, targetId: $targetId, score: $score, gradeWaiting: $gradeWaiting, outOf: $outOf, userId: $userId, date: $date)';
+  }
 
   @override
   bool operator ==(covariant Score other) {
     if (identical(this, other)) return true;
-
-    return other.type == type &&
-        other.totalScore == totalScore &&
-        listEquals(other.scoreSegments, scoreSegments);
+  
+    return 
+      other.id == id &&
+      other.targetType == targetType &&
+      other.targetId == targetId &&
+      other.score == score &&
+      other.gradeWaiting == gradeWaiting &&
+      other.outOf == outOf &&
+      other.userId == userId &&
+      other.date == date;
   }
 
   @override
-  int get hashCode =>
-      type.hashCode ^ totalScore.hashCode ^ scoreSegments.hashCode;
-}
-
-class ScoreSegment {
-  final String name;
-  final int score;
-  ScoreSegment({
-    required this.name,
-    required this.score,
-  });
-
-  ScoreSegment copyWith({
-    String? name,
-    int? score,
-  }) {
-    return ScoreSegment(
-      name: name ?? this.name,
-      score: score ?? this.score,
-    );
+  int get hashCode {
+    return id.hashCode ^
+      targetType.hashCode ^
+      targetId.hashCode ^
+      score.hashCode ^
+      gradeWaiting.hashCode ^
+      outOf.hashCode ^
+      userId.hashCode ^
+      date.hashCode;
   }
-
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'name': name,
-      'score': score,
-    };
-  }
-
-  factory ScoreSegment.fromMap(Map<String, dynamic> map) {
-    return ScoreSegment(
-      name: map['name'] as String,
-      score: map['score'] as int,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory ScoreSegment.fromJson(String source) =>
-      ScoreSegment.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() => 'ScoreSegment(name: $name, score: $score)';
-
-  @override
-  bool operator ==(covariant ScoreSegment other) {
-    if (identical(this, other)) return true;
-
-    return other.name == name && other.score == score;
-  }
-
-  @override
-  int get hashCode => name.hashCode ^ score.hashCode;
 }

@@ -126,8 +126,13 @@ class LessonNotifier extends StateNotifier<LessonState> {
 
         toast("ጥያቄዎ ደርሶናል በ24 ሰአት ውስጥ እንመልሳለን።", ToastType.success, context);
         if (state.currentLesson == null) return;
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => QuizPage(state.currentLesson!)));
+        // await PlaylistHelper.audioPlayer.stop();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => QuizPage(state.currentLesson!),
+          ),
+        );
       } else {
         print(res.statusCode);
         state = state.copyWith(isUploadingConfusion: false);
@@ -506,7 +511,8 @@ class LessonNotifier extends StateNotifier<LessonState> {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () {
+                onPressed: () async {
+                  
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -522,7 +528,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
                   ),
                 ),
                 child: const Text(
-                  'አይ፣ ግር የለኝም 👍',
+                  'አይ፣ ጥያቄ የለኝም 👍',
                   style: TextStyle(color: primaryColor),
                 ),
               ),

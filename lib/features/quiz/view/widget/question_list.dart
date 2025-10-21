@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
+import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
 import 'package:lottie/lottie.dart';
 
 class QuestionOption {
@@ -29,7 +31,8 @@ class QuestionModel {
 
 class MultipleQuestionQuiz extends StatefulWidget {
   final List<QuestionModel> questions;
-  final void Function(int score, Map<String, List<String>> answers) onFinish;
+  final Future<bool> Function(int score, Map<String, List<String>> answers)
+      onFinish;
 
   const MultipleQuestionQuiz({
     super.key,
@@ -79,7 +82,7 @@ class _MultipleQuestionQuizState extends State<MultipleQuestionQuiz>
     setState(() => _score = score);
   }
 
-  void _goNext() {
+  Future<void> _goNext() async {
     if (_currentIndex < widget.questions.length - 1) {
       _controller.reverse().then((_) {
         setState(() {
@@ -89,8 +92,10 @@ class _MultipleQuestionQuizState extends State<MultipleQuestionQuiz>
       });
     } else {
       _calculateScore();
-      widget.onFinish(_score, _answers);
-      setState(() => _showReview = true);
+      final go = await widget.onFinish(_score, _answers);
+      if (go) {
+        setState(() => _showReview = true);
+      }
     }
   }
 
@@ -238,12 +243,20 @@ class _MultipleQuestionQuizState extends State<MultipleQuestionQuiz>
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
-                    _currentIndex == widget.questions.length - 1
-                        ? "አስረክብ"
-                        : "ቀጣይ",
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                  child: Consumer(builder: (context, ref, _) {
+                    final state = ref.watch(quizNotifierProvider);
+                    return state.isSubmitting
+                        ? CircularProgressIndicator(
+                            color: whiteColor,
+                          )
+                        : Text(
+                            _currentIndex == widget.questions.length - 1
+                                ? "አስረክብ"
+                                : "ቀጣይ",
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.white),
+                          );
+                  }),
                 ),
               ],
             ),

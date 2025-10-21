@@ -3,14 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
 
-import 'package:islamic_online_learning/features/auth/model/score.dart';
+import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthState {
   final bool isLoading, initial, courseStarted;
   final User? user;
   final CourseRelatedData? courseRelatedData;
-  final List<Score>? scores;
+  final List<ConstScore>? scores;
   final String? error;
 
   AuthState({
@@ -45,7 +45,7 @@ class AuthState {
     bool? isLoading,
     bool? courseStarted,
     User? user,
-    List<Score>? scores,
+    List<ConstScore>? scores,
     String? error,
     CourseRelatedData? courseRelatedData,
   }) {

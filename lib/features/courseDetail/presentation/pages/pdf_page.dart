@@ -67,8 +67,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
   @override
   void dispose() {
     if (widget.isFromPro) {
-      _playerStateSub?.cancel();
       ref.read(lessonNotifierProvider.notifier).removeCurrentLesson();
+      _playerStateSub?.cancel();
     }
     super.dispose();
     _pageTc.dispose();
@@ -87,6 +87,9 @@ class _PdfPageState extends ConsumerState<PdfPage> {
   }
 
   void playerStreamListener(PlayerState _) async {
+    if (!_.playing) {
+      return;
+    }
     if (_.processingState == ProcessingState.completed) {
       final lessonN = ref.read(lessonNotifierProvider.notifier);
       // final lessonState = ref.read(lessonNotifierProvider);

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
-import 'package:islamic_online_learning/features/auth/model/score.dart';
+import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthService {
@@ -132,13 +132,13 @@ class AuthService {
     }
   }
 
-  Future<List<Score>> getScores() async {
+  Future<List<ConstScore>> getScores() async {
     final response = await customGetRequest(
       getScoresApi,
       authorized: true,
     );
     if (response.statusCode == 200) {
-      List<Score> score = Score.listFromJson(response.body);
+      List<ConstScore> score = ConstScore.listFromJson(response.body);
       return score; //token
     } else {
       print("Response status: ${response.statusCode}");
