@@ -15,6 +15,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       state = state.copyWith(isLoading: true);
       final curriculumNGroup = await service.fetchCurriculum();
       final curriculum = curriculumNGroup.curriculum;
+      final scores = curriculumNGroup.scores;
       final group = curriculumNGroup.group;
       if (curriculum == null) {
         throw Exception("No curriculum assigned yet");
@@ -24,6 +25,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       state = state.copyWith(
         isLoading: false,
         curriculum: curriculum,
+        scores: scores,
       );
     } catch (e) {
       print("Error: $e");

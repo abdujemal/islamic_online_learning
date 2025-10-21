@@ -5,6 +5,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
+import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
@@ -57,7 +58,7 @@ class CurriculumService {
       if (currNGroup.curriculum != null) {
         await pref.setString(
             PrefConsts.curriculumDate, currNGroup.curriculum!.updatedOn);
-       
+
         await CurriculumDbHelper.instance
             .insertCurriculum(currNGroup.curriculum!.toMap());
         for (AssignedCourse course
@@ -83,6 +84,7 @@ class CurriculumService {
               ? Curriculum.fromMap(currsFromDb, fromDb: true)
               : null,
           group: currNGroup.group,
+          scores: currNGroup.scores,
         );
       }
     } else {
@@ -96,15 +98,18 @@ class CurriculumService {
 class CurriculumNGroup {
   final Curriculum? curriculum;
   final CourseRelatedData group;
+  final List<Score> scores;
   CurriculumNGroup({
     required this.curriculum,
     required this.group,
+    required this.scores,
   });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'curriculum': curriculum?.toMap(),
       'group': group.toMap(),
+      'scores': scores.map((e) => e.toMap())
     };
   }
 
@@ -114,6 +119,11 @@ class CurriculumNGroup {
           ? Curriculum.fromMap(map['currentCurriculum'] as Map<String, dynamic>)
           : null,
       group: CourseRelatedData.fromMap(map['group'] as Map<String, dynamic>),
+      scores: List<Score>.from(
+        (map["scores"] as List<dynamic>).map(
+          (e) => Score.fromMap(e),
+        ),
+      ),
     );
   }
 

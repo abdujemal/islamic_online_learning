@@ -26,7 +26,7 @@ import '../../../main/data/model/course_model.dart';
 class PdfPage extends ConsumerStatefulWidget {
   final String path;
   final int pageNum;
-  final bool isFromPro;
+  final bool isFromPro, isPast;
   final CourseModel courseModel;
   final double volume;
   const PdfPage({
@@ -34,6 +34,7 @@ class PdfPage extends ConsumerStatefulWidget {
     required this.path,
     this.pageNum = 0,
     this.isFromPro = false,
+    this.isPast = false,
     required this.volume,
     required this.courseModel,
   });
@@ -59,6 +60,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
   bool showTopAudio = false;
   bool showNotes = false;
+  bool isPlaying = false;
 
   final TextEditingController _pageTc = TextEditingController();
   final FocusNode _pageFocus = FocusNode();
@@ -66,7 +68,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
   @override
   void dispose() {
-    if (widget.isFromPro) {
+    if (widget.isFromPro && !widget.isPast) {
       ref.read(lessonNotifierProvider.notifier).removeCurrentLesson();
       _playerStateSub?.cancel();
     }
@@ -80,7 +82,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
     super.initState();
     courseModel = widget.courseModel;
 
-    if (widget.isFromPro) {
+    if (widget.isFromPro && !widget.isPast) {
       _playerStateSub = PlaylistHelper.audioPlayer.playerStateStream
           .listen(playerStreamListener);
     }
@@ -483,18 +485,32 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                   const SizedBox(
                     height: 15,
                   ),
-                  FloatingActionButton(
-                    child: const Text(
-                      "ድምጾች",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: whiteColor,
+                  if (!widget.isFromPro)
+                    FloatingActionButton(
+                      child: const Text(
+                        "ድምጾች",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: whiteColor,
+                        ),
                       ),
+                      onPressed: () {
+                        _scaffoldKey.currentState!.openDrawer();
+                      },
                     ),
-                    onPressed: () {
-                      _scaffoldKey.currentState!.openDrawer();
-                    },
-                  ),
+                  if (widget.isFromPro && widget.isPast && !isPlaying)
+                    FloatingActionButton(
+                      child: const Text(
+                        "ድምፁን አጫውት",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: whiteColor,
+                        ),
+                      ),
+                      onPressed: () {
+                        _scaffoldKey.currentState!.openDrawer();
+                      },
+                    ),
                   const SizedBox(
                     height: 15,
                   ),

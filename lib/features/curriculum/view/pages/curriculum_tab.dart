@@ -27,9 +27,7 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
         final otpId = pref.getString(PrefConsts.otpId);
 
         if (token != null && curriculumId != null) {
-          ref
-              .read(authNotifierProvider.notifier)
-              .checkIfTheCourseStarted(ref);
+          ref.read(authNotifierProvider.notifier).checkIfTheCourseStarted(ref);
         }
 
         ref.read(authNotifierProvider.notifier).unfinishedRegistration(
@@ -45,6 +43,7 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
     // final curriculumState = ref.watch(curriculumNotifierProvider);
+
     super.build(context);
     return Scaffold(
         body: Padding(

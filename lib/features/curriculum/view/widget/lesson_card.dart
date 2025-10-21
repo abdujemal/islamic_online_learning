@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/static_datas.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
+import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
@@ -38,11 +39,24 @@ class _LessonCardState extends ConsumerState<LessonCard> {
   //     }
   //   });
   // }
+
+  Color getColor(double prcnt) {
+    prcnt = prcnt * 100;
+    if (prcnt < 30) {
+      return Colors.red;
+    } else if (prcnt < 60) {
+      return Colors.amber;
+    } else {
+      return primaryColor;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
-    final score = ConstScore.get(ScoreNames.Lesson, ref, authState.scores ?? []);
+    final constScore =
+        ConstScore.get(ScoreNames.Lesson, ref, authState.scores ?? []);
     final assignedCourse = ref
         .watch(assignedCoursesNotifierProvider)
         .curriculum
@@ -53,6 +67,27 @@ class _LessonCardState extends ConsumerState<LessonCard> {
     //     ref.watch(downloadProgressCheckernProvider.call(audioPath));
     final isDownloading = lessonState.isDownloading &&
         lessonState.currentLesson?.id == widget.lesson.id;
+
+    final scoresResult = ref
+        .watch(assignedCoursesNotifierProvider)
+        .scores
+        .where(
+          (e) => e.targetId == widget.lesson.id,
+        )
+        .toList();
+    Score? score = scoresResult.isNotEmpty ? scoresResult.first : null;
+    if (widget.isPastLesson && score == null) {
+      score = Score(
+        id: "id",
+        targetType: "Lesson",
+        targetId: widget.lesson.id,
+        score: 0,
+        gradeWaiting: false,
+        outOf: constScore?.totalScore ?? 0,
+        userId: "userId",
+        date: DateTime.now(),
+      );
+    }
 
     return Container(
       key: _key,
@@ -112,15 +147,31 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                                     vertical: .5,
                                   ),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
+                                    border: score != null
+                                        ? Border.all(
+                                            color: getColor(
+                                              score.score / score.outOf,
+                                            ),
+                                          )
+                                        : Border.all(color: Colors.grey),
                                     borderRadius: BorderRadius.circular(3),
                                   ),
-                                  child: Text(
-                                    "${score?.totalScore ?? "..."} ነጥብ",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                    ),
-                                  ),
+                                  child: score != null
+                                      ? Text(
+                                          "${score.score}/${score.outOf} ነጥብ",
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: getColor(
+                                              score.score / score.outOf,
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          "${constScore?.totalScore ?? "..."} ነጥብ",
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                          ),
+                                        ),
                                 ),
                               )
                             ],
@@ -130,7 +181,7 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: widget.isCurrentLesson
+                      child: widget.isCurrentLesson && score == null
                           ? ElevatedButton(
                               onPressed: () {
                                 if (assignedCourse == null) {
@@ -156,9 +207,22 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                                 ),
                               ),
                             )
-                          : widget.isPastLesson
+                          : widget.isPastLesson || score != null
                               ? OutlinedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    if (assignedCourse == null) {
+                                      print("assignedCourse: null");
+                                      return;
+                                    }
+                                    ref
+                                        .read(lessonNotifierProvider.notifier)
+                                        .startLesson(
+                                          widget.lesson,
+                                          assignedCourse,
+                                          ref,
+                                          isPast: true,
+                                        );
+                                  },
                                   style: OutlinedButton.styleFrom(
                                     padding: EdgeInsets.all(0),
                                     foregroundColor: primaryColor,
@@ -167,7 +231,9 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                                         // borderRadius: BorderRadius.circular(12),
                                         ),
                                   ),
-                                  child: const Text("ክፈት"),
+                                  child: Text(isDownloading
+                                      ? "ኪታቡን ዳውንሎድ በማረግ ላይ..."
+                                      : "ክፈት"),
                                 )
                               : SizedBox(),
                     ),

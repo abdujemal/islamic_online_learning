@@ -27,7 +27,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
   LessonNotifier() : super(LessonState());
 
   Future<void> startLesson(
-      Lesson lesson, AssignedCourse course, WidgetRef ref) async {
+      Lesson lesson, AssignedCourse course, WidgetRef ref, {bool isPast = false}) async {
     final audioData = AudioSource.uri(
       Uri.parse(lesson.audioUrl),
       tag: MediaItem(
@@ -42,10 +42,12 @@ class LessonNotifier extends StateNotifier<LessonState> {
     // print("mmmmmm pdfId: ${course.course?.pdfId}");
     // return;
     state = state.copyWith(currentLesson: lesson, currentCourse: course);
-    await downloadPdf(ref, course, lesson);
-    final player = PlaylistHelper.audioPlayer;
-    player.setAudioSource(audioData);
-    player.play();
+    await downloadPdf(ref, course, lesson, isPast);
+    if (!isPast) {
+      final player = PlaylistHelper.audioPlayer;
+      player.setAudioSource(audioData);
+      player.play();
+    }
   }
 
   Future<String?> getPdfPath(
@@ -73,7 +75,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
   }
 
   Future<void> downloadPdf(
-      WidgetRef ref, AssignedCourse course, Lesson lesson) async {
+      WidgetRef ref, AssignedCourse course, Lesson lesson, bool isPast) async {
     state = state.copyWith(isDownloading: true);
     final pdfId = state.currentCourse?.course?.pdfId;
     // final courseModel = state.currentCourse?.course;
@@ -102,6 +104,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
             volume: lesson.volume.toDouble(),
             courseModel: courseModel,
             isFromPro: true,
+            isPast: isPast
           ),
         ),
       );
@@ -512,7 +515,6 @@ class LessonNotifier extends StateNotifier<LessonState> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () async {
-                  
                   Navigator.push(
                     context,
                     MaterialPageRoute(
