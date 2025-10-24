@@ -168,7 +168,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
   bool isTodayExamDay() {
     DateTime today = DateTime.now();
-    return today.weekday == DateTime.monday;
+    return today.weekday == DateTime.friday;
   }
 
   ExamData getExamData(List<DiscussionData> discussions, WidgetRef ref) {

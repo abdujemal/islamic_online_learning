@@ -23,9 +23,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // toast(err.message, ToastType.error, context);
     } catch (err) {
       print("Error: $err");
+      final token = await getToken();
       // toast("የእርስዎን መለያ ማግኘት አልተቻለም።", ToastType.error, context);
-      state =
-          state.copyWith(isLoading: false, error: "የእርስዎን መለያ ማግኘት አልተቻለም።");
+      state = state.copyWith(
+        isLoading: false,
+        error: "የእርስዎን መለያ ማግኘት አልተቻለም።",
+        tokenIsNull: token == null,
+      );
     }
   }
 
@@ -51,7 +55,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (err) {
       print("Could not get course data");
       print("err: ${err.toString()}");
-      return null;
+      throw Exception("Could not get course data");
     }
   }
 

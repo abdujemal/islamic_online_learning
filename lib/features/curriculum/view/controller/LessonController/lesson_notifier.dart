@@ -26,28 +26,34 @@ import 'package:permission_handler/permission_handler.dart';
 class LessonNotifier extends StateNotifier<LessonState> {
   LessonNotifier() : super(LessonState());
 
-  Future<void> startLesson(
-      Lesson lesson, AssignedCourse course, WidgetRef ref, {bool isPast = false}) async {
-    final audioData = AudioSource.uri(
-      Uri.parse(lesson.audioUrl),
-      tag: MediaItem(
-        id: lesson.id,
-        title: lesson.title,
-        artist: course.course!.ustaz,
-        album: course.course!.category,
-        artUri: Uri.parse(course.course!.image),
-        extras: course.course!.toMap(),
-      ),
-    );
+  Future<void> startLesson(Lesson lesson, AssignedCourse course, WidgetRef ref,
+      {bool isPast = false}) async {
     // print("mmmmmm pdfId: ${course.course?.pdfId}");
     // return;
     state = state.copyWith(currentLesson: lesson, currentCourse: course);
     await downloadPdf(ref, course, lesson, isPast);
     if (!isPast) {
-      final player = PlaylistHelper.audioPlayer;
-      player.setAudioSource(audioData);
-      player.play();
+      playLesson();
     }
+  }
+
+  Future<void> playLesson() async {
+    final audioData = AudioSource.uri(
+      Uri.parse(state.currentLesson!.audioUrl),
+      tag: MediaItem(
+        id: state.currentLesson!.id,
+        title: state.currentLesson!.title,
+        artist: state.currentCourse!.course!.ustaz,
+        album: state.currentCourse!.course!.category,
+        artUri: Uri.parse(
+          state.currentCourse!.course!.image,
+        ),
+        extras: state.currentCourse!.course!.toMap(),
+      ),
+    );
+    final player = PlaylistHelper.audioPlayer;
+    await player.setAudioSource(audioData);
+    player.play();
   }
 
   Future<String?> getPdfPath(
@@ -100,12 +106,11 @@ class LessonNotifier extends StateNotifier<LessonState> {
         ref.context,
         MaterialPageRoute(
           builder: (_) => PdfPage(
-            path: pdfUrl,
-            volume: lesson.volume.toDouble(),
-            courseModel: courseModel,
-            isFromPro: true,
-            isPast: isPast
-          ),
+              path: pdfUrl,
+              volume: lesson.volume.toDouble(),
+              courseModel: courseModel,
+              isFromPro: true,
+              isPast: isPast),
         ),
       );
     }

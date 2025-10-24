@@ -3,6 +3,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/streak.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
+import 'package:islamic_online_learning/features/quiz/model/question.dart';
 import 'package:islamic_online_learning/features/quiz/model/quiz.dart';
 
 class QuizService {
@@ -14,6 +15,22 @@ class QuizService {
 
     if (res.statusCode == 200) {
       final quizzes = Quiz.listFromJson(res.body);
+      return quizzes;
+    } else {
+      print("res status code ${res.statusCode}");
+      print("res body ${res.body}");
+      throw Exception(res.body);
+    }
+  }
+
+  Future<List<Question>> getTestQuestions() async {
+    final res = await customGetRequest(
+      getTestQuestionApi,
+      authorized: true,
+    );
+
+    if (res.statusCode == 200) {
+      final quizzes = Question.listFromJson(res.body);
       return quizzes;
     } else {
       print("res status code ${res.statusCode}");

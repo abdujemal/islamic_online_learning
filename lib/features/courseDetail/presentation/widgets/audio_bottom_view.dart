@@ -22,7 +22,7 @@ import 'finish_confirmation.dart';
 
 class AudioBottomView extends ConsumerStatefulWidget {
   final String courseId;
-  final VoidCallback onClose;
+  final bool? Function() onClose;
   const AudioBottomView(this.courseId, this.onClose, {super.key});
 
   @override
@@ -32,7 +32,14 @@ class AudioBottomView extends ConsumerStatefulWidget {
 
 class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
   bool isLoading = false;
-  final List<double> _speeds = [0.5, 1.0, 1.2, 1.5, 1.7, 2.0];
+  final List<double> _speeds = [
+    0.5,
+    1.0,
+    1.2,
+    1.5,
+    1.7,
+    2.0,
+  ];
 
   final List<String> _speedsLabel = [
     "Slow",
@@ -155,8 +162,9 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                               ),
                               child: LinearProgressIndicator(
                                 color: primaryColor,
-                                backgroundColor:
-                                    Theme.of(context).chipTheme.backgroundColor!,
+                                backgroundColor: Theme.of(context)
+                                    .chipTheme
+                                    .backgroundColor!,
                               ),
                             ),
                           ),
@@ -189,7 +197,11 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                         ),
                         GestureDetector(
                           onTap: () async {
-                            widget.onClose();
+                            final res = widget.onClose();
+                            if (res == false) {
+                              PlaylistHelper.audioPlayer.stop();
+                              return;
+                            }
                             int audioLen = metaData.extras?["courseIds"]
                                     .toString()
                                     .split(",")
@@ -231,8 +243,8 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                               isStarted: 1,
                                               isFinished: 1,
                                               pausedAtAudioNum: id,
-                                              pausedAtAudioSec:
-                                                  audioPlayer.position.inSeconds,
+                                              pausedAtAudioSec: audioPlayer
+                                                  .position.inSeconds,
                                               lastViewed:
                                                   DateTime.now().toString(),
                                             ),
@@ -257,8 +269,8 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                             ).copyWith(
                                               isStarted: 1,
                                               pausedAtAudioNum: id,
-                                              pausedAtAudioSec:
-                                                  audioPlayer.position.inSeconds,
+                                              pausedAtAudioSec: audioPlayer
+                                                  .position.inSeconds,
                                               lastViewed:
                                                   DateTime.now().toString(),
                                             ),
@@ -381,7 +393,8 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                           onPressed: () async {
                             PlaylistHelper.audioPlayer.seekToPrevious();
                           },
-                          icon: const Icon(Icons.skip_previous_rounded, size: 40),
+                          icon:
+                              const Icon(Icons.skip_previous_rounded, size: 40),
                         ),
                         StreamBuilder(
                             stream: audioPlayer.playingStream,
@@ -393,32 +406,34 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
                                         size: 40),
                                 onPressed: () async {
                                   if (audioPlayer.playing) {
-                                    widget.onClose();
-                                    if (metaData.extras?["isFinished"] == 0) {
-                                      int id = int.parse(metaData.title
-                                              .split(" ")
-                                              .last
-                                              .replaceAll('.mp3', '')) -
-                                          1;
-                                      print("AudioIdFromBottom $id");
-                                      await ref
-                                          .read(mainNotifierProvider.notifier)
-                                          .saveCourse(
-                                            CourseModel.fromMap(
-                                              metaData.extras as Map,
-                                              metaData.extras?["courseId"],
-                                            ).copyWith(
-                                              isStarted: 1,
-                                              pausedAtAudioNum: id,
-                                              pausedAtAudioSec:
-                                                  audioPlayer.position.inSeconds,
-                                              lastViewed:
-                                                  DateTime.now().toString(),
-                                            ),
-                                            null,
-                                            context,
-                                            showMsg: false,
-                                          );
+                                    final res = widget.onClose();
+                                    if (res == true) {
+                                      if (metaData.extras?["isFinished"] == 0) {
+                                        int id = int.parse(metaData.title
+                                                .split(" ")
+                                                .last
+                                                .replaceAll('.mp3', '')) -
+                                            1;
+                                        print("AudioIdFromBottom $id");
+                                        await ref
+                                            .read(mainNotifierProvider.notifier)
+                                            .saveCourse(
+                                              CourseModel.fromMap(
+                                                metaData.extras as Map,
+                                                metaData.extras?["courseId"],
+                                              ).copyWith(
+                                                isStarted: 1,
+                                                pausedAtAudioNum: id,
+                                                pausedAtAudioSec: audioPlayer
+                                                    .position.inSeconds,
+                                                lastViewed:
+                                                    DateTime.now().toString(),
+                                              ),
+                                              null,
+                                              context,
+                                              showMsg: false,
+                                            );
+                                      }
                                     }
                                     PlaylistHelper.audioPlayer.pause();
                                     setState(() {});

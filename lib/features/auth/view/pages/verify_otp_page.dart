@@ -33,6 +33,7 @@ class _VerifyOtpPageState extends ConsumerState<VerifyOtpPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(signInNotifierProvider);
+    
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -54,7 +55,7 @@ class _VerifyOtpPageState extends ConsumerState<VerifyOtpPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              "ወደ ስልክዎ ባለ 6 አሃዝ ኮድ ልከናል።",
+              "ወደ ${emailBlopper(widget.phone)} ባለ 6 አሃዝ ኮድ ልከናል።",
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 32),

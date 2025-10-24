@@ -20,6 +20,7 @@ const String getCurriculumApi = "$baseUrl/curriculums";
 const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
 const String confusionsApi = "$baseUrl/confusions";
 const String getQuizzesApi = "$baseUrl/curriculums/{lessonId}/quizzes";
+const String getTestQuestionApi = "$baseUrl/tests";
 const String quizAttemptsApi = "$baseUrl/quizAttempts";
 const String addStreakApi = "$baseUrl/streaks";
 //auth
@@ -216,4 +217,19 @@ void printMap(Map<String, dynamic> map) {
     print("${kv.key}: ${kv.value}");
   }
   print("}");
+}
+
+String emailBlopper(String email) {
+  final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
+  if (emailRegex.hasMatch(email)) {
+    final firstSegment = email.split(".").first.substring(0, 3);
+    final middleSegment =
+        List.generate(email.split(".").first.substring(3).length, (i) => "*")
+            .join("");
+
+    return "$firstSegment$middleSegment.${email.split(".").last}";
+  } else {
+    return email;
+  }
 }

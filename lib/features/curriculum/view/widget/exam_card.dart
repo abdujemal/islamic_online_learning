@@ -6,6 +6,7 @@ import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:islamic_online_learning/features/quiz/view/pages/question_page.dart';
 
 class ExamCard extends ConsumerStatefulWidget {
   final bool isLastExam;
@@ -31,8 +32,8 @@ class _ExamCardState extends ConsumerState<ExamCard> {
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
-    final score =
-        ConstScore.get(ScoreNames.IndividualAssignment, ref, authState.scores ?? []);
+    final score = ConstScore.get(
+        ScoreNames.IndividualAssignment, ref, authState.scores ?? []);
 
     return Container(
       // key:_key,
@@ -114,7 +115,14 @@ class _ExamCardState extends ConsumerState<ExamCard> {
                       width: double.infinity,
                       child: widget.isCurrent
                           ? ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => QuestionPage(),
+                                  ),
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.purple,
                                 shape: RoundedRectangleBorder(

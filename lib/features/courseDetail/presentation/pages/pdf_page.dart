@@ -3,10 +3,9 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
-
+import 'package:pdfx/pdfx.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/note_helper.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/add_note.dart';
@@ -44,7 +43,7 @@ class PdfPage extends ConsumerStatefulWidget {
 }
 
 class _PdfPageState extends ConsumerState<PdfPage> {
-  late PDFViewController pdfViewController;
+  // late PdfController pdfViewController;
 
   late CourseModel courseModel;
 
@@ -56,7 +55,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late PDFViewController _controller;
+  late PdfController _controller;
 
   bool showTopAudio = false;
   bool showNotes = false;
@@ -81,6 +80,11 @@ class _PdfPageState extends ConsumerState<PdfPage> {
   void initState() {
     super.initState();
     courseModel = widget.courseModel;
+
+    _controller = PdfController(
+      initialPage: courseModel.pdfPage.toInt() - 1,
+      document: PdfDocument.openFile(widget.path),
+    );
 
     if (widget.isFromPro && !widget.isPast) {
       _playerStateSub = PlaylistHelper.audioPlayer.playerStateStream
@@ -246,7 +250,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                               onSubmitted: (value) {
                                 if (_pageTc.text.isNotEmpty) {
                                   int pg = int.parse(_pageTc.text) - 1;
-                                  _controller.setPage(pg);
+                                  // _controller.setPage(pg);
                                   _pageFocus.unfocus();
                                   _pageTc.text = "";
                                 }
@@ -274,7 +278,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                             onTap: () {
                               if (_pageTc.text.isNotEmpty) {
                                 int pg = int.parse(_pageTc.text) - 1;
-                                _controller.setPage(pg);
+                                // _controller.setPage(pg);
                                 _pageFocus.unfocus();
                                 _pageTc.text = "";
                               }
@@ -499,16 +503,25 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                       },
                     ),
                   if (widget.isFromPro && widget.isPast && !isPlaying)
-                    FloatingActionButton(
-                      child: const Text(
-                        "ድምፁን አጫውት",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: whiteColor,
+                    InkWell(
+                      child: Card(
+                        color: primaryColor,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 10,
+                          ),
+                          child: const Text(
+                            "ድምፁን አጫውት",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: whiteColor,
+                            ),
+                          ),
                         ),
                       ),
-                      onPressed: () {
-                        _scaffoldKey.currentState!.openDrawer();
+                      onTap: () {
+                        ref.read(lessonNotifierProvider.notifier).playLesson();
                       },
                     ),
                   const SizedBox(
@@ -566,7 +579,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                 courseModel.courseId,
                 () {
                   if (widget.isFromPro) {
-                    return;
+                    return false;
                   }
                   // audioPlayer.sequenceState.
 
@@ -585,38 +598,47 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                 },
               ),
               body: SafeArea(
-                child: PDFView(
-                  filePath: widget.path,
-                  defaultPage: courseModel.pdfPage.toInt() - 1,
-                  pageSnap: false,
-                  autoSpacing: false,
-                  nightMode: theme == ThemeMode.dark,
-                  pageFling: false,
-                  onRender: (pgs) {
-                    setState(() {
-                      pages = pgs;
-                      isReady = true;
-                    });
-                  },
-                  onError: (error) {
-                    toast(error, ToastType.error, context);
-                  },
-                  onPageError: (page, error) {
-                    toast(
-                        '$page: ${error.toString()}', ToastType.error, context);
-                  },
-                  onViewCreated: (PDFViewController pdfViewController) {
-                    _controller = pdfViewController;
-                  },
-                  onPageChanged: (int? page, int? total) {
-                    if (page != null && total != null) {
-                      ref.read(pdfPageProvider.notifier).update((i) => page);
-                      currentPage = page;
-                      toast("${page + 1} / $total", ToastType.normal, context);
-                    }
-                  },
-                ),
-              ),
+                  child: PdfView(
+                controller: _controller,
+                pageSnapping: false,
+                scrollDirection: Axis.vertical,
+                onPageChanged: (page) {
+                  ref.read(pdfPageProvider.notifier).update((i) => page);
+                  currentPage = page;
+                  toast("${page + 1} / ${_controller.pagesCount}", ToastType.normal, context);
+                },
+              )
+                  // PDFView(
+                  //   filePath: widget.path,
+                  //   defaultPage: courseModel.pdfPage.toInt() - 1,
+                  //   autoSpacing: false,
+                  //   nightMode: theme == ThemeMode.dark,
+                  //   pageFling: false,
+                  //   onRender: (pgs) {
+                  //     setState(() {
+                  //       pages = pgs;
+                  //       isReady = true;
+                  //     });
+                  //   },
+                  //   onError: (error) {
+                  //     toast(error, ToastType.error, context);
+                  //   },
+                  //   onPageError: (page, error) {
+                  //     toast(
+                  //         '$page: ${error.toString()}', ToastType.error, context);
+                  //   },
+                  //   onViewCreated: (PDFViewController pdfViewController) {
+                  //     _controller = pdfViewController;
+                  //   },
+                  //   onPageChanged: (int? page, int? total) {
+                  //     if (page != null && total != null) {
+                  //       ref.read(pdfPageProvider.notifier).update((i) => page);
+                  //       currentPage = page;
+                  //       toast("${page + 1} / $total", ToastType.normal, context);
+                  //     }
+                  //   },
+                  // ),
+                  ),
             );
           }),
     );
