@@ -91,7 +91,7 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
                 discussionData: discussionData,
                 isExamLocked: isExamLocked,
                 isExamCurrent: isCurrentLesson && isTodayExamDay,
-                isLocked: isLocked,
+                isLocked: isLocked && !hasExam,
                 isCurrent: isCurrentLesson && isTodayDiscussion,
               );
             } else {
@@ -101,11 +101,18 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
               final bool isTodayDiscussion = ref
                   .read(assignedCoursesNotifierProvider.notifier)
                   .isTodayDiscussionDay(ref);
+              final bool isTodayLesson = ref
+                  .read(assignedCoursesNotifierProvider.notifier)
+                  .isTodayLessonDay();
               bool isCurrentLesson = lesson.order == currentLessonIndex;
               bool isPastLesson = lesson.order < currentLessonIndex;
               final bool isLocked = (lesson.order > currentLessonIndex);
 
               if (isCurrentLesson && isTodayDiscussion) {
+                isCurrentLesson = false;
+                isPastLesson = true;
+              } 
+               if (!isTodayLesson && isCurrentLesson) {
                 isCurrentLesson = false;
                 isPastLesson = true;
               }

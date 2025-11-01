@@ -12,16 +12,25 @@ const String databaseUrl =
 const String dbPath = "/Islamic Online Learning/db/myDB.db";
 const String serverUrl = "https://ilmfelagi.com/api";
 
-//new apis
+//main apis
 const String baseUrl = "https://ilmfelagi-pro-backend.onrender.com/api/v1";
 //sub apis
+//curriculums
 const String curriculumsApi = "$baseUrl/curriculums/all";
 const String getCurriculumApi = "$baseUrl/curriculums";
 const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
-const String confusionsApi = "$baseUrl/confusions";
 const String getQuizzesApi = "$baseUrl/curriculums/{lessonId}/quizzes";
+//confusions
+const String confusionsApi = "$baseUrl/confusions";
+//tests
 const String getTestQuestionApi = "$baseUrl/tests";
+const String getGivenTimeApi = "$baseUrl/tests/givenTime";
+const String getCheckTestApi = "$baseUrl/tests/checkTest";
+const String addTestAttemptApi = "$baseUrl/tests/start";
+const String submitTestApi = "$baseUrl/tests/submit";
+//quizAttempts
 const String quizAttemptsApi = "$baseUrl/quizAttempts";
+//streaks
 const String addStreakApi = "$baseUrl/streaks";
 //auth
 const String requestOtpApi = "$baseUrl/auth/otp";
@@ -67,7 +76,7 @@ void toast(String message, ToastType toastType, BuildContext context,
         style: const TextStyle(color: whiteColor),
       ),
       dismissDirection: DismissDirection.down,
-      duration: Duration(milliseconds: isLong ? 3000 : 1200),
+      duration: Duration(milliseconds: isLong ? 4000 : 1200),
       backgroundColor: toastType == ToastType.error
           ? Colors.red
           : toastType == ToastType.success

@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/static_datas.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
+import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
 import 'package:islamic_online_learning/features/quiz/view/pages/question_page.dart';
 
 class ExamCard extends ConsumerStatefulWidget {
@@ -28,12 +31,66 @@ class ExamCard extends ConsumerStatefulWidget {
 }
 
 class _ExamCardState extends ConsumerState<ExamCard> {
+  ConstScore? constScore;
+  Score? getScore() {
+    final isPastLesson = !widget.isCurrent && !widget.isLastExam;
+    final testResult = ref
+        .watch(assignedCoursesNotifierProvider)
+        .testAttempts
+        .where(
+          (e) => e.afterLessonNum == widget.examData.lessonTo,
+        )
+        .toList();
+    print(
+        "testResult: $testResult, $isPastLesson ${widget.examData.lessonFrom}");
+    TestAttempt? testAttempt = testResult.isNotEmpty ? testResult.first : null;
+
+    if (testAttempt == null) {
+      return null;
+    }
+
+    final scoresResult = ref
+        .watch(assignedCoursesNotifierProvider)
+        .scores
+        .where(
+          (e) => e.targetId == testAttempt.id,
+        )
+        .toList();
+    print("scoresResult: $scoresResult");
+    Score? score = scoresResult.isNotEmpty ? scoresResult.first : null;
+    if (isPastLesson && score == null) {
+      score = Score(
+        id: "id",
+        targetType: "IndividualAssignment",
+        targetId: testAttempt.id,
+        score: 0,
+        gradeWaiting: false,
+        outOf: constScore?.totalScore ?? 0,
+        userId: "userId",
+        date: DateTime.now(),
+      );
+    }
+    return score;
+  }
+
+  Color getColor(double prcnt) {
+    prcnt = prcnt * 100;
+    if (prcnt < 50) {
+      return Colors.red;
+    } else {
+      return primaryColor;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
-    final score = ConstScore.get(
+    constScore = ConstScore.get(
         ScoreNames.IndividualAssignment, ref, authState.scores ?? []);
+
+    Score? score = getScore();
+    print("score: $score");
 
     return Container(
       // key:_key,
@@ -95,15 +152,37 @@ class _ExamCardState extends ConsumerState<ExamCard> {
                                     vertical: .5,
                                   ),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
+                                    border: score != null
+                                        ? Border.all(
+                                            color: score.gradeWaiting
+                                                ? primaryColor
+                                                : getColor(
+                                                    score.score / score.outOf,
+                                                  ),
+                                          )
+                                        : Border.all(color: Colors.grey),
                                     borderRadius: BorderRadius.circular(3),
                                   ),
-                                  child: Text(
-                                    "${score?.totalScore ?? "..."} ነጥብ",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                    ),
-                                  ),
+                                  child: score != null
+                                      ? Text(
+                                          score.gradeWaiting
+                                              ? "እየታረመ ነው"
+                                              : "${score.score}/${score.outOf} ነጥብ",
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: score.gradeWaiting
+                                                ? primaryColor
+                                                : getColor(
+                                                    score.score / score.outOf,
+                                                  ),
+                                          ),
+                                        )
+                                      : Text(
+                                          "${score != null}${constScore?.totalScore ?? "..."} ነጥብ",
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                          ),
+                                        ),
                                 ),
                               )
                             ],
@@ -113,13 +192,14 @@ class _ExamCardState extends ConsumerState<ExamCard> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: widget.isCurrent
+                      child: widget.isCurrent && score == null
                           ? ElevatedButton(
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => QuestionPage(),
+                                    builder: (_) =>
+                                        QuestionPage(widget.examData.title),
                                   ),
                                 );
                               },

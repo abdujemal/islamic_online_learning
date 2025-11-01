@@ -16,6 +16,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       final curriculumNGroup = await service.fetchCurriculum();
       final curriculum = curriculumNGroup.curriculum;
       final scores = curriculumNGroup.scores;
+      final testAttempts = curriculumNGroup.testAttempts;
       final group = curriculumNGroup.group;
       if (curriculum == null) {
         throw Exception("No curriculum assigned yet");
@@ -26,6 +27,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
         isLoading: false,
         curriculum: curriculum,
         scores: scores,
+        testAttempts: testAttempts,
       );
     } catch (e) {
       print("Error: $e");
@@ -168,7 +170,19 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
   bool isTodayExamDay() {
     DateTime today = DateTime.now();
-    return today.weekday == DateTime.friday;
+    //TODO: change it to the real one
+    return today.weekday == DateTime.saturday;
+  }
+
+  bool isTodayLessonDay() {
+    DateTime today = DateTime.now();
+    final lessonDays = [
+      DateTime.monday,
+      DateTime.tuesday,
+      DateTime.wednesday,
+      DateTime.thursday
+    ];
+    return lessonDays.contains(today.weekday);
   }
 
   ExamData getExamData(List<DiscussionData> discussions, WidgetRef ref) {

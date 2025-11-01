@@ -42,10 +42,8 @@ class _LessonCardState extends ConsumerState<LessonCard> {
 
   Color getColor(double prcnt) {
     prcnt = prcnt * 100;
-    if (prcnt < 30) {
+    if (prcnt < 50) {
       return Colors.red;
-    } else if (prcnt < 60) {
-      return Colors.amber;
     } else {
       return primaryColor;
     }

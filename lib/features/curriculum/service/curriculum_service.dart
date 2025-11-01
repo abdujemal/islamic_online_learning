@@ -10,6 +10,7 @@ import 'package:islamic_online_learning/features/curriculum/model/assigned_cours
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_db_helper.dart';
+import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CurriculumService {
@@ -85,6 +86,7 @@ class CurriculumService {
               : null,
           group: currNGroup.group,
           scores: currNGroup.scores,
+          testAttempts: currNGroup.testAttempts,
         );
       }
     } else {
@@ -99,32 +101,40 @@ class CurriculumNGroup {
   final Curriculum? curriculum;
   final CourseRelatedData group;
   final List<Score> scores;
+  final List<TestAttempt> testAttempts;
   CurriculumNGroup({
     required this.curriculum,
     required this.group,
     required this.scores,
+    required this.testAttempts,
   });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'curriculum': curriculum?.toMap(),
       'group': group.toMap(),
-      'scores': scores.map((e) => e.toMap())
+      'scores': scores.map((e) => e.toMap()),
+      'testAttempts': testAttempts.map((e) => e.toMap())
     };
   }
 
   factory CurriculumNGroup.fromMap(Map<String, dynamic> map) {
     return CurriculumNGroup(
-      curriculum: map['currentCurriculum'] != null
-          ? Curriculum.fromMap(map['currentCurriculum'] as Map<String, dynamic>)
-          : null,
-      group: CourseRelatedData.fromMap(map['group'] as Map<String, dynamic>),
-      scores: List<Score>.from(
-        (map["scores"] as List<dynamic>).map(
-          (e) => Score.fromMap(e),
+        curriculum: map['currentCurriculum'] != null
+            ? Curriculum.fromMap(
+                map['currentCurriculum'] as Map<String, dynamic>)
+            : null,
+        group: CourseRelatedData.fromMap(map['group'] as Map<String, dynamic>),
+        scores: List<Score>.from(
+          (map["scores"] as List<dynamic>).map(
+            (e) => Score.fromMap(e),
+          ),
         ),
-      ),
-    );
+        testAttempts: List<TestAttempt>.from(
+          (map["testAttempts"] as List<dynamic>).map(
+            (e) => TestAttempt.fromMap(e),
+          ),
+        ));
   }
 
   String toJson() => json.encode(toMap());
