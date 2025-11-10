@@ -65,12 +65,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<bool> checkIfTheCourseStarted(WidgetRef ref) async {
     getMyInfo(ref.context);
-    final started = await hasCourseStarted();
-    if (started == true) {
-      state = state.copyWith(courseStarted: true);
-      ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum(ref);
-      return true;
-    } else {
+    try{
+      final started = await hasCourseStarted();
+      if (started == true) {
+        state = state.copyWith(courseStarted: true);
+        ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum(ref);
+        return true;
+      } else {
+        return false;
+      }
+
+    }catch(err){
       return false;
     }
   }

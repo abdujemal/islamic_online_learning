@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
-
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <application
         android:label="ዒልም ፈላጊ"
         android:name="${applicationName}"
@@ -80,6 +80,12 @@
             <action android:name="android.intent.action.MEDIA_BUTTON" />
           </intent-filter>
         </receiver> 
+        <!-- for live kit -->
+        <service
+          android:name="de.julianassmann.flutter_background.IsolateHolderService"
+          android:enabled="true"
+          android:exported="false"
+          android:foregroundServiceType="mediaProjection" />
         
 
         <!-- <service android:name="flutter.overlay.window.flutter_overlay_window.OverlayService" android:exported="false" />

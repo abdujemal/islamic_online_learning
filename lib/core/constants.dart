@@ -14,6 +14,9 @@ const String serverUrl = "https://ilmfelagi.com/api";
 
 //main apis
 const String baseUrl = "https://ilmfelagi-pro-backend.onrender.com/api/v1";
+//livekit token generater
+const String LIVEKIT_URL = "wss://islamic-lms-w13mlg50.livekit.cloud";
+const String TOKEN_ENDPOINT = "$baseUrl/discussions/livekit/token";
 //sub apis
 //curriculums
 const String curriculumsApi = "$baseUrl/curriculums/all";
