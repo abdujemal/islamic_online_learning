@@ -25,6 +25,8 @@ const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
 const String getQuizzesApi = "$baseUrl/curriculums/{lessonId}/quizzes";
 //confusions
 const String confusionsApi = "$baseUrl/confusions";
+//discussions
+const String discussionsApi = "$baseUrl/discussions";
 //tests
 const String getTestQuestionApi = "$baseUrl/tests";
 const String getGivenTimeApi = "$baseUrl/tests/givenTime";
@@ -245,3 +247,9 @@ String emailBlopper(String email) {
     return email;
   }
 }
+
+String formatTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final secs = seconds % 60;
+    return "${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}";
+  }

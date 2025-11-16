@@ -76,12 +76,6 @@ class _ShortAnswerQuizState extends ConsumerState<ShortAnswerQuiz> {
     );
   }
 
-  String _formatTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    return "${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}";
-  }
-
   void _submitAnswers() {
     _timer.cancel();
 
@@ -182,7 +176,7 @@ class _ShortAnswerQuizState extends ConsumerState<ShortAnswerQuiz> {
             ),
 
             Text(
-              _formatTime(_remainingSeconds),
+              formatTime(_remainingSeconds),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: _remainingSeconds < 60 ? Colors.red : null,

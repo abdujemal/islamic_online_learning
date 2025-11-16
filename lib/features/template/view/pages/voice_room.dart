@@ -1,271 +1,146 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_notifier.dart';
+import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_state.dart';
+import 'package:islamic_online_learning/utils.dart';
 import 'package:livekit_client/livekit_client.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class VoiceRoomPage extends ConsumerStatefulWidget {
-  const VoiceRoomPage({super.key});
+  final String title;
+  final int afterLessonNo;
+  const VoiceRoomPage({
+    super.key,
+    required this.title,
+    required this.afterLessonNo,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _VoiceRoomPageState();
 }
 
 class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
-  Room? _room;
-  bool _isConnecting = false;
-  bool _isMuted = false;
-  List<RemoteParticipant> _participants = [];
-  Timer? _speakerPollTimer;
-  String _identity = 'guest${DateTime.now().millisecondsSinceEpoch % 10000}';
-  String _roomName = 'telegram-style-room';
-  EventsListener<RoomEvent>? _listener;
+  // Room? room;
+  // EventsListener<RoomEvent>? listener;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _speakerPollTimer?.cancel();
-    _room?.dispose();
-    super.dispose();
-  }
-
-  Future<String> _fetchToken(String identity, String roomName) async {
-    final resp = await customPostRequest(
-      TOKEN_ENDPOINT,
-      {"identity": identity, "room": roomName},
-      authorized: true,
-    );
-
-    if (resp.statusCode != 200) {
-      throw Exception(
-          'Token request failed (${resp.statusCode}): ${resp.body}');
-    }
-    // Accept both JSON { token } and plain string body
-    try {
-      final j = json.decode(resp.body);
-      if (j is Map && j['token'] != null) return j['token'];
-    } catch (_) {}
-    return resp.body.trim();
-  }
-
-  Future<void> _ensureMicPermission() async {
-    final status = await Permission.microphone.status;
-    if (!status.isGranted) {
-      final result = await Permission.microphone.request();
-      if (!result.isGranted) {
-        throw Exception('Microphone permission not granted');
-      }
-    }
-  }
-
-  Future<void> _connect() async {
-    setState(() => _isConnecting = true);
-    try {
-      await _ensureMicPermission();
-
-      final token = await _fetchToken(_identity, _roomName);
-
-      // Connect to LiveKit. In typical LiveKit Cloud flow you pass the WSS URL
-      // and the server-generated token (JWT).
-      final roomOptions = RoomOptions(
-        adaptiveStream: true,
-        dynacast: true,
-        // ... your room options
-      );
-
-      final room = Room(roomOptions: roomOptions);
-
-      await room.connect(LIVEKIT_URL, token);
-
-      await room.localParticipant?.setMicrophoneEnabled(true);
-
-      _listener = room.createListener();
-      _listener!
-        ..on<RoomDisconnectedEvent>((_) {
-          // handle disconnect
-          debugPrint('Disconnected: ${_.reason}');
-          _stopSpeakerPoll();
-          setState(() {
-            _participants = [];
-          });
-        })
-        ..on<ParticipantConnectedEvent>((e) {
-          print("participant joined: ${e.participant.identity}");
-        });
-
-      // Keep participants in local state
-      void updateParticipants() {
-        final remote = room.remoteParticipants;
-        // convert to RemoteParticipant list snapshot:
-        print("remote participants: ${remote.length}");
-        final list = remote.values.whereType<RemoteParticipant>().toList();
-        setState(() {
-          _participants = list;
-        });
-      }
-
-      // initial snapshot
-      updateParticipants();
-
-      // subscribe to participant events (SDK exposes participant events; this uses a simple poll)
-      _speakerPollTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-        updateParticipants();
-      });
-
-      // Automatically enable mic (local publish)
-      try {
-        await room.localParticipant?.setMicrophoneEnabled(!_isMuted);
-      } catch (e) {
-        debugPrint('Could not enable mic: $e');
-      }
-
-      setState(() {
-        _room = room;
-        _isConnecting = false;
-      });
-    } catch (e) {
-      setState(() => _isConnecting = false);
-      _showError('Connection failed: $e');
-    }
-  }
-
-  Future<void> _disconnect() async {
-    _stopSpeakerPoll();
-    try {
-      await _room?.dispose();
-    } catch (_) {}
-    setState(() {
-      _room = null;
-      _participants = [];
+    Future.microtask(() {
+      final voiceRoomNotifier = ref.read(voiceRoomNotifierProvider.notifier);
+      voiceRoomNotifier.connect(ref, widget.title);
     });
   }
 
-  void _stopSpeakerPoll() {
-    _speakerPollTimer?.cancel();
-    _speakerPollTimer = null;
-  }
-
-  Future<void> _toggleMute() async {
-    try {
-      final newMuted = !_isMuted;
-      await _room?.localParticipant?.setMicrophoneEnabled(!newMuted);
-      setState(() {
-        _isMuted = newMuted;
-      });
-    } catch (e) {
-      _showError('Failed to toggle mic: $e');
-    }
-  }
+  // @override
+  // void dispose() {
+  //   ref.read(voiceRoomNotifierProvider.notifier).disconnect();
+  //   super.dispose();
+  // }
 
   void _showError(String msg) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  Widget _buildParticipantTile(RemoteParticipant p, bool isLarge) {
-    final identity = p.identity ?? 'anon';
-    final isSpeaking = p.isSpeaking ?? false;
+  Widget _buildParticipantTile(Participant p, bool isLarge) {
+    final identity = p.identity;
+    final isSpeaking = p.isSpeaking;
     final initials = identity.isEmpty ? 'U' : identity[0].toUpperCase();
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.all(8),
-      padding: EdgeInsets.all(isLarge ? 16 : 8),
+      margin: const EdgeInsets.only(left: 8),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
         color:
             isSpeaking ? Colors.tealAccent.withOpacity(0.15) : Colors.white12,
         borderRadius: BorderRadius.circular(isLarge ? 16 : 12),
         border: Border.all(
           color: isSpeaking ? Colors.tealAccent : Colors.transparent,
-          width: isSpeaking ? 3 : 0,
+          width: 3,
         ),
       ),
-      width: isLarge ? 180 : 110,
-      height: isLarge ? 220 : 140,
+      width: 110,
+      // height: isLarge ? 220 : 140,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircleAvatar(
-            radius: isLarge ? 40 : 28,
-            backgroundColor:
-                Colors.primaries[identity.hashCode % Colors.primaries.length],
-            child: Text(initials,
-                style: TextStyle(
-                    fontSize: isLarge ? 28 : 18, color: Colors.white)),
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: isLarge ? 40 : 28,
+                backgroundColor: userIdToColor(identity),
+                child: Text(
+                  initials,
+                  style: TextStyle(
+                    fontSize: isLarge ? 28 : 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: p.isMuted
+                      ? Icon(
+                          Icons.mic_off,
+                          size: 12,
+                          color: Colors.white,
+                        )
+                      : p.connectionQuality == ConnectionQuality.poor
+                          ? Icon(
+                              Icons.signal_cellular_connected_no_internet_0_bar,
+                              size: 12,
+                              color: Colors.redAccent,
+                            )
+                          : Container(),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(identity,
-              style: TextStyle(
-                  fontSize: isLarge ? 18 : 14, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Text(
-              p.isMuted == true
-                  ? 'Muted'
-                  : (isSpeaking ? 'Speaking' : 'Listening'),
-              style: TextStyle(fontSize: 12, color: Colors.white70)),
+            identity,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 6),
         ],
       ),
     );
   }
 
-  Widget _buildMainArea() {
-    // Arrange participants: highlight a "speaker" (first speaking participant or first participant)
-    RemoteParticipant? main;
-    if (_participants.isNotEmpty) {
-      main = _participants.firstWhere((p) => p.isSpeaking == true,
-          orElse: () => _participants.first);
-    }
-
+  Widget _buildMainArea(VoiceRoomState state) {
     return Column(
       children: [
-        const SizedBox(height: 24),
-        Text(
-          'Voice Chat — ${_roomName.replaceAll('-', ' ')}',
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 16),
-        if (main != null)
-          _buildParticipantTile(main, true)
-        else
-          Container(
-            width: 180,
-            height: 220,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: Colors.white12, borderRadius: BorderRadius.circular(16)),
-            child: const Text('No participants',
-                style: TextStyle(color: Colors.white70)),
-          ),
-        const SizedBox(height: 18),
-        Text(
-          '${_participants.length + (_room != null ? 1 : 0)} participant(s) connected',
-          style: const TextStyle(color: Colors.white70),
-        ),
         const SizedBox(height: 14),
-        Expanded(
-          child: GridView.count(
-            crossAxisCount: 2,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            childAspectRatio: 0.7,
-            children: _participants
-                .map((p) => _buildParticipantTile(p, false))
-                .toList(),
+        Row(
+          children: List.generate(
+            state.participants.length,
+            (index) => _buildParticipantTile(
+              state.participants[index],
+              false,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildBottomControls() {
-    final connected = _room != null;
+  Widget _buildBottomControls(VoiceRoomState state) {
+    final connected = state.room != null;
+    print('VoiceRoomPage: connected=$connected, isMuted=${state.isMuted}');
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
@@ -274,10 +149,15 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
             // Mute/unmute
             FloatingActionButton(
               heroTag: 'mute',
-              backgroundColor: _isMuted ? Colors.redAccent : Colors.white,
-              onPressed: connected ? _toggleMute : null,
-              child: Icon(_isMuted ? Icons.mic_off : Icons.mic,
-                  color: _isMuted ? Colors.white : Colors.black),
+              backgroundColor: state.isMuted ? Colors.redAccent : Colors.white,
+              onPressed: () {
+                if (connected) {
+                  ref.read(voiceRoomNotifierProvider.notifier).toggleMute(ref);
+                }
+              },
+              // connected ? ref.read(voiceRoomNotifierProvider.notifier).toggleMute : null,
+              child: Icon(state.isMuted ? Icons.mic_off : Icons.mic,
+                  color: state.isMuted ? Colors.white : Colors.black),
             ),
             const SizedBox(width: 12),
             // Leave / Join
@@ -290,19 +170,23 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
-                onPressed: _isConnecting
+                onPressed: state.isConnecting
                     ? null
                     : () async {
                         if (connected) {
-                          await _disconnect();
+                          await ref
+                              .read(voiceRoomNotifierProvider.notifier)
+                              .disconnect();
                         } else {
-                          await _connect();
+                          await ref
+                              .read(voiceRoomNotifierProvider.notifier)
+                              .connect(ref, widget.title);
                         }
                       },
                 child: Text(
-                  _isConnecting
-                      ? 'Connecting...'
-                      : (connected ? 'Leave Call' : 'Join Call'),
+                  state.isConnecting
+                      ? 'በመገናኘት ላይ...'
+                      : (connected ? 'ጥሪውን ዝጋው' : 'ጥሪውን ጀምር'),
                   style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -327,7 +211,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
     );
   }
 
-  Widget _buildTopBar() {
+  Widget _buildTopBar(VoiceRoomState state) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -339,65 +223,77 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
             ),
             const SizedBox(width: 12),
             Expanded(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Telegram Voice Chat',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text(
-                    (_room != null) ? 'In call as $_identity' : 'Not connected',
-                    style: TextStyle(fontSize: 12, color: Colors.white70)),
-              ],
-            )),
-            IconButton(
-              onPressed: () async {
-                final identity = await _showIdentityDialog();
-                if (identity != null && identity.isNotEmpty) {
-                  setState(() {
-                    _identity = identity;
-                  });
-                }
-              },
-              icon: const Icon(Icons.edit, color: Colors.white70),
-            )
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'የውይይት መድረክ',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    (state.room != null)
+                        ? 'በ${state.identity} ስም አየር ላይ ኖት'
+                        : 'አልተገናኘም',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Future<String?> _showIdentityDialog() {
-    final controller = TextEditingController(text: _identity);
-    return showDialog<String>(
-      context: context,
-      builder: (c) => AlertDialog(
-        title: const Text('Set display name'),
-        content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(labelText: 'Display name')),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(c), child: const Text('Cancel')),
-          TextButton(
-              onPressed: () => Navigator.pop(c, controller.text.trim()),
-              child: const Text('Save')),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // replicate a Telegram vibe
-      body: Column(
-        children: [
-          _buildTopBar(),
-          Expanded(child: _buildMainArea()),
-          _buildBottomControls(),
-        ],
+    final voiceRoomState = ref.watch(voiceRoomNotifierProvider);
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        ref.read(voiceRoomNotifierProvider.notifier).disconnect();
+        // return Future.value(true);
+      },
+      child: Scaffold(
+        body: Column(
+          children: [
+            _buildTopBar(voiceRoomState),
+            Consumer(builder: (context, ref, _) {
+              final remainingSeconds = ref.watch(remainingSecondsProvider);
+              if (remainingSeconds == 0 || voiceRoomState.timer == null) {
+                return Container();
+              }
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  LinearProgressIndicator(
+                    value: remainingSeconds /
+                            voiceRoomState.totalSeconds,
+                    backgroundColor: Colors.white12,
+                    color: Colors.tealAccent,
+                  ),
+                  Text(
+                      "${remainingSeconds /
+                            voiceRoomState.totalSeconds}"),
+                  Text(
+                    'ቀሪ ጊዜ: ${formatTime(remainingSeconds)}',
+                    style: TextStyle(
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              );
+            }),
+            Expanded(child: _buildMainArea(voiceRoomState)),
+            _buildBottomControls(voiceRoomState),
+          ],
+        ),
       ),
     );
   }

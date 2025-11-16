@@ -7,6 +7,7 @@ import 'package:islamic_online_learning/features/auth/view/controller/provider.d
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/exam_card.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:islamic_online_learning/features/template/view/pages/voice_room.dart';
 
 class DiscussionCard extends ConsumerStatefulWidget {
   final bool isLocked;
@@ -51,7 +52,8 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
-    final score = ConstScore.get(ScoreNames.Discussion, ref, authState.scores ?? []);
+    final score =
+        ConstScore.get(ScoreNames.Discussion, ref, authState.scores ?? []);
     return Column(
       key: _key,
       children: [
@@ -134,7 +136,18 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                           width: double.infinity,
                           child: widget.isCurrent
                               ? ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => VoiceRoomPage(
+                                          title: widget.discussionData.title,
+                                          afterLessonNo:
+                                              widget.discussionData.lessonTo,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue,
                                     shape: RoundedRectangleBorder(

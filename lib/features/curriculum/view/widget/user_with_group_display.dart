@@ -139,7 +139,7 @@ class _UserWithGroupDisplayState extends ConsumerState<UserWithGroupDisplay> {
                             crossAxisCount: 2,
                             mainAxisSpacing: 2,
                             crossAxisSpacing: 2,
-                            childAspectRatio: 4,
+                            childAspectRatio: 2.4,
                           ),
                           itemCount: members.length,
                           itemBuilder: (context, index) => Container(
@@ -157,7 +157,7 @@ class _UserWithGroupDisplayState extends ConsumerState<UserWithGroupDisplay> {
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundColor:
-                                    userIdToColor(members[index].id),
+                                    userIdToColor(members[index].name),
                                 child: Text(
                                   members[index].name[0].toUpperCase(),
                                   style: const TextStyle(

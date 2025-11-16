@@ -20,7 +20,6 @@ import 'package:islamic_online_learning/features/main/presentation/widgets/botto
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_drawer.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/rate_us_dailog.dart';
-import 'package:islamic_online_learning/features/template/view/pages/voice_room.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -377,17 +376,7 @@ class _MainPageState extends ConsumerState<MainPage>
                   ),
                   actions: [
                     currentIndex != 1
-                        ? IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => VoiceRoomPage(),
-                                ),
-                              );
-                            },
-                            icon: Icon(Icons.call),
-                          )
+                        ? SizedBox()
                         : IconButton(
                             onPressed: () {
                               Navigator.push(
