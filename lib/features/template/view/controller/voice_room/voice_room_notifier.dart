@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/quiz/model/question.dart';
+import 'package:islamic_online_learning/features/quiz/model/quiz.dart';
 import 'package:islamic_online_learning/features/template/model/discussion.dart';
 import 'package:islamic_online_learning/features/template/service/voice_room_service.dart';
 import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_state.dart';
@@ -12,6 +15,10 @@ import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 final remainingSecondsProvider = StateProvider<int>((ref) => 0);
+final discussionQuizzesProvider = StateProvider<List<Quiz>?>((ref) => null);
+final discussionQuestionsProvider =
+    StateProvider<List<Question>?>((ref) => null);
+final discussionTopicsProvider = StateProvider<List<String>?>((ref) => null);
 
 final voiceRoomNotifierProvider =
     StateNotifierProvider<VoiceRoomNotifier, VoiceRoomState>((ref) {
@@ -22,15 +29,18 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
   final VoiceRoomService voiceRoomService;
   VoiceRoomNotifier(this.voiceRoomService) : super(VoiceRoomState());
 
-  void startTimer(WidgetRef ref, int seconds) {
+  void startTimer(WidgetRef ref, int seconds, Discussion discussionModel) {
     ref.read(remainingSecondsProvider.notifier).state = seconds;
     state.timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final remainingSeconds = ref.read(remainingSecondsProvider);
       if (remainingSeconds == 0) {
         timer.cancel();
         state.room?.disconnect();
+        state = state.copyWith(
+            room: null, participants: [], status: VoiceRoomStatus.end);
         // _showTimeUpDialog();
       } else {
+        changeStatus(remainingSeconds - 1, ref, discussionModel);
         ref.read(remainingSecondsProvider.notifier).state =
             remainingSeconds - 1;
         // setState(() {
@@ -38,6 +48,60 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
         // });
       }
     });
+  }
+
+  void changeStatus(
+      int remainingSeconds, WidgetRef ref, Discussion discussionModel) {
+    if (state.givenTime == null) return;
+    GivenTime givenTime = state.givenTime!;
+    int sec = givenTime.totalTime - remainingSeconds;
+    int discussion = 0;
+    int quiz = discussion + givenTime.segments.quiz;
+    int assignment = givenTime.segments.assignment;
+    print("$sec $discussion $quiz $assignment");
+
+    if (sec == discussion) {
+      getTopicsOfDiscussion(
+        ref,
+        discussionModel.fromLesson,
+        discussionModel.toLesson,
+      );
+      state = state.copyWith(status: VoiceRoomStatus.discussing);
+      return;
+    } else if (sec == quiz) {
+      state = state.copyWith(status: VoiceRoomStatus.choice);
+      getDiscussionQuizzes(ref);
+      return;
+    } else if (sec == assignment) {
+      getDiscussionShortAnswers(ref);
+      state = state.copyWith(status: VoiceRoomStatus.short);
+      return;
+    }
+  }
+
+  void initStatus(int seconds, WidgetRef ref, Discussion discussionModel) {
+    GivenTime givenTime = state.givenTime!;
+    int sec = givenTime.totalTime - seconds;
+    int discussion = 0;
+    int quiz = discussion + givenTime.segments.quiz;
+    int assignment = givenTime.segments.assignment;
+    if (sec > assignment) {
+      getDiscussionShortAnswers(ref);
+      state = state.copyWith(status: VoiceRoomStatus.short);
+      return;
+    } else if (sec > quiz) {
+      getDiscussionQuizzes(ref);
+      state = state.copyWith(status: VoiceRoomStatus.choice);
+      return;
+    } else if (sec >= discussion) {
+      getTopicsOfDiscussion(
+        ref,
+        discussionModel.fromLesson,
+        discussionModel.toLesson,
+      );
+      state = state.copyWith(status: VoiceRoomStatus.discussing);
+      return;
+    }
   }
 
   Future<Discussion> _createDiscussion(String title) async {
@@ -91,8 +155,9 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
       state = state.copyWith(
         roomName: discussion.id,
         identity: authState.user!.name,
-        totalSeconds: 20 * 60,
+        givenTime: discussion.givenTime,
       );
+      initStatus(discussion.discussionSecond, ref, discussion);
 
       final token = await _fetchToken(state.identity, state.roomName);
 
@@ -109,7 +174,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
 
       await room.connect(LIVEKIT_URL, token);
 
-      startTimer(ref, discussion.discussionSecond);
+      startTimer(ref, discussion.discussionSecond, discussion);
 
       await room.localParticipant?.setMicrophoneEnabled(true);
 
@@ -196,11 +261,12 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
       );
     } catch (e) {
       // setState(() => _isConnecting = false);
+      state = state.copyWith(isConnecting: false);
       if (e.toString().contains("Meeting already done")) {
         toast('ውይይቱ አልቋል!', ToastType.error, ref.context);
         return;
       }
-      state = state.copyWith(isConnecting: false);
+      print(e.toString());
       toast('Connection failed: $e', ToastType.error, ref.context);
     }
   }
@@ -209,6 +275,9 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     // _stopSpeakerPoll();
     try {
       await state.room?.disconnect();
+      await state.listener?.dispose();
+
+      state.timer?.cancel();
     } catch (_) {}
     // state = state.copyWith(
     //   room: null,
@@ -235,11 +304,47 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     }
   }
 
+  Future<void> getDiscussionQuizzes(WidgetRef ref) async {
+    try {
+      final quizzes = await voiceRoomService.getQuizzesForDiscussion();
+      ref.read(discussionQuizzesProvider.notifier).state = quizzes;
+    } catch (e) {
+      toast(e.toString(), ToastType.error, ref.context);
+      print("Error fetching discussion quizzes: $e");
+      ref.read(discussionQuizzesProvider.notifier).state = [];
+    }
+  }
+
+  Future<void> getDiscussionShortAnswers(WidgetRef ref) async {
+    try {
+      final shortAnswers = await voiceRoomService.getQuestionsForDiscussion();
+      ref.read(discussionQuestionsProvider.notifier).state = shortAnswers;
+    } catch (e) {
+      toast(e.toString(), ToastType.error, ref.context);
+      print("Error fetching discussion short answer: $e");
+      ref.read(discussionQuestionsProvider.notifier).state = [];
+    }
+  }
+
+  void getTopicsOfDiscussion(WidgetRef ref, int fromLesson, int toLesson) {
+    final lessons =
+        ref.read(assignedCoursesNotifierProvider).curriculum?.lessons;
+    if (lessons == null) return;
+    final selectedLessons = lessons
+        .where(
+            (lesson) => lesson.order >= fromLesson && lesson.order <= toLesson)
+        .toList();
+
+    final topics = selectedLessons.map((e) => e.title).toList();
+    ref.read(discussionTopicsProvider.notifier).state = topics;
+  }
+
   @override
   void dispose() {
     state.listener?.dispose();
     state.room?.dispose();
     state.timer?.cancel();
+    state = VoiceRoomState();
     super.dispose();
   }
 }

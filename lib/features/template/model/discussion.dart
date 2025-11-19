@@ -3,7 +3,8 @@ import 'dart:convert';
 
 class Discussion {
   final String id;
-  final int afterLesson;
+  final int fromLesson;
+  final int toLesson;
   final int courseNum;
   final int discussionSecond;
   final String curriculumId;
@@ -13,7 +14,8 @@ class Discussion {
   final GivenTime givenTime;
   Discussion({
     required this.id,
-    required this.afterLesson,
+    required this.fromLesson,
+    required this.toLesson,
     required this.courseNum,
     required this.discussionSecond,
     required this.curriculumId,
@@ -36,7 +38,8 @@ class Discussion {
   }) {
     return Discussion(
       id: id ?? this.id,
-      afterLesson: afterLesson ?? this.afterLesson,
+      fromLesson: afterLesson ?? this.fromLesson,
+      toLesson: afterLesson ?? this.toLesson,
       courseNum: courseNum ?? this.courseNum,
       discussionSecond: discussionSecond ?? this.discussionSecond,
       curriculumId: curriculumId ?? this.curriculumId,
@@ -50,7 +53,8 @@ class Discussion {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'afterLesson': afterLesson,
+      'fromLesson': fromLesson,
+      'toLesson': toLesson,
       'courseNum': courseNum,
       'discussionSecond': discussionSecond,
       'curriculumId': curriculumId,
@@ -65,7 +69,8 @@ class Discussion {
       Map<String, dynamic> givenTimeMap) {
     return Discussion(
       id: map['id'] as String,
-      afterLesson: map['afterLesson'] as int,
+      fromLesson: map['fromLesson'] as int,
+      toLesson: map['toLesson'] as int,
       courseNum: map['courseNum'] as int,
       curriculumId: map['curriculumId'] as String,
       title: map['title'] as String,
@@ -86,7 +91,7 @@ class Discussion {
 
   @override
   String toString() {
-    return 'Discussion(id: $id, afterLesson: $afterLesson, courseNum: $courseNum, discussionSecond: $discussionSecond, curriculumId: $curriculumId, title: $title, startAt: $startAt, groupId: $groupId, givenTime: $givenTime)';
+    return 'Discussion(id: $id,  courseNum: $courseNum, discussionSecond: $discussionSecond, curriculumId: $curriculumId, title: $title, startAt: $startAt, groupId: $groupId, givenTime: $givenTime)';
   }
 
   @override
@@ -94,7 +99,7 @@ class Discussion {
     if (identical(this, other)) return true;
 
     return other.id == id &&
-        other.afterLesson == afterLesson &&
+       
         other.courseNum == courseNum &&
         other.discussionSecond == discussionSecond &&
         other.curriculumId == curriculumId &&
@@ -107,7 +112,7 @@ class Discussion {
   @override
   int get hashCode {
     return id.hashCode ^
-        afterLesson.hashCode ^
+       
         courseNum.hashCode ^
         discussionSecond.hashCode ^
         curriculumId.hashCode ^
@@ -151,21 +156,21 @@ class GivenTime {
 }
 
 class Segments {
-  final int attendance;
+  final int discussion;
   final int quiz;
   final int assignment;
   Segments({
-    required this.attendance,
+    required this.discussion,
     required this.quiz,
     required this.assignment,
   });
   Segments copyWith({
-    int? attendance,
+    int? discussion,
     int? quiz,
     int? assignment,
   }) {
     return Segments(
-      attendance: attendance ?? this.attendance,
+      discussion: discussion ?? this.discussion,
       quiz: quiz ?? this.quiz,
       assignment: assignment ?? this.assignment,
     );
@@ -173,15 +178,16 @@ class Segments {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'attendance': attendance,
+      'discussion': discussion,
       'quiz': quiz,
       'assignment': assignment,
     };
   }
 
   factory Segments.fromMap(Map<String, dynamic> map) {
+    print("segment:$map");
     return Segments(
-      attendance: map['attendance'] as int,
+      discussion: map['discussion'] as int,
       quiz: map['quiz'] as int,
       assignment: map['assignment'] as int,
     );
@@ -190,7 +196,7 @@ class Segments {
 
 // totalTime: number;
 //     segments: {
-//         attendance: number;
+//         discussion: number;
 //         quiz: number;
 //         assignment: number;
 //     };

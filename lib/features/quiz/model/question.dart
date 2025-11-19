@@ -6,11 +6,13 @@ class Question {
   final String question;
   final String hint;
   final String lessonId;
+  final int? attempts;
   Question({
     required this.id,
     required this.question,
     required this.hint,
     required this.lessonId,
+    this.attempts,
   });
 
   Question copyWith({
@@ -18,12 +20,14 @@ class Question {
     String? question,
     String? hint,
     String? lessonId,
+    int? attempts,
   }) {
     return Question(
       id: id ?? this.id,
       question: question ?? this.question,
       hint: hint ?? this.hint,
       lessonId: lessonId ?? this.lessonId,
+      attempts: attempts ?? this.attempts,
     );
   }
 
@@ -33,12 +37,13 @@ class Question {
       'question': question,
       'hint': hint,
       'lessonId': lessonId,
+      "attempts": attempts,
     };
   }
 
-  static List<Question> listFromJson(String responseBody, {bool fromDb = false}) {
-    final parsed = jsonDecode(responseBody)
-        as List<dynamic>;
+  static List<Question> listFromJson(String responseBody,
+      {bool fromDb = false}) {
+    final parsed = jsonDecode(responseBody) as List<dynamic>;
     return parsed.map((json) => Question.fromMap(json)).toList();
   }
 
@@ -48,12 +53,14 @@ class Question {
       question: map['question'] as String,
       hint: map['hint'] as String,
       lessonId: map['lessonId'] as String,
+      attempts: map['attempts'] == null ?  map['attempts'] as int: null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Question.fromJson(String source) => Question.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Question.fromJson(String source) =>
+      Question.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -63,19 +70,15 @@ class Question {
   @override
   bool operator ==(covariant Question other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.question == question &&
-      other.hint == hint &&
-      other.lessonId == lessonId;
+
+    return other.id == id &&
+        other.question == question &&
+        other.hint == hint &&
+        other.lessonId == lessonId;
   }
 
   @override
   int get hashCode {
-    return id.hashCode ^
-      question.hashCode ^
-      hint.hashCode ^
-      lessonId.hashCode;
+    return id.hashCode ^ question.hashCode ^ hint.hashCode ^ lessonId.hashCode;
   }
 }

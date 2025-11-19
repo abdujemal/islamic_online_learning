@@ -31,6 +31,7 @@ class QuestionModel {
 
 class MultipleQuestionQuiz extends StatefulWidget {
   final List<QuestionModel> questions;
+  final bool fromDiscussion;
   final Future<bool> Function(int score, Map<String, List<String>> answers)
       onFinish;
 
@@ -38,6 +39,7 @@ class MultipleQuestionQuiz extends StatefulWidget {
     super.key,
     required this.questions,
     required this.onFinish,
+    this.fromDiscussion = false,
   });
 
   @override

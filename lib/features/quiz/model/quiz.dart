@@ -12,6 +12,7 @@ class Quiz {
   final String assignedCourseId;
   final String curriculumId;
   final int answer;
+  final int? attempts;
   Quiz({
     required this.id,
     required this.question,
@@ -21,6 +22,7 @@ class Quiz {
     required this.assignedCourseId,
     required this.curriculumId,
     required this.answer,
+    this.attempts,
   });
 
   Quiz copyWith({
@@ -32,6 +34,7 @@ class Quiz {
     String? assignedCourseId,
     String? curriculumId,
     int? answer,
+    int? attempts,
   }) {
     return Quiz(
       id: id ?? this.id,
@@ -42,6 +45,7 @@ class Quiz {
       assignedCourseId: assignedCourseId ?? this.assignedCourseId,
       curriculumId: curriculumId ?? this.curriculumId,
       answer: answer ?? this.answer,
+      attempts: attempts ?? this.attempts,
     );
   }
 
@@ -55,7 +59,13 @@ class Quiz {
       'assignedCourseId': assignedCourseId,
       'curriculumId': curriculumId,
       'answer': answer,
+      'attempts': attempts,
     };
+  }
+
+  static List<Quiz> listFromJson2(String responseBody) {
+    final parsed = jsonDecode(responseBody) as List<dynamic>;
+    return parsed.map((json) => Quiz.fromMap(json)).toList();
   }
 
   static List<Quiz> listFromJson(String responseBody, {bool fromDb = false}) {
@@ -74,6 +84,7 @@ class Quiz {
       assignedCourseId: map['assignedCourseId'] as String,
       curriculumId: map['curriculumId'] as String,
       answer: map['answer'] as int,
+      attempts: map['attempts'] == null ? map['attempts'] as int : null,
     );
   }
 

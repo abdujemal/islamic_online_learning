@@ -154,7 +154,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     final discussionWeekDay = getWeekDayFromText(discussionDay);
 
     DateTime today = DateTime.now();
-    return today.weekday == 7; //discussionWeekDay;
+    return today.weekday == 3; //discussionWeekDay;
   }
 
   int getWeekDayFromText(String text) {

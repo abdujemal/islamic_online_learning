@@ -1,13 +1,23 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
+import 'package:islamic_online_learning/features/template/model/discussion.dart';
 import 'package:livekit_client/livekit_client.dart';
+
+enum VoiceRoomStatus {
+  initial,
+  discussing,
+  choice,
+  short,
+  end,
+}
 
 class VoiceRoomState {
   bool isConnecting;
+  VoiceRoomStatus status;
   Room? room;
   bool isMuted;
-  int totalSeconds;
+  GivenTime? givenTime;
   List<dynamic> participants;
   Timer? timer;
   String identity;
@@ -21,7 +31,8 @@ class VoiceRoomState {
     this.participants = const [],
     this.roomName = '',
     this.identity = "",
-    this.totalSeconds = 0,
+    this.givenTime,
+    this.status = VoiceRoomStatus.initial,
     this.listener,
     this.timer,
   });
@@ -33,9 +44,10 @@ class VoiceRoomState {
     bool? isMuted,
     List<dynamic>? participants,
     String? identity,
-    int? totalSeconds,
+    GivenTime? givenTime,
     String? roomName,
     EventsListener<RoomEvent>? listener,
+    VoiceRoomStatus? status,
   }) {
     return VoiceRoomState(
       room: room ?? this.room,
@@ -45,8 +57,9 @@ class VoiceRoomState {
       identity: identity ?? this.identity,
       roomName: roomName ?? this.roomName,
       listener: listener ?? this.listener,
-      totalSeconds: totalSeconds ?? this.totalSeconds,
+      givenTime: givenTime ?? this.givenTime,
       timer: timer ?? this.timer,
+      status: status ?? this.status,
     );
   }
 }

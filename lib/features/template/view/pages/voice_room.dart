@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_notifier.dart';
 import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_state.dart';
+import 'package:islamic_online_learning/features/template/view/widget/discussion_task_ui.dart';
 import 'package:islamic_online_learning/utils.dart';
 import 'package:livekit_client/livekit_client.dart';
 
@@ -122,19 +123,19 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
   }
 
   Widget _buildMainArea(VoiceRoomState state) {
-    return Column(
-      children: [
-        const SizedBox(height: 14),
-        Row(
-          children: List.generate(
-            state.participants.length,
-            (index) => _buildParticipantTile(
-              state.participants[index],
-              false,
-            ),
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 15,
+      ),
+      child: Row(
+        children: List.generate(
+          state.participants.length,
+          (index) => _buildParticipantTile(
+            state.participants[index],
+            false,
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -252,6 +253,31 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
     );
   }
 
+  Widget _buildProgressBar(VoiceRoomState voiceRoomState) {
+    return Consumer(builder: (context, ref, _) {
+      final remainingSeconds = ref.watch(remainingSecondsProvider);
+      if (remainingSeconds == 0 || voiceRoomState.timer == null) {
+        return Container();
+      }
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          LinearProgressIndicator(
+            value: remainingSeconds / voiceRoomState.givenTime!.totalTime,
+            backgroundColor: Colors.white12,
+            color: Colors.tealAccent,
+          ),
+          Text(
+            'ቀሪ ጊዜ: ${formatTime(remainingSeconds)}',
+            style: TextStyle(
+              color: Colors.white70,
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final voiceRoomState = ref.watch(voiceRoomNotifierProvider);
@@ -264,34 +290,20 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
         body: Column(
           children: [
             _buildTopBar(voiceRoomState),
-            Consumer(builder: (context, ref, _) {
-              final remainingSeconds = ref.watch(remainingSecondsProvider);
-              if (remainingSeconds == 0 || voiceRoomState.timer == null) {
-                return Container();
-              }
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+            _buildProgressBar(voiceRoomState),
+            Expanded(
+              child: Column(
                 children: [
-                  LinearProgressIndicator(
-                    value: remainingSeconds /
-                            voiceRoomState.totalSeconds,
-                    backgroundColor: Colors.white12,
-                    color: Colors.tealAccent,
-                  ),
-                  Text(
-                      "${remainingSeconds /
-                            voiceRoomState.totalSeconds}"),
-                  Text(
-                    'ቀሪ ጊዜ: ${formatTime(remainingSeconds)}',
-                    style: TextStyle(
-                      color: Colors.white70,
+                  _buildMainArea(voiceRoomState),
+                  Expanded(
+                    child: DiscussionTaskUi(
+                      status: voiceRoomState.status,
                     ),
                   ),
+                  _buildBottomControls(voiceRoomState),
                 ],
-              );
-            }),
-            Expanded(child: _buildMainArea(voiceRoomState)),
-            _buildBottomControls(voiceRoomState),
+              ),
+            )
           ],
         ),
       ),
