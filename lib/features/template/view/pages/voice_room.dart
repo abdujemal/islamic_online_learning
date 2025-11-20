@@ -12,17 +12,20 @@ import 'package:livekit_client/livekit_client.dart';
 class VoiceRoomPage extends ConsumerStatefulWidget {
   final String title;
   final int afterLessonNo;
-  const VoiceRoomPage({
-    super.key,
-    required this.title,
-    required this.afterLessonNo,
-  });
+  final int fromLesson;
+  const VoiceRoomPage(
+      {super.key,
+      required this.title,
+      required this.afterLessonNo,
+      required this.fromLesson});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _VoiceRoomPageState();
 }
 
 class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
+  bool canPop = false;
+
   // Room? room;
   // EventsListener<RoomEvent>? listener;
 
@@ -31,7 +34,11 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
     super.initState();
     Future.microtask(() {
       final voiceRoomNotifier = ref.read(voiceRoomNotifierProvider.notifier);
-      voiceRoomNotifier.connect(ref, widget.title);
+      voiceRoomNotifier.connect(
+        ref,
+        widget.title,
+        widget.fromLesson,
+      );
     });
   }
 
@@ -48,68 +55,87 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
 
   Widget _buildParticipantTile(Participant p, bool isLarge) {
     final identity = p.identity;
+    final isMe = p.runtimeType != RemoteParticipant;
     final isSpeaking = p.isSpeaking;
     final initials = identity.isEmpty ? 'U' : identity[0].toUpperCase();
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.only(left: 8),
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color:
-            isSpeaking ? Colors.tealAccent.withOpacity(0.15) : Colors.white12,
-        borderRadius: BorderRadius.circular(isLarge ? 16 : 12),
-        border: Border.all(
-          color: isSpeaking ? Colors.tealAccent : Colors.transparent,
-          width: 3,
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8.0,
       ),
-      width: 110,
-      // height: isLarge ? 220 : 140,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Stack(
             children: [
-              CircleAvatar(
-                radius: isLarge ? 40 : 28,
-                backgroundColor: userIdToColor(identity),
-                child: Text(
-                  initials,
-                  style: TextStyle(
-                    fontSize: isLarge ? 28 : 18,
-                    color: Colors.white,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 100),
+                padding: EdgeInsets.all(isSpeaking ? 5 : 0),
+                margin: EdgeInsets.all(isSpeaking ? 0 : 5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSpeaking ? Colors.tealAccent : Colors.transparent,
                   ),
                 ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    shape: BoxShape.circle,
-                  ),
-                  child: p.isMuted
-                      ? Icon(
-                          Icons.mic_off,
-                          size: 12,
-                          color: Colors.white,
-                        )
-                      : p.connectionQuality == ConnectionQuality.poor
-                          ? Icon(
-                              Icons.signal_cellular_connected_no_internet_0_bar,
-                              size: 12,
-                              color: Colors.redAccent,
-                            )
-                          : Container(),
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: userIdToColor(identity),
+                        // borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSpeaking
+                              ? Colors.tealAccent
+                              : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                      width: 48,
+                      height: 48,
+                      child: Center(
+                        child: Text(
+                          initials,
+                          style: TextStyle(
+                            fontSize: isLarge ? 28 : 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        padding: EdgeInsets.all(p.isMuted ? 2 : 0),
+                        decoration: BoxDecoration(
+                          color: Colors.black45,
+                          shape: BoxShape.circle,
+                        ),
+                        child: p.isMuted
+                            ? Icon(
+                                Icons.mic_off,
+                                size: 12,
+                                color: Colors.white,
+                              )
+                            : p.connectionQuality == ConnectionQuality.poor
+                                ? Icon(
+                                    Icons
+                                        .signal_cellular_connected_no_internet_0_bar,
+                                    size: 12,
+                                    color: Colors.redAccent,
+                                  )
+                                : Container(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 5),
           Text(
-            identity,
+            "$identity ${isMe ? "(እርሶ)" : ""}",
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -127,15 +153,18 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
       padding: const EdgeInsets.only(
         top: 15,
       ),
-      child: Row(
-        children: List.generate(
-          state.participants.length,
-          (index) => _buildParticipantTile(
-            state.participants[index],
-            false,
+      child: Consumer(builder: (context, ref, _) {
+        final participants = ref.watch(participantsProvider);
+        return Row(
+          children: List.generate(
+            participants.length,
+            (index) => _buildParticipantTile(
+              participants[index],
+              false,
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -177,11 +206,11 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
                         if (connected) {
                           await ref
                               .read(voiceRoomNotifierProvider.notifier)
-                              .disconnect();
+                              .disconnect(ref);
                         } else {
                           await ref
                               .read(voiceRoomNotifierProvider.notifier)
-                              .connect(ref, widget.title);
+                              .connect(ref, widget.title, widget.fromLesson);
                         }
                       },
                 child: Text(
@@ -241,7 +270,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
                         : 'አልተገናኘም',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white70,
+                      // color: Colors.white70,
                     ),
                   ),
                 ],
@@ -269,9 +298,9 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
           ),
           Text(
             'ቀሪ ጊዜ: ${formatTime(remainingSeconds)}',
-            style: TextStyle(
-              color: Colors.white70,
-            ),
+            // style: TextStyle(
+            //   color: Colors.white70,
+            // ),
           ),
         ],
       );
@@ -282,8 +311,19 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
   Widget build(BuildContext context) {
     final voiceRoomState = ref.watch(voiceRoomNotifierProvider);
     return PopScope(
+      canPop: canPop,
       onPopInvokedWithResult: (didPop, result) {
-        ref.read(voiceRoomNotifierProvider.notifier).disconnect();
+        if (canPop == false) {
+          if (voiceRoomState.room == null) {
+            toast("please press it again.", ToastType.normal, context);
+          } else {
+            ref.read(voiceRoomNotifierProvider.notifier).disconnect(ref);
+          }
+          setState(() {
+            canPop = true;
+          });
+        }
+
         // return Future.value(true);
       },
       child: Scaffold(

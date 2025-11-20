@@ -17,6 +17,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       final curriculum = curriculumNGroup.curriculum;
       final scores = curriculumNGroup.scores;
       final testAttempts = curriculumNGroup.testAttempts;
+      final discussions = curriculumNGroup.discussions;
       final group = curriculumNGroup.group;
       if (curriculum == null) {
         throw Exception("No curriculum assigned yet");
@@ -28,6 +29,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
         curriculum: curriculum,
         scores: scores,
         testAttempts: testAttempts,
+        discussions: discussions,
       );
     } catch (e) {
       print("Error: $e");
@@ -154,7 +156,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     final discussionWeekDay = getWeekDayFromText(discussionDay);
 
     DateTime today = DateTime.now();
-    return today.weekday == 3; //discussionWeekDay;
+    return today.weekday == 4; //discussionWeekDay;
   }
 
   int getWeekDayFromText(String text) {

@@ -1,18 +1,25 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/quiz/model/question.dart';
 import 'package:islamic_online_learning/features/quiz/model/quiz.dart';
+import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/template/model/discussion.dart';
 import 'package:islamic_online_learning/features/template/service/voice_room_service.dart';
 import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_state.dart';
+import 'package:islamic_online_learning/features/template/view/widget/discussion_completed_ui.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final participantsProvider = StateProvider<List<dynamic>>((ref) => []);
 
 final remainingSecondsProvider = StateProvider<int>((ref) => 0);
 final discussionQuizzesProvider = StateProvider<List<Quiz>?>((ref) => null);
@@ -25,19 +32,30 @@ final voiceRoomNotifierProvider =
   return VoiceRoomNotifier(ref.read(voiceRoomServiceProvider));
 });
 
+final qaStateProvider = StateProvider<List<QA>>((ref) => []);
+final quizAnsStateProvider = StateProvider<List<QuizAns>>((ref) => []);
+
+final isSubmittingProvider = StateProvider<bool>((ref) => false);
+
 class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
   final VoiceRoomService voiceRoomService;
   VoiceRoomNotifier(this.voiceRoomService) : super(VoiceRoomState());
 
   void startTimer(WidgetRef ref, int seconds, Discussion discussionModel) {
     ref.read(remainingSecondsProvider.notifier).state = seconds;
-    state.timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    state.timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       final remainingSeconds = ref.read(remainingSecondsProvider);
       if (remainingSeconds == 0) {
         timer.cancel();
-        state.room?.disconnect();
-        state = state.copyWith(
-            room: null, participants: [], status: VoiceRoomStatus.end);
+        // state.room?.disconnect();
+        await disconnect(ref);
+        state = state.copyWith(status: VoiceRoomStatus.end);
+        Navigator.pushReplacement(
+          ref.context,
+          MaterialPageRoute(
+            builder: (_) => DiscussionCompletedUi(),
+          ),
+        );
         // _showTimeUpDialog();
       } else {
         changeStatus(remainingSeconds - 1, ref, discussionModel);
@@ -104,8 +122,9 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     }
   }
 
-  Future<Discussion> _createDiscussion(String title) async {
-    final discussion = await voiceRoomService.createDiscussion(title);
+  Future<Discussion> _createDiscussion(String title, int fromLesson) async {
+    final discussion =
+        await voiceRoomService.createDiscussion(title, fromLesson);
     return discussion;
   }
 
@@ -138,7 +157,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     return resp.body.trim();
   }
 
-  Future<void> connect(WidgetRef ref, String title) async {
+  Future<void> connect(WidgetRef ref, String title, int fromLesson) async {
     state = state.copyWith(isConnecting: true);
     try {
       await _ensureMicPermission();
@@ -150,14 +169,18 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
         return;
       }
 
-      final discussion = await _createDiscussion(title);
+      final discussion = await _createDiscussion(title, fromLesson);
 
       state = state.copyWith(
         roomName: discussion.id,
         identity: authState.user!.name,
         givenTime: discussion.givenTime,
+        discussionSec: discussion.discussionSecond,
       );
-      initStatus(discussion.discussionSecond, ref, discussion);
+
+      initStatus(discussion.discussionSecond??0, ref, discussion);
+
+      initAnswer(ref);
 
       final token = await _fetchToken(state.identity, state.roomName);
 
@@ -174,7 +197,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
 
       await room.connect(LIVEKIT_URL, token);
 
-      startTimer(ref, discussion.discussionSecond, discussion);
+      startTimer(ref, discussion.discussionSecond??0, discussion);
 
       await room.localParticipant?.setMicrophoneEnabled(true);
 
@@ -198,7 +221,8 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
           });
         }
 
-        state = state.copyWith(participants: _participants);
+        // state = state.copyWith(participants: _participants);
+        ref.read(participantsProvider.notifier).state = _participants;
       }
 
       state = state.copyWith(listener: room.createListener());
@@ -210,7 +234,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
           // setState(() {
           //   _participants = [];
           // });
-          state = state.copyWith(participants: []);
+          ref.read(participantsProvider.notifier).state = [];
         })
         ..on<ParticipantConnectedEvent>((e) {
           updateParticipants();
@@ -271,12 +295,12 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     }
   }
 
-  Future<void> disconnect() async {
+  Future<void> disconnect(WidgetRef ref) async {
     // _stopSpeakerPoll();
     try {
       await state.room?.disconnect();
       await state.listener?.dispose();
-
+      ref.read(participantsProvider.notifier).state = [];
       state.timer?.cancel();
     } catch (_) {}
     // state = state.copyWith(
@@ -339,10 +363,111 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     ref.read(discussionTopicsProvider.notifier).state = topics;
   }
 
+  Future<void> initAnswer(WidgetRef ref) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    List<dynamic> res1 =
+        json.decode(pref.getString(PrefConsts.discussionQuestions) ?? "[]");
+    List<QA> qas = res1.map((e) => QA.fromMap(e)).toList();
+
+    List<dynamic> res2 =
+        json.decode(pref.getString(PrefConsts.discussionQuizzes) ?? "[]");
+    List<QuizAns> quizAnses = res2.map((e) => QuizAns.fromMap(e)).toList();
+
+    ref.read(qaStateProvider.notifier).state = qas;
+    ref.read(quizAnsStateProvider.notifier).state = quizAnses;
+  }
+
+  Future<void> submitAnswerForQuestion(WidgetRef ref, QA qa) async {
+    final qas = ref.read(qaStateProvider);
+    final cond = qas.where((e) => e.questionId == qa.questionId).isNotEmpty;
+    if (cond) {
+      final newList =
+          qas.map((e) => e.questionId == qa.questionId ? qa : e).toList();
+      ref.read(qaStateProvider.notifier).state = newList;
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      final lst = newList
+          .map(
+            (e) => e.toJson(),
+          )
+          .toList()
+          .toString();
+      print({"lst": lst});
+      pref.setString(
+        PrefConsts.discussionQuestions,
+        lst,
+      );
+    } else {
+      final newList = [...qas, qa];
+      ref.read(qaStateProvider.notifier).state = newList;
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      final lst = newList
+          .map(
+            (e) => e.toJson(),
+          )
+          .toList()
+          .toString();
+      print({"lst": lst});
+      pref.setString(
+        PrefConsts.discussionQuestions,
+        lst,
+      );
+    }
+  }
+
+  Future<void> submitAnswerForQuiz(WidgetRef ref, QuizAns qa) async {
+    final qas = ref.read(quizAnsStateProvider);
+    final cond = qas.where((e) => e.quizId == qa.quizId).isNotEmpty;
+    if (cond) {
+      final newList = qas.map((e) => e.quizId == qa.quizId ? qa : e).toList();
+      ref.read(quizAnsStateProvider.notifier).state = newList;
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      final lst = newList
+          .map(
+            (e) => e.toJson(),
+          )
+          .toList()
+          .toString();
+      print({"lst": lst});
+      pref.setString(
+        PrefConsts.discussionQuizzes,
+        lst,
+      );
+    } else {
+      final newList = [...qas, qa];
+      ref.read(quizAnsStateProvider.notifier).state = newList;
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      final lst = newList
+          .map(
+            (e) => e.toJson(),
+          )
+          .toList()
+          .toString();
+      print({"lst": lst});
+      pref.setString(
+        PrefConsts.discussionQuizzes,
+        lst,
+      );
+    }
+  }
+
+  Future<void> submitDiscussionTask(WidgetRef ref) async {
+    final qas = ref.read(qaStateProvider);
+    final quizAns = ref.read(quizAnsStateProvider);
+    try {
+      ref.read(isSubmittingProvider.notifier).state = true;
+      await voiceRoomService.submit(qas, quizAns);
+    } catch (e) {
+      toast(e.toString(), ToastType.error, ref.context);
+      print(e);
+    }
+  }
+
   @override
   void dispose() {
-    state.listener?.dispose();
+    state.room?.disconnect();
     state.room?.dispose();
+    state.listener?.dispose();
     state.timer?.cancel();
     state = VoiceRoomState();
     super.dispose();

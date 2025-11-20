@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/static_datas.dart';
+import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
+import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/exam_card.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/template/view/pages/voice_room.dart';
@@ -47,13 +50,55 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
   //     }
   //   });
   // }
+  Color getColor(double prcnt) {
+    prcnt = prcnt * 100;
+    if (prcnt < 50) {
+      return Colors.red;
+    } else {
+      return primaryColor;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authNotifierProvider);
-    final score =
+    final constScore =
         ConstScore.get(ScoreNames.Discussion, ref, authState.scores ?? []);
+    final discussions = ref
+        .watch(assignedCoursesNotifierProvider)
+        .discussions
+        .where(
+          (e) => e.toLesson == widget.discussionData.lessonTo,
+        )
+        .toList();
+    print("discussions.length ${discussions.length}");
+    Score? score;
+    if (discussions.isNotEmpty) {
+      final scoresResult = ref
+          .watch(assignedCoursesNotifierProvider)
+          .scores
+          .where(
+            (e) => e.targetId == discussions.first.id,
+          )
+          .toList();
+      print("scoresResult.length ${scoresResult.length}");
+
+      score = scoresResult.isNotEmpty ? scoresResult.first : null;
+      if (!widget.isCurrent && widget.isLocked && score == null) {
+        score = Score(
+          id: "id",
+          targetType: "Discussion",
+          targetId: discussions.first.id,
+          score: 0,
+          gradeWaiting: false,
+          outOf: constScore?.totalScore ?? 0,
+          userId: "userId",
+          date: DateTime.now(),
+        );
+      }
+    }
+
     return Column(
       key: _key,
       children: [
@@ -116,15 +161,39 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                                         vertical: .5,
                                       ),
                                       decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey),
+                                        border: score != null
+                                            ? Border.all(
+                                                color: score.gradeWaiting
+                                                    ? primaryColor
+                                                    : getColor(
+                                                        score.score /
+                                                            score.outOf,
+                                                      ),
+                                              )
+                                            : Border.all(color: Colors.grey),
                                         borderRadius: BorderRadius.circular(3),
                                       ),
-                                      child: Text(
-                                        "${score?.totalScore ?? "..."} ነጥብ",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                        ),
-                                      ),
+                                      child: score != null
+                                          ? Text(
+                                              score.gradeWaiting
+                                                  ? "እየታረመ ነው"
+                                                  : "${score.score}/${score.outOf} ነጥብ",
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: score.gradeWaiting
+                                                    ? primaryColor
+                                                    : getColor(
+                                                        score.score /
+                                                            score.outOf,
+                                                      ),
+                                              ),
+                                            )
+                                          : Text(
+                                              "${score != null}${constScore?.totalScore ?? "..."} ነጥብ",
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                              ),
+                                            ),
                                     ),
                                   )
                                 ],
@@ -134,31 +203,41 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                         ),
                         SizedBox(
                           width: double.infinity,
-                          child: widget.isCurrent
-                              ? ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => VoiceRoomPage(
-                                          title: widget.discussionData.title,
-                                          afterLessonNo:
-                                              widget.discussionData.lessonTo,
+                          child: widget.isCurrent && score == null
+                              ? BouncyElevatedButton(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (_) => DiscussionCompletedUi(),
+                                      //   ),
+                                      // );
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => VoiceRoomPage(
+                                            title: widget.discussionData.title,
+                                            afterLessonNo:
+                                                widget.discussionData.lessonTo,
+                                            fromLesson: widget
+                                                .discussionData.lessonFrom,
+                                          ),
                                         ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      shape: RoundedRectangleBorder(
+                                          // borderRadius: BorderRadius.circular(12),
+                                          ),
+                                    ),
+                                    child: const Text(
+                                      "ውይይቱን ጀምር",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: whiteColor,
                                       ),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    shape: RoundedRectangleBorder(
-                                        // borderRadius: BorderRadius.circular(12),
-                                        ),
-                                  ),
-                                  child: const Text(
-                                    "ውይይቱን ጀምር",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: whiteColor,
                                     ),
                                   ),
                                 )

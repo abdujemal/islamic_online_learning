@@ -18,7 +18,7 @@ class VoiceRoomState {
   Room? room;
   bool isMuted;
   GivenTime? givenTime;
-  List<dynamic> participants;
+  int discussionSec;
   Timer? timer;
   String identity;
   String roomName;
@@ -28,7 +28,7 @@ class VoiceRoomState {
     this.room,
     this.isConnecting = false,
     this.isMuted = false,
-    this.participants = const [],
+    this.discussionSec = 0,
     this.roomName = '',
     this.identity = "",
     this.givenTime,
@@ -42,24 +42,24 @@ class VoiceRoomState {
     Timer? timer,
     bool? isConnecting,
     bool? isMuted,
-    List<dynamic>? participants,
     String? identity,
     GivenTime? givenTime,
     String? roomName,
     EventsListener<RoomEvent>? listener,
     VoiceRoomStatus? status,
+    int? discussionSec,
   }) {
     return VoiceRoomState(
       room: room ?? this.room,
       isConnecting: isConnecting ?? this.isConnecting,
       isMuted: isMuted ?? this.isMuted,
-      participants: participants ?? this.participants,
       identity: identity ?? this.identity,
       roomName: roomName ?? this.roomName,
       listener: listener ?? this.listener,
       givenTime: givenTime ?? this.givenTime,
       timer: timer ?? this.timer,
       status: status ?? this.status,
+      discussionSec: discussionSec ?? this.discussionSec,
     );
   }
 }

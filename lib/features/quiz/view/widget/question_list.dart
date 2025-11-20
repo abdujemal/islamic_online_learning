@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
+import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_notifier.dart';
 import 'package:lottie/lottie.dart';
 
 class QuestionOption {
@@ -29,24 +31,27 @@ class QuestionModel {
   });
 }
 
-class MultipleQuestionQuiz extends StatefulWidget {
+class MultipleQuestionQuiz extends ConsumerStatefulWidget {
   final List<QuestionModel> questions;
   final bool fromDiscussion;
   final Future<bool> Function(int score, Map<String, List<String>> answers)
       onFinish;
+  final Function(Map<String, String> qa)? onSubmit;
 
   const MultipleQuestionQuiz({
     super.key,
     required this.questions,
     required this.onFinish,
+    this.onSubmit,
     this.fromDiscussion = false,
   });
 
   @override
-  State<MultipleQuestionQuiz> createState() => _MultipleQuestionQuizState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _MultipleQuestionQuizState();
 }
 
-class _MultipleQuestionQuizState extends State<MultipleQuestionQuiz>
+class _MultipleQuestionQuizState extends ConsumerState<MultipleQuestionQuiz>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   final Map<String, List<String>> _answers = {};
@@ -59,12 +64,23 @@ class _MultipleQuestionQuizState extends State<MultipleQuestionQuiz>
   @override
   void initState() {
     super.initState();
+    if (widget.fromDiscussion) {
+      initAnswers();
+    }
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
     _fadeAnim = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
     _controller.forward();
+  }
+
+  void initAnswers() {
+    final quizAnses = ref.read(quizAnsStateProvider);
+    for (QuizAns q in quizAnses) {
+      _answers[q.quizId] = ["${q.answer}"];
+    }
+    setState(() {});
   }
 
   @override
@@ -95,7 +111,7 @@ class _MultipleQuestionQuizState extends State<MultipleQuestionQuiz>
     } else {
       _calculateScore();
       final go = await widget.onFinish(_score, _answers);
-      if (go) {
+      if (go && !widget.fromDiscussion) {
         setState(() => _showReview = true);
       }
     }
@@ -127,17 +143,28 @@ class _MultipleQuestionQuizState extends State<MultipleQuestionQuiz>
         decoration: BoxDecoration(
           // color: Colors.white,
           borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.black.withOpacity(0.08),
+          //     blurRadius: 12,
+          //     offset: const Offset(0, 6),
+          //   ),
+          // ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (widget.fromDiscussion)
+              Consumer(builder: (context, ref, _) {
+                final remainingSec = ref.watch(remainingSecondsProvider);
+                final voiceRoomState = ref.read(voiceRoomNotifierProvider);
+                final remainingMsec = remainingSec -
+                    (voiceRoomState.givenTime?.segments.assignment ?? 0);
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0),
+                  child: Text(formatTime(remainingMsec)),
+                );
+              }),
             LinearProgressIndicator(
               value: (_currentIndex + 1) / widget.questions.length,
               color: Colors.blueAccent,
@@ -195,6 +222,12 @@ class _MultipleQuestionQuizState extends State<MultipleQuestionQuiz>
                           ..add(option.id);
                       }
                       _answers[current.id] = List.from(selectedAnswers);
+                      if (widget.onSubmit != null) {
+                        widget.onSubmit!({
+                          "qid": current.id,
+                          "answer": option.id,
+                        });
+                      }
                     });
                   },
                   title: Text(

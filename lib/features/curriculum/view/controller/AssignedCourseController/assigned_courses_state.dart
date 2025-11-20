@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
 import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
+import 'package:islamic_online_learning/features/template/model/discussion.dart';
 
 class AssignedCoursesState {
   final bool isLoading, initial, isErrorAuth, isErrorPayment;
   final Curriculum? curriculum;
   final List<Score> scores;
   final List<TestAttempt> testAttempts;
+  final List<Discussion> discussions;
   final int? expandedCourseOrder;
   final String? error;
 
@@ -18,6 +20,7 @@ class AssignedCoursesState {
     this.isErrorPayment = false,
     this.scores = const [],
     this.testAttempts = const [],
+    this.discussions = const [],
     this.curriculum,
     this.expandedCourseOrder,
     this.error,
@@ -57,6 +60,7 @@ class AssignedCoursesState {
     Curriculum? curriculum,
     List<Score>? scores,
     List<TestAttempt>? testAttempts,
+    List<Discussion>? discussions,
     int? expandedCourseOrder,
     String? error,
   }) {
@@ -66,6 +70,7 @@ class AssignedCoursesState {
       curriculum: curriculum ?? this.curriculum,
       scores: scores ?? this.scores,
       testAttempts: testAttempts ?? this.testAttempts,
+      discussions: discussions ?? this.discussions,
       isErrorAuth: isErrorAuth ?? false,
       isErrorPayment: isErrorPayment ?? false,
       expandedCourseOrder: expandedCourseOrder ?? this.expandedCourseOrder,

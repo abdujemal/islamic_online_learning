@@ -6,13 +6,11 @@ class Question {
   final String question;
   final String hint;
   final String lessonId;
-  final int? attempts;
   Question({
     required this.id,
     required this.question,
     required this.hint,
     required this.lessonId,
-    this.attempts,
   });
 
   Question copyWith({
@@ -20,14 +18,12 @@ class Question {
     String? question,
     String? hint,
     String? lessonId,
-    int? attempts,
   }) {
     return Question(
       id: id ?? this.id,
       question: question ?? this.question,
       hint: hint ?? this.hint,
       lessonId: lessonId ?? this.lessonId,
-      attempts: attempts ?? this.attempts,
     );
   }
 
@@ -37,7 +33,6 @@ class Question {
       'question': question,
       'hint': hint,
       'lessonId': lessonId,
-      "attempts": attempts,
     };
   }
 
@@ -53,7 +48,6 @@ class Question {
       question: map['question'] as String,
       hint: map['hint'] as String,
       lessonId: map['lessonId'] as String,
-      attempts: map['attempts'] == null ?  map['attempts'] as int: null,
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/static_datas.dart';
+import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
@@ -180,28 +181,33 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                     SizedBox(
                       width: double.infinity,
                       child: widget.isCurrentLesson && score == null
-                          ? ElevatedButton(
-                              onPressed: () {
-                                if (assignedCourse == null) {
-                                  print("assignedCourse: null");
-                                  return;
-                                }
-                                ref
-                                    .read(lessonNotifierProvider.notifier)
-                                    .startLesson(
-                                        widget.lesson, assignedCourse, ref);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                                shape: RoundedRectangleBorder(
-                                    // borderRadius: BorderRadius.circular(12),
-                                    ),
-                              ),
-                              child: Text(
-                                isDownloading ? "ኪታቡን ዳውንሎድ በማረግ ላይ..." : "ጀምር",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: whiteColor,
+                          ? BouncyElevatedButton(
+                              scale: 1.02,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (assignedCourse == null) {
+                                    print("assignedCourse: null");
+                                    return;
+                                  }
+                                  ref
+                                      .read(lessonNotifierProvider.notifier)
+                                      .startLesson(
+                                          widget.lesson, assignedCourse, ref);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                      ),
+                                ),
+                                child: Text(
+                                  isDownloading
+                                      ? "ኪታቡን ዳውንሎድ በማረግ ላይ..."
+                                      : "ጀምር",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: whiteColor,
+                                  ),
                                 ),
                               ),
                             )

@@ -1,17 +1,19 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:islamic_online_learning/core/constants.dart';
+
 class Discussion {
   final String id;
   final int fromLesson;
   final int toLesson;
   final int courseNum;
-  final int discussionSecond;
+  final int? discussionSecond;
   final String curriculumId;
   final String title;
   final DateTime startAt;
   final String groupId;
-  final GivenTime givenTime;
+  final GivenTime? givenTime;
   Discussion({
     required this.id,
     required this.fromLesson,
@@ -61,12 +63,13 @@ class Discussion {
       'title': title,
       'startAt': startAt.millisecondsSinceEpoch,
       'groupId': groupId,
-      'givenTime': givenTime.toMap(),
+      'givenTime': givenTime?.toMap(),
     };
   }
 
-  factory Discussion.fromMap(Map<String, dynamic> map, int discussionSec,
-      Map<String, dynamic> givenTimeMap) {
+  factory Discussion.fromMap(Map<String, dynamic> map, int? discussionSec,
+      Map<String, dynamic>? givenTimeMap) {
+    printMap(map);
     return Discussion(
       id: map['id'] as String,
       fromLesson: map['fromLesson'] as int,
@@ -77,7 +80,7 @@ class Discussion {
       startAt: DateTime.parse(map['startAt'] as String),
       groupId: map['groupId'] as String,
       discussionSecond: discussionSec,
-      givenTime: GivenTime.fromMap(givenTimeMap),
+      givenTime: givenTimeMap == null ? null : GivenTime.fromMap(givenTimeMap),
     );
   }
 
@@ -99,7 +102,6 @@ class Discussion {
     if (identical(this, other)) return true;
 
     return other.id == id &&
-       
         other.courseNum == courseNum &&
         other.discussionSecond == discussionSecond &&
         other.curriculumId == curriculumId &&
@@ -112,7 +114,6 @@ class Discussion {
   @override
   int get hashCode {
     return id.hashCode ^
-       
         courseNum.hashCode ^
         discussionSecond.hashCode ^
         curriculumId.hashCode ^

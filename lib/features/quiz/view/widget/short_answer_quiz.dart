@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_notifier.dart';
 
 class ShortAnswerQuiz extends ConsumerStatefulWidget {
   final List<Map<String, dynamic>> questions;
   final Duration timeLimit;
+  final bool fromDiscussion;
   final Function(List<Map<String, String>>) onFinish;
   final Function(Map<String, String>) onSubmit;
 
@@ -17,6 +20,7 @@ class ShortAnswerQuiz extends ConsumerStatefulWidget {
     required this.onFinish,
     required this.onSubmit,
     required this.timeLimit,
+    this.fromDiscussion = false,
   });
 
   @override
@@ -35,7 +39,9 @@ class _ShortAnswerQuizState extends ConsumerState<ShortAnswerQuiz> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds == 0) {
         timer.cancel();
-        _showTimeUpDialog();
+        if (!widget.fromDiscussion) {
+          _showTimeUpDialog();
+        }
       } else {
         setState(() {
           _remainingSeconds--;
@@ -94,7 +100,23 @@ class _ShortAnswerQuizState extends ConsumerState<ShortAnswerQuiz> {
     super.initState();
     _remainingSeconds = widget.timeLimit.inSeconds;
     _startTimer();
+    if (widget.fromDiscussion) {
+      initAnswers();
+    }
     controller.text = answers[currentIndex] ?? '';
+  }
+
+  void initAnswers() {
+    final qas = ref.read(qaStateProvider);
+    int i = 0;
+    for (var q in widget.questions) {
+      final res = qas.where((e) => e.questionId == q["id"]);
+      if (res.isNotEmpty) {
+        answers[i] = res.first.answer;
+      }
+      i++;
+    }
+    setState(() {});
   }
 
   void nextQuestion() {
@@ -169,9 +191,10 @@ class _ShortAnswerQuizState extends ConsumerState<ShortAnswerQuiz> {
 
             LinearProgressIndicator(
               value: _remainingSeconds / widget.timeLimit.inSeconds,
-              color: Colors.red,
-              backgroundColor: Colors.red.shade100,
-              minHeight: 6,
+              color: _remainingSeconds <= 10 ? Colors.red : Colors.tealAccent,
+              // backgroundColor: Colors.red.shade100,
+              backgroundColor: Colors.white12,
+              // minHeight: 6,
               borderRadius: BorderRadius.circular(30),
             ),
 

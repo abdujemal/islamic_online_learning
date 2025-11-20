@@ -29,6 +29,7 @@ const String confusionsApi = "$baseUrl/confusions";
 const String discussionsApi = "$baseUrl/discussions";
 const String discussionQuizzesApi = "$discussionsApi/quizzes";
 const String discussionQuestionsApi = "$discussionsApi/questions";
+const String submitDiscussionTasksApi = "$discussionsApi/submit";
 //tests
 const String getTestQuestionApi = "$baseUrl/tests";
 const String getGivenTimeApi = "$baseUrl/tests/givenTime";

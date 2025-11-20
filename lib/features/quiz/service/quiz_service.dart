@@ -207,3 +207,56 @@ class QA {
   @override
   int get hashCode => questionId.hashCode ^ answer.hashCode;
 }
+
+class QuizAns {
+  final String quizId;
+  final int answer;
+  QuizAns({
+    required this.quizId,
+    required this.answer,
+  });
+  
+
+  QuizAns copyWith({
+    String? quizId,
+    int? answer,
+  }) {
+    return QuizAns(
+      quizId: quizId ?? this.quizId,
+      answer: answer ?? this.answer,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'quizId': quizId,
+      'answer': answer,
+    };
+  }
+
+  factory QuizAns.fromMap(Map<String, dynamic> map) {
+    return QuizAns(
+      quizId: map['quizId'] as String,
+      answer: map['answer'] as int,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory QuizAns.fromJson(String source) => QuizAns.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() => 'QuizAns(quizId: $quizId, answer: $answer)';
+
+  @override
+  bool operator ==(covariant QuizAns other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.quizId == quizId &&
+      other.answer == answer;
+  }
+
+  @override
+  int get hashCode => quizId.hashCode ^ answer.hashCode;
+}

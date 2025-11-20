@@ -3,6 +3,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/quiz/model/question.dart';
 import 'package:islamic_online_learning/features/quiz/model/quiz.dart';
+import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/template/model/discussion.dart';
 
 final voiceRoomServiceProvider = Provider<VoiceRoomService>((ref) {
@@ -10,11 +11,12 @@ final voiceRoomServiceProvider = Provider<VoiceRoomService>((ref) {
 });
 
 class VoiceRoomService {
-  Future<Discussion> createDiscussion(String title) async {
+  Future<Discussion> createDiscussion(String title, int fromLesson) async {
     final res = await customPostRequest(
       discussionsApi,
       {
         "title": title,
+        "fromLesson": fromLesson,
       },
       authorized: true,
     );
@@ -44,5 +46,21 @@ class VoiceRoomService {
       throw Exception('Failed to load questions: ${res.body}');
     }
     return Question.listFromJson(res.body);
+  }
+
+  Future<void> submit(List<QA> qas, List<QuizAns> quizAns) async {
+    final res = await customPostRequest(
+      submitDiscussionTasksApi,
+      {
+        "questionAttempts": qas.map((e) => e.toMap()).toList(),
+        "quizIds": quizAns.map((e) => e.quizId).toList(),
+        "answers": quizAns.map((e) => e.answer).toList(),
+      },
+      authorized: true,
+    );
+    if (res.statusCode != 200) {
+      throw Exception('Failed to submit discussion tasks: ${res.body}');
+    }
+    // return Question.listFromJson(res.body);
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/static_datas.dart';
+import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
@@ -178,7 +179,7 @@ class _ExamCardState extends ConsumerState<ExamCard> {
                                           ),
                                         )
                                       : Text(
-                                          "${score != null}${constScore?.totalScore ?? "..."} ነጥብ",
+                                          "${constScore?.totalScore ?? "..."} ነጥብ",
                                           style: TextStyle(
                                             fontSize: 10,
                                           ),
@@ -193,27 +194,29 @@ class _ExamCardState extends ConsumerState<ExamCard> {
                     SizedBox(
                       width: double.infinity,
                       child: widget.isCurrent && score == null
-                          ? ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        QuestionPage(widget.examData.title),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.purple,
-                                shape: RoundedRectangleBorder(
-                                    // borderRadius: BorderRadius.circular(12),
+                          ? BouncyElevatedButton(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          QuestionPage(widget.examData.title),
                                     ),
-                              ),
-                              child: const Text(
-                                "ፈተናውን ጀምር",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: whiteColor,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.purple,
+                                  shape: RoundedRectangleBorder(
+                                      // borderRadius: BorderRadius.circular(12),
+                                      ),
+                                ),
+                                child: const Text(
+                                  "ፈተናውን ጀምር",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: whiteColor,
+                                  ),
                                 ),
                               ),
                             )

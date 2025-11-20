@@ -9,4 +9,7 @@ class PrefConsts {
   static final String theme = "theme";
   static final String showBeginner = "showBeginner";
   static final String curriculumDate = "curriculum_date";
+  static final String discussionQuestions = "discussion_questions";
+  static final String discussionQuizzes = "discussion_quizzes";
+
 }

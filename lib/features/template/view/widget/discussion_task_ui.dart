@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
-import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/quiz/view/widget/question_list.dart';
 import 'package:islamic_online_learning/features/quiz/view/widget/short_answer_quiz.dart';
 import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_notifier.dart';
@@ -20,24 +20,55 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
   Widget _buildDiscussionUI() {
     return Consumer(builder: (context, ref, _) {
       final topics = ref.watch(discussionTopicsProvider);
-      return Column(
-        children: [
-          Center(
-            child: Text(
-              "Discussion Phase",
-              style: TextStyle(fontSize: 24, color: Colors.white),
+      return Expanded(
+        child: Column(
+          children: [
+            Center(
+              child: Text(
+                "አሰላሙ አለይኩም ውራህመቱላሂ ወበረካቱሁ",
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
             ),
-          ),
-          Expanded(
-            child: topics == null
-                ? CircularProgressIndicator()
-                : SingleChildScrollView(
-                    child: Column(
-                      children: topics.map((e) => Text(e)).toList(),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              "ኢንሻአላህ ለ5 ደቂቃ ያክል በዚህ ሳምንት የተማራቹትን ትወያያላችሁ።",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+            Center(
+              child: Text(
+                "የመወያያ ርእሶች",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Expanded(
+              child: topics == null
+                  ? CircularProgressIndicator()
+                  : SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: topics
+                            .map((e) => Text(
+                                  e,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ))
+                            .toList(),
+                      ),
                     ),
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       );
     });
   }
@@ -52,11 +83,12 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
           );
         } else if (quizzes.isEmpty) {
           return Center(
-            child: Text("No quizzes available. continue discussion."),
+            child: Text("ምንም ጥያቄ የለም. ውይይቱን ቀጥሉ."),
           );
         } else {
           return SingleChildScrollView(
             child: MultipleQuestionQuiz(
+              fromDiscussion: true,
               questions: quizzes
                   .map(
                     (q) => QuestionModel(
@@ -74,8 +106,25 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
                     ),
                   )
                   .toList(),
+              onSubmit: (qa) {
+                // print(qa);
+                ref
+                    .read(voiceRoomNotifierProvider.notifier)
+                    .submitAnswerForQuiz(
+                      ref,
+                      QuizAns(
+                        quizId: qa["qid"]!,
+                        answer: int.parse(qa["answer"]!),
+                      ),
+                    );
+              },
               onFinish: (i, answers) async {
-                await Future.delayed(Duration(seconds: 1));
+                // await Future.delayed(Duration(seconds: 1));
+                toast(
+                    "You have finished the Multiple Choice questions. Please wait for the countdown to end.",
+                    ToastType.success,
+                    context,
+                    isLong: true);
                 return true;
                 // print("i: $i, answers: $answers");
                 // List<String> quizAnswers = [];
@@ -102,56 +151,82 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
 
   Widget _buildShortAnswerUI(VoiceRoomState voiceRoomState) {
     return Consumer(builder: (context, ref, _) {
+      if (voiceRoomState.timer == null) {
+        return SizedBox();
+      }
       final questions = ref.watch(discussionQuestionsProvider);
+      if (voiceRoomState.givenTime == null) return SizedBox();
+      final discussionSeconds = voiceRoomState.givenTime!.segments.assignment >
+              voiceRoomState.discussionSec
+          ? voiceRoomState.discussionSec
+          : voiceRoomState.givenTime!.segments.assignment;
       if (questions == null) {
         return Center(
           child: CircularProgressIndicator(),
         );
       }
-      return ShortAnswerQuiz(
-        timeLimit: Duration(
-          seconds: voiceRoomState.givenTime?.segments.assignment ?? 10 * 60,
-        ),
-        questions: questions
-            .map(
-              (q) => {
-                "id": q.id,
-                "question": q.question,
-              },
-            )
-            .toList(),
-        onSubmit: (answer) {
-          print(answer);
-          ref.read(questionsNotifierProvider.notifier).addOUpdateAns(
-                QA(
-                  questionId: answer["qid"]!,
-                  answer: answer["answer"]!,
-                ),
-              );
-        },
-        onFinish: (answers) async {
-          print("answers: $answers");
-          // await ref.read(questionsNotifierProvider.notifier).submitTest(context);
-          // setState(() {
-          //   canPop = true;
-          // });
-          // Navigator.pop(context);
+      if (questions.isEmpty) {
+        return Center(
+          child: Text("No questions"),
+        );
+      }
+      return Expanded(
+        child: SingleChildScrollView(
+          child: ShortAnswerQuiz(
+            timeLimit: Duration(
+              seconds: discussionSeconds,
+            ),
+            fromDiscussion: true,
+            questions: questions
+                .map(
+                  (q) => {
+                    "id": q.id,
+                    "question": q.question,
+                  },
+                )
+                .toList(),
+            onSubmit: (answer) {
+              print(answer);
+              ref
+                  .read(voiceRoomNotifierProvider.notifier)
+                  .submitAnswerForQuestion(
+                    ref,
+                    QA(
+                      questionId: answer["qid"]!,
+                      answer: answer["answer"]!,
+                    ),
+                  );
+            },
+            onFinish: (answers) async {
+              print("answers: $answers");
+              toast(
+                  "You have finished the short answer Questions. Please wait for the countdown to end.",
+                  ToastType.success,
+                  context,
+                  isLong: true);
+              // await ref.read(questionsNotifierProvider.notifier).submitTest(context);
+              // setState(() {
+              //   canPop = true;
+              // });
+              // Navigator.pop(context);
 
-          // List<String> quizAnswers = [];
-          // for (var ans in answers) {
-          //   quizAnswers.add("${ans.key}:${ans.value.join("")}");
-          // }
-          // await ref.read(quizNotifierProvider.notifier).submitQuestions(
-          //       widget.lesson,
-          //       quizAnswers,
-          //       ref,
-          //     );
-          // if (ref.read(quizNotifierProvider).submittingError != null) {
-          //   return false;
-          // } else {
-          //   return true;
-          // }
-        },
+              // List<String> quizAnswers = [];
+              // for (var ans in answers) {
+              //   quizAnswers.add("${ans.key}:${ans.value.join("")}");
+              // }
+              // await ref.read(quizNotifierProvider.notifier).submitQuestions(
+              //       widget.lesson,
+              //       quizAnswers,
+              //       ref,
+              //     );
+              // if (ref.read(quizNotifierProvider).submittingError != null) {
+              //   return false;
+              // } else {
+              //   return true;
+              // }
+            },
+          ),
+        ),
       );
     });
   }
@@ -161,12 +236,15 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
     final voiceRoomState = ref.watch(voiceRoomNotifierProvider);
     return Column(
       children: [
-        Text(
-          widget.status.toString(),
-          style: const TextStyle(
-            color: Colors.tealAccent,
-          ),
-        ),
+        // Text(
+        //   widget.status.toString(),
+        //   style: const TextStyle(
+        //     color: Colors.tealAccent,
+        //   ),
+        // ),
+        // if (widget.status == VoiceRoomStatus.end)
+
+        // else
         if (widget.status == VoiceRoomStatus.discussing)
           _buildDiscussionUI()
         else if (widget.status == VoiceRoomStatus.choice)

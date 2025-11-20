@@ -11,6 +11,7 @@ import 'package:islamic_online_learning/features/curriculum/model/curriculum.dar
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_db_helper.dart';
 import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
+import 'package:islamic_online_learning/features/template/model/discussion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CurriculumService {
@@ -84,6 +85,7 @@ class CurriculumService {
           curriculum: currsFromDb != null
               ? Curriculum.fromMap(currsFromDb, fromDb: true)
               : null,
+          discussions: currNGroup.discussions,
           group: currNGroup.group,
           scores: currNGroup.scores,
           testAttempts: currNGroup.testAttempts,
@@ -101,12 +103,14 @@ class CurriculumNGroup {
   final Curriculum? curriculum;
   final CourseRelatedData group;
   final List<Score> scores;
+  final List<Discussion> discussions;
   final List<TestAttempt> testAttempts;
   CurriculumNGroup({
     required this.curriculum,
     required this.group,
     required this.scores,
     required this.testAttempts,
+    required this.discussions,
   });
 
   Map<String, dynamic> toMap() {
@@ -114,11 +118,13 @@ class CurriculumNGroup {
       'curriculum': curriculum?.toMap(),
       'group': group.toMap(),
       'scores': scores.map((e) => e.toMap()),
-      'testAttempts': testAttempts.map((e) => e.toMap())
+      'testAttempts': testAttempts.map((e) => e.toMap()),
+      "discussions": discussions.map((e) => e.toMap()),
     };
   }
 
   factory CurriculumNGroup.fromMap(Map<String, dynamic> map) {
+    printMap(map);
     return CurriculumNGroup(
         curriculum: map['currentCurriculum'] != null
             ? Curriculum.fromMap(
@@ -130,6 +136,10 @@ class CurriculumNGroup {
             (e) => Score.fromMap(e),
           ),
         ),
+        discussions:
+            List<Discussion>.from((map["discussions"] as List<dynamic>).map(
+          (e) => Discussion.fromMap(e, null, null),
+        )),
         testAttempts: List<TestAttempt>.from(
           (map["testAttempts"] as List<dynamic>).map(
             (e) => TestAttempt.fromMap(e),
