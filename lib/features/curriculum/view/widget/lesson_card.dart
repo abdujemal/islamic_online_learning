@@ -94,7 +94,10 @@ class _LessonCardState extends ConsumerState<LessonCard> {
         top: 10,
       ),
       width: double.infinity,
-      color: Theme.of(context).cardColor,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Stack(
         children: [
           Padding(
@@ -197,8 +200,8 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: primaryColor,
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(50),
-                                      ),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
                                 ),
                                 child: Text(
                                   isDownloading
@@ -232,8 +235,8 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                                     foregroundColor: primaryColor,
                                     side: BorderSide(color: primaryColor),
                                     shape: RoundedRectangleBorder(
-                                        // borderRadius: BorderRadius.circular(12),
-                                        ),
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
                                   ),
                                   child: Text(isDownloading
                                       ? "ኪታቡን ዳውንሎድ በማረግ ላይ..."

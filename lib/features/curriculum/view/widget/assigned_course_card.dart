@@ -73,11 +73,15 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                         ? Border.all(
                             color: primaryColor,
                           )
-                        : null,
+                        : Border.all(
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color ??
+                                    Colors.black,
+                          ),
                     color: widget.isCurrentCourse
                         ? primaryColor
                         : widget.isFutureCourse
-                            ? Colors.grey
+                            ? Colors.transparent
                             : null,
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -92,7 +96,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                     weight: 1,
                     color: !widget.isCurrentCourse && !widget.isFutureCourse
                         ? primaryColor
-                        : whiteColor,
+                        : Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),
                 SizedBox(

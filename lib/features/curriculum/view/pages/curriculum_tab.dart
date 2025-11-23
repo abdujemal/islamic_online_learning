@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_list.dart';
@@ -21,8 +22,8 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(sharedPrefProvider).then((pref) {
-        token = pref.getString(PrefConsts.token);
+      ref.read(sharedPrefProvider).then((pref) async {
+        token = await getAccessToken();
         curriculumId = pref.getString(PrefConsts.curriculumId);
         final otpId = pref.getString(PrefConsts.otpId);
 

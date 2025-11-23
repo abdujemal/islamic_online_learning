@@ -34,7 +34,7 @@ class ExamCard extends ConsumerStatefulWidget {
 class _ExamCardState extends ConsumerState<ExamCard> {
   ConstScore? constScore;
   Score? getScore() {
-    final isPastLesson = !widget.isCurrent && !widget.isLastExam;
+    final isPastLesson = !widget.isCurrent && !widget.isLocked;
     final testResult = ref
         .watch(assignedCoursesNotifierProvider)
         .testAttempts
@@ -42,8 +42,8 @@ class _ExamCardState extends ConsumerState<ExamCard> {
           (e) => e.afterLessonNum == widget.examData.lessonTo,
         )
         .toList();
-    print(
-        "testResult: $testResult, $isPastLesson ${widget.examData.lessonFrom}");
+    // print(
+    //     "testResult: $testResult, $isPastLesson ${widget.examData.lessonFrom}");
     TestAttempt? testAttempt = testResult.isNotEmpty ? testResult.first : null;
 
     if (testAttempt == null) {
@@ -57,7 +57,7 @@ class _ExamCardState extends ConsumerState<ExamCard> {
           (e) => e.targetId == testAttempt.id,
         )
         .toList();
-    print("scoresResult: $scoresResult");
+    // print("scoresResult: $scoresResult");
     Score? score = scoresResult.isNotEmpty ? scoresResult.first : null;
     if (isPastLesson && score == null) {
       score = Score(
@@ -99,7 +99,10 @@ class _ExamCardState extends ConsumerState<ExamCard> {
         top: 10,
       ),
       width: double.infinity,
-      color: Theme.of(context).cardColor,
+       decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
       child: Stack(
         children: [
           Padding(
@@ -208,8 +211,8 @@ class _ExamCardState extends ConsumerState<ExamCard> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.purple,
                                   shape: RoundedRectangleBorder(
-                                      // borderRadius: BorderRadius.circular(12),
-                                      ),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
                                 ),
                                 child: const Text(
                                   "ፈተናውን ጀምር",

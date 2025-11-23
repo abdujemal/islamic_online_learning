@@ -30,18 +30,20 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
         children: List.generate(
           state.curriculum?.lessons != null
               ? state.curriculum!.lessons!.length +
+                  // 161 +
                   ref
                       .read(assignedCoursesNotifierProvider.notifier)
                       .getDiscussionNumOfCurrentCourse(ref)
               : 0,
           (index) {
+            // print("realIndex: $realIndex");
             if (ref
                 .read(assignedCoursesNotifierProvider.notifier)
                 .isIndexDiscussion(index, ref)) {
               discussionIndex++;
               final discussionData = ref
                   .read(assignedCoursesNotifierProvider.notifier)
-                  .getDiscussionData(index, realIndex, ref);
+                  .getDiscussionData(index, realIndex, discussionIndex, ref);
               // return Text("discussion ${realIndex}");
               Lesson lesson = state.curriculum!.lessons![realIndex];
               bool isLocked = (lesson.order > currentLessonIndex);
@@ -70,14 +72,22 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
                 discussionInUpToExam = [];
               }
 
-              if (isCurrentLesson && !isTodayDiscussion) {
-                isLocked = true;
-              }
+              // if (isCurrentLesson && !isTodayDiscussion) {
+              //   isLocked = true;
+              // }
 
               if (isCurrentLesson && !isTodayExamDay) {
                 isExamLocked = true;
               }
 
+              // return Column(
+              //   children: [
+              //     Text("discussion: r-$realIndex i-$index $isLocked"),
+              //     if (hasExam) Text("Exam"),
+              //     Text(
+              //         "LessonFrom: ${discussionData.lessonFrom} to ${discussionData.lessonTo}")
+              //   ],
+              // );
               return DiscussionCard(
                 isLastDiscussion: index + 1 ==
                     (state.curriculum?.lessons != null
@@ -91,12 +101,12 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
                 discussionData: discussionData,
                 isExamLocked: isExamLocked,
                 isExamCurrent: isCurrentLesson && isTodayExamDay,
-                isLocked: isLocked && !hasExam,
+                isLocked: isLocked, //&& !hasExam,
                 isCurrent: isCurrentLesson && isTodayDiscussion,
               );
             } else {
               realIndex++;
-              // return Text("Lesson");
+
               Lesson lesson = state.curriculum!.lessons![realIndex];
               final bool isTodayDiscussion = ref
                   .read(assignedCoursesNotifierProvider.notifier)
@@ -111,12 +121,13 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
               if (isCurrentLesson && isTodayDiscussion) {
                 isCurrentLesson = false;
                 isPastLesson = true;
-              } 
-               if (!isTodayLesson && isCurrentLesson) {
+              }
+              if (!isTodayLesson && isCurrentLesson) {
                 isCurrentLesson = false;
                 isPastLesson = true;
               }
 
+              // return Text("Lesson: r-$realIndex i-$index");
               return LessonCard(
                 lesson: lesson,
                 isCurrentLesson: isCurrentLesson,

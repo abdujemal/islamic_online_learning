@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
@@ -7,6 +8,7 @@ import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthService {
+  final storage = const FlutterSecureStorage();
   Future<void> sendOtpRequest(String phone) async {
     final response = await customPostRequest(
       requestOtpApi,
@@ -41,12 +43,28 @@ class AuthService {
     if (response.statusCode == 200) {
       final data = (jsonDecode(response.body))["data"];
       final user = (jsonDecode(response.body))["user"];
-      final token = (jsonDecode(response.body))["token"];
+      // final token = (jsonDecode(response.body))["token"];
       // print(data);
-      if (data != null) {
-        return {"otp": data};
+      if (data['ok'] == true &&
+          data['token'] != null &&
+          data['refreshToken'] != null) {
+        await storage.write(
+          key: 'access_token',
+          value: "Bearer ${data['token']}",
+        );
+        await storage.write(
+          key: 'refresh_token',
+          value: data['refreshToken'],
+        );
+        await storage.write(
+          key: 'phone',
+          value: phone,
+        );
+      }
+      if (user == null) {
+        return {"data": data};
       } else {
-        return {"user": user, "token": token};
+        return {"user": user, "data": data};
       }
       // // print(response.body);
       // throw Exception('Failed to verifying otp');

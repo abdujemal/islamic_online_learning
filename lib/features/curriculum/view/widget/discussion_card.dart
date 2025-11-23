@@ -72,7 +72,6 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
           (e) => e.toLesson == widget.discussionData.lessonTo,
         )
         .toList();
-    print("discussions.length ${discussions.length}");
     Score? score;
     if (discussions.isNotEmpty) {
       final scoresResult = ref
@@ -82,21 +81,20 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
             (e) => e.targetId == discussions.first.id,
           )
           .toList();
-      print("scoresResult.length ${scoresResult.length}");
-
       score = scoresResult.isNotEmpty ? scoresResult.first : null;
-      if (!widget.isCurrent && widget.isLocked && score == null) {
-        score = Score(
-          id: "id",
-          targetType: "Discussion",
-          targetId: discussions.first.id,
-          score: 0,
-          gradeWaiting: false,
-          outOf: constScore?.totalScore ?? 0,
-          userId: "userId",
-          date: DateTime.now(),
-        );
-      }
+    }
+
+    if (!widget.isCurrent && !widget.isLocked && score == null) {
+      score = Score(
+        id: "id",
+        targetType: "Discussion",
+        targetId: "discussions.first.id",
+        score: 0,
+        gradeWaiting: false,
+        outOf: constScore?.totalScore ?? 0,
+        userId: "userId",
+        date: DateTime.now(),
+      );
     }
 
     return Column(
@@ -108,7 +106,10 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
             top: 10,
           ),
           width: double.infinity,
-          color: Theme.of(context).cardColor,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Stack(
             children: [
               Padding(
@@ -189,7 +190,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                                               ),
                                             )
                                           : Text(
-                                              "${score != null}${constScore?.totalScore ?? "..."} ነጥብ",
+                                              "${constScore?.totalScore ?? "..."} ነጥብ",
                                               style: TextStyle(
                                                 fontSize: 10,
                                               ),
@@ -229,8 +230,8 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.blue,
                                       shape: RoundedRectangleBorder(
-                                          // borderRadius: BorderRadius.circular(12),
-                                          ),
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
                                     ),
                                     child: const Text(
                                       "ውይይቱን ጀምር",

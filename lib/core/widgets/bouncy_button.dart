@@ -6,7 +6,7 @@ class BouncyElevatedButton extends StatefulWidget {
   const BouncyElevatedButton({
     super.key,
     required this.child,
-    this.scale =  1.07,
+    this.scale =  1.03,
   });
 
   @override

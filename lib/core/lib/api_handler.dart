@@ -2,9 +2,11 @@ import "dart:convert";
 import "dart:io";
 
 import "package:connectivity_plus/connectivity_plus.dart";
+import "package:flutter_secure_storage/flutter_secure_storage.dart";
 import "package:http/http.dart" as http;
-import "package:islamic_online_learning/core/lib/pref_consts.dart";
-import "package:shared_preferences/shared_preferences.dart";
+import "package:islamic_online_learning/core/constants.dart";
+
+final storage = const FlutterSecureStorage();
 
 Future<http.Response> customGetRequest(String url,
     {bool authorized = false}) async {
@@ -14,59 +16,87 @@ Future<http.Response> customGetRequest(String url,
     throw ConnectivityException("እባክዎ ኢንተርኔት ያብሩ!");
   }
 
-  final token = await getToken();
+  final token = await getAccessToken();
 
-  final response = await http.get(
-    Uri.parse(url),
-    headers: {
-      if (authorized) ...{
-        "authorization": "$token",
+  call() => http.get(
+        Uri.parse(url),
+        headers: {
+          if (authorized) ...{
+            "authorization": "$token",
+          }
+        },
+      );
+
+  var response = await call();
+
+  if (authorized) {
+    if (response.statusCode == 401 && response.body.contains("auth")) {
+      // try refresh
+      final r = await refreshToken();
+      if (r['ok'] == true) {
+        // retry
+        // token = await getAccessToken();
+        response = await call();
+      } else {
+        // cannot refresh: logout
+        // await auth.logout();
+        throw Exception("logout");
       }
-    },
-  );
+    }
+    return response;
+  }
+
   final parsed = jsonDecode(response.body);
   print(parsed);
-  if (response.statusCode == 403) {
-    if (parsed["type"] == "auth") {
-      throw AuthException("ይቅርታ መለያዎ ታግድዋል!");
-    } else {
-      throw PaymentException("ያልተሟላ ከፍያ አሎት!");
-    }
-  }
 
-  if (response.statusCode == 401) {
-    if (parsed["type"] == "auth") {
-      throw AuthException("መለያዎ ትክክላኛ አይደለም!");
-    } else {
-      throw PaymentException("ክፍያ የሎትም!");
-    }
-  }
-  handleErrors(response);
+  print("res body ${response.body}");
 
   return response;
 }
 
 Future<http.Response> customPostRequest(String url, Map<String, dynamic>? map,
     {bool authorized = false}) async {
+  final connectivityResult = await (Connectivity().checkConnectivity());
+  if (connectivityResult.contains(ConnectivityResult.none)) {
+    throw ConnectivityException("እባክዎ ኢንተርኔት ያብሩ!");
+  }
   print("POST $url");
   print("req body $map");
 
-  final token = await getToken();
+  final token = await getAccessToken();
 
-  final response = await http.post(
-    Uri.parse(url),
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      if (authorized) ...{
-        "authorization": "$token",
+  call() => http.post(
+        Uri.parse(url),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          if (authorized) ...{
+            "authorization": "$token",
+          }
+        },
+        body: map != null ? jsonEncode(map) : null,
+      );
+
+  var response = await call();
+
+  if (authorized) {
+    if (response.statusCode == 401 && response.body.contains("auth")) {
+      // try refresh
+      final r = await refreshToken();
+      if (r['ok'] == true) {
+        // retry
+        // token = await getAccessToken();
+        response = await call();
+      } else {
+        // cannot refresh: logout
+        // await auth.logout();
+        throw Exception("logout");
       }
-    },
-    body: map != null ? jsonEncode(map) : null,
-  );
-  print("res body ${response.body}");
+    }
+    return response;
+  }
 
-  handleErrors(response);
+  print("res body ${response.body}");
 
   return response;
 }
@@ -92,7 +122,7 @@ Future<http.StreamedResponse> customPostWithForm(
 
   // Optionally add headers (e.g., if your API needs auth)
   if (authorized) {
-    final token = await getToken();
+    final token = await getAccessToken();
     if (token == null) throw Exception("Token is null");
     request.headers['Authorization'] = token;
   }
@@ -113,28 +143,8 @@ Future<http.StreamedResponse> customPostWithForm(
   // }
 }
 
-void handleErrors(http.Response response) {
-  final parsed = jsonDecode(response.body);
-  if (response.statusCode == 403) {
-    if (parsed["type"] == "auth") {
-      throw AuthException("ይቅርታ መለያዎ ታግድዋል!");
-    } else {
-      throw PaymentException("ያልተሟላ ከፍያ አሎት!");
-    }
-  }
-
-  if (response.statusCode == 401) {
-    if (parsed["type"] == "auth") {
-      throw AuthException("መለያዎ ትክክላኛ አይደለም!");
-    } else {
-      throw PaymentException("ክፍያ የሎትም!");
-    }
-  }
-}
-
-Future<String?> getToken() async {
-  final pref = await SharedPreferences.getInstance();
-  final token = pref.getString(PrefConsts.token);
+Future<String?> getAccessToken() async {
+  final token = await storage.read(key: 'access_token');
   print("token: $token");
   return token;
 }
@@ -177,3 +187,25 @@ class PaymentException extends HttpException {
 //     );
 //   }
 // }
+
+Future<Map<String, dynamic>> refreshToken() async {
+  final refresh = await storage.read(key: 'refresh_token');
+  final phone = await storage.read(key: "phone");
+  if (refresh == null) return {'ok': false, 'error': 'no_refresh'};
+  final res = await customPostRequest(
+    refreshTokenApi,
+    {
+      "refreshToken": refresh,
+      "phone": phone,
+    },
+  );
+  final body = jsonDecode(res.body);
+  final data = body["data"];
+  if (data['ok'] == true &&
+      data['token'] != null &&
+      data['refreshToken'] != null) {
+    await storage.write(key: 'access_token', value: "Bearer ${data['token']}");
+    await storage.write(key: 'refresh_token', value: data['refreshToken']);
+  }
+  return body;
+}

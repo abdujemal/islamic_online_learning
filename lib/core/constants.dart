@@ -41,6 +41,7 @@ const String quizAttemptsApi = "$baseUrl/quizAttempts";
 //streaks
 const String addStreakApi = "$baseUrl/streaks";
 //auth
+const String refreshTokenApi = "$baseUrl/auth/otp/refresh-token";
 const String requestOtpApi = "$baseUrl/auth/otp";
 const String verifyOtpApi = "$baseUrl/auth/otp/verify";
 const String similarGroupsApi = "$baseUrl/auth/user/groups";

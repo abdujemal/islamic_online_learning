@@ -57,6 +57,7 @@ class CurriculumService {
     if (response.statusCode == 200) {
       final currNGroup = CurriculumNGroup.fromJson(response.body);
       // return currNGroup;
+
       if (currNGroup.curriculum != null) {
         await pref.setString(
             PrefConsts.curriculumDate, currNGroup.curriculum!.updatedOn);
@@ -80,11 +81,12 @@ class CurriculumService {
           currNGroup.group.courseNum,
         );
         // print("currsFromDb: $currsFromDb");
+        final currData = currsFromDb != null
+            ? Curriculum.fromMap(currsFromDb, fromDb: true)
+            : null;
 
         return CurriculumNGroup(
-          curriculum: currsFromDb != null
-              ? Curriculum.fromMap(currsFromDb, fromDb: true)
-              : null,
+          curriculum: currData,
           discussions: currNGroup.discussions,
           group: currNGroup.group,
           scores: currNGroup.scores,

@@ -23,7 +23,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // toast(err.message, ToastType.error, context);
     } catch (err) {
       print("Error: $err");
-      final token = await getToken();
+      final token = await getAccessToken();
       // toast("የእርስዎን መለያ ማግኘት አልተቻለም።", ToastType.error, context);
       state = state.copyWith(
         isLoading: false,

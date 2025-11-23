@@ -62,10 +62,10 @@ class SignInNotifier extends StateNotifier<SignInState> {
       final data = await authService.verifyOtpRequest(phone, otp);
       final pref = await ref.read(sharedPrefProvider);
       print("Data: ${data.toString()}");
-      if (data["otp"] != null) {
-        pref.setString(PrefConsts.otpId, data["otp"]["id"] as String);
+      if (data["user"] == null) {
+        pref.setString(PrefConsts.otpId, data["data"]["otpId"] as String);
         state = state.copyWith(isLoading: false);
-
+        // pref.setString(PrefConsts.token, "Bearer ${data["data"]["token"] as String}");
         // if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,
@@ -78,7 +78,7 @@ class SignInNotifier extends StateNotifier<SignInState> {
         );
         // }
       } else {
-        pref.setString(PrefConsts.token, "Bearer ${data["token"] as String}");
+        // pref.setString(PrefConsts.token, "Bearer ${data["token"] as String}");
         state = state.copyWith(isLoading: false);
 
         // if (mounted) {
