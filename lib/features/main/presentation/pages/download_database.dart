@@ -27,96 +27,52 @@ class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
 
   int? dbSize;
 
-  downloadDb() async {
-    if (dbSize == null) {
+  Future<void> downloadDb() async {
+    if (dbSize == null) return;
+
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      isDownloading = false;
+      setState(() {});
+      toast("እባክዎ ኢንተርኔት ያብሩ!", ToastType.error, context);
       return;
     }
+
     isDownloading = true;
     setState(() {});
-
-    final connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
-      if (mounted) {
-        isDownloading = false;
-        setState(() {});
-        toast("እባክዎ ኢንተርኔት ያብሩ!", ToastType.error, context);
-      }
-      return;
-    }
 
     Directory directory = await getApplicationSupportDirectory();
     String path = '${directory.path}$dbPath';
 
-    try {
-      Dio dio = Dio();
-      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-          (client) {
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
-        return client;
-      };
-
-      final response = await dio.download(
-        databaseUrl,
-        path,
-        cancelToken: cancelToken,
-        // options: Options(
-        //   headers: {
-        //     'Range': 'bytes=${File(path).lengthSync()}-',
-        //   },
-        // ),
-
-        onReceiveProgress: (count, total) {
-          if (total != -1) {
-            progress = (count / dbSize!) * 100;
-            setState(() {});
-          }
-        },
-      );
-
-      if (response.statusCode == 200) {
-        if (mounted) {
-          isDownloading = false;
-          setState(() {});
-          if (File(path).existsSync()) {
-            if (mounted) {
-              toast("በተሳካ ሁኒታ ዳውንሎድ ተደርጓል!", ToastType.success, context);
-            }
-
-            await DatabaseHelper().initializeDatabase();
-            if (mounted) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MainPage(),
-                ),
-                (route) => false,
-              );
-            }
-          } else {
-            print("file does not exist");
-            if (mounted) {
-              toast("ችግር ተፈጥሯል!", ToastType.error, context);
-            }
-          }
-        }
-      } else {
-        print("response code: ${response.statusCode}");
-
-        if (mounted) {
-          isDownloading = false;
-          setState(() {});
-          toast("ችግር ተፈጥሯል!", ToastType.error, context);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
+    await resumableDownload(
+      url: databaseUrl,
+      savePath: path,
+      cancelToken: cancelToken,
+      onProgress: (received, total) {
+        progress = (received / total) * 100;
+        setState(() {});
+      },
+      onDone: () async {
         isDownloading = false;
         setState(() {});
-        toast(e.toString(), ToastType.normal, context);
-      }
-      print(e.toString());
-    }
+        toast("በተሳካ ሁኒታ ዳውንሎድ ተደርጓል!", ToastType.success, context);
+
+        await DatabaseHelper().initializeDatabase();
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const MainPage()),
+            (route) => false,
+          );
+        }
+      },
+      onError: (e) async {
+        isDownloading = false;
+        setState(() {});
+        toast(e.toString(), ToastType.error, context);
+        print(e);
+      },
+    );
   }
 
   Future<int?> getFileSize(String url) async {

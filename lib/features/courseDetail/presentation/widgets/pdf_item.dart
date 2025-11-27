@@ -40,7 +40,7 @@ class _PdfItemState extends ConsumerState<PdfItem> {
     if (mounted) {
       return await ref
           .read(cdNotifierProvider.notifier)
-          .isDownloaded("${widget.title}.pdf", "PDF", context);
+          .isDownloaded("${widget.title}.pdf", "PDF", widget.fileId, context);
     } else {
       return false;
     }

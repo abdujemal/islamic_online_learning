@@ -13,7 +13,6 @@ import 'package:path_provider/path_provider.dart';
 import 'features/main/presentation/pages/main_page.dart';
 import 'firebase_options.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
@@ -206,19 +205,25 @@ Future<int?> getFileSize(String url) async {
 Future<bool> checkDb() async {
   Directory directory = await getApplicationSupportDirectory();
   String path = '${directory.path}$dbPath';
-  if (File(path).existsSync()) {
-    // print("file exists");
-    // print("local len: ${File(path).lengthSync()}");
-    // int? size = await getFileSize(databaseUrl);
-    // print(size);
-    // if (size == null) {
-    //   return false;
-    // }
+  return await verifyFileLength(
+    filePath: path,
+    expectedSize: 7360512,
+    aboveTheSize: true,
+    // url: databaseUrl,
+  );
+  // if (File(path).existsSync()) {
+  //   // print("file exists");
+  //   // print("local len: ${File(path).lengthSync()}");
+  //   // int? size = await getFileSize(databaseUrl);
+  //   // print(size);
+  //   // if (size == null) {
+  //   //   return false;
+  //   // }
 
-    return true; //size == File(path).lengthSync();
-  } else {
-    return false;
-  }
+  //   return true; //size == File(path).lengthSync();
+  // } else {
+  //   return false;
+  // }
 }
 
 class MyHttpOverrides extends HttpOverrides {

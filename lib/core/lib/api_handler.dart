@@ -2,9 +2,13 @@ import "dart:convert";
 import "dart:io";
 
 import "package:connectivity_plus/connectivity_plus.dart";
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:flutter_secure_storage/flutter_secure_storage.dart";
 import "package:http/http.dart" as http;
 import "package:islamic_online_learning/core/constants.dart";
+import "package:islamic_online_learning/features/auth/view/pages/register_page.dart";
+import "package:islamic_online_learning/features/main/presentation/pages/main_page.dart";
 
 final storage = const FlutterSecureStorage();
 
@@ -145,8 +149,24 @@ Future<http.StreamedResponse> customPostWithForm(
 
 Future<String?> getAccessToken() async {
   final token = await storage.read(key: 'access_token');
+  final refreshToken = await storage.read(key: "refresh_token");
   print("token: $token");
+  print("refreshToken: $refreshToken");
   return token;
+}
+
+Future<void> deleteTokens() async {
+  await storage.delete(key: "access_token");
+  await storage.delete(key: "refresh_token");
+}
+
+Future<void> logout(BuildContext context) async {
+  await deleteTokens();
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => MainPage()),
+    (_) => false,
+  );
 }
 
 class ConnectivityException extends HttpException {
@@ -161,32 +181,23 @@ class PaymentException extends HttpException {
   PaymentException(super.message);
 }
 
-// T handleError<T>(Object err, T state) {
-//   if (err is ConnectivityException) {
-//     return state.copyWith(
-//       isLoading: false,
-//       error: err.message,
-//     );
-//   } else if (err is AuthException) {
-//     return state.copyWith(
-//       isLoading: false,
-//       isErrorAuth: true,
-//       error: err.message,
-//     );
-//   } else if (err is PaymentException) {
-//     return state.copyWith(
-//       isLoading: false,
-//       isErrorPayment: true,
-//       error: err.message,
-//     );
-//   } else {
-//     print("Error: $err");
-//     return state.copyWith(
-//       isLoading: false,
-//       error: "ደርሶቹን ማግኘት አልተቻለም።",
-//     );
-//   }
-// }
+Future<void> handleError(
+    String err, BuildContext context, VoidCallback action) async {
+  if (err.contains("refresh_token")) {
+    await logout(context);
+  } else if (err.contains("your_account_is_blocked")) {
+    await logout(context);
+  } else if (err.contains("your_account_is_blocked")) {
+    await logout(context);
+  } else if (err.contains("no_refresh")) {
+    await logout(context);
+  } else if (err.contains("user_not_found")) {
+    await logout(context);
+  } else if (err.contains("logout")) {
+    await logout(context);
+  }
+  action();
+}
 
 Future<Map<String, dynamic>> refreshToken() async {
   final refresh = await storage.read(key: 'refresh_token');

@@ -115,7 +115,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
           onFinish: () {
             ref.read(sharedPrefProvider).then((pref) {
               final show1 = bool.parse(
-                  pref.getString(PrefConsts.showGuide)?.split(",").first ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").first ??
+                      "true");
 
               pref.setString(PrefConsts.showGuide, '$show1,false');
 
@@ -126,7 +127,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
           onSkip: () {
             ref.read(sharedPrefProvider).then((pref) {
               final show1 = bool.parse(
-                  pref.getString(PrefConsts.showGuide)?.split(",").first ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").first ??
+                      "true");
 
               pref.setString(PrefConsts.showGuide, '$show1,false');
 
@@ -179,7 +181,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
           ref.read(showGuideProvider.notifier).update(
             (state) {
               show = bool.parse(
-                  pref.getString(PrefConsts.showGuide)?.split(",").last ?? "true");
+                  pref.getString(PrefConsts.showGuide)?.split(",").last ??
+                      "true");
 
               print("${pref.getString(PrefConsts.showGuide)}");
 
@@ -193,7 +196,8 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
               return [
                 bool.parse(
-                    pref.getString(PrefConsts.showGuide)?.split(",").first ?? "true"),
+                    pref.getString(PrefConsts.showGuide)?.split(",").first ??
+                        "true"),
                 show,
               ];
             },
@@ -724,7 +728,15 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                                         ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
                                                         : "${courseModel.title}.pdf",
                                                     "PDF",
+                                                    courseModel.pdfId
+                                                            .contains(",")
+                                                        ? courseModel.pdfId
+                                                                .split(",")[
+                                                            courseModel.pdfNum
+                                                                .toInt()]
+                                                        : courseModel.pdfId,
                                                     context,
+                                                    300000,
                                                   );
                                               print(
                                                   "isPDFDownloded:- $isPDFDownloded");
@@ -915,9 +927,12 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                                   .read(cdNotifierProvider
                                                       .notifier)
                                                   .isDownloaded(
-                                                      "${courseModel.title}.pdf",
-                                                      "PDF",
-                                                      context);
+                                                    "${courseModel.title}.pdf",
+                                                    "PDF",
+                                                    courseModel.pdfId,
+                                                    context,
+                                                    300000
+                                                  );
 
                                               Directory dir =
                                                   await getApplicationSupportDirectory();

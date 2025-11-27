@@ -4,8 +4,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -17,7 +17,8 @@ abstract class CourseDetailDataSrc {
     CancelToken cancelToken,
     Ref ref,
   );
-  Future<bool> checkIfTheFileIsDownloaded(String fileName, String folderName);
+  Future<bool> checkIfTheFileIsDownloaded(
+      String fileName, String folderName, String url, int fileSize);
   Future<String> loadFileOnline(String fileId, bool isAudio);
   Future<String> createDynamicLink(CourseModel courseModel);
   Future<bool> deleteFile(String fileName, String folderName);
@@ -28,12 +29,15 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
   ICourseDatailDataSrc(this.dio);
   @override
   Future<bool> checkIfTheFileIsDownloaded(
-      String fileName, String folderName) async {
+      String fileName, String folderName, String url, int fileSize) async {
     Directory dir = await getApplicationSupportDirectory();
 
     final filePath = "${dir.path}/$folderName/$fileName";
 
-    return await File(filePath).exists();
+    return await verifyFileLength(
+      filePath: filePath,
+      expectedSize: fileSize,
+    );
   }
 
   @override
@@ -50,78 +54,233 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
           (X509Certificate cert, String host, int port) => true;
       return client;
     };
+
     Directory dir = await getApplicationSupportDirectory();
+    await Directory("${dir.path}/$folderName").create(recursive: true);
 
     final filePath = "${dir.path}/$folderName/$fileName";
+    final file = File(filePath);
 
-    if (await File(filePath).exists()) {
-      // ref.read(downloadProgressProvider.notifier).update((state) => []);
-      return File(filePath);
-    }
+    // int downloadedBytes = 0;
 
-    ref.read(downloadProgressProvider.notifier).update((state) {
-      if (kDebugMode) {
-        print(state.length);
-        print(filePath);
-        print("adding...");
-      }
-      return [
-        ...state,
-        DownloadProgress(
-          cancelToken: cancelToken,
-          progress: 0,
-          receivedBytes: 0,
-          totalBytes: 0,
-          filePath: filePath,
-          title: fileName.split(",").last,
-        ),
-      ];
-    });
+    // The actual file URL
+    final fileDownloadUrl = fileId;
 
-    String fileDownloadUrl = "";
-    // if (folderName == "Audio") {
-    fileDownloadUrl = fileId;
-    // } else {
-    //   final fileUrl =
-    //       'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
-    //   final response = await dio.get(fileUrl);
-    //   final fileData = response.data['result'];
-    //   fileDownloadUrl =
-    //       'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
-    // }
+    ref.read(downloadProgressProvider.notifier).update(
+          (s) => [
+            ...s,
+            DownloadProgress(
+              cancelToken: cancelToken,
+              progress: 0,
+              receivedBytes: 0,
+              totalBytes: 0,
+              filePath: filePath,
+              title: fileName.split(",").last,
+            ),
+          ],
+        );
 
-    await dio.download(
-      fileDownloadUrl,
-      filePath,
+    await resumableDownload(
+      url: fileDownloadUrl,
+      savePath: filePath,
       cancelToken: cancelToken,
-      onReceiveProgress: (receivedBytes, totalBytes) {
-        if (totalBytes != -1) {
-          double progress = (receivedBytes / totalBytes) * 100;
-          if (progress <= 100.0) {
-            ref.read(downloadProgressProvider.notifier).update((state) {
-              return state
-                  .map(
-                    (DownloadProgress e) => e.filePath == filePath
-                        ? e.copyWith(
-                            progress: progress,
-                            filePath: filePath,
-                            receivedBytes: receivedBytes,
-                            totalBytes: totalBytes,
-                          )
-                        : e,
-                  )
-                  .toList();
-            });
-          }
-        }
+      onProgress: (received, totalBytes) {
+        double progress = (received / totalBytes) * 100;        
+        ref.read(downloadProgressProvider.notifier).update((state) {        
+          return state
+              .map(
+                (e) => e.filePath == filePath
+                    ? e.copyWith(
+                        progress: progress,
+                        receivedBytes: received,
+                        totalBytes: totalBytes,
+                      )
+                    : e,
+              )
+              .toList();
+        });
+      },
+      onDone: () async {
+        ref.read(downloadProgressProvider.notifier).update(
+              (state) => state.where((e) => e.filePath != filePath).toList(),
+            );
+      },
+      onError: (error) {
+        throw Exception(error.toString());
       },
     );
+    return file;
+    // if (await file.exists()) {
+    //   downloadedBytes = await file.length();
+    // }
 
-    ref
-        .read(downloadProgressProvider.notifier)
-        .update((state) => state.where((e) => e.filePath != filePath).toList());
-    return File(filePath);
+    // // Add progress item if not exists
+    // ref.read(downloadProgressProvider.notifier).update((state) {
+    //   final exists = state.any((e) => e.filePath == filePath);
+    //   if (!exists) {
+    //     return [
+    //       ...state,
+    //       DownloadProgress(
+    //         cancelToken: cancelToken,
+    //         progress: 0,
+    //         receivedBytes: downloadedBytes,
+    //         totalBytes: 0,
+    //         filePath: filePath,
+    //         title: fileName.split(",").last,
+    //       ),
+    //     ];
+    //   }
+    //   return state;
+    // });
+
+    // // Add header to continue download
+    // Map<String, dynamic> headers =
+    //     downloadedBytes > 0 ? {"Range": "bytes=$downloadedBytes-"} : {};
+
+    // final response = await dio.get<ResponseBody>(
+    //   fileDownloadUrl,
+    //   options: Options(
+    //     responseType: ResponseType.stream,
+    //     headers: headers,
+    //   ),
+    //   cancelToken: cancelToken,
+    // );
+
+    // final totalBytes = response.headers.map["content-length"]?.first != null
+    //     ? int.parse(response.headers.map["content-length"]!.first) +
+    //         downloadedBytes
+    //     : downloadedBytes;
+
+    // final sink = file.openWrite(
+    //   mode: downloadedBytes > 0 ? FileMode.append : FileMode.write,
+    // );
+
+    // int received = downloadedBytes;
+
+    // await response.data!.stream.listen(
+    //   (chunk) {
+    //     sink.add(chunk);
+    //     received += chunk.length;
+
+    //     double progress = (received / totalBytes) * 100;
+
+    //     ref.read(downloadProgressProvider.notifier).update((state) {
+    //       return state
+    //           .map(
+    //             (e) => e.filePath == filePath
+    //                 ? e.copyWith(
+    //                     progress: progress,
+    //                     receivedBytes: received,
+    //                     totalBytes: totalBytes,
+    //                   )
+    //                 : e,
+    //           )
+    //           .toList();
+    //     });
+    //   },
+    //   onDone: () async {
+    //     await sink.close();
+
+    //     ref.read(downloadProgressProvider.notifier).update(
+    //           (state) => state.where((e) => e.filePath != filePath).toList(),
+    //         );
+    //   },
+    //   onError: (e) async {
+    //     await sink.close();
+    //     throw e;
+    //   },
+    //   cancelOnError: true,
+    // ).asFuture();
+
+    // return file;
   }
+
+  // @override
+  // Future<File> downloadFile(
+  //   String fileId,
+  //   String fileName,
+  //   String folderName,
+  //   CancelToken cancelToken,
+  //   Ref ref,
+  // ) async {
+  //   (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+  //       (client) {
+  //     client.badCertificateCallback =
+  //         (X509Certificate cert, String host, int port) => true;
+  //     return client;
+  //   };
+  //   Directory dir = await getApplicationSupportDirectory();
+
+  //   final filePath = "${dir.path}/$folderName/$fileName";
+
+  //   if (await File(filePath).exists()) {
+  //     // ref.read(downloadProgressProvider.notifier).update((state) => []);
+  //     return File(filePath);
+  //   }
+
+  //   ref.read(downloadProgressProvider.notifier).update((state) {
+  //     if (kDebugMode) {
+  //       print(state.length);
+  //       print(filePath);
+  //       print("adding...");
+  //     }
+  //     return [
+  //       ...state,
+  //       DownloadProgress(
+  //         cancelToken: cancelToken,
+  //         progress: 0,
+  //         receivedBytes: 0,
+  //         totalBytes: 0,
+  //         filePath: filePath,
+  //         title: fileName.split(",").last,
+  //       ),
+  //     ];
+  //   });
+
+  //   String fileDownloadUrl = "";
+  //   // if (folderName == "Audio") {
+  //   fileDownloadUrl = fileId;
+  //   // } else {
+  //   //   final fileUrl =
+  //   //       'https://api.telegram.org/bot$botToken/getFile?file_id=$fileId';
+  //   //   final response = await dio.get(fileUrl);
+  //   //   final fileData = response.data['result'];
+  //   //   fileDownloadUrl =
+  //   //       'https://api.telegram.org/file/bot$botToken/${fileData['file_path']}';
+  //   // }
+
+  //   await dio.download(
+  //     fileDownloadUrl,
+  //     filePath,
+  //     cancelToken: cancelToken,
+  //     onReceiveProgress: (receivedBytes, totalBytes) {
+  //       if (totalBytes != -1) {
+  //         double progress = (receivedBytes / totalBytes) * 100;
+  //         if (progress <= 100.0) {
+  //           ref.read(downloadProgressProvider.notifier).update((state) {
+  //             return state
+  //                 .map(
+  //                   (DownloadProgress e) => e.filePath == filePath
+  //                       ? e.copyWith(
+  //                           progress: progress,
+  //                           filePath: filePath,
+  //                           receivedBytes: receivedBytes,
+  //                           totalBytes: totalBytes,
+  //                         )
+  //                       : e,
+  //                 )
+  //                 .toList();
+  //           });
+  //         }
+  //       }
+  //     },
+  //   );
+
+  //   ref
+  //       .read(downloadProgressProvider.notifier)
+  //       .update((state) => state.where((e) => e.filePath != filePath).toList());
+  //   return File(filePath);
+  // }
 
   @override
   Future<String> loadFileOnline(String fileId, bool isAudio) async {

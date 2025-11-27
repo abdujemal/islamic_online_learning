@@ -16,30 +16,49 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       state = state.copyWith(isLoading: true);
       final user = await authService.getMyInfo();
-      await getScores();
+      await getScores(context);
       state = state.copyWith(isLoading: false, user: user);
     } on ConnectivityException catch (err) {
       state = state.copyWith(isLoading: false, error: err.toString());
       // toast(err.message, ToastType.error, context);
     } catch (err) {
-      print("Error: $err");
-      final token = await getAccessToken();
       // toast("የእርስዎን መለያ ማግኘት አልተቻለም።", ToastType.error, context);
-      state = state.copyWith(
-        isLoading: false,
-        error: "የእርስዎን መለያ ማግኘት አልተቻለም።",
-        tokenIsNull: token == null,
+      handleError(
+        err.toString(),
+        context,
+        () {
+          print("Error: $err");
+          // final token = await getAccessToken();
+          //     state = state.copyWith(
+          //       isLoading: false,
+          //       error: "የእርስዎን መለያ ማግኘት አልተቻለም።",
+          //       tokenIsNull: token == null,
+          //     );
+        },
       );
     }
   }
 
-  Future<void> getScores() async {
+  Future<void> getScores(BuildContext context) async {
     try {
       final scores = await authService.getScores();
       state = state.copyWith(scores: scores);
     } catch (err) {
-      print("Could not get scores");
-      print("err: ${err.toString()}");
+      handleError(
+        err.toString(),
+        context,
+        () {
+          print("Could not get scores");
+          print("err: ${err.toString()}");
+          print("Error: $err");
+          // final token = await getAccessToken();
+          //     state = state.copyWith(
+          //       isLoading: false,
+          //       error: "የእርስዎን መለያ ማግኘት አልተቻለም።",
+          //       tokenIsNull: token == null,
+          //     );
+        },
+      );
     }
   }
 
@@ -65,7 +84,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<bool> checkIfTheCourseStarted(WidgetRef ref) async {
     getMyInfo(ref.context);
-    try{
+    try {
       final started = await hasCourseStarted();
       if (started == true) {
         state = state.copyWith(courseStarted: true);
@@ -74,8 +93,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       } else {
         return false;
       }
-
-    }catch(err){
+    } catch (err) {
       return false;
     }
   }

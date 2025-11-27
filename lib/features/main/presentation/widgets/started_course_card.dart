@@ -104,12 +104,13 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
 
   Future<bool> checkFile(int index) async {
     if (mounted) {
-      final isDownloaded = await ref
-          .read(cdNotifierProvider.notifier)
-          .isDownloaded(
-              "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
-              "Audio",
-              context);
+      final isDownloaded =
+          await ref.read(cdNotifierProvider.notifier).isDownloaded(
+                "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
+                "Audio",
+                widget.courseModel.courseIds[index],
+                context,
+              );
       return isDownloaded;
     }
     return false;
@@ -236,6 +237,10 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                                 ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
                                                 : "${courseModel.title}.pdf",
                                             "PDF",
+                                            courseModel.pdfId.contains(",")
+                                                ? courseModel.pdfId.split(",")[
+                                                    courseModel.pdfNum.toInt()]
+                                                : courseModel.pdfId,
                                             context,
                                           );
                                       print("isPDFDownloded:- $isPDFDownloded");

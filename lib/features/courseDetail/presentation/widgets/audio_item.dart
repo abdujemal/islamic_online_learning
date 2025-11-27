@@ -76,12 +76,16 @@ class _AudioItemState extends ConsumerState<AudioItem> {
 
   Future<bool> checkFile() async {
     if (mounted) {
-      final isDownloaded = await ref
-          .read(cdNotifierProvider.notifier)
-          .isDownloaded(
-              "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3",
-              "Audio",
-              context);
+      final isDownloaded =
+          await ref.read(cdNotifierProvider.notifier).isDownloaded(
+                "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3",
+                "Audio",
+                widget.audioId,
+                context,
+                int.parse(
+                  widget.courseModel.audioSizes.split(",")[widget.index - 1],
+                ),
+              );
       return isDownloaded;
     }
     return false;

@@ -56,6 +56,7 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
         final bool isPdfDownloaded = await cdNotifier.isDownloaded(
           "${widget.courseModel.title} $i.pdf",
           "PDF",
+          pdfId,
           context,
         );
         if (!isPdfDownloaded) {
@@ -85,6 +86,7 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
       final bool isAudioDownloaded = await cdNotifier.isDownloaded(
           '${widget.courseModel.ustaz},${widget.courseModel.title} $i.mp3',
           "Audio",
+          audioId,
           context);
       if (kDebugMode) {
         print(isAudioDownloaded);

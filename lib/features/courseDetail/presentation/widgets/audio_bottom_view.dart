@@ -15,7 +15,6 @@ import '../../../../core/Audio Feature/audio_providers.dart';
 import '../../../../core/Audio Feature/playlist_helper.dart';
 import '../../../../core/Audio Feature/position_data_model.dart';
 import '../../../main/data/model/course_model.dart';
-import '../stateNotifier/providers.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'finish_confirmation.dart';
@@ -50,11 +49,11 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
     "Super Fast",
   ];
 
-  Future<bool> isDownloaded(String title, String ustaz) {
-    return ref
-        .read(cdNotifierProvider.notifier)
-        .isDownloaded("$ustaz,$title.mp3", "Audio", context);
-  }
+  // Future<bool> isDownloaded(String title, String ustaz) {
+  //   return ref
+  //       .read(cdNotifierProvider.notifier)
+  //       .isDownloaded("$ustaz,$title.mp3", "Audio", context);
+  // }
 
   Future<String> getPath(String folderName, String fileName) async {
     Directory dir = await getApplicationSupportDirectory();

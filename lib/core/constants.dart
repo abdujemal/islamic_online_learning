@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
@@ -256,4 +260,113 @@ String formatTime(int seconds) {
   final minutes = seconds ~/ 60;
   final secs = seconds % 60;
   return "${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}";
+}
+
+Future<bool> verifyFileLength({
+  // required String url,
+  required int expectedSize,
+  required String filePath,
+  bool aboveTheSize = false,
+}) async {
+  try {
+    final file = File(filePath);
+
+    if (!await file.exists()) return false;
+
+    // Step 4: Validate file size
+    final actualSize = await file.length();
+
+    return aboveTheSize
+        ? actualSize >= expectedSize
+        : actualSize == expectedSize;
+  } catch (e) {
+    print("Error equating file length: $e");
+    return false;
+  }
+}
+
+Future<void> resumableDownload({
+  required String url,
+  required String savePath,
+  required CancelToken cancelToken,
+  required void Function(int received, int total) onProgress,
+  required Future<void> Function() onDone,
+  required Future<void> Function(Object error) onError, // <-- onError added
+}) async {
+  final dio = Dio();
+
+  // Allow SSL bypass if needed
+  (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+      (client) {
+    client.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+    return client;
+  };
+
+  try {
+    final file = File(savePath);
+
+    // Get already downloaded size
+    int downloadedBytes = 0;
+
+    if (await file.exists()) {
+      downloadedBytes = await file.length();
+    } else {
+      await file.create(recursive: true);
+    }
+
+    // Ask server for full size
+    final head = await dio.head(url);
+    final fullSize = int.tryParse(head.headers.value('content-length') ?? "0");
+
+    if (fullSize == null || fullSize == 0) {
+      throw Exception("Could not determine file size from server.");
+    }
+
+    // Already fully downloaded?
+    if (downloadedBytes == fullSize) {
+      await onDone();
+      return;
+    }
+
+    // Open file for appending
+    final raf = file.openSync(mode: FileMode.append);
+
+    // Stream download from last byte
+    final response = await dio.get<ResponseBody>(
+      url,
+      options: Options(
+        responseType: ResponseType.stream,
+        headers: {
+          'Range': 'bytes=$downloadedBytes-',
+        },
+      ),
+      cancelToken: cancelToken,
+    );
+
+    int received = downloadedBytes;
+
+    // Stream chunks
+    await for (var chunk in response.data!.stream) {
+      if (cancelToken.isCancelled) {
+        await raf.close();
+        return;
+      }
+
+      raf.writeFromSync(chunk);
+      received += chunk.length;
+
+      onProgress(received, fullSize);
+    }
+
+    await raf.close();
+
+    // Finished
+    if (received >= fullSize) {
+      await onDone();
+    }
+  } catch (e) {
+    await onError(e); // <--- call your onError callback
+    print("Download error: $e");
+  }
 }
