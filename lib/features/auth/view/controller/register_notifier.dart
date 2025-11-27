@@ -95,9 +95,9 @@ class RegisterNotifier extends StateNotifier<RegisterState> {
     );
     try {
       state = state.copyWith(isSaving: true);
-      final token = await authService.register(userInput);
+      await authService.register(userInput);
       final pref = await ref.read(sharedPrefProvider);
-      pref.setString(PrefConsts.token, "Bearer $token");
+      // pref.setString(PrefConsts.token, "Bearer $token");
       pref.remove(PrefConsts.otpId);
       state = state.copyWith(isSaving: false);
       Navigator.pushAndRemoveUntil(

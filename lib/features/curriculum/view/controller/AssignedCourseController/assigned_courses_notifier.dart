@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islamic_online_learning/core/constants.dart';
+// import 'package:islamic_online_learning/core/constants.dart';
 
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_service.dart';
@@ -277,13 +277,13 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     int lessonCount = 0;
     int index = 1;
     List<Map<int, List<int>>> lessonsInDiscussions = [];
-    bool isLastDiscussion = false;
+    // bool isLastDiscussion = false;
     while (true) {
       if (lessonCount < (noOfLessons - 1)) {
         if (isIndexDis(index, ref)) {
           discussionCount++;
           lessonsInDiscussions.add({discussionCount: []});
-          isLastDiscussion = true;
+          // isLastDiscussion = true;
         } else {
           lessonCount++;
           lessonsInDiscussions = lessonsInDiscussions
@@ -293,7 +293,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
                     }
                   : e)
               .toList();
-          isLastDiscussion = false;
+          // isLastDiscussion = false;
         }
       } else {
         break;

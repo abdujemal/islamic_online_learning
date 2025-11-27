@@ -259,13 +259,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       "\n- አንድ ቡድን 5 ሰው ሲሞላ በቀጣዩ ቀን ቂርአት ይጀመራል። "
                       "\n- ለእርስዎ የሚስማማ ቡድን ካጡ አድስ ቡድን መፍጠር ይችላሉ።"),
                 ),
-                if (state.isLoadingGroups)
+                if (state.isLoadingGroups) ...[
                   Expanded(
                     child: Center(
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                if (!state.isLoadingGroups && state.groups.isNotEmpty)
+                ] else if (!state.isLoadingGroups &&
+                    state.groups.isNotEmpty) ...[
                   Expanded(
                     child: ListView.builder(
                       itemCount: state.groups.length + 1,
@@ -336,6 +337,54 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       },
                     ),
                   ),
+                ] else ...[
+                  Expanded(
+                      child: Center(
+                    child: Text("ምንም ቡድን የለም"),
+                  )),
+                  Container(
+                    padding: EdgeInsets.all(7),
+                    margin: EdgeInsets.only(
+                      top: 10,
+                    ),
+                    decoration: state.isAddingNewGroup
+                        ? BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                              color:
+                                  Theme.of(context).chipTheme.backgroundColor ??
+                                      Colors.grey,
+                            ),
+                          )
+                        : null,
+                    child: Column(
+                      spacing: 15,
+                      children: [
+                        if (!state.isAddingNewGroup)
+                          ElevatedButton(
+                            onPressed: () {
+                              ref
+                                  .read(registerNotifierProvider.notifier)
+                                  .toggleAddingGroup();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              // minimumSize: const Size(80, 56),
+                            ),
+                            child: const Text("አድስ ቡድን ፍጠር"),
+                          ),
+                        if (state.isAddingNewGroup)
+                          AddNewGroup(
+                            userData: userData,
+                          )
+                      ],
+                    ),
+                  )
+                ]
               ]
             ],
           ),

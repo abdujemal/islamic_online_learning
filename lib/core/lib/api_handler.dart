@@ -3,11 +3,10 @@ import "dart:io";
 
 import "package:connectivity_plus/connectivity_plus.dart";
 import "package:flutter/material.dart";
-import "package:flutter/services.dart";
 import "package:flutter_secure_storage/flutter_secure_storage.dart";
 import "package:http/http.dart" as http;
 import "package:islamic_online_learning/core/constants.dart";
-import "package:islamic_online_learning/features/auth/view/pages/register_page.dart";
+import "package:islamic_online_learning/features/auth/view/pages/payment_due_page.dart";
 import "package:islamic_online_learning/features/main/presentation/pages/main_page.dart";
 
 final storage = const FlutterSecureStorage();
@@ -108,43 +107,59 @@ Future<http.Response> customPostRequest(String url, Map<String, dynamic>? map,
 Future<http.StreamedResponse> customPostWithForm(
     String url, Map<String, dynamic>? map, File file,
     {bool authorized = false}) async {
-  var uri = Uri.parse(url);
-  print("POST $url");
-  print("req body $map");
-  if (!file.existsSync()) {
-    print("⚠️ File not found: ${file.path}");
-    throw Exception("File does not exist");
-  }
-
-  var request = http.MultipartRequest('POST', uri);
-  if (map != null) {
-    for (var kv in map.entries) {
-      request.fields[kv.key] = kv.value;
+  call() async {
+    var uri = Uri.parse(url);
+    print("POST $url");
+    print("req body $map");
+    if (!file.existsSync()) {
+      print("⚠️ File not found: ${file.path}");
+      throw Exception("File does not exist");
     }
-  }
-  request.files.add(await http.MultipartFile.fromPath('file', file.path));
 
-  // Optionally add headers (e.g., if your API needs auth)
+    var request = http.MultipartRequest('POST', uri);
+    if (map != null) {
+      for (var kv in map.entries) {
+        request.fields[kv.key] = kv.value;
+      }
+    }
+    request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+    // Optionally add headers (e.g., if your API needs auth)
+    if (authorized) {
+      final token = await getAccessToken();
+      if (token == null) throw Exception("Token is null");
+      request.headers['Authorization'] = token;
+    }
+
+    // Send request
+    final res = await request.send();
+
+    return res;
+  }
+
+  var response = await call();
+
   if (authorized) {
-    final token = await getAccessToken();
-    if (token == null) throw Exception("Token is null");
-    request.headers['Authorization'] = token;
+    if (response.statusCode == 401 &&
+        (response.reasonPhrase?.contains("auth") ?? false)) {
+      // try refresh
+      final r = await refreshToken();
+      if (r['ok'] == true) {
+        // retry
+        // token = await getAccessToken();
+        response = await call();
+      } else {
+        // cannot refresh: logout
+        // await auth.logout();
+        throw Exception("logout");
+      }
+    }
+    return response;
   }
 
-  // Send request
-  final res = await request.send();
+  // print("res body ${response.body}");
 
-  return res;
-
-  // if (response.statusCode == 200 || response.statusCode == 201) {
-  //   print('✅ Upload successful!');
-  //   return true;
-  // } else {
-  //   print('❌ Upload failed with status: ${response.statusCode}');
-  //   final respStr = await response.stream.bytesToString();
-  //   print('Server response: $respStr');
-  //   return false;
-  // }
+  return response;
 }
 
 Future<String?> getAccessToken() async {
@@ -166,6 +181,15 @@ Future<void> logout(BuildContext context) async {
     context,
     MaterialPageRoute(builder: (_) => MainPage()),
     (_) => false,
+  );
+}
+
+Future<void> paymentIsDue(BuildContext context) async {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => PaymentDuePage(),
+    ),
   );
 }
 
@@ -195,6 +219,10 @@ Future<void> handleError(
     await logout(context);
   } else if (err.contains("logout")) {
     await logout(context);
+  } else if (err.contains("no_subscription")) {
+    paymentIsDue(context);
+  } else if (err.contains("your_subscription_is_due")) {
+    paymentIsDue(context);
   }
   action();
 }

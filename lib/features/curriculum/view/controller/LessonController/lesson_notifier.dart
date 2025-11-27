@@ -132,7 +132,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
         //st
         // print("uploaded successfully.");
 
-        toast("ጥያቄዎ ደርሶናል በ24 ሰአት ውስጥ እንመልሳለን።", ToastType.success, context);
+        toast("ጥያቄዎ ደርሶናል በ24 ሰአት ውስጥ እንመልሳለን። ኢንሻአላህ!", ToastType.success, context);
         if (state.currentLesson == null) return;
         // await PlaylistHelper.audioPlayer.stop();
         Navigator.push(

@@ -12,6 +12,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/core/update_checker.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dart';
+import 'package:islamic_online_learning/features/auth/view/pages/payment_due_page.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
@@ -376,7 +377,17 @@ class _MainPageState extends ConsumerState<MainPage>
                   ),
                   actions: [
                     currentIndex != 1
-                        ? SizedBox()
+                        ? IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PaymentDuePage(),
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.refresh),
+                          )
                         : IconButton(
                             onPressed: () {
                               Navigator.push(

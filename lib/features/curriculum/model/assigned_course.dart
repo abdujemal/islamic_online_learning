@@ -108,6 +108,7 @@ class AssignedCourse {
 class Course {
   final String courseId;
   final String pdfId;
+  final List<int> pdfSize;
   final String image;
   final String ustaz;
   final String category;
@@ -117,23 +118,24 @@ class Course {
     required this.image,
     required this.ustaz,
     required this.category,
+    required this.pdfSize,
   });
-  
 
   Course copyWith({
     String? courseId,
     String? pdfId,
+    List<int>? pdfSize,
     String? image,
     String? ustaz,
     String? category,
   }) {
     return Course(
-      courseId: courseId ?? this.courseId,
-      pdfId: pdfId ?? this.pdfId,
-      image: image ?? this.image,
-      ustaz: ustaz ?? this.ustaz,
-      category: category ?? this.category,
-    );
+        courseId: courseId ?? this.courseId,
+        pdfId: pdfId ?? this.pdfId,
+        image: image ?? this.image,
+        ustaz: ustaz ?? this.ustaz,
+        category: category ?? this.category,
+        pdfSize: pdfSize ?? this.pdfSize);
   }
 
   Map<String, dynamic> toMap() {
@@ -143,46 +145,50 @@ class Course {
       'image': image,
       'ustaz': ustaz,
       'category': category,
+      'pdfSize': pdfSize
     };
   }
 
   factory Course.fromMap(Map<String, dynamic> map) {
     return Course(
-      courseId: map['courseId'] as String,
-      pdfId: map['pdfId'] as String,
-      image: map['image'] as String,
-      ustaz: map['ustaz'] as String,
-      category: map['category'] as String,
-    );
+        courseId: map['courseId'] as String,
+        pdfId: map['pdfId'] as String,
+        image: map['image'] as String,
+        ustaz: map['ustaz'] as String,
+        category: map['category'] as String,
+        pdfSize:
+            (map["pdfSize"] as List<dynamic>).map((e) => e as int).toList());
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Course.fromJson(String source) => Course.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Course.fromJson(String source) =>
+      Course.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'Course(courseId: $courseId, pdfId: $pdfId, image: $image, ustaz: $ustaz, category: $category)';
+    return 'Course(courseId: $courseId, pdfId: $pdfId, image: $image, ustaz: $ustaz, category: $category, pdfSize: $pdfSize)';
   }
 
   @override
   bool operator ==(covariant Course other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.courseId == courseId &&
-      other.pdfId == pdfId &&
-      other.image == image &&
-      other.ustaz == ustaz &&
-      other.category == category;
+
+    return other.courseId == courseId &&
+        other.pdfId == pdfId &&
+        other.image == image &&
+        other.ustaz == ustaz &&
+        other.pdfSize == pdfSize&&
+        other.category == category;
   }
 
   @override
   int get hashCode {
     return courseId.hashCode ^
-      pdfId.hashCode ^
-      image.hashCode ^
-      ustaz.hashCode ^
-      category.hashCode;
+        pdfId.hashCode ^
+        image.hashCode ^
+        ustaz.hashCode ^
+        pdfSize.hashCode^
+        category.hashCode;
   }
 }

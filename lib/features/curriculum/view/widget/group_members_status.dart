@@ -42,7 +42,7 @@ class _GroupMembersStatusState extends ConsumerState<GroupMembersStatus> {
                     onPressed: () {
                       ref
                           .read(authNotifierProvider.notifier)
-                          .getMyInfo(context);
+                          .getMyInfo(ref);
                     },
                     icon: Icon(Icons.refresh),
                   )

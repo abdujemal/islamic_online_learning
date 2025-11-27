@@ -71,7 +71,7 @@ class SignInNotifier extends StateNotifier<SignInState> {
           context,
           MaterialPageRoute(
             builder: (_) => RegisterPage(
-              otpId: data["otp"]["id"],
+              otpId: data["data"]["otpId"],
             ),
           ),
           (route) => false,

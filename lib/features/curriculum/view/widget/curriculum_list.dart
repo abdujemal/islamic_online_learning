@@ -13,14 +13,6 @@ class CurriculumList extends ConsumerStatefulWidget {
 
 class _CurriculumListState extends ConsumerState<CurriculumList> {
   @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      ref.read(curriculumNotifierProvider.notifier).getCurriculums();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final state = ref.watch(curriculumNotifierProvider);
     if (state.initial) {

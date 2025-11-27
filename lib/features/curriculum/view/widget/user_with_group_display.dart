@@ -44,9 +44,7 @@ class _UserWithGroupDisplayState extends ConsumerState<UserWithGroupDisplay> {
               alignment: Alignment.centerRight,
               child: IconButton(
                 onPressed: () {
-                  ref
-                      .read(authNotifierProvider.notifier)
-                      .checkIfTheCourseStarted(ref);
+                  ref.read(authNotifierProvider.notifier).getMyInfo(ref);
                 },
                 icon: Icon(Icons.refresh),
               ),

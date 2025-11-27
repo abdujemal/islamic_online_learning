@@ -129,7 +129,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
   Widget build(BuildContext context) {
     final audioPlayer = PlaylistHelper.audioPlayer;
 
-    ThemeMode theme = ref.read(themeProvider);
+    // ThemeMode theme = ref.read(themeProvider);
 
     return WillPopScope(
       onWillPop: () async {
@@ -249,7 +249,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                               keyboardType: TextInputType.number,
                               onSubmitted: (value) {
                                 if (_pageTc.text.isNotEmpty) {
-                                  int pg = int.parse(_pageTc.text) - 1;
+                                  // int pg = int.parse(_pageTc.text) - 1;
                                   // _controller.setPage(pg);
                                   _pageFocus.unfocus();
                                   _pageTc.text = "";
@@ -277,7 +277,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                             ),
                             onTap: () {
                               if (_pageTc.text.isNotEmpty) {
-                                int pg = int.parse(_pageTc.text) - 1;
+                                // int pg = int.parse(_pageTc.text) - 1;
                                 // _controller.setPage(pg);
                                 _pageFocus.unfocus();
                                 _pageTc.text = "";
@@ -595,6 +595,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
                     setState(() {});
                   }
+                  return null;
                 },
               ),
               body: SafeArea(

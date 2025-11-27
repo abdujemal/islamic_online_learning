@@ -385,6 +385,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
                   setState(() {});
                 }
+                return null;
               },
             ),
             body: SafeArea(

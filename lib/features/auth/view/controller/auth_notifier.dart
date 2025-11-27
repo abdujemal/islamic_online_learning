@@ -12,11 +12,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final Ref ref;
   AuthNotifier(this.authService, this.ref) : super(AuthState());
 
-  Future<void> getMyInfo(BuildContext context) async {
+  Future<void> getMyInfo(WidgetRef ref) async {
     try {
       state = state.copyWith(isLoading: true);
       final user = await authService.getMyInfo();
-      await getScores(context);
+      await getScores(ref.context);
+      _checkIfTheCourseStarted(ref);
       state = state.copyWith(isLoading: false, user: user);
     } on ConnectivityException catch (err) {
       state = state.copyWith(isLoading: false, error: err.toString());
@@ -25,41 +26,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // toast("የእርስዎን መለያ ማግኘት አልተቻለም።", ToastType.error, context);
       handleError(
         err.toString(),
-        context,
-        () {
+        ref.context,
+        () async {
           print("Error: $err");
-          // final token = await getAccessToken();
-          //     state = state.copyWith(
-          //       isLoading: false,
-          //       error: "የእርስዎን መለያ ማግኘት አልተቻለም።",
-          //       tokenIsNull: token == null,
-          //     );
+          final token = await getAccessToken();
+          state = state.copyWith(
+            isLoading: false,
+            error: "የእርስዎን መለያ ማግኘት አልተቻለም።",
+            tokenIsNull: token == null,
+          );
         },
       );
     }
   }
 
   Future<void> getScores(BuildContext context) async {
-    try {
-      final scores = await authService.getScores();
-      state = state.copyWith(scores: scores);
-    } catch (err) {
-      handleError(
-        err.toString(),
-        context,
-        () {
-          print("Could not get scores");
-          print("err: ${err.toString()}");
-          print("Error: $err");
-          // final token = await getAccessToken();
-          //     state = state.copyWith(
-          //       isLoading: false,
-          //       error: "የእርስዎን መለያ ማግኘት አልተቻለም።",
-          //       tokenIsNull: token == null,
-          //     );
-        },
-      );
-    }
+    final scores = await authService.getScores();
+    state = state.copyWith(scores: scores);
   }
 
   void setCourseRelatedData(CourseRelatedData data) async {
@@ -82,39 +65,36 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(user: null);
   }
 
-  Future<bool> checkIfTheCourseStarted(WidgetRef ref) async {
-    getMyInfo(ref.context);
-    try {
-      final started = await hasCourseStarted();
-      if (started == true) {
-        state = state.copyWith(courseStarted: true);
-        ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum(ref);
-        return true;
-      } else {
-        return false;
-      }
-    } catch (err) {
+  Future<bool> _checkIfTheCourseStarted(WidgetRef ref) async {
+    // getMyInfo(ref.context);
+    // try {
+    final started = await hasCourseStarted();
+    if (started == true) {
+      state = state.copyWith(courseStarted: true);
+      ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum(ref);
+      return true;
+    } else {
       return false;
     }
+    // } catch (err) {
+    //   return false;
+    // }
   }
 
-  void unfinishedRegistration(String? otpId, BuildContext context,
-      {bool signedIn = false}) {
-    if (signedIn) return;
-    if (otpId != null) {
-      if (context.mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (_) => RegisterPage(
-              otpId: otpId,
-            ),
+  void unfinishedRegistration(
+    String otpId,
+    BuildContext context,
+  ) {
+    if (context.mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RegisterPage(
+            otpId: otpId,
           ),
-          (v) => false,
-        );
-      }
-    } else {
-      ref.read(curriculumNotifierProvider.notifier).getCurriculums();
+        ),
+        (v) => false,
+      );
     }
   }
 }

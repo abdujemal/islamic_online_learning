@@ -104,14 +104,14 @@ class AuthService {
     }
   }
 
-  Future<String> register(UserInput userInput) async {
+  Future<void> register(UserInput userInput) async {
     final response = await customPostRequest(
       registerApi,
       userInput.toMap(),
     );
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      return data["token"]; //token
+      // final data = jsonDecode(response.body) as Map<String, dynamic>;
+      // return data["token"]; //token
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
