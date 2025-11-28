@@ -23,7 +23,9 @@ class _QuizPageState extends ConsumerState<QuizPage> {
     super.initState();
     Future.microtask(() {
       PlaylistHelper.audioPlayer.stop();
-      ref.read(quizNotifierProvider.notifier).getQuizzes(widget.lesson.id);
+      ref
+          .read(quizNotifierProvider.notifier)
+          .getQuizzes(widget.lesson.id, context);
     });
   }
 
@@ -85,7 +87,7 @@ class _QuizPageState extends ConsumerState<QuizPage> {
                     onPressed: () async {
                       await ref
                           .read(quizNotifierProvider.notifier)
-                          .getQuizzes(widget.lesson.id);
+                          .getQuizzes(widget.lesson.id, context);
                     },
                     icon: Icon(Icons.refresh),
                   )
@@ -117,7 +119,7 @@ class _QuizPageState extends ConsumerState<QuizPage> {
                     onPressed: () async {
                       await ref
                           .read(quizNotifierProvider.notifier)
-                          .getQuizzes(widget.lesson.id);
+                          .getQuizzes(widget.lesson.id, context);
                     },
                     icon: Icon(Icons.refresh),
                   )

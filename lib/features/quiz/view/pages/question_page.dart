@@ -22,7 +22,10 @@ class _QuestionPageState extends ConsumerState<QuestionPage> {
     super.initState();
     Future.microtask(() {
       // PlaylistHelper.audioPlayer.stop();
-      ref.read(questionsNotifierProvider.notifier).getTestQuestion().then((v) {
+      ref
+          .read(questionsNotifierProvider.notifier)
+          .getTestQuestion(context)
+          .then((v) {
         final state = ref.read(questionsNotifierProvider);
 
         if (state.questions.isNotEmpty &&
@@ -133,7 +136,7 @@ class _QuestionPageState extends ConsumerState<QuestionPage> {
                 onStart: () {
                   ref
                       .read(questionsNotifierProvider.notifier)
-                      .startTest(widget.testTitle);
+                      .startTest(widget.testTitle, context);
                 },
               ),
               empty: (_) => Center(
@@ -145,7 +148,7 @@ class _QuestionPageState extends ConsumerState<QuestionPage> {
                       onPressed: () async {
                         await ref
                             .read(questionsNotifierProvider.notifier)
-                            .getTestQuestion();
+                            .getTestQuestion(context);
                       },
                       icon: Icon(Icons.refresh),
                     )
@@ -177,7 +180,7 @@ class _QuestionPageState extends ConsumerState<QuestionPage> {
                       onPressed: () async {
                         await ref
                             .read(questionsNotifierProvider.notifier)
-                            .getTestQuestion();
+                            .getTestQuestion(context);
                       },
                       icon: Icon(Icons.refresh),
                     )

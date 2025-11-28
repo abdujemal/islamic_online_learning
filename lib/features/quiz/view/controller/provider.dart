@@ -7,7 +7,7 @@ import 'package:islamic_online_learning/features/quiz/view/controller/quiz_state
 
 final quizNotifierProvider =
     StateNotifierProvider<QuizNotifier, QuizState>((ref) {
-  return QuizNotifier(ref.read(quizServiceProvider));
+  return QuizNotifier(ref.read(quizServiceProvider), ref);
 });
 
 final quizServiceProvider = Provider<QuizService>((ref) {
@@ -16,5 +16,5 @@ final quizServiceProvider = Provider<QuizService>((ref) {
 
 final questionsNotifierProvider =
     StateNotifierProvider<QuestionNotifier, QuestionState>((ref) {
-  return QuestionNotifier(ref.read(quizServiceProvider));
+  return QuestionNotifier(ref.read(quizServiceProvider), ref);
 });

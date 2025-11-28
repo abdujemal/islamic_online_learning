@@ -14,7 +14,7 @@ class AssignedCourseService {
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-      throw Exception('Failed to load curriculum');
+      throw Exception('Failed to load lessons of an assigned course: ${response.body}');
     }
   }
 }

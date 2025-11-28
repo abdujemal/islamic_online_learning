@@ -54,7 +54,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
               if (value) {
                 ref
                     .read(pastLessonStateProvider.notifier)
-                    .getLessonForCourse(widget.assignedCourse.id);
+                    .getLessonForCourse(widget.assignedCourse.id, context);
               }
             }
           },
@@ -94,8 +94,8 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                             : Icons.check_rounded,
                     size: widget.isCurrentCourse ? 30 : 25,
                     weight: 1,
-                    color: !widget.isCurrentCourse && !widget.isFutureCourse
-                        ? primaryColor
+                    color: widget.isCurrentCourse
+                        ? whiteColor
                         : Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),

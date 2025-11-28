@@ -29,17 +29,17 @@ final curriculumNotifierProvider =
 final assignedCoursesNotifierProvider =
     StateNotifierProvider<AssignedCoursesNotifier, AssignedCoursesState>((ref) {
   final service = ref.watch(curriculumServiceProvider);
-  return AssignedCoursesNotifier(service);
+  return AssignedCoursesNotifier(service, ref);
 });
 
 final pastLessonStateProvider =
     StateNotifierProvider<PastLessonNotifier, PastLessonState>((ref) {
   final service = ref.watch(assignedCourseServiceProvider);
-  return PastLessonNotifier(service);
+  return PastLessonNotifier(service, ref);
 });
 
 final lessonNotifierProvider = StateNotifierProvider<LessonNotifier, LessonState>((ref) {
   // final service = ref.watch(assignedCourseServiceProvider);
   // return LessonNotifier(service);
-  return LessonNotifier();
+  return LessonNotifier(ref);
 });

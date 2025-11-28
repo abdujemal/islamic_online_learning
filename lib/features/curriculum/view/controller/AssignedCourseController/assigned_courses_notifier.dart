@@ -1,5 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 // import 'package:islamic_online_learning/core/constants.dart';
 
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
@@ -8,12 +11,16 @@ import 'package:islamic_online_learning/features/curriculum/view/controller/Assi
 
 class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
   final CurriculumService service;
+  final Ref ref;
+  AssignedCoursesNotifier(this.service, this.ref)
+      : super(AssignedCoursesState());
 
-  AssignedCoursesNotifier(this.service) : super(AssignedCoursesState());
-
-  Future<void> getCurriculum(WidgetRef ref) async {
+  Future<void> getCurriculum(BuildContext context) async {
     try {
       state = state.copyWith(isLoading: true);
+      ref
+          .read(authNotifierProvider.notifier)
+          .setCourseStarted(CourseStarted.LOADING);
       final curriculumNGroup = await service.fetchCurriculum();
       final curriculum = curriculumNGroup.curriculum;
       final scores = curriculumNGroup.scores;
@@ -25,6 +32,9 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       }
       // print(curriculum);
       ref.read(authNotifierProvider.notifier).setCourseRelatedData(group);
+      ref
+          .read(authNotifierProvider.notifier)
+          .setCourseStarted(CourseStarted.STARTED);
       state = state.copyWith(
         isLoading: false,
         curriculum: curriculum,
@@ -34,7 +44,25 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       );
     } catch (e) {
       print("Error: $e");
-      state = state.copyWith(isLoading: false, error: "ደርሶቹን ማግኘት አልተቻለም።");
+      if (e.toString().contains("course_is_not_started")) {
+        ref
+            .read(authNotifierProvider.notifier)
+            .setCourseStarted(CourseStarted.NOTSTARTED);
+      }
+      handleError(
+        e.toString(),
+        context,
+        ref,
+        () {
+          ref
+              .read(authNotifierProvider.notifier)
+              .setCourseStarted(CourseStarted.STARTED);
+          state = state.copyWith(
+            isLoading: false,
+            error: getErrorMsg(e.toString(), "ደርሶቹን ማግኘት አልተቻለም።"),
+          );
+        },
+      );
     }
   }
 
@@ -214,6 +242,15 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
     DateTime today = DateTime.now();
     return today.weekday == discussionWeekDay;
+  }
+
+  bool isTodayLessThanDiscussionDay(WidgetRef ref) {
+    final authState = ref.read(authNotifierProvider);
+    final discussionDay = authState.user?.group.discussionDay ?? "Sunday";
+    final discussionWeekDay = getWeekDayFromText(discussionDay);
+
+    DateTime today = DateTime.now();
+    return today.weekday < discussionWeekDay;
   }
 
   int getWeekDayFromText(String text) {

@@ -3,10 +3,13 @@ import "dart:io";
 
 import "package:connectivity_plus/connectivity_plus.dart";
 import "package:flutter/material.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_secure_storage/flutter_secure_storage.dart";
 import "package:http/http.dart" as http;
 import "package:islamic_online_learning/core/constants.dart";
+import "package:islamic_online_learning/features/auth/view/controller/provider.dart";
 import "package:islamic_online_learning/features/auth/view/pages/payment_due_page.dart";
+import "package:islamic_online_learning/features/curriculum/view/controller/provider.dart";
 import "package:islamic_online_learning/features/main/presentation/pages/main_page.dart";
 
 final storage = const FlutterSecureStorage();
@@ -19,16 +22,18 @@ Future<http.Response> customGetRequest(String url,
     throw ConnectivityException("እባክዎ ኢንተርኔት ያብሩ!");
   }
 
-  final token = await getAccessToken();
+  call() async {
+    final token = await getAccessToken();
 
-  call() => http.get(
-        Uri.parse(url),
-        headers: {
-          if (authorized) ...{
-            "authorization": "$token",
-          }
-        },
-      );
+    return http.get(
+      Uri.parse(url),
+      headers: {
+        if (authorized) ...{
+          "authorization": "$token",
+        }
+      },
+    );
+  }
 
   var response = await call();
 
@@ -66,19 +71,20 @@ Future<http.Response> customPostRequest(String url, Map<String, dynamic>? map,
   print("POST $url");
   print("req body $map");
 
-  final token = await getAccessToken();
-
-  call() => http.post(
-        Uri.parse(url),
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          if (authorized) ...{
-            "authorization": "$token",
-          }
-        },
-        body: map != null ? jsonEncode(map) : null,
-      );
+  call() async {
+    final token = await getAccessToken();
+    return http.post(
+      Uri.parse(url),
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        if (authorized) ...{
+          "authorization": "$token",
+        }
+      },
+      body: map != null ? jsonEncode(map) : null,
+    );
+  }
 
   var response = await call();
 
@@ -175,22 +181,23 @@ Future<void> deleteTokens() async {
   await storage.delete(key: "refresh_token");
 }
 
-Future<void> logout(BuildContext context) async {
-  await deleteTokens();
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(builder: (_) => MainPage()),
-    (_) => false,
-  );
+Future<void> logout(Ref ref, BuildContext context) async {
+  ref.read(authNotifierProvider.notifier).logout();
+  if (context.mounted) {
+    Navigator.pushAndRemoveUntil(
+        context, MaterialPageRoute(builder: (_) => MainPage()), (_) => false);
+  }
 }
 
 Future<void> paymentIsDue(BuildContext context) async {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => PaymentDuePage(),
-    ),
-  );
+  if (context.mounted) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PaymentDuePage(),
+      ),
+    );
+  }
 }
 
 class ConnectivityException extends HttpException {
@@ -206,25 +213,42 @@ class PaymentException extends HttpException {
 }
 
 Future<void> handleError(
-    String err, BuildContext context, VoidCallback action) async {
+    String err, BuildContext context, Ref ref, VoidCallback action) async {
   if (err.contains("refresh_token")) {
-    await logout(context);
+    await logout(ref, context);
   } else if (err.contains("your_account_is_blocked")) {
-    await logout(context);
-  } else if (err.contains("your_account_is_blocked")) {
-    await logout(context);
+    await logout(ref, context);
   } else if (err.contains("no_refresh")) {
-    await logout(context);
+    await logout(ref, context);
   } else if (err.contains("user_not_found")) {
-    await logout(context);
+    await logout(ref, context);
   } else if (err.contains("logout")) {
-    await logout(context);
+    await logout(ref, context);
   } else if (err.contains("no_subscription")) {
     paymentIsDue(context);
   } else if (err.contains("your_subscription_is_due")) {
     paymentIsDue(context);
   }
   action();
+}
+
+String getErrorMsg(String err, String fallback) {
+  if (err.contains("refresh_token")) {
+    return "እባክዎ ድጋሚ ይግቡ";
+  } else if (err.contains("your_account_is_blocked")) {
+    return "እባክዎ ድጋሚ ይግቡ";
+  } else if (err.contains("no_refresh")) {
+    return "እባክዎ ድጋሚ ይግቡ";
+  } else if (err.contains("user_not_found")) {
+    return "እባክዎ ድጋሚ ይግቡ";
+  } else if (err.contains("logout")) {
+    return "እባክዎ ድጋሚ ይግቡ";
+  } else if (err.contains("no_subscription")) {
+    return "እባክዎ ከፍያዎን ያድሱ!";
+  } else if (err.contains("your_subscription_is_due")) {
+    return "እባክዎ ከፍያዎን ያድሱ!";
+  }
+  return fallback;
 }
 
 Future<Map<String, dynamic>> refreshToken() async {
@@ -238,13 +262,18 @@ Future<Map<String, dynamic>> refreshToken() async {
       "phone": phone,
     },
   );
-  final body = jsonDecode(res.body);
-  final data = body["data"];
-  if (data['ok'] == true &&
-      data['token'] != null &&
-      data['refreshToken'] != null) {
-    await storage.write(key: 'access_token', value: "Bearer ${data['token']}");
-    await storage.write(key: 'refresh_token', value: data['refreshToken']);
+  if (res.statusCode == 200) {
+    final body = jsonDecode(res.body);
+    final data = body["data"];
+    if (data['ok'] == true &&
+        data['token'] != null &&
+        data['refreshToken'] != null) {
+      await storage.write(
+          key: 'access_token', value: "Bearer ${data['token']}");
+      await storage.write(key: 'refresh_token', value: data['refreshToken']);
+    }
+    return data;
+  } else {
+    return {"ok": false};
   }
-  return body;
 }

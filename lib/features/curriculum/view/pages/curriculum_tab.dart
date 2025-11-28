@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
+import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_list.dart';
@@ -29,7 +30,7 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
         final otpId = pref.getString(PrefConsts.otpId);
 
         if (token != null && curriculumId != null && otpId == null) {
-          ref.read(authNotifierProvider.notifier).getMyInfo(ref);
+          ref.read(authNotifierProvider.notifier).getMyInfo(context);
         } else if (otpId != null) {
           ref.read(authNotifierProvider.notifier).unfinishedRegistration(
                 otpId,
@@ -56,10 +57,13 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (authState.tokenIsNull && !authState.isLoading) CurriculumList(),
-          if (!authState.initial && !authState.courseStarted)
+          if (!authState.tokenIsNull &&
+              !authState.initial &&
+              authState.courseStarted != CourseStarted.STARTED)
             GroupMembersStatus(),
-          if (authState.user != null &&
-              authState.courseStarted &&
+          if (!authState.tokenIsNull &&
+              authState.user != null &&
+              authState.courseStarted == CourseStarted.STARTED &&
               authState.error == null)
             AssignedCourseList()
         ],

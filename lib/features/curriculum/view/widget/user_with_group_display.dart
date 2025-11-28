@@ -44,7 +44,7 @@ class _UserWithGroupDisplayState extends ConsumerState<UserWithGroupDisplay> {
               alignment: Alignment.centerRight,
               child: IconButton(
                 onPressed: () {
-                  ref.read(authNotifierProvider.notifier).getMyInfo(ref);
+                  ref.read(authNotifierProvider.notifier).getMyInfo(context);
                 },
                 icon: Icon(Icons.refresh),
               ),
@@ -137,7 +137,7 @@ class _UserWithGroupDisplayState extends ConsumerState<UserWithGroupDisplay> {
                             crossAxisCount: 2,
                             mainAxisSpacing: 2,
                             crossAxisSpacing: 2,
-                            childAspectRatio: 2.4,
+                            childAspectRatio: 1 / 0.6,
                           ),
                           itemCount: members.length,
                           itemBuilder: (context, index) => Container(
@@ -152,23 +152,33 @@ class _UserWithGroupDisplayState extends ConsumerState<UserWithGroupDisplay> {
                                 )
                               ],
                             ),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor:
-                                    userIdToColor(members[index].name),
-                                child: Text(
-                                  members[index].name[0].toUpperCase(),
-                                  style: const TextStyle(
-                                    color: whiteColor,
-                                    fontWeight: FontWeight.bold,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor:
+                                        userIdToColor(members[index].name),
+                                    child: Text(
+                                      members[index].name[0].toUpperCase(),
+                                      style: const TextStyle(
+                                        color: whiteColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              title: Text(
-                                members[index].name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                  SizedBox(
+                                    height: 2,
+                                  ),
+                                  Text(
+                                    members[index].name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

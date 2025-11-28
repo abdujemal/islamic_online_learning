@@ -132,7 +132,7 @@ class QuizService {
     } else {
       print("res status code ${res.statusCode}");
       print("res body ${res.body}");
-      throw Exception("ጥያቄዎቹን ማረም አልተቻለም!");
+      throw Exception("ጥያቄዎቹን ማረም አልተቻለም!: ${res.body}");
     }
   }
 
@@ -152,7 +152,7 @@ class QuizService {
     } else {
       print("res status code ${res.statusCode}");
       print("res body ${res.body}");
-      throw Exception("ጥያቄዎቹን ማረም አልተቻለም!");
+      throw Exception("ጥያቄዎቹን ማረም አልተቻለም!: ${res.body}");
     }
   }
 }

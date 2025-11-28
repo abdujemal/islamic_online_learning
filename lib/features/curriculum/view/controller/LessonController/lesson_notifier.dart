@@ -24,7 +24,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LessonNotifier extends StateNotifier<LessonState> {
-  LessonNotifier() : super(LessonState());
+  final Ref ref;
+  LessonNotifier(this.ref) : super(LessonState());
 
   Future<void> startLesson(Lesson lesson, AssignedCourse course, WidgetRef ref,
       {bool isPast = false}) async {
@@ -132,7 +133,8 @@ class LessonNotifier extends StateNotifier<LessonState> {
         //st
         // print("uploaded successfully.");
 
-        toast("ጥያቄዎ ደርሶናል በ24 ሰአት ውስጥ እንመልሳለን። ኢንሻአላህ!", ToastType.success, context);
+        toast("ጥያቄዎ ደርሶናል በ24 ሰአት ውስጥ እንመልሳለን። ኢንሻአላህ!", ToastType.success,
+            context);
         if (state.currentLesson == null) return;
         // await PlaylistHelper.audioPlayer.stop();
         Navigator.push(
@@ -147,9 +149,13 @@ class LessonNotifier extends StateNotifier<LessonState> {
         toast("አፕሎድ ማረግ አልተቻለም!", ToastType.error, context);
       }
     } catch (err) {
-      state = state.copyWith(isUploadingConfusion: false);
-      print(err.toString());
-      toast("አፕሎድ ማረግ አልተቻለም!", ToastType.error, context);
+      handleError(err.toString(), context, ref, () {
+        state = state.copyWith(isUploadingConfusion: false);
+        print(err.toString());
+
+        toast(getErrorMsg(err.toString(), "አፕሎድ ማረግ አልተቻለም!"), ToastType.error,
+            context);
+      });
     }
   }
 

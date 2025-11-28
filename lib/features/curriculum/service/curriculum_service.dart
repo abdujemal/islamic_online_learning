@@ -26,7 +26,7 @@ class CurriculumService {
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-      throw Exception('Failed to load curriculum');
+      throw Exception('Failed to load curriculums: ${response.body}');
     }
   }
 
@@ -96,7 +96,7 @@ class CurriculumService {
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-      throw Exception('Failed to load curriculum');
+      throw Exception('Failed to load curriculum: ${response.body}');
     }
   }
 }

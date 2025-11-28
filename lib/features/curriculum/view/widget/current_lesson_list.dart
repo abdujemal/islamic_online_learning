@@ -52,6 +52,10 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
                   .read(assignedCoursesNotifierProvider.notifier)
                   .isTodayDiscussionDay(ref);
 
+              final bool isTodayLessThanDiscussion = ref
+                  .read(assignedCoursesNotifierProvider.notifier)
+                  .isTodayLessThanDiscussionDay(ref);
+
               final bool isTodayExamDay = ref
                   .read(assignedCoursesNotifierProvider.notifier)
                   .isTodayExamDay();
@@ -72,9 +76,9 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
                 discussionInUpToExam = [];
               }
 
-              // if (isCurrentLesson && !isTodayDiscussion) {
-              //   isLocked = true;
-              // }
+              if (isCurrentLesson && isTodayLessThanDiscussion) {
+                isLocked = true;
+              }
 
               if (isCurrentLesson && !isTodayExamDay) {
                 isExamLocked = true;

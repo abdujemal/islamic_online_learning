@@ -112,7 +112,7 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
                 scrollingDone = false;
                 await ref
                     .read(assignedCoursesNotifierProvider.notifier)
-                    .getCurriculum(ref);
+                    .getCurriculum(context);
                 // currentCourseIndex = ref
                 //         .read(authNotifierProvider)
                 //         .courseRelatedData
@@ -202,7 +202,7 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
                       scrollingDone = false;
                       await ref
                           .read(assignedCoursesNotifierProvider.notifier)
-                          .getCurriculum(ref);
+                          .getCurriculum(context);
                     },
                     icon: Icon(Icons.refresh),
                   )

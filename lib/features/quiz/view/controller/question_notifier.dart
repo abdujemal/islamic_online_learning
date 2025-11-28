@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/question_state.dart';
 
 class QuestionNotifier extends StateNotifier<QuestionState> {
   final QuizService quizService;
-  QuestionNotifier(this.quizService) : super(QuestionState());
+  final Ref ref;
+  QuestionNotifier(this.quizService, this.ref) : super(QuestionState());
 
-  Future<void> getTestQuestion() async {
+  Future<void> getTestQuestion(BuildContext context) async {
     try {
       state = state.copyWith(isLoading: true);
       final quizzes = await quizService.getTestQuestions();
@@ -23,8 +25,13 @@ class QuestionNotifier extends StateNotifier<QuestionState> {
         isThereUnfinishedTest: isThereUnfinishedTest,
       );
     } catch (err) {
-      state = state.copyWith(isLoading: false, error: "ጥያቄዎቹን ማግኘት አልተቻለም!");
-      print(err);
+      handleError(err.toString(), context, ref, () {
+        state = state.copyWith(
+          isLoading: false,
+          error: getErrorMsg(err.toString(), "ጥያቄዎቹን ማግኘት አልተቻለም!"),
+        );
+        print(err);
+      });
     }
   }
 
@@ -43,15 +50,19 @@ class QuestionNotifier extends StateNotifier<QuestionState> {
     );
   }
 
-  Future<void> startTest(String title) async {
+  Future<void> startTest(String title, BuildContext context) async {
     try {
       state = state.copyWith(isLoading: true);
       final testAttempt = await quizService.addTestAttempt(title);
 
       state = state.copyWith(isLoading: false, testAttempt: testAttempt);
     } catch (err) {
-      state = state.copyWith(isLoading: false, error: "ፈተናውን መጀመር አልተቻለም!");
-      print(err);
+      handleError(err.toString(), context, ref, () {
+        state = state.copyWith(
+            isLoading: false,
+            error: getErrorMsg(err.toString(), "ፈተናውን መጀመር አልተቻለም!"));
+        print(err);
+      });
     }
   }
 
@@ -72,9 +83,15 @@ class QuestionNotifier extends StateNotifier<QuestionState> {
           ToastType.success, context,
           isLong: true);
     } catch (err) {
-      state = state.copyWith(isSubmitting: false);
-      toast("ፈተናውን ማስረከብ አልተቻለም!", ToastType.error, context);
-      print(err);
+      handleError(err.toString(), context, ref, () {
+        state = state.copyWith(isSubmitting: false);
+        toast(
+          getErrorMsg(err.toString(), "ፈተናውን ማስረከብ አልተቻለም!"),
+          ToastType.error,
+          context,
+        );
+        print(err);
+      });
     }
   }
 

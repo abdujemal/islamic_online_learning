@@ -29,7 +29,7 @@ final discussionTopicsProvider = StateProvider<List<String>?>((ref) => null);
 
 final voiceRoomNotifierProvider =
     StateNotifierProvider<VoiceRoomNotifier, VoiceRoomState>((ref) {
-  return VoiceRoomNotifier(ref.read(voiceRoomServiceProvider));
+  return VoiceRoomNotifier(ref.read(voiceRoomServiceProvider), ref);
 });
 
 final qaStateProvider = StateProvider<List<QA>>((ref) => []);
@@ -39,7 +39,8 @@ final isSubmittingProvider = StateProvider<bool>((ref) => false);
 
 class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
   final VoiceRoomService voiceRoomService;
-  VoiceRoomNotifier(this.voiceRoomService) : super(VoiceRoomState());
+  final Ref ref;
+  VoiceRoomNotifier(this.voiceRoomService, this.ref) : super(VoiceRoomState());
 
   void startTimer(WidgetRef ref, int seconds, Discussion discussionModel) {
     ref.read(remainingSecondsProvider.notifier).state = seconds;
@@ -178,7 +179,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
         discussionSec: discussion.discussionSecond,
       );
 
-      initStatus(discussion.discussionSecond??0, ref, discussion);
+      initStatus(discussion.discussionSecond ?? 0, ref, discussion);
 
       initAnswer(ref);
 
@@ -197,7 +198,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
 
       await room.connect(LIVEKIT_URL, token);
 
-      startTimer(ref, discussion.discussionSecond??0, discussion);
+      startTimer(ref, discussion.discussionSecond ?? 0, discussion);
 
       await room.localParticipant?.setMicrophoneEnabled(true);
 
@@ -290,8 +291,13 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
         toast('ውይይቱ አልቋል!', ToastType.error, ref.context);
         return;
       }
+      handleError(e.toString(), ref.context, this.ref, () {});
       print(e.toString());
-      toast('Connection failed: $e', ToastType.error, ref.context);
+      toast(
+        getErrorMsg(e.toString(), 'Connection failed: $e'),
+        ToastType.error,
+        ref.context,
+      );
     }
   }
 
@@ -333,9 +339,12 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
       final quizzes = await voiceRoomService.getQuizzesForDiscussion();
       ref.read(discussionQuizzesProvider.notifier).state = quizzes;
     } catch (e) {
-      toast(e.toString(), ToastType.error, ref.context);
-      print("Error fetching discussion quizzes: $e");
-      ref.read(discussionQuizzesProvider.notifier).state = [];
+      handleError(e.toString(), ref.context, this.ref, () {
+        toast(getErrorMsg(e.toString(), e.toString()), ToastType.error,
+            ref.context);
+        print("Error fetching discussion quizzes: $e");
+        ref.read(discussionQuizzesProvider.notifier).state = [];
+      });
     }
   }
 
@@ -344,9 +353,11 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
       final shortAnswers = await voiceRoomService.getQuestionsForDiscussion();
       ref.read(discussionQuestionsProvider.notifier).state = shortAnswers;
     } catch (e) {
-      toast(e.toString(), ToastType.error, ref.context);
-      print("Error fetching discussion short answer: $e");
-      ref.read(discussionQuestionsProvider.notifier).state = [];
+      handleError(e.toString(), ref.context, this.ref, () {
+        toast(getErrorMsg(e.toString(), e.toString()), ToastType.error, ref.context);
+        print("Error fetching discussion short answer: $e");
+        ref.read(discussionQuestionsProvider.notifier).state = [];
+      });
     }
   }
 
@@ -458,8 +469,10 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
       ref.read(isSubmittingProvider.notifier).state = true;
       await voiceRoomService.submit(qas, quizAns);
     } catch (e) {
-      toast(e.toString(), ToastType.error, ref.context);
-      print(e);
+      handleError(e.toString(), ref.context, this.ref, () {
+        toast(getErrorMsg(e.toString(), e.toString()), ToastType.error, ref.context);
+        print(e);
+      });
     }
   }
 

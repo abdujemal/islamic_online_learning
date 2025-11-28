@@ -12,12 +12,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final Ref ref;
   AuthNotifier(this.authService, this.ref) : super(AuthState());
 
-  Future<void> getMyInfo(WidgetRef ref) async {
+  Future<void> getMyInfo(BuildContext context) async {
     try {
       state = state.copyWith(isLoading: true);
       final user = await authService.getMyInfo();
-      await getScores(ref.context);
-      _checkIfTheCourseStarted(ref);
+      await getScores(context);
+      await _checkIfTheCourseStarted(context);
       state = state.copyWith(isLoading: false, user: user);
     } on ConnectivityException catch (err) {
       state = state.copyWith(isLoading: false, error: err.toString());
@@ -26,13 +26,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // toast("የእርስዎን መለያ ማግኘት አልተቻለም።", ToastType.error, context);
       handleError(
         err.toString(),
-        ref.context,
+        context,
+        ref,
         () async {
           print("Error: $err");
           final token = await getAccessToken();
           state = state.copyWith(
             isLoading: false,
-            error: "የእርስዎን መለያ ማግኘት አልተቻለም።",
+            error: getErrorMsg(err.toString(), "የእርስዎን መለያ ማግኘት አልተቻለም።"),
             tokenIsNull: token == null,
           );
         },
@@ -51,34 +52,44 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<bool?> hasCourseStarted() async {
-    try {
-      final yes = await authService.hasCourseStarted();
-      return yes;
-    } catch (err) {
-      print("Could not get course data");
-      print("err: ${err.toString()}");
-      throw Exception("Could not get course data");
-    }
+    // try {
+    final yes = await authService.hasCourseStarted();
+    return yes;
+    // } catch (err) {
+    //   print("Could not get course data");
+    //   print("err: ${err.toString()}");
+    //   throw Exception("Could not get course data");
+    // }
   }
 
   Future<void> logout() async {
-    state = state.copyWith(user: null);
+    await deleteTokens();
+    ref.read(curriculumNotifierProvider.notifier).getCurriculums();
+    setUserNull();
   }
 
-  Future<bool> _checkIfTheCourseStarted(WidgetRef ref) async {
+  void setUserNull() {
+    state = state.copyWith(user: null, tokenIsNull: true);
+  }
+
+  Future<void> _checkIfTheCourseStarted(BuildContext context) async {
     // getMyInfo(ref.context);
+    ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum(context);
     // try {
-    final started = await hasCourseStarted();
-    if (started == true) {
-      state = state.copyWith(courseStarted: true);
-      ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum(ref);
-      return true;
-    } else {
-      return false;
-    }
+    //   final started = await hasCourseStarted();
+    //   if (started == true) {
+    //     state = state.copyWith(courseStarted: true);
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
     // } catch (err) {
     //   return false;
     // }
+  }
+
+  void setCourseStarted(CourseStarted v) {
+    state = state.copyWith(courseStarted: v);
   }
 
   void unfinishedRegistration(

@@ -73,7 +73,7 @@ class AuthService {
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-      throw Exception('Failed to verifying otp');
+      throw Exception('Failed to verifying otp: ${response.body}');
     }
   }
 
@@ -100,7 +100,7 @@ class AuthService {
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-      throw Exception('Failed to load groups');
+      throw Exception('Failed to load groups: ${response.body}');
     }
   }
 
@@ -115,7 +115,7 @@ class AuthService {
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-      throw Exception('Failed to register');
+      throw Exception('Failed to register: ${response.body}');
     }
   }
 
@@ -130,7 +130,7 @@ class AuthService {
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-      throw Exception('Failed to get your profile');
+      throw Exception('Failed to get your profile: ${response.body}');
     }
   }
 
@@ -146,7 +146,7 @@ class AuthService {
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-      throw Exception('Failed to get your profile');
+      throw Exception('Failed to get your profile: ${response.body}');
     }
   }
 
@@ -161,7 +161,7 @@ class AuthService {
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-      throw Exception('Failed to get your profile');
+      throw Exception('Failed to get const scores: ${response.body}');
     }
   }
 }

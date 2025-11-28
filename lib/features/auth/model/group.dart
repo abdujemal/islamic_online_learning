@@ -132,7 +132,7 @@ class Group {
           ? DateTime.parse(map['courseStartDate'] as String)
           : null,
       createdAt: DateTime.parse(map['createdAt'] as String),
-      noOfMembers: map['_count']["members"],
+      noOfMembers: map['_count'] == null ? null : map['_count']["members"],
       members: map['members'] != null
           ? List<Member>.from(
               (map['members'] as List<dynamic>).map<Member?>(

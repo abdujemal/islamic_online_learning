@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
@@ -46,8 +47,7 @@ class _BottomNavState extends ConsumerState<BottomNav> {
             (index) => InkWell(
               onTap: () async {
                 if (index == 2) {
-                  final pref = await ref.read(sharedPrefProvider);
-                  final token = pref.getString(PrefConsts.token);
+                  final token = await getAccessToken();
                   if (token == null) {
                     if (mounted) {
                       toast("ይቅርታ አካውንት የሎትም!", ToastType.error, context);

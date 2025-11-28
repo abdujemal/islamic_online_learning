@@ -6,9 +6,17 @@ import 'package:islamic_online_learning/features/auth/model/course_related_data.
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 
+enum CourseStarted {
+  INITIAL,
+  STARTED,
+  NOTSTARTED,
+  LOADING,
+}
+
 class AuthState {
-  final bool isLoading, initial, courseStarted, tokenIsNull;
+  final bool isLoading, initial, tokenIsNull;
   final User? user;
+  final CourseStarted courseStarted;
   final CourseRelatedData? courseRelatedData;
   final List<ConstScore>? scores;
   final String? error;
@@ -16,7 +24,7 @@ class AuthState {
   AuthState({
     this.isLoading = false,
     this.initial = true,
-    this.courseStarted = false,
+    this.courseStarted = CourseStarted.INITIAL,
     this.tokenIsNull = true,
     this.scores,
     this.user,
@@ -31,6 +39,8 @@ class AuthState {
   }) {
     if (initial) {
       return SizedBox();
+    } else if (courseStarted == CourseStarted.LOADING) {
+      return loading(this);
     } else if (isLoading) {
       return loading(this);
     } else if (!isLoading && this.error != null) {
@@ -44,7 +54,7 @@ class AuthState {
 
   AuthState copyWith({
     bool? isLoading,
-    bool? courseStarted,
+    CourseStarted? courseStarted,
     bool? tokenIsNull,
     User? user,
     List<ConstScore>? scores,
@@ -63,4 +73,3 @@ class AuthState {
     );
   }
 }
-
