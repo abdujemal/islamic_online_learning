@@ -237,7 +237,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
   bool isTodayDiscussionDay(WidgetRef ref) {
     final authState = ref.read(authNotifierProvider);
-    final discussionDay = authState.user?.group.discussionDay ?? "Sunday";
+    final discussionDay = authState.user?.group.discussionDay ?? "k";
     final discussionWeekDay = getWeekDayFromText(discussionDay);
 
     DateTime today = DateTime.now();
@@ -246,10 +246,11 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
   bool isTodayLessThanDiscussionDay(WidgetRef ref) {
     final authState = ref.read(authNotifierProvider);
-    final discussionDay = authState.user?.group.discussionDay ?? "Sunday";
+    final discussionDay = authState.user?.group.discussionDay ?? "jk";
     final discussionWeekDay = getWeekDayFromText(discussionDay);
 
     DateTime today = DateTime.now();
+    print("${today.weekday} < $discussionWeekDay");
     return today.weekday < discussionWeekDay;
   }
 
@@ -257,10 +258,11 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     switch (text) {
       case "Friday":
         return 5;
-      case "SaturDay":
+      case "Saturday":
         return 6;
       default:
         return 7;
+        // throw Exception("no days");
     }
   }
 

@@ -53,6 +53,7 @@ const String registerApi = "$baseUrl/auth/user";
 const String getMyInfoApi = "$baseUrl/auth/user/me";
 const String getMyCourseInfoApi = "$baseUrl/auth/user/courseData";
 const String getScoresApi = "$baseUrl/auth/user/scores";
+const String getStreaksApi = "$baseUrl/streaks/{year}/{month}";
 
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 

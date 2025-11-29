@@ -62,6 +62,11 @@ class Streak {
     );
   }
 
+  static List<Streak> listFromJson(String responseBody) {
+    final parsed = jsonDecode(responseBody) as List<dynamic>;
+    return parsed.map((json) => Streak.fromMap(json)).toList();
+  }
+
   String toJson() => json.encode(toMap());
 
   factory Streak.fromJson(String source) =>

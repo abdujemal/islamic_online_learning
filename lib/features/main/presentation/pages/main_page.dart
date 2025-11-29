@@ -12,9 +12,15 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/core/update_checker.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dart';
+import 'package:islamic_online_learning/features/auth/view/pages/account_tab2.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/payment_due_page.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_celebrate.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_lottie_celebrate.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/streak_celebrate_page.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/streak_celebration_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
@@ -382,7 +388,9 @@ class _MainPageState extends ConsumerState<MainPage>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => PaymentDuePage(),
+                                  builder: (_) => StreakCelebratePage(
+                                    streak: 4,
+                                  ),
                                 ),
                               );
                             },
@@ -417,7 +425,7 @@ class _MainPageState extends ConsumerState<MainPage>
                   children: [
                     const CurriculumTab(),
                     const Home(),
-                    const AccountTab(),
+                    const AccountTab2(),
                   ],
                 ),
               ),

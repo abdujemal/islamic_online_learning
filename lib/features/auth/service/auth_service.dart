@@ -5,6 +5,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
+import 'package:islamic_online_learning/features/auth/model/streak.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthService {
@@ -162,6 +163,23 @@ class AuthService {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
       throw Exception('Failed to get const scores: ${response.body}');
+    }
+  }
+
+  Future<List<DateTime>> getStreakFor(int month, int year) async {
+    final response = await customGetRequest(
+      getStreaksApi
+          .replaceAll("{year}", "$year")
+          .replaceAll("{month}", "$month"),
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      final streaks = jsonDecode(response.body) as List<dynamic>;
+      return streaks.map((e) => DateTime.parse(e as String)).toList(); //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to get streaks: ${response.body}');
     }
   }
 }

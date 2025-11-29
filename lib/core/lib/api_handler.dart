@@ -9,7 +9,7 @@ import "package:http/http.dart" as http;
 import "package:islamic_online_learning/core/constants.dart";
 import "package:islamic_online_learning/features/auth/view/controller/provider.dart";
 import "package:islamic_online_learning/features/auth/view/pages/payment_due_page.dart";
-import "package:islamic_online_learning/features/curriculum/view/controller/provider.dart";
+// import "package:islamic_online_learning/features/curriculum/view/controller/provider.dart";
 import "package:islamic_online_learning/features/main/presentation/pages/main_page.dart";
 
 final storage = const FlutterSecureStorage();
