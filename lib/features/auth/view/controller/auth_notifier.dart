@@ -43,6 +43,41 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> updateMyInfo(BuildContext context, String name, int age) async {
+    try {
+      state = state.copyWith(isUpdating: true);
+      final user = await authService.updateMyInfo(name, age);
+      // await getScores(context);
+      // await _checkIfTheCourseStarted(context);
+      state = state.copyWith(isUpdating: false, user: user);
+      Navigator.pop(context);
+    } on ConnectivityException catch (err) {
+      state = state.copyWith(isUpdating: false, error: err.toString());
+      // toast(err.message, ToastType.error, context);
+    } catch (err) {
+      // toast("የእርስዎን መለያ ማግኘት አልተቻለም።", ToastType.error, context);
+      handleError(
+        err.toString(),
+        context,
+        ref,
+        () async {
+          print("Error: $err");
+          final token = await getAccessToken();
+          toast(
+            getErrorMsg(err.toString(), "መለያዎን ማደስ አልተቻለም!"),
+            ToastType.error,
+            context,
+          );
+          state = state.copyWith(
+            isUpdating: false,
+            // error: getErrorMsg(err.toString(), "የእርስዎን መለያ ማግኘት አልተቻለም።"),
+            tokenIsNull: token == null,
+          );
+        },
+      );
+    }
+  }
+
   Future<void> getScores(BuildContext context) async {
     final scores = await authService.getScores();
     state = state.copyWith(scores: scores);

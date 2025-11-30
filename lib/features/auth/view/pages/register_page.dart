@@ -94,6 +94,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       // Gender
                       DropdownButtonFormField<String>(
                         value: _gender,
+                        
                         decoration: const InputDecoration(
                           labelText: "ፆታ",
                           border: OutlineInputBorder(),

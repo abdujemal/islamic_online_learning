@@ -250,7 +250,6 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     final discussionWeekDay = getWeekDayFromText(discussionDay);
 
     DateTime today = DateTime.now();
-    print("${today.weekday} < $discussionWeekDay");
     return today.weekday < discussionWeekDay;
   }
 
@@ -268,7 +267,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
   bool isTodayExamDay() {
     DateTime today = DateTime.now();
-    return today.weekday == DateTime.sunday;
+    return today.weekday == DateTime.monday;
   }
 
   bool isTodayLessonDay() {

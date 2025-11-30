@@ -44,6 +44,7 @@ const String submitTestApi = "$baseUrl/tests/submit";
 const String quizAttemptsApi = "$baseUrl/quizAttempts";
 //streaks
 const String addStreakApi = "$baseUrl/streaks";
+const String getStreaksApi = "$baseUrl/streaks/{year}/{month}";
 //auth
 const String refreshTokenApi = "$baseUrl/auth/otp/refresh-token";
 const String requestOtpApi = "$baseUrl/auth/otp";
@@ -51,9 +52,10 @@ const String verifyOtpApi = "$baseUrl/auth/otp/verify";
 const String similarGroupsApi = "$baseUrl/auth/user/groups";
 const String registerApi = "$baseUrl/auth/user";
 const String getMyInfoApi = "$baseUrl/auth/user/me";
+const String updateMyInfoApi = "$baseUrl/auth/user/me";
 const String getMyCourseInfoApi = "$baseUrl/auth/user/courseData";
 const String getScoresApi = "$baseUrl/auth/user/scores";
-const String getStreaksApi = "$baseUrl/streaks/{year}/{month}";
+const String getStreakNumApi = "$baseUrl/auth/user/streak";
 
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 

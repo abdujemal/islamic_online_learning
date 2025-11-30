@@ -135,6 +135,27 @@ class AuthService {
     }
   }
 
+  Future<User> updateMyInfo(String name, int age) async {
+    final dob = DateTime.now().subtract(Duration(days: age * 365));
+    final response = await customPutRequest(
+      updateMyInfoApi,
+      {
+        "name": name,
+        "dob": dob.toString(),
+      },
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)["user"];
+      User user = User.fromMap(data);
+      return user; //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to update your profile: ${response.body}');
+    }
+  }
+
   Future<bool> hasCourseStarted() async {
     final response = await customGetRequest(
       getMyCourseInfoApi,
@@ -180,6 +201,22 @@ class AuthService {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
       throw Exception('Failed to get streaks: ${response.body}');
+    }
+  }
+
+  Future<int?> getUsersStreakNum() async {
+    final response = await customGetRequest(
+      getStreakNumApi,
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data["numOfStreaks"]; //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      return null;
+      // throw Exception('Failed to get streak num: ${response.body}');
     }
   }
 }
