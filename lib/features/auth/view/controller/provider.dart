@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/auth/service/auth_service.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/auth_notifier.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
+import 'package:islamic_online_learning/features/auth/view/controller/confusions_notifier.dart';
+import 'package:islamic_online_learning/features/auth/view/controller/confusions_state.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/register_notifier.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/register_state.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/sign_in_notifier.dart';
@@ -25,4 +27,9 @@ final registerNotifierProvider =
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.read(authServiceProvider), ref);
+});
+
+final confusionsNotifierProvider =
+    StateNotifierProvider<ConfusionsNotifier, ConfusionsState>((ref) {
+  return ConfusionsNotifier(ref.read(authServiceProvider), ref);
 });

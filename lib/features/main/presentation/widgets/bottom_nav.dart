@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 // import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
@@ -48,7 +49,8 @@ class _BottomNavState extends ConsumerState<BottomNav> {
               onTap: () async {
                 if (index == 2) {
                   final token = await getAccessToken();
-                  if (token == null) {
+                  final user = ref.read(authNotifierProvider).user;
+                  if (token == null || user == null) {
                     if (mounted) {
                       toast("ይቅርታ አካውንት የሎትም!", ToastType.error, context);
                     }

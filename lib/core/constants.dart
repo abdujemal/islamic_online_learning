@@ -29,6 +29,7 @@ const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
 const String getQuizzesApi = "$baseUrl/curriculums/{lessonId}/quizzes";
 //confusions
 const String confusionsApi = "$baseUrl/confusions";
+
 //discussions
 const String discussionsApi = "$baseUrl/discussions";
 const String discussionQuizzesApi = "$discussionsApi/quizzes";

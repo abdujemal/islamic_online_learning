@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/auth/model/confusion.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/streak.dart';
@@ -217,6 +218,21 @@ class AuthService {
       print("Response body: ${response.body}");
       return null;
       // throw Exception('Failed to get streak num: ${response.body}');
+    }
+  }
+
+  Future<List<Confusion>> getConfusions(int page) async {
+    final response = await customGetRequest(
+      "$confusionsApi?page=$page",
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      List<Confusion> confusions = Confusion.listFromJson(response.body);
+      return confusions; //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to get confusions: ${response.body}');
     }
   }
 }

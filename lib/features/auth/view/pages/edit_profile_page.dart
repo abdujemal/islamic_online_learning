@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
@@ -112,7 +113,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   onPressed: isSaving ? null : saveProfile,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: Colors.blue,
+                    backgroundColor: primaryColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

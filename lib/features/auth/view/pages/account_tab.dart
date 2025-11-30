@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/auth/view/pages/confusions_page.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/edit_profile_page.dart';
 import 'package:islamic_online_learning/features/auth/view/widget/hijri_streak_calender_dialog.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/aboutus.dart';
@@ -98,7 +99,14 @@ class _AccountTabState extends ConsumerState<AccountTab> {
           _buildSettingItem(
             icon: Icons.question_answer,
             title: "Confusion Messages",
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ConfusionsPage(),
+                ),
+              );
+            },
           ),
           _buildSettingItem(
             icon: Icons.question_mark_rounded,
