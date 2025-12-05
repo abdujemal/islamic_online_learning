@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
-import 'package:islamic_online_learning/features/auth/model/streak.dart';
 import 'package:islamic_online_learning/features/auth/service/auth_service.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/register_page.dart';

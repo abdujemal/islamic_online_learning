@@ -5,7 +5,6 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/current_lesson_list.dart';
-import 'package:islamic_online_learning/features/curriculum/view/widget/current_lesson_list.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/past_lesson_list.dart';
 
 class AssignedCourseCard extends ConsumerStatefulWidget {

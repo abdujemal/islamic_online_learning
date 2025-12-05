@@ -6,7 +6,6 @@ import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/confusion.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
-import 'package:islamic_online_learning/features/auth/model/streak.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthService {
