@@ -119,15 +119,18 @@ class QuizService {
 
   Future<Streak> submitQuizzes(Lesson lesson, List<String> answers) async {
     final res = await customPostRequest(
-      quizAttemptsApi,
+      submitQuizApi,
       {
         "answers": answers,
+        "streakType": "Lesson",
+        "streakPass": dotenv.get("STREAK_PASS"),
+        "lessonId": lesson.id,
       },
       authorized: true,
     );
 
     if (res.statusCode == 200) {
-      final streak = await addLessonStreak(lesson.id);
+      final streak = Streak.fromJson(res.body);
       return streak;
     } else {
       print("res status code ${res.statusCode}");
@@ -215,7 +218,6 @@ class QuizAns {
     required this.quizId,
     required this.answer,
   });
-  
 
   QuizAns copyWith({
     String? quizId,
@@ -243,7 +245,8 @@ class QuizAns {
 
   String toJson() => json.encode(toMap());
 
-  factory QuizAns.fromJson(String source) => QuizAns.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory QuizAns.fromJson(String source) =>
+      QuizAns.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() => 'QuizAns(quizId: $quizId, answer: $answer)';
@@ -251,10 +254,8 @@ class QuizAns {
   @override
   bool operator ==(covariant QuizAns other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.quizId == quizId &&
-      other.answer == answer;
+
+    return other.quizId == quizId && other.answer == answer;
   }
 
   @override

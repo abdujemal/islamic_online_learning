@@ -15,22 +15,24 @@ import 'package:islamic_online_learning/features/template/view/pages/voice_room.
 class DiscussionCard extends ConsumerStatefulWidget {
   final bool isLocked;
   final bool isCurrent;
-  final bool isExamLocked;
-  final bool isExamCurrent;
-  final bool isLastDiscussion;
-  final bool hasExam;
-  final ExamData? examData;
+  final int afterLesson;
+  // final bool isExamLocked;
+  // final bool isExamCurrent;
+  // final bool isLastDiscussion;
+  // final bool hasExam;
+  // final ExamData? examData;
   final DiscussionData discussionData;
   const DiscussionCard({
     super.key,
-    required this.isExamCurrent,
-    required this.isExamLocked,
-    required this.examData,
-    required this.hasExam,
-    required this.isLastDiscussion,
+    // required this.isExamCurrent,
+    // required this.isExamLocked,
+    // required this.examData,
+    // required this.hasExam,
+    // required this.isLastDiscussion,
     required this.discussionData,
     required this.isLocked,
     required this.isCurrent,
+    required this.afterLesson,
   });
 
   @override
@@ -90,6 +92,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
         targetType: "Discussion",
         targetId: "discussions.first.id",
         score: 0,
+        afterLesson: widget.afterLesson,
         gradeWaiting: false,
         outOf: constScore?.totalScore ?? 0,
         userId: "userId",
@@ -266,14 +269,14 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
             ],
           ),
         ),
-        if (widget.hasExam)
-          ExamCard(
-            examData: widget.examData!,
-            discussionData: widget.discussionData,
-            isLastExam: widget.isLastDiscussion,
-            isLocked: widget.isExamLocked,
-            isCurrent: widget.isExamCurrent,
-          )
+        // if (widget.hasExam)
+        //   ExamCard(
+        //     examData: widget.examData!,
+        //     discussionData: widget.discussionData,
+        //     isLastExam: widget.isLastDiscussion,
+        //     isLocked: widget.isExamLocked,
+        //     isCurrent: widget.isExamCurrent,
+        //   )
       ],
     );
   }

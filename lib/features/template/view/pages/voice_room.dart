@@ -13,11 +13,12 @@ class VoiceRoomPage extends ConsumerStatefulWidget {
   final String title;
   final int afterLessonNo;
   final int fromLesson;
-  const VoiceRoomPage(
-      {super.key,
-      required this.title,
-      required this.afterLessonNo,
-      required this.fromLesson});
+  const VoiceRoomPage({
+    super.key,
+    required this.title,
+    required this.afterLessonNo,
+    required this.fromLesson,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _VoiceRoomPageState();

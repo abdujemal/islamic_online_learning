@@ -325,7 +325,7 @@ class _MultipleQuestionQuizState extends ConsumerState<MultipleQuestionQuiz>
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "ያገኙት ነጥብ: ${_score + 1} / ${widget.questions.length}",
+                  "ያገኙት ነጥብ: ${_score} / ${widget.questions.length}",
                   style: const TextStyle(
                     fontSize: 18,
                     // color: Colors.black87,
@@ -346,7 +346,7 @@ class _MultipleQuestionQuizState extends ConsumerState<MultipleQuestionQuiz>
                   ),
                   child: Text(
                     _getMotivationalMessage(
-                      ((_score + 1) / widget.questions.length) * 100,
+                      ((_score) / widget.questions.length) * 100,
                     ),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
@@ -421,7 +421,9 @@ class _MultipleQuestionQuizState extends ConsumerState<MultipleQuestionQuiz>
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.symmetric(
+            vertical: 25,
+          ),
           child: ElevatedButton(
             onPressed: () {
               Navigator.pushAndRemoveUntil(
@@ -452,10 +454,10 @@ class _MultipleQuestionQuizState extends ConsumerState<MultipleQuestionQuiz>
 
   String _getMotivationalMessage(double percent) {
     if (percent >= 90) {
-      return "🌟ማሻአላህ! ጥሩ ስራ ሰርተዋል።\nለአላህ ብለው እውቀት መሻታትዎን ይቀጥሉ 'እውቀትን ለመፈለግ መንገድን የተከተለ አላህ የጀነት መንገድን ያቀላልለት' (ሙስሊም)";
+      return "🌟ማሻአላህ! ጥሩ ስራ ሰርተዋል።\nለአላህ ብለው እውቀት መሻታትዎን ይቀጥሉ 'እውቀትን ለመፈለግ መንገድን የተከተለ አላህ የጀነት መንገድን ያቀልለት' (ሙስሊም)";
       //return "🌟 مَا شَاءَ اللهُ! You’ve done excellently.\nKeep seeking knowledge for the sake of Allah, for 'Whoever follows a path to seek knowledge, Allah will make easy for him a path to Paradise.' (Muslim)";
     } else if (percent >= 70) {
-      return "💪 አልሀምዱሊላህ! ጥሩ እየሰሩ ነው።\nያታውሱ፡- 'ከእናንተ መካከል ምርጦች እውቀትን የሚማሩ እና የሚያስተምሩ ናቸው።' (ቡኻሪ)";
+      return "💪 አልሀምዱሊላህ! ጥሩ እየሰሩ ነው።\nያስታውሱ፡- 'ከእናንተ መካከል ምርጦች እውቀትን የሚማሩ እና የሚያስተምሩ ናቸው።' (ቡኻሪ)";
       // return "💪 Alhamdulillah! You’re doing great.\nRemember: 'The best among you are those who learn and teach knowledge.' (Bukhari)";
     } else if (percent >= 50) {
       return "🌱 ጥሩ ጥረዋል! ደረጃ በደረጃ መማርዎን ይቀጥል።\nአላህ ለበጎ ነገር የሚተጉትን ይወዳል - እያንዳንዱ ጥረት ትልቅ ዋጋ አለው ኢንሻአላህ።";

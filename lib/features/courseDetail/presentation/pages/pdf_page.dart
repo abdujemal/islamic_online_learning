@@ -68,7 +68,6 @@ class _PdfPageState extends ConsumerState<PdfPage> {
   @override
   void dispose() {
     if (widget.isFromPro && !widget.isPast) {
-      ref.read(lessonNotifierProvider.notifier).removeCurrentLesson();
       _playerStateSub?.cancel();
     }
     super.dispose();
@@ -85,7 +84,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
       initialPage: courseModel.pdfPage.toInt() - 1,
       document: PdfDocument.openFile(widget.path),
     );
-
+    print(
+        "widget.isFromPro: ${widget.isFromPro} && !widget.isPast: ${!widget.isPast}");
     if (widget.isFromPro && !widget.isPast) {
       _playerStateSub = PlaylistHelper.audioPlayer.playerStateStream
           .listen(playerStreamListener);
@@ -97,6 +97,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
       return;
     }
     if (_.processingState == ProcessingState.completed) {
+      if (!ref.context.mounted) return;
       final lessonN = ref.read(lessonNotifierProvider.notifier);
       // final lessonState = ref.read(lessonNotifierProvider);
       await lessonN.showConfusionDialog(context);
@@ -139,6 +140,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
         }
         if (widget.isFromPro) {
           await PlaylistHelper.audioPlayer.stop();
+          ref.read(lessonNotifierProvider.notifier).removeCurrentLesson();
+
           return true;
         }
         if (currentPage != null && pages != null) {
@@ -606,7 +609,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                 onPageChanged: (page) {
                   ref.read(pdfPageProvider.notifier).update((i) => page);
                   currentPage = page;
-                  toast("${page + 1} / ${_controller.pagesCount}", ToastType.normal, context);
+                  toast("${page + 1} / ${_controller.pagesCount}",
+                      ToastType.normal, context);
                 },
               )
                   // PDFView(

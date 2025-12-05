@@ -43,6 +43,7 @@ const String addTestAttemptApi = "$baseUrl/tests/start";
 const String submitTestApi = "$baseUrl/tests/submit";
 //quizAttempts
 const String quizAttemptsApi = "$baseUrl/quizAttempts";
+const String submitQuizApi = "$baseUrl/quizAttempts/submit";
 //streaks
 const String addStreakApi = "$baseUrl/streaks";
 const String getStreaksApi = "$baseUrl/streaks/{year}/{month}";

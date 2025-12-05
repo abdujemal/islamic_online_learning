@@ -5,6 +5,7 @@ import 'package:flutter_sound/public/flutter_sound_player.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/quiz/view/pages/quiz_page.dart';
 import 'package:lottie/lottie.dart'; // add lottie: ^2.6.0 (or latest) in pubspec.yaml
@@ -200,12 +201,13 @@ class LessonNotifier extends StateNotifier<LessonState> {
       await recorder.stopRecorder();
     }
 
-    Future<void> playRecording() async {
+    Future<void> playRecording(VoidCallback setState) async {
       if (recordedFilePath == null) return;
       await player.startPlayer(
         fromURI: recordedFilePath,
         whenFinished: () {
           isPlaying = false;
+          setState();
         },
       );
     }
@@ -239,6 +241,9 @@ class LessonNotifier extends StateNotifier<LessonState> {
                       children: [
                         if (confusionUi) ...[
                           confusionContent(
+                            () {
+                              setState(() {});
+                            },
                             isRecording,
                             recordedFilePath,
                             isPlaying,
@@ -285,6 +290,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
   }
 
   Widget confusionContent(
+      setState,
       isRecording,
       recordedFilePath,
       isPlaying,
@@ -307,26 +313,28 @@ class LessonNotifier extends StateNotifier<LessonState> {
           SizedBox(
             height: 25,
           ),
-          GestureDetector(
-            onTap: () async {
-              print(state.currentLesson?.id);
-              await startRecording();
-              setRecording(true);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: primaryColor,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: primaryColor.withOpacity(0.4),
-                    blurRadius: 20,
-                    spreadRadius: 2,
-                  )
-                ],
+          BouncyElevatedButton(
+            child: GestureDetector(
+              onTap: () async {
+                print(state.currentLesson?.id);
+                await startRecording();
+                setRecording(true);
+              },
+              child: Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColor.withOpacity(0.4),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                    )
+                  ],
+                ),
+                child: const Icon(Icons.mic, color: Colors.white, size: 36),
               ),
-              child: const Icon(Icons.mic, color: Colors.white, size: 36),
             ),
           ),
           SizedBox(
@@ -424,36 +432,56 @@ class LessonNotifier extends StateNotifier<LessonState> {
                           // setState(() => isPlaying = false);
                           setPlaying(false);
                         } else {
-                          await playRecording();
+                          await playRecording(() {
+                            setPlaying(false);
+                          });
                           // setState(() => isPlaying = true);
                           setPlaying(true);
                         }
                       },
                     ),
                     const SizedBox(width: 10),
-                    if (!isPlaying)
-                      Text(
-                        isPlaying ? 'በመጫወት ላይ...' : 'ድምፅዎን ይሰሙ 🎧',
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500),
-                      ),
-                    if (isPlaying)
-                      Center(
-                        child: Lottie.asset(
-                          'assets/animations/playing.json',
-                          height: 100,
-                          repeat: true,
+                    Column(
+                      children: [
+                        if (!isPlaying)
+                          Text(
+                            'ድምፅዎን ይሰሙ 🎧',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                        if (isPlaying)
+                          Center(
+                            child: Lottie.asset(
+                              'assets/animations/playing.json',
+                              height: 100,
+                              repeat: true,
+                            ),
+                          ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: whiteColor,
+                          ),
+                          onPressed: () async {
+                            await stopPlayback();
+                            // setState(() => isPlaying = false);
+                            setPlaying(false);
+                            setRecordedFilePath(null);
+                          },
+                          child: Text("ድጋሚ ቅዳ"),
                         ),
-                      ),
-                    TextButton(
-                      onPressed: () async {
-                        await stopPlayback();
-                        // setState(() => isPlaying = false);
-                        setPlaying(false);
-                        setRecordedFilePath(null);
-                      },
-                      child: Text("ድጋሚ ቅዳ"),
-                    )
+                      ],
+                    ),
+
+                    // TextButton(
+                    //   onPressed: () async {
+                    //     await stopPlayback();
+                    //     // setState(() => isPlaying = false);
+                    //     setPlaying(false);
+                    //     setRecordedFilePath(null);
+                    //   },
+                    //   child: Text("ድጋሚ ቅዳ"),
+                    // )
                   ],
                 ),
               ),
@@ -513,7 +541,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
         ),
         const SizedBox(height: 18),
         const Text(
-          'የዛሬው ደርስ ላይ ግር ወይም ጥያቄ አለ?',
+          'የዛሬው ደርስ ላይ ጥያቄ አልዎት?',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 15,

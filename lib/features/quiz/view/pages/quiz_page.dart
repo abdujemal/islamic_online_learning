@@ -29,104 +29,106 @@ class _QuizPageState extends ConsumerState<QuizPage> {
     });
   }
 
-  void stateListener(v, y) {}
+  // void stateListener(v, y) {}
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("ጥያቄዎች"),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("ጥያቄዎች"),
+        ),
+        body: ref.watch(quizNotifierProvider).map(
+              loading: (_) => ListView.builder(
+                itemCount: 1,
+                itemBuilder: (context, index) => QuestionItemShimmer(),
+              ),
+              loaded: (_) => MultipleQuestionQuiz(
+                questions: _.quizzes
+                    .map(
+                      (q) => QuestionModel(
+                        id: q.id,
+                        question: q.question,
+                        options: q.options
+                            .map(
+                              (e) => QuestionOption(
+                                id: "${q.options.indexOf(e)}",
+                                text: e,
+                                isCorrect: q.options.indexOf(e) == q.answer,
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    )
+                    .toList(),
+                onFinish: (i, answers) async {
+                  print("i: $i, answers: $answers");
+                  List<String> quizAnswers = [];
+                  for (var ans in answers.entries) {
+                    quizAnswers.add("${ans.key}:${ans.value.join("")}");
+                  }
+                  await ref.read(quizNotifierProvider.notifier).submitQuestions(
+                        widget.lesson,
+                        quizAnswers,
+                        ref,
+                      );
+                  if (ref.read(quizNotifierProvider).submittingError != null) {
+                    return false;
+                  } else {
+                    return true;
+                  }
+                },
+              ),
+              empty: (_) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("ምንም የለም"),
+                    IconButton(
+                      onPressed: () async {
+                        await ref
+                            .read(quizNotifierProvider.notifier)
+                            .getQuizzes(widget.lesson.id, context);
+                      },
+                      icon: Icon(Icons.refresh),
+                    )
+                  ],
+                ),
+              ),
+              submittedW: (_) => AlreadySubmittedScreen(
+                onBack: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MainPage(),
+                    ),
+                    (_) => false,
+                  );
+                },
+              ),
+              error: (_) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _.error ?? "",
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        await ref
+                            .read(quizNotifierProvider.notifier)
+                            .getQuizzes(widget.lesson.id, context);
+                      },
+                      icon: Icon(Icons.refresh),
+                    )
+                  ],
+                ),
+              ),
+            ),
       ),
-      body: ref.watch(quizNotifierProvider).map(
-            loading: (_) => ListView.builder(
-              itemCount: 1,
-              itemBuilder: (context, index) => QuestionItemShimmer(),
-            ),
-            loaded: (_) => MultipleQuestionQuiz(
-              questions: _.quizzes
-                  .map(
-                    (q) => QuestionModel(
-                      id: q.id,
-                      question: q.question,
-                      options: q.options
-                          .map(
-                            (e) => QuestionOption(
-                              id: "${q.options.indexOf(e)}",
-                              text: e,
-                              isCorrect: q.options.indexOf(e) == q.answer,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  )
-                  .toList(),
-              onFinish: (i, answers) async {
-                print("i: $i, answers: $answers");
-                List<String> quizAnswers = [];
-                for (var ans in answers.entries) {
-                  quizAnswers.add("${ans.key}:${ans.value.join("")}");
-                }
-                await ref.read(quizNotifierProvider.notifier).submitQuestions(
-                      widget.lesson,
-                      quizAnswers,
-                      ref,
-                    );
-                if (ref.read(quizNotifierProvider).submittingError != null) {
-                  return false;
-                } else {
-                  return true;
-                }
-              },
-            ),
-            empty: (_) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("ምንም የለም"),
-                  IconButton(
-                    onPressed: () async {
-                      await ref
-                          .read(quizNotifierProvider.notifier)
-                          .getQuizzes(widget.lesson.id, context);
-                    },
-                    icon: Icon(Icons.refresh),
-                  )
-                ],
-              ),
-            ),
-            submittedW: (_) => AlreadySubmittedScreen(
-              onBack: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => MainPage(),
-                  ),
-                  (_) => false,
-                );
-              },
-            ),
-            error: (_) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _.error ?? "",
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      await ref
-                          .read(quizNotifierProvider.notifier)
-                          .getQuizzes(widget.lesson.id, context);
-                    },
-                    icon: Icon(Icons.refresh),
-                  )
-                ],
-              ),
-            ),
-          ),
     );
   }
 }

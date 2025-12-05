@@ -89,8 +89,8 @@ class CurriculumService {
           curriculum: currData,
           discussions: currNGroup.discussions,
           group: currNGroup.group,
-          scores: currNGroup.scores,
-          testAttempts: currNGroup.testAttempts,
+          scores: [],//currNGroup.scores,
+          testAttempts: [],//currNGroup.testAttempts,
         );
       }
     } else {

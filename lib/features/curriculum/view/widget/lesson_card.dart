@@ -83,6 +83,7 @@ class _LessonCardState extends ConsumerState<LessonCard> {
         score: 0,
         gradeWaiting: false,
         outOf: constScore?.totalScore ?? 0,
+        afterLesson: widget.lesson.order,
         userId: "userId",
         date: DateTime.now(),
       );

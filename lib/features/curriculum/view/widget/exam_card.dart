@@ -16,6 +16,7 @@ class ExamCard extends ConsumerStatefulWidget {
   final bool isLastExam;
   final bool isLocked;
   final bool isCurrent;
+  final int afterLesson;
   final ExamData examData;
   final DiscussionData discussionData;
   const ExamCard({
@@ -25,6 +26,7 @@ class ExamCard extends ConsumerStatefulWidget {
     required this.isLocked,
     required this.isCurrent,
     required this.isLastExam,
+    required this.afterLesson,
   });
 
   @override
@@ -47,6 +49,20 @@ class _ExamCardState extends ConsumerState<ExamCard> {
     TestAttempt? testAttempt = testResult.isNotEmpty ? testResult.first : null;
 
     if (testAttempt == null) {
+      if (isPastLesson) {
+        final score = Score(
+          id: "id",
+          targetType: "IndividualAssignment",
+          targetId: "testAttempt.id",
+          score: 0,
+          afterLesson: widget.afterLesson,
+          gradeWaiting: false,
+          outOf: constScore?.totalScore ?? 0,
+          userId: "userId",
+          date: DateTime.now(),
+        );
+        return score;
+      }
       return null;
     }
 
@@ -59,6 +75,7 @@ class _ExamCardState extends ConsumerState<ExamCard> {
         .toList();
     // print("scoresResult: $scoresResult");
     Score? score = scoresResult.isNotEmpty ? scoresResult.first : null;
+    print("isPastLesson: $isPastLesson && ${score ?? "null"}");
     if (isPastLesson && score == null) {
       score = Score(
         id: "id",
@@ -67,6 +84,7 @@ class _ExamCardState extends ConsumerState<ExamCard> {
         score: 0,
         gradeWaiting: false,
         outOf: constScore?.totalScore ?? 0,
+        afterLesson: widget.afterLesson,
         userId: "userId",
         date: DateTime.now(),
       );
@@ -99,10 +117,10 @@ class _ExamCardState extends ConsumerState<ExamCard> {
         top: 10,
       ),
       width: double.infinity,
-       decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Stack(
         children: [
           Padding(

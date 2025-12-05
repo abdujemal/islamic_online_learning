@@ -84,7 +84,7 @@ class Quiz {
       assignedCourseId: map['assignedCourseId'] as String,
       curriculumId: map['curriculumId'] as String,
       answer: map['answer'] as int,
-      attempts: map['attempts'] == null ? map['attempts'] as int : null,
+      attempts: map['attempts'] != null ? map['attempts'] as int : null,
     );
   }
 

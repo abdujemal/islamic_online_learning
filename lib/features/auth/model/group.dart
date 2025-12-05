@@ -21,6 +21,7 @@ class Group {
   final DateTime? courseStartDate;
   final DateTime createdAt;
   final int? noOfMembers;
+  final int noOfLessonsPerDay;
   final List<Member>? members;
   final GroupRequest? groupUpdateRequest;
   Group({
@@ -34,6 +35,7 @@ class Group {
     required this.discussionTime,
     required this.discussionDay,
     required this.timeZone,
+    required this.noOfLessonsPerDay,
     this.startDate,
     this.currStartDate,
     this.courseStartDate,
@@ -48,6 +50,7 @@ class Group {
     String? name,
     int? lessonNum,
     int? courseNum,
+    int? noOfLessonsPerDay,
     String? curriculumId,
     String? gender,
     String? ageGroup,
@@ -69,6 +72,7 @@ class Group {
       courseNum: courseNum ?? this.courseNum,
       curriculumId: curriculumId ?? this.curriculumId,
       gender: gender ?? this.gender,
+      noOfLessonsPerDay: noOfLessonsPerDay ?? this.noOfLessonsPerDay,
       ageGroup: ageGroup ?? this.ageGroup,
       discussionTime: discussionTime ?? this.discussionTime,
       discussionDay: discussionDay ?? this.discussionDay,
@@ -99,6 +103,7 @@ class Group {
       'ageGroup': ageGroup,
       'discussionTime': discussionTime,
       'discussionDay': discussionDay,
+      'noOfLessonsPerDay': noOfLessonsPerDay,
       'timeZone': timeZone,
       'startDate': startDate,
       'currStartDate': currStartDate,
@@ -116,6 +121,7 @@ class Group {
       name: map['name'] as String,
       lessonNum: map['lessonNum'] as int,
       courseNum: map['courseNum'] as int,
+      noOfLessonsPerDay: map["noOfLessonsPerDay"] as int,
       curriculumId: map['curriculumId'] as String,
       gender: map['gender'] as String,
       ageGroup: map['ageGroup'] as String,
@@ -154,7 +160,7 @@ class Group {
 
   @override
   String toString() {
-    return 'Group(id: $id, name: $name, lessonNum: $lessonNum, courseNum: $courseNum, curriculumId: $curriculumId, gender: $gender, ageGroup: $ageGroup, discussionTime: $discussionTime, discussionDay: $discussionDay, timeZone: $timeZone, startDate: $startDate, currStartDate: $currStartDate, courseStartDate: $courseStartDate, createdAt: $createdAt, noOfMembers: $noOfMembers, members: $members, groupUpdateRequest: $groupUpdateRequest)';
+    return 'Group(id: $id, name: $name, lessonNum: $lessonNum, noOfLessonsPerDay: $noOfLessonsPerDay, courseNum: $courseNum, curriculumId: $curriculumId, gender: $gender, ageGroup: $ageGroup, discussionTime: $discussionTime, discussionDay: $discussionDay, timeZone: $timeZone, startDate: $startDate, currStartDate: $currStartDate, courseStartDate: $courseStartDate, createdAt: $createdAt, noOfMembers: $noOfMembers, members: $members, groupUpdateRequest: $groupUpdateRequest)';
   }
 
   @override
@@ -167,6 +173,7 @@ class Group {
         other.courseNum == courseNum &&
         other.curriculumId == curriculumId &&
         other.gender == gender &&
+        other.noOfLessonsPerDay == noOfLessonsPerDay &&
         other.ageGroup == ageGroup &&
         other.discussionTime == discussionTime &&
         other.discussionDay == discussionDay &&
@@ -188,6 +195,7 @@ class Group {
         courseNum.hashCode ^
         curriculumId.hashCode ^
         gender.hashCode ^
+        noOfLessonsPerDay.hashCode ^
         ageGroup.hashCode ^
         discussionTime.hashCode ^
         discussionDay.hashCode ^
