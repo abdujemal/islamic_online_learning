@@ -38,18 +38,35 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
       authState.user!.group.noOfLessonsPerDay,
       (i) => currentLessonNum + i,
     );
+    final notOpenedYet =
+        DateTime.now().compareTo(authState.user!.group.startDate!) == -1;
     // print("currentLessonIndexes: $currentLessonIndexes");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: List.generate(
+      child: Column(children: [
+        if(notOpenedYet)
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            vertical: 15,
+          ),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.amber),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            "ሰኞ ቂራት ይጀመራል። ኢንሻአላህ!",
+            textAlign: TextAlign.center,
+          ),
+        ),
+        ...List.generate(
           state.curriculum!.lessons!.length,
           (index) {
             Lesson lesson = state.curriculum!.lessons![index];
             bool isCurrentLesson = currentLessonIndexes
                 .contains(lesson.order); //lesson.order == currentLessonIndex;
             bool isPastLesson = lesson.order < currentLessonNum;
-            final bool isLocked = (lesson.order > currentLessonIndexes.last);
+            bool isLocked = (lesson.order > currentLessonIndexes.last);
 
             // if (isCurrentLesson && isTodayDiscussion) {
             //   isCurrentLesson = false;
@@ -151,6 +168,12 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
               isExamLocked = true;
             }
 
+            if (notOpenedYet) {
+              isLocked = true;
+              isCurrentLesson = false;
+              isPastLesson = false;
+            }
+
             // if (authState.user!.group.courseNum ==
             //     widget.assignedCourse.order) {
             //  isCurrentLesson = false;
@@ -193,7 +216,7 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
             );
           },
         ),
-      ),
+      ]),
     );
   }
 }

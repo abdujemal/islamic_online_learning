@@ -109,20 +109,25 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(user: null, tokenIsNull: true);
   }
 
-  Future<void> _checkIfTheCourseStarted(BuildContext context) async {
+  Future<bool> _checkIfTheCourseStarted(BuildContext context) async {
     // getMyInfo(ref.context);
-    ref.read(assignedCoursesNotifierProvider.notifier).getCurriculum(context);
-    // try {
-    //   final started = await hasCourseStarted();
-    //   if (started == true) {
-    //     state = state.copyWith(courseStarted: true);
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // } catch (err) {
-    //   return false;
-    // }
+    try {
+      state = state.copyWith(courseStarted: CourseStarted.LOADING);
+      final started = await hasCourseStarted();
+      if (started == true) {
+        state = state.copyWith(courseStarted: CourseStarted.STARTED);
+        ref
+            .read(assignedCoursesNotifierProvider.notifier)
+            .getCurriculum(context);
+        return true;
+      } else {
+        state = state.copyWith(courseStarted: CourseStarted.NOTSTARTED);
+        return false;
+      }
+    } catch (err) {
+      state = state.copyWith(courseStarted: CourseStarted.NOTSTARTED);
+      return false;
+    }
   }
 
   Future<List<DateTime>> getStreakFor(

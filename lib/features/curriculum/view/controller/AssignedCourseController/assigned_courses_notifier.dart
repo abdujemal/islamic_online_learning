@@ -189,7 +189,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
     return DiscussionData(
       title:
-          "ከ${lessons[initialIndex].title}$initialIndex እስክ ${lessons[index].title}$index",
+          "ከ${lessons[initialIndex].title} እስክ ${lessons[index].title}",
       lessonFrom: initialIndex,
       lessonTo: index,
       discussionIndex: index,
