@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_notifier.dart';
-import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_state.dart';
-import 'package:islamic_online_learning/features/template/view/widget/discussion_task_ui.dart';
+import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_notifier.dart';
+import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_state.dart';
+import 'package:islamic_online_learning/features/meeting/view/widget/discussion_task_ui.dart';
 import 'package:islamic_online_learning/utils.dart';
 import 'package:livekit_client/livekit_client.dart';
 
@@ -327,25 +327,27 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
 
         // return Future.value(true);
       },
-      child: Scaffold(
-        body: Column(
-          children: [
-            _buildTopBar(voiceRoomState),
-            _buildProgressBar(voiceRoomState),
-            Expanded(
-              child: Column(
-                children: [
-                  _buildMainArea(voiceRoomState),
-                  Expanded(
-                    child: DiscussionTaskUi(
-                      status: voiceRoomState.status,
+      child: SafeArea(
+        child: Scaffold(
+          body: Column(
+            children: [
+              _buildTopBar(voiceRoomState),
+              _buildProgressBar(voiceRoomState),
+              Expanded(
+                child: Column(
+                  children: [
+                    _buildMainArea(voiceRoomState),
+                    Expanded(
+                      child: DiscussionTaskUi(
+                        status: voiceRoomState.status,
+                      ),
                     ),
-                  ),
-                  _buildBottomControls(voiceRoomState),
-                ],
-              ),
-            )
-          ],
+                    _buildBottomControls(voiceRoomState),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

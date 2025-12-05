@@ -30,156 +30,158 @@ class _AccountTabState extends ConsumerState<AccountTab> {
 
     final currentUser = authState.user!;
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          const SizedBox(height: 20),
-
-          // ⭐ Profile Header
-          Center(
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 45,
-                  backgroundColor: userIdToColor(currentUser.name),
-                  child: Text(
-                    currentUser.name[0].toUpperCase(),
-                    style: const TextStyle(
-                        color: whiteColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            const SizedBox(height: 20),
+      
+            // ⭐ Profile Header
+            Center(
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 45,
+                    backgroundColor: userIdToColor(currentUser.name),
+                    child: Text(
+                      currentUser.name[0].toUpperCase(),
+                      style: const TextStyle(
+                          color: whiteColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  currentUser.name,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 12),
+                  Text(
+                    currentUser.name,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  currentUser.phone,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.textTheme.bodySmall?.color,
+                  const SizedBox(height: 4),
+                  Text(
+                    currentUser.phone,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.textTheme.bodySmall?.color,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 15),
-                _buildStreakCard(theme, currentUser),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // ⭐ Section Title
-          Text(
-            "Account Settings",
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // ⭐ Settings Cards
-          _buildSettingItem(
-            icon: Icons.account_circle,
-            title: "Edit Profile",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => EditProfilePage(),
-                ),
-              );
-            },
-          ),
-          _buildSettingItem(
-            icon: Icons.question_answer,
-            title: "Confusion Messages",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ConfusionsPage(),
-                ),
-              );
-            },
-          ),
-          _buildSettingItem(
-            icon: Icons.question_mark_rounded,
-            title: "My Tests",
-            onTap: () {},
-          ),
-          _buildSettingItem(
-            icon: Icons.payment,
-            title: "Payments",
-            onTap: () {},
-          ),
-          _buildSettingItem(
-            icon: Icons.security,
-            title: "Privacy & Security",
-            onTap: () {},
-          ),
-
-          const SizedBox(height: 30),
-
-          // ⭐ Support Section
-          Text(
-            "Support",
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          _buildSettingItem(
-            icon: Icons.question_mark,
-            title: "Help Center",
-            onTap: () {},
-          ),
-          _buildSettingItem(
-            icon: Icons.info,
-            title: "About",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => AboutUs(),
-                ),
-              );
-            },
-          ),
-
-          const SizedBox(height: 40),
-
-          // ⭐ Logout button
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 15),
+                  _buildStreakCard(theme, currentUser),
+                ],
               ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            onPressed: () {
-              ref.read(authNotifierProvider.notifier).logout();
-              ref.read(menuIndexProvider.notifier).update((state) => 1);
-            },
-            child: const Text(
-              "Log Out",
-              style: TextStyle(
-                fontSize: 16,
+      
+            const SizedBox(height: 32),
+      
+            // ⭐ Section Title
+            Text(
+              "Account Settings",
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
               ),
             ),
-          ),
-
-          const SizedBox(height: 60),
-        ],
+            const SizedBox(height: 16),
+      
+            // ⭐ Settings Cards
+            _buildSettingItem(
+              icon: Icons.account_circle,
+              title: "Edit Profile",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EditProfilePage(),
+                  ),
+                );
+              },
+            ),
+            _buildSettingItem(
+              icon: Icons.question_answer,
+              title: "Confusion Messages",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ConfusionsPage(),
+                  ),
+                );
+              },
+            ),
+            _buildSettingItem(
+              icon: Icons.question_mark_rounded,
+              title: "My Tests",
+              onTap: () {},
+            ),
+            _buildSettingItem(
+              icon: Icons.payment,
+              title: "Payments",
+              onTap: () {},
+            ),
+            _buildSettingItem(
+              icon: Icons.security,
+              title: "Privacy & Security",
+              onTap: () {},
+            ),
+      
+            const SizedBox(height: 30),
+      
+            // ⭐ Support Section
+            Text(
+              "Support",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+      
+            _buildSettingItem(
+              icon: Icons.question_mark,
+              title: "Help Center",
+              onTap: () {},
+            ),
+            _buildSettingItem(
+              icon: Icons.info,
+              title: "About",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AboutUs(),
+                  ),
+                );
+              },
+            ),
+      
+            const SizedBox(height: 40),
+      
+            // ⭐ Logout button
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              onPressed: () {
+                ref.read(authNotifierProvider.notifier).logout();
+                ref.read(menuIndexProvider.notifier).update((state) => 1);
+              },
+              child: const Text(
+                "Log Out",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+      
+            const SizedBox(height: 60),
+          ],
+        ),
       ),
     );
   }

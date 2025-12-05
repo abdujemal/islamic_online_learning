@@ -145,9 +145,9 @@ class _MainState extends ConsumerState<Main> {
               future: checkDb(),
               builder: (context, snap) {
                 if (snap.data == null) {
-                  return Scaffold(
-                    body: SafeArea(
-                      child: Center(
+                  return SafeArea(
+                    child: Scaffold(
+                      body: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

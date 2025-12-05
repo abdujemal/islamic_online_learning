@@ -4,8 +4,8 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/quiz/view/widget/question_list.dart';
 import 'package:islamic_online_learning/features/quiz/view/widget/short_answer_quiz.dart';
-import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_notifier.dart';
-import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_state.dart';
+import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_notifier.dart';
+import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_state.dart';
 
 class DiscussionTaskUi extends ConsumerStatefulWidget {
   final VoiceRoomStatus status;

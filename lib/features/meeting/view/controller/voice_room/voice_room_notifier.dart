@@ -11,10 +11,10 @@ import 'package:islamic_online_learning/features/curriculum/view/controller/prov
 import 'package:islamic_online_learning/features/quiz/model/question.dart';
 import 'package:islamic_online_learning/features/quiz/model/quiz.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
-import 'package:islamic_online_learning/features/template/model/discussion.dart';
-import 'package:islamic_online_learning/features/template/service/voice_room_service.dart';
-import 'package:islamic_online_learning/features/template/view/controller/voice_room/voice_room_state.dart';
-import 'package:islamic_online_learning/features/template/view/widget/discussion_completed_ui.dart';
+import 'package:islamic_online_learning/features/meeting/model/discussion.dart';
+import 'package:islamic_online_learning/features/meeting/service/voice_room_service.dart';
+import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_state.dart';
+import 'package:islamic_online_learning/features/meeting/view/widget/discussion_completed_ui.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';

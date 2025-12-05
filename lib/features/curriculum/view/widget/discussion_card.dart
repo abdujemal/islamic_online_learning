@@ -9,7 +9,7 @@ import 'package:islamic_online_learning/features/auth/view/controller/provider.d
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
-import 'package:islamic_online_learning/features/template/view/pages/voice_room.dart';
+import 'package:islamic_online_learning/features/meeting/view/pages/voice_room.dart';
 
 class DiscussionCard extends ConsumerStatefulWidget {
   final bool isLocked;

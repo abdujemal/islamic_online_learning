@@ -4,7 +4,7 @@ import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/quiz/model/question.dart';
 import 'package:islamic_online_learning/features/quiz/model/quiz.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
-import 'package:islamic_online_learning/features/template/model/discussion.dart';
+import 'package:islamic_online_learning/features/meeting/model/discussion.dart';
 
 final voiceRoomServiceProvider = Provider<VoiceRoomService>((ref) {
   return VoiceRoomService();

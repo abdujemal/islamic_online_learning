@@ -71,123 +71,125 @@ class _QuestionPageState extends ConsumerState<QuestionPage> {
           }
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("ፈተና"),
-        ),
-        body: ref.watch(questionsNotifierProvider).map(
-              loading: (_) => ListView.builder(
-                itemCount: 1,
-                itemBuilder: (context, index) => QuestionItemShimmer(),
-              ),
-              testStarted: (_) => ShortAnswerQuiz(
-                timeLimit: Duration(minutes: _.givenTime!),
-                questions: _.questions
-                    .map(
-                      (q) => {
-                        "id": q.id,
-                        "question": q.question,
-                      },
-                    )
-                    .toList(),
-                onSubmit: (answer) {
-                  print(answer);
-                  ref.read(questionsNotifierProvider.notifier).addOUpdateAns(
-                        QA(
-                          questionId: answer["qid"]!,
-                          answer: answer["answer"]!,
-                        ),
-                      );
-                },
-                onFinish: (answers) async {
-                  print("answers: $answers");
-                  await ref
-                      .read(questionsNotifierProvider.notifier)
-                      .submitTest(context);
-                  setState(() {
-                    canPop = true;
-                  });
-                  Navigator.pop(context);
-
-                  // List<String> quizAnswers = [];
-                  // for (var ans in answers) {
-                  //   quizAnswers.add("${ans.key}:${ans.value.join("")}");
-                  // }
-                  // await ref.read(quizNotifierProvider.notifier).submitQuestions(
-                  //       widget.lesson,
-                  //       quizAnswers,
-                  //       ref,
-                  //     );
-                  // if (ref.read(quizNotifierProvider).submittingError != null) {
-                  //   return false;
-                  // } else {
-                  //   return true;
-                  // }
-                },
-              ),
-              loaded: (_) => TestIntroPage(
-                testTitle: widget.testTitle,
-                duration: "${_.givenTime ?? "..."}",
-                unfinishedTest: _.isThereUnfinishedTest,
-                rules: [
-                  "የተሰጠዎት ጊዜ ካለቀ ምንም ጥያቄ መስራት ስለማይችሉ፤ እባክዎ ጊዜዎን ባግባቡ ይጠቀሙ።",
-                  "ፈተናውን ከጀመሩ ቡሃላ ወደ ሃላ ከተመለሱ ወይም ወደ ከአፑ ከወጡ፤ ድጋሚ ተመልሰው መፈተን ስለማይችሉ፤ ፈተናውን ከጀመሩ እስኪ ጨርሱ ድረስ ከአፑ እንዳይወጡ።"
-                ],
-                onStart: () {
-                  ref
-                      .read(questionsNotifierProvider.notifier)
-                      .startTest(widget.testTitle, context);
-                },
-              ),
-              empty: (_) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("ምንም የለም"),
-                    IconButton(
-                      onPressed: () async {
-                        await ref
-                            .read(questionsNotifierProvider.notifier)
-                            .getTestQuestion(context);
-                      },
-                      icon: Icon(Icons.refresh),
-                    )
-                  ],
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text("ፈተና"),
+          ),
+          body: ref.watch(questionsNotifierProvider).map(
+                loading: (_) => ListView.builder(
+                  itemCount: 1,
+                  itemBuilder: (context, index) => QuestionItemShimmer(),
                 ),
-              ),
-              submittedW: (_) => AlreadySubmittedScreen(
-                onBack: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MainPage(),
-                    ),
-                    (_) => false,
-                  );
-                },
-              ),
-              error: (_) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _.error ?? "",
-                      style: TextStyle(
-                        color: Colors.red,
+                testStarted: (_) => ShortAnswerQuiz(
+                  timeLimit: Duration(minutes: _.givenTime!),
+                  questions: _.questions
+                      .map(
+                        (q) => {
+                          "id": q.id,
+                          "question": q.question,
+                        },
+                      )
+                      .toList(),
+                  onSubmit: (answer) {
+                    print(answer);
+                    ref.read(questionsNotifierProvider.notifier).addOUpdateAns(
+                          QA(
+                            questionId: answer["qid"]!,
+                            answer: answer["answer"]!,
+                          ),
+                        );
+                  },
+                  onFinish: (answers) async {
+                    print("answers: $answers");
+                    await ref
+                        .read(questionsNotifierProvider.notifier)
+                        .submitTest(context);
+                    setState(() {
+                      canPop = true;
+                    });
+                    Navigator.pop(context);
+        
+                    // List<String> quizAnswers = [];
+                    // for (var ans in answers) {
+                    //   quizAnswers.add("${ans.key}:${ans.value.join("")}");
+                    // }
+                    // await ref.read(quizNotifierProvider.notifier).submitQuestions(
+                    //       widget.lesson,
+                    //       quizAnswers,
+                    //       ref,
+                    //     );
+                    // if (ref.read(quizNotifierProvider).submittingError != null) {
+                    //   return false;
+                    // } else {
+                    //   return true;
+                    // }
+                  },
+                ),
+                loaded: (_) => TestIntroPage(
+                  testTitle: widget.testTitle,
+                  duration: "${_.givenTime ?? "..."}",
+                  unfinishedTest: _.isThereUnfinishedTest,
+                  rules: [
+                    "የተሰጠዎት ጊዜ ካለቀ ምንም ጥያቄ መስራት ስለማይችሉ፤ እባክዎ ጊዜዎን ባግባቡ ይጠቀሙ።",
+                    "ፈተናውን ከጀመሩ ቡሃላ ወደ ሃላ ከተመለሱ ወይም ወደ ከአፑ ከወጡ፤ ድጋሚ ተመልሰው መፈተን ስለማይችሉ፤ ፈተናውን ከጀመሩ እስኪ ጨርሱ ድረስ ከአፑ እንዳይወጡ።"
+                  ],
+                  onStart: () {
+                    ref
+                        .read(questionsNotifierProvider.notifier)
+                        .startTest(widget.testTitle, context);
+                  },
+                ),
+                empty: (_) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("ምንም የለም"),
+                      IconButton(
+                        onPressed: () async {
+                          await ref
+                              .read(questionsNotifierProvider.notifier)
+                              .getTestQuestion(context);
+                        },
+                        icon: Icon(Icons.refresh),
+                      )
+                    ],
+                  ),
+                ),
+                submittedW: (_) => AlreadySubmittedScreen(
+                  onBack: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => MainPage(),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () async {
-                        await ref
-                            .read(questionsNotifierProvider.notifier)
-                            .getTestQuestion(context);
-                      },
-                      icon: Icon(Icons.refresh),
-                    )
-                  ],
+                      (_) => false,
+                    );
+                  },
+                ),
+                error: (_) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _.error ?? "",
+                        style: TextStyle(
+                          color: Colors.red,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () async {
+                          await ref
+                              .read(questionsNotifierProvider.notifier)
+                              .getTestQuestion(context);
+                        },
+                        icon: Icon(Icons.refresh),
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
+        ),
       ),
     );
   }

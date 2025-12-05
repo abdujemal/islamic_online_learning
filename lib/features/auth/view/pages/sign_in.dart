@@ -36,9 +36,9 @@ class _SignInState extends ConsumerState<SignIn> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(signInNotifierProvider);
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
+    return SafeArea(
+      child: Scaffold(
+        body: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +68,7 @@ class _SignInState extends ConsumerState<SignIn> {
                       ),
                       fillColor: Theme.of(context).chipTheme.backgroundColor ??
                           Colors.grey.shade100),
-
+              
                   pickerDialogStyle: PickerDialogStyle(
                       listTileDivider: Divider(color: whiteColor)),
                   initialCountryCode: 'ET', // Ethiopia default
@@ -134,7 +134,7 @@ class _SignInState extends ConsumerState<SignIn> {
                   if (state.isLoading) {
                     return;
                   }
-
+              
                   ref.read(signInNotifierProvider.notifier).sendOtp(
                         _emailController.text,
                         widget.curriculumId,

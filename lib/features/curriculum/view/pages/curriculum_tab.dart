@@ -50,25 +50,27 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
     // final curriculumState = ref.watch(curriculumNotifierProvider);
 
     super.build(context);
-    return Scaffold(
-        body: Padding(
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (authState.tokenIsNull && !authState.isLoading) CurriculumList(),
-          if (!authState.tokenIsNull &&
-              !authState.initial &&
-              authState.courseStarted != CourseStarted.STARTED)
-            GroupMembersStatus(),
-          if (!authState.tokenIsNull &&
-              authState.user != null &&
-              authState.courseStarted == CourseStarted.STARTED &&
-              authState.error == null)
-            AssignedCourseList()
-        ],
-      ),
-    ));
+    return SafeArea(
+      child: Scaffold(
+          body: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (authState.tokenIsNull && !authState.isLoading) CurriculumList(),
+            if (!authState.tokenIsNull &&
+                !authState.initial &&
+                authState.courseStarted != CourseStarted.STARTED)
+              GroupMembersStatus(),
+            if (!authState.tokenIsNull &&
+                authState.user != null &&
+                authState.courseStarted == CourseStarted.STARTED &&
+                authState.error == null)
+              AssignedCourseList()
+          ],
+        ),
+      )),
+    );
   }
 
   @override

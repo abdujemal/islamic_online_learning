@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
 import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
-import 'package:islamic_online_learning/features/template/model/discussion.dart';
+import 'package:islamic_online_learning/features/meeting/model/discussion.dart';
 
 class AssignedCoursesState {
   final bool isLoading, initial, isErrorAuth, isErrorPayment;

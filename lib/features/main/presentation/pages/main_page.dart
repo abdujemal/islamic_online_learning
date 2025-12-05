@@ -305,119 +305,121 @@ class _MainPageState extends ConsumerState<MainPage>
               showTopAudio = false;
             }
             return UpdateChecker(
-              child: Scaffold(
-                bottomNavigationBar: BottomNav(_tabController),
-                appBar: AppBar(
-                  title: currentIndex != 1
-                      ? curriculumState.curriculum != null && currentIndex == 0
-                          ? Text(curriculumState.curriculum?.title ?? "")
-                          : Text("ዒልም ፈላጊ")
-                      : AnimatedSearchBar(
-                          height: 50,
-                          label: "ዒልም ፈላጊ",
-                          controller: _searchController,
-                          labelStyle: const TextStyle(fontSize: 16),
-                          searchStyle: TextStyle(
-                            color: ref.read(themeProvider) == ThemeMode.dark
-                                ? Colors.white
-                                : Colors.black,
-                          ),
-                          cursorColor: primaryColor,
-                          searchIcon: Padding(
-                            padding: const EdgeInsets.only(top: 5.0),
-                            child: Icon(
-                              key: _searchIconKey,
-                              Icons.search_rounded,
+              child: SafeArea(
+                child: Scaffold(
+                  bottomNavigationBar: BottomNav(_tabController),
+                  appBar: AppBar(
+                    title: currentIndex != 1
+                        ? curriculumState.curriculum != null && currentIndex == 0
+                            ? Text(curriculumState.curriculum?.title ?? "")
+                            : Text("ዒልም ፈላጊ")
+                        : AnimatedSearchBar(
+                            height: 50,
+                            label: "ዒልም ፈላጊ",
+                            controller: _searchController,
+                            labelStyle: const TextStyle(fontSize: 16),
+                            searchStyle: TextStyle(
+                              color: ref.read(themeProvider) == ThemeMode.dark
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
-                          ),
-                          textInputAction: TextInputAction.search,
-                          searchDecoration: const InputDecoration(
-                            hintText: 'ፈልግ...',
-                            alignLabelWithHint: true,
-                            fillColor: Colors.white,
-                            focusColor: Colors.white,
-                            hintStyle: TextStyle(
-                              color: Colors.white70,
+                            cursorColor: primaryColor,
+                            searchIcon: Padding(
+                              padding: const EdgeInsets.only(top: 5.0),
+                              child: Icon(
+                                key: _searchIconKey,
+                                Icons.search_rounded,
+                              ),
                             ),
-                            border: InputBorder.none,
-                          ),
-                          onChanged: (value) {
-                            ref
-                                .read(queryProvider.notifier)
-                                .update((state) => value);
-                            if (ref.watch(menuIndexProvider) != 0) {
+                            textInputAction: TextInputAction.search,
+                            searchDecoration: const InputDecoration(
+                              hintText: 'ፈልግ...',
+                              alignLabelWithHint: true,
+                              fillColor: Colors.white,
+                              focusColor: Colors.white,
+                              hintStyle: TextStyle(
+                                color: Colors.white70,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                            onChanged: (value) {
                               ref
-                                  .read(menuIndexProvider.notifier)
-                                  .update((state) => 0);
-                              // tabController.animateTo(0);
-                            }
-
-                            startSearchTimer(value);
-                          },
-                          onFieldSubmitted: (value) {
-                            ref
-                                .read(mainNotifierProvider.notifier)
-                                .searchCourses(value, 20);
-                          },
-                          onClose: () {
-                            ref.read(mainNotifierProvider.notifier).getCourses(
-                                  context: context,
-                                );
-                          },
-                        ),
-                  bottom: PreferredSize(
-                    preferredSize: Size(
-                      MediaQuery.of(context).size.width,
-                      showTopAudio ? 40 : 0,
-                    ),
-                    child: showTopAudio
-                        ? CurrentAudioView(metaData as MediaItem)
-                        : const SizedBox(),
-                  ),
-                  actions: [
-                    currentIndex != 1
-                        ? IconButton(
-                            onPressed: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (_) => NewLessonStructure(),
-                              //   ),
-                              // );
+                                  .read(queryProvider.notifier)
+                                  .update((state) => value);
+                              if (ref.watch(menuIndexProvider) != 0) {
+                                ref
+                                    .read(menuIndexProvider.notifier)
+                                    .update((state) => 0);
+                                // tabController.animateTo(0);
+                              }
+                
+                              startSearchTimer(value);
                             },
-                            icon: Icon(Icons.refresh),
-                          )
-                        : IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => Fav(),
-                                ),
-                              );
+                            onFieldSubmitted: (value) {
+                              ref
+                                  .read(mainNotifierProvider.notifier)
+                                  .searchCourses(value, 20);
                             },
-                            icon: Icon(Icons.bookmark_rounded),
+                            onClose: () {
+                              ref.read(mainNotifierProvider.notifier).getCourses(
+                                    context: context,
+                                  );
+                            },
                           ),
-                  ],
-                  leading: Builder(builder: (context) {
-                    return IconButton(
-                      key: _menuKey,
-                      icon: const Icon(Icons.menu_rounded),
-                      onPressed: () {
-                        Scaffold.of(context).openDrawer();
-                      },
-                    );
-                  }),
-                ),
-                drawer: const MainDrawer(),
-                body: TabBarView(
-                  physics: NeverScrollableScrollPhysics(),
-                  controller: _tabController,
-                  children: [
-                    const CurriculumTab(),
-                    const Home(),
-                    const AccountTab(),
-                  ],
+                    bottom: PreferredSize(
+                      preferredSize: Size(
+                        MediaQuery.of(context).size.width,
+                        showTopAudio ? 40 : 0,
+                      ),
+                      child: showTopAudio
+                          ? CurrentAudioView(metaData as MediaItem)
+                          : const SizedBox(),
+                    ),
+                    actions: [
+                      currentIndex != 1
+                          ? IconButton(
+                              onPressed: () {
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (_) => NewLessonStructure(),
+                                //   ),
+                                // );
+                              },
+                              icon: Icon(Icons.refresh),
+                            )
+                          : IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => Fav(),
+                                  ),
+                                );
+                              },
+                              icon: Icon(Icons.bookmark_rounded),
+                            ),
+                    ],
+                    leading: Builder(builder: (context) {
+                      return IconButton(
+                        key: _menuKey,
+                        icon: const Icon(Icons.menu_rounded),
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                      );
+                    }),
+                  ),
+                  drawer: const MainDrawer(),
+                  body: TabBarView(
+                    physics: NeverScrollableScrollPhysics(),
+                    controller: _tabController,
+                    children: [
+                      const CurriculumTab(),
+                      const Home(),
+                      const AccountTab(),
+                    ],
+                  ),
                 ),
               ),
             );

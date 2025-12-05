@@ -11,7 +11,7 @@ import 'package:islamic_online_learning/features/curriculum/model/curriculum.dar
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_db_helper.dart';
 import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
-import 'package:islamic_online_learning/features/template/model/discussion.dart';
+import 'package:islamic_online_learning/features/meeting/model/discussion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CurriculumService {

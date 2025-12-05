@@ -51,45 +51,47 @@ class _DownloadedFilesPageState extends ConsumerState<DownloadedFilesPage>
           if (process == ProcessingState.idle) {
             showTopAudio = false;
           }
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("ዳውንሎድ የተደረጉ"),
-              bottom: PreferredSize(
-                preferredSize: Size(
-                  MediaQuery.of(context).size.width,
-                  showTopAudio ? 100 : 60,
-                ),
-                child: Column(
-                  children: [
-                    TabBar(
-                      controller: tabController,
-                      tabs: const [
-                        Tab(
-                          child: Text(
-                            'ፒዲኡፎች',
-                            style: TextStyle(color: primaryColor),
+          return SafeArea(
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text("ዳውንሎድ የተደረጉ"),
+                bottom: PreferredSize(
+                  preferredSize: Size(
+                    MediaQuery.of(context).size.width,
+                    showTopAudio ? 100 : 60,
+                  ),
+                  child: Column(
+                    children: [
+                      TabBar(
+                        controller: tabController,
+                        tabs: const [
+                          Tab(
+                            child: Text(
+                              'ፒዲኡፎች',
+                              style: TextStyle(color: primaryColor),
+                            ),
                           ),
-                        ),
-                        Tab(
-                          child: Text(
-                            'ድምጾች',
-                            style: TextStyle(color: primaryColor),
+                          Tab(
+                            child: Text(
+                              'ድምጾች',
+                              style: TextStyle(color: primaryColor),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    if (showTopAudio) CurrentAudioView(metaData as MediaItem)
-                  ],
+                        ],
+                      ),
+                      if (showTopAudio) CurrentAudioView(metaData as MediaItem)
+                    ],
+                  ),
                 ),
               ),
-            ),
-            body: SafeArea(
-              child: TabBarView(
-                controller: tabController,
-                children: const [
-                  DPdfsPage(),
-                  DAudiosPage(),
-                ],
+              body: SafeArea(
+                child: TabBarView(
+                  controller: tabController,
+                  children: const [
+                    DPdfsPage(),
+                    DAudiosPage(),
+                  ],
+                ),
               ),
             ),
           );

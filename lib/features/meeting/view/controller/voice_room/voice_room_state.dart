@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
-import 'package:islamic_online_learning/features/template/model/discussion.dart';
+import 'package:islamic_online_learning/features/meeting/model/discussion.dart';
 import 'package:livekit_client/livekit_client.dart';
 
 enum VoiceRoomStatus {

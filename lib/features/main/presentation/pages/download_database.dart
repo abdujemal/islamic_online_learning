@@ -113,82 +113,84 @@ class _DownloadDatabaseState extends ConsumerState<DownloadDatabase> {
             cancelToken.cancel();
           }
         },
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text("ዳታዎችን ዳውንሎድ ማድረግያ"),
-          ),
-          body: SafeArea(
-            child: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/bg1.png'),
-                  fit: BoxFit.fill,
-                  opacity: 0.6,
+        child: SafeArea(
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text("ዳታዎችን ዳውንሎድ ማድረግያ"),
+            ),
+            body: SafeArea(
+              child: Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/bg1.png'),
+                    fit: BoxFit.fill,
+                    opacity: 0.6,
+                  ),
                 ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "ሁሉንም ደርሶች መጠቀም እንዲያስችሎ የሁሉም ደርሶች ዳታዎች ማውረድ ይኖርቦታል።",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "ሁሉንም ደርሶች መጠቀም እንዲያስችሎ የሁሉም ደርሶች ዳታዎች ማውረድ ይኖርቦታል።",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    dbSize == null
-                        ? const Text("...")
-                        : Text("የዳታዎቹ መጠን: ${formatFileSize(dbSize!)}"),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    isDownloading
-                        ? Column(
-                            children: [
-                              LinearProgressIndicator(
-                                value: progress / 100,
-                                color: primaryColor,
-                                backgroundColor: primaryColor.withOpacity(0.2),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text("${progress.toStringAsFixed(2)}% "),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  progress = 0;
-                                  setState(() {});
-                                  cancelToken.cancel();
-                                },
-                                child: const Text(
-                                  "አቁም",
-                                  style: TextStyle(
-                                    fontSize: 17,
-                                    color: Colors.red,
-                                  ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      dbSize == null
+                          ? const Text("...")
+                          : Text("የዳታዎቹ መጠን: ${formatFileSize(dbSize!)}"),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      isDownloading
+                          ? Column(
+                              children: [
+                                LinearProgressIndicator(
+                                  value: progress / 100,
+                                  color: primaryColor,
+                                  backgroundColor: primaryColor.withOpacity(0.2),
                                 ),
-                              )
-                            ],
-                          )
-                        : MainBtn(
-                            icon: Icons.download,
-                            title: "ዳውንሎድ",
-                            onTap: () async {
-                              cancelToken = CancelToken();
-                              await downloadDb();
-                            },
-                          )
-                  ],
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text("${progress.toStringAsFixed(2)}% "),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    progress = 0;
+                                    setState(() {});
+                                    cancelToken.cancel();
+                                  },
+                                  child: const Text(
+                                    "አቁም",
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
+                          : MainBtn(
+                              icon: Icons.download,
+                              title: "ዳውንሎድ",
+                              onTap: () async {
+                                cancelToken = CancelToken();
+                                await downloadDb();
+                              },
+                            )
+                    ],
+                  ),
                 ),
               ),
             ),
