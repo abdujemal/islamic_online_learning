@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
@@ -31,6 +32,14 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await Schedule().init();
+
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+SystemChrome.setSystemUIOverlayStyle(
+  SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark, // or Brightness.light
+  ),
+);
 
   runApp(
     const ProviderScope(
@@ -145,9 +154,9 @@ class _MainState extends ConsumerState<Main> {
               future: checkDb(),
               builder: (context, snap) {
                 if (snap.data == null) {
-                  return SafeArea(
-                    child: Scaffold(
-                      body: Center(
+                  return Scaffold(
+                    body: SafeArea(
+                      child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

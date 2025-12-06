@@ -57,7 +57,8 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
     ref.read(loadAudiosProvider.notifier).update((state) => 0);
     for (String id in audios) {
       i++;
-      if (await checkFile(i)) {
+      if (await checkFile(
+          i, int.parse(courseModel.audioSizes.split(",")[i - 1]))) {
         String fileName = "${courseModel.ustaz},${courseModel.title} $i.mp3";
 
         if (mounted) {
@@ -102,15 +103,18 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
     return "${dir.path}/$folderName/$fileName";
   }
 
-  Future<bool> checkFile(int index) async {
+  Future<bool> checkFile(int index, int size) async {
     if (mounted) {
       final isDownloaded =
           await ref.read(cdNotifierProvider.notifier).isDownloaded(
                 "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
                 "Audio",
-                widget.courseModel.courseIds[index],
+                // widget.courseModel.courseIds[index-1],
                 context,
+                size,
               );
+      print(
+          "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3 => $isDownloaded");
       return isDownloaded;
     }
     return false;
@@ -237,10 +241,10 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                                 ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
                                                 : "${courseModel.title}.pdf",
                                             "PDF",
-                                            courseModel.pdfId.contains(",")
-                                                ? courseModel.pdfId.split(",")[
-                                                    courseModel.pdfNum.toInt()]
-                                                : courseModel.pdfId,
+                                            // courseModel.pdfId.contains(",")
+                                            //     ? courseModel.pdfId.split(",")[
+                                            //         courseModel.pdfNum.toInt()]
+                                            //     : courseModel.pdfId,
                                             context,
                                           );
                                       print("isPDFDownloded:- $isPDFDownloded");

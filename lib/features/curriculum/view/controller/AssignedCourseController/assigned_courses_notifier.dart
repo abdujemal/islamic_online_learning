@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 // import 'package:islamic_online_learning/core/constants.dart';
@@ -8,6 +9,7 @@ import 'package:islamic_online_learning/features/auth/view/controller/auth_state
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_service.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_state.dart';
+import 'package:islamic_online_learning/utils.dart';
 
 class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
   final CurriculumService service;
@@ -129,6 +131,76 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     return lessonStructure;
   }
 
+  List<dynamic> getLessonStructureWRest(DateTime courseStartDay,
+      int noOfLessons, int lessonPerDay, List<Rest> rests) {
+    DateTime startDay = courseStartDay;
+    List<dynamic> mainLessonStructure = [];
+    // console.log("Started...");
+    for (Rest rest in rests) {
+      if (rest.date
+              .compareTo(addDaysIgnoringWeekend(courseStartDay, noOfLessons)) ==
+          1) {
+        print("rest: ${rest.id} is jumped");
+        continue;
+      }
+      final lessonLen = businessDaysBetween(rest.date, startDay);
+      print("rest: ${rest.id} lessonLen: $lessonLen is jumped");
+
+      //differenceInBusinessDays(rest.date, startDay) - differenceInWeeks(rest.date, startDay)
+
+      // console.log("lessonLen:",lessonLen, "after date:", rest.date, "before date:", startDay)
+      final lessonStructure =
+          getLessonStructure(lessonPerDay, startDay, lessonLen);
+      mainLessonStructure = [...mainLessonStructure, ...lessonStructure];
+      List<int> cleanMainStructure = mainLessonStructure
+          .where((e) => e.runtimeType == int)
+          .map((e) => e as int)
+          .toList();
+      final restIndex = cleanMainStructure.reduce((pv, cv) => pv + cv) - 1;
+      mainLessonStructure.add(rest.copyWith(afterLesson: restIndex));
+      startDay = addDaysIgnoringWeekend(rest.date, rest.amount);
+      print("mainLessonStructure: $mainLessonStructure");
+
+      // if(getDay(startDay) == 5){
+      //   startDay = addBusinessDays(startDay, 1);
+      // }
+      // console.log("week day of", rest.id, ": ", getDay(startDay))
+    }
+    List<int> cleanStructure = mainLessonStructure
+        .where((e) => e.runtimeType == int)
+        .map((e) => e as int)
+        .toList();
+
+    // f cleanStructure:number[] = mainLessonStructure.filter((e)=>typeof e == 'number')
+    // console.log({mainLessonStructure})
+    // print("cleanStructure: $cleanStructure, mainLessonStructure: $mainLessonStructure");
+    if (cleanStructure.isEmpty ||
+        noOfLessons > cleanStructure.reduce((pv, cv) => pv + cv)) {
+      final l = noOfLessons -
+          (cleanStructure.isEmpty
+              ? 0
+              : cleanStructure.reduce((pv, cv) => pv + cv));
+      final lastStructure = getLessonStructure(lessonPerDay, startDay, l);
+      mainLessonStructure = [...mainLessonStructure, ...lastStructure];
+    }
+
+    List<int> cleanMainStructure = mainLessonStructure
+        .where((e) => e.runtimeType == int)
+        .map((e) => e as int)
+        .toList();
+    List<Rest> cleanRestStructure = mainLessonStructure
+        .where((e) => e.runtimeType == Rest)
+        .map((e) => e as Rest)
+        .toList();
+
+    // const cleanMainStructure:number[] = mainLessonStructure.filter((e)=>typeof e == 'number')
+    // const cleanRestStructure:number[] = mainLessonStructure.filter((e)=>typeof e != 'number')
+
+    print({"mainLessonStructure": mainLessonStructure});
+    print("mainLessonStructure: ${[cleanMainStructure, cleanRestStructure]}");
+    return [cleanMainStructure, cleanRestStructure];
+  }
+
   bool hasDiscussion(List<int> lessonStructure, int noOfLesson, int index) {
     int totalL = 0;
     for (int l in lessonStructure) {
@@ -188,8 +260,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     }
 
     return DiscussionData(
-      title:
-          "ከ${lessons[initialIndex].title} እስክ ${lessons[index].title}",
+      title: "ከ${lessons[initialIndex].title} እስክ ${lessons[index].title}",
       lessonFrom: initialIndex,
       lessonTo: index,
       discussionIndex: index,
@@ -331,7 +402,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     int upToD = 0;
     int i = 0;
     while (true) {
-      if (upToD < lessonIndex+1 ) {
+      if (upToD < lessonIndex + 1) {
         upToD = upToD + lessonStructure[i];
       } else {
         break;
@@ -658,6 +729,37 @@ class ExamData {
     required this.lessonTo,
     required this.discussionIndex,
   });
+}
+
+class Rest {
+  final int id;
+  final DateTime date;
+  final int amount;
+  final String reason;
+  final int? afterLesson;
+  Rest({
+    required this.id,
+    required this.date,
+    required this.amount,
+    required this.reason,
+    this.afterLesson,
+  });
+
+  Rest copyWith({
+    int? id,
+    DateTime? date,
+    int? amount,
+    String? reason,
+    int? afterLesson,
+  }) {
+    return Rest(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      amount: amount ?? this.amount,
+      reason: reason ?? this.reason,
+      afterLesson: afterLesson ?? this.afterLesson,
+    );
+  }
 }
 
 enum LessonCardStatus { NONE, LESSON, DISCUSSION, EXAM }

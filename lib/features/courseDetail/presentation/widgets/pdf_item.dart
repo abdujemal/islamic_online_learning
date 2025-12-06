@@ -38,9 +38,12 @@ class _PdfItemState extends ConsumerState<PdfItem> {
 
   Future<bool> checkFile() async {
     if (mounted) {
-      return await ref
-          .read(cdNotifierProvider.notifier)
-          .isDownloaded("${widget.title}.pdf", "PDF", widget.fileId, context);
+      return await ref.read(cdNotifierProvider.notifier).isDownloaded(
+            "${widget.title}.pdf",
+            "PDF",
+            // widget.fileId,
+            context,
+          );
     } else {
       return false;
     }

@@ -115,7 +115,7 @@ class _PdfDrawerState extends ConsumerState<PdfDrawer> {
           await ref.read(cdNotifierProvider.notifier).isDownloaded(
                 "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
                 "Audio",
-                widget.audios[index],
+                // widget.audios[index],
                 context,
               );
       return isDownloaded;

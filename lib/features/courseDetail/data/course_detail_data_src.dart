@@ -18,7 +18,7 @@ abstract class CourseDetailDataSrc {
     Ref ref,
   );
   Future<bool> checkIfTheFileIsDownloaded(
-      String fileName, String folderName, String url, int fileSize);
+      String fileName, String folderName, int fileSize);
   Future<String> loadFileOnline(String fileId, bool isAudio);
   Future<String> createDynamicLink(CourseModel courseModel);
   Future<bool> deleteFile(String fileName, String folderName);
@@ -29,7 +29,7 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
   ICourseDatailDataSrc(this.dio);
   @override
   Future<bool> checkIfTheFileIsDownloaded(
-      String fileName, String folderName, String url, int fileSize) async {
+      String fileName, String folderName, int fileSize) async {
     Directory dir = await getApplicationSupportDirectory();
 
     final filePath = "${dir.path}/$folderName/$fileName";

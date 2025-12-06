@@ -86,18 +86,18 @@ class _AddConfusionPageState extends ConsumerState<AddConfusionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF5F6FA),
-        appBar: AppBar(
-          title: Text(
-            "Confusion on ${widget.lesson.title}",
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          elevation: 0,
-          backgroundColor: primaryColor.shade600,
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F6FA),
+      appBar: AppBar(
+        title: Text(
+          "Confusion on ${widget.lesson.title}",
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        body: Padding(
+        elevation: 0,
+        backgroundColor: primaryColor.shade600,
+      ),
+      body: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

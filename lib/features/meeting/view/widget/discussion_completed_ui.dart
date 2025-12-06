@@ -18,11 +18,11 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor:
-            isDark ? const Color(0xFF0F2027) : const Color(0xFFF8F9FA),
-        body: SafeArea(
+    return Scaffold(
+      backgroundColor:
+          isDark ? const Color(0xFF0F2027) : const Color(0xFFF8F9FA),
+      body: SafeArea(
+        child: SafeArea(
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -54,9 +54,9 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     size: 90,
                   ),
                 ),
-      
+            
                 const SizedBox(height: 35),
-      
+            
                 // Title
                 Text(
                   "ውይይቱ ተጠናቀቀ",
@@ -66,9 +66,9 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     color: isDark ? Colors.white : Colors.grey.shade900,
                   ),
                 ),
-      
+            
                 const SizedBox(height: 16),
-      
+            
                 // Quote
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -87,18 +87,18 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     ),
                   ),
                 ),
-      
+            
                 const SizedBox(height: 25),
-      
+            
                 // Divider
                 Container(
                   width: 130,
                   height: 2,
                   color: isDark ? Colors.white12 : Colors.grey.shade300,
                 ),
-      
+            
                 const SizedBox(height: 25),
-      
+            
                 // Message
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -115,7 +115,7 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     ),
                   ),
                 ),
-      
+            
                 const SizedBox(height: 25),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -131,9 +131,9 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     ),
                   ),
                 ),
-      
+            
                 const SizedBox(height: 15),
-      
+            
                 // Button
                 Consumer(builder: (context, ref, _) {
                   final isSubmitting = ref.watch(isSubmittingProvider);
@@ -174,7 +174,7 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     ),
                   );
                 }),
-      
+            
                 const SizedBox(height: 60),
               ],
             ),

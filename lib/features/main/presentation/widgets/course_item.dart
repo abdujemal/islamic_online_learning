@@ -125,7 +125,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
           await ref.read(cdNotifierProvider.notifier).isDownloaded(
                 "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
                 "Audio",
-                widget.courseModel.courseIds[index],
+                // widget.courseModel.courseIds[index],
                 context,
               );
       return isDownloaded;
@@ -339,11 +339,11 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                                   : "${courseModel.title}.pdf",
                                                                   
                                                               "PDF",
-                                                              courseModel.pdfId
-                                                                      .contains(
-                                                                          ",")
-                                                                  ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
-                                                                  : "${courseModel.title}.pdf",
+                                                              // courseModel.pdfId
+                                                              //         .contains(
+                                                              //             ",")
+                                                              //     ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
+                                                              //     : "${courseModel.title}.pdf",
                                                               context,
                                                             );
                                                     print(

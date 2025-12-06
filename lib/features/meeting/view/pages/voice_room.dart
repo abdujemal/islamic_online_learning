@@ -327,9 +327,9 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
 
         // return Future.value(true);
       },
-      child: SafeArea(
-        child: Scaffold(
-          body: Column(
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
             children: [
               _buildTopBar(voiceRoomState),
               _buildProgressBar(voiceRoomState),

@@ -18,10 +18,10 @@ class ICourseDetailRepo extends CourseDetailRepo {
 
   @override
   FutureEither<bool> checkIfTheFileIsDownloaded(
-      String fileName, String folderName, String url, int fileSize) async {
+      String fileName, String folderName, int fileSize) async {
     try {
       final res = await courseDetailDataSrc.checkIfTheFileIsDownloaded(
-          fileName, folderName, url, fileSize);
+          fileName, folderName, fileSize);
       return right(res);
     } catch (e) {
       return left(Failure(messege: e.toString()));

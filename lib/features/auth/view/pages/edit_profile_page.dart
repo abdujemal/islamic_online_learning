@@ -40,20 +40,20 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Edit Profile"),
-          centerTitle: true,
-          elevation: 0,
-        ),
-        body: SingleChildScrollView(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Edit Profile"),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 30),
-      
+            
               TextFormField(
                 controller: _nameController,
                 // focusNode: _nameFocusNode,
@@ -64,9 +64,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 validator: (value) =>
                     value == null || value.isEmpty ? "ስምዎን ያስገቡ" : null,
               ),
-      
+            
               const SizedBox(height: 15),
-      
+            
               TextFormField(
                 controller: _emailController,
                 // focusNode: _nameFocusNode,
@@ -78,9 +78,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 validator: (value) =>
                     value == null || value.isEmpty ? "ኢሜል ያስገቡ" : null,
               ),
-      
+            
               const SizedBox(height: 15),
-      
+            
               TextFormField(
                 controller: _ageController,
                 // focusNode: _ageFocusNode,
@@ -100,11 +100,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   return null;
                 },
               ),
-      
+            
               const SizedBox(height: 15),
-      
+            
               const SizedBox(height: 30),
-      
+            
               // 💾 Save Button
               SizedBox(
                 width: double.infinity,

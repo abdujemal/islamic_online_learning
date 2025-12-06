@@ -71,12 +71,12 @@ class _QuestionPageState extends ConsumerState<QuestionPage> {
           }
         }
       },
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text("ፈተና"),
-          ),
-          body: ref.watch(questionsNotifierProvider).map(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("ፈተና"),
+        ),
+        body: SafeArea(
+          child: ref.watch(questionsNotifierProvider).map(
                 loading: (_) => ListView.builder(
                   itemCount: 1,
                   itemBuilder: (context, index) => QuestionItemShimmer(),
@@ -109,7 +109,7 @@ class _QuestionPageState extends ConsumerState<QuestionPage> {
                       canPop = true;
                     });
                     Navigator.pop(context);
-        
+                
                     // List<String> quizAnswers = [];
                     // for (var ans in answers) {
                     //   quizAnswers.add("${ans.key}:${ans.value.join("")}");

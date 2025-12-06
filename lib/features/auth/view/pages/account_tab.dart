@@ -30,14 +30,14 @@ class _AccountTabState extends ConsumerState<AccountTab> {
 
     final currentUser = authState.user!;
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        body: ListView(
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             const SizedBox(height: 20),
-      
+            
             // ⭐ Profile Header
             Center(
               child: Column(
@@ -72,9 +72,9 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 ],
               ),
             ),
-      
+            
             const SizedBox(height: 32),
-      
+            
             // ⭐ Section Title
             Text(
               "Account Settings",
@@ -83,7 +83,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
               ),
             ),
             const SizedBox(height: 16),
-      
+            
             // ⭐ Settings Cards
             _buildSettingItem(
               icon: Icons.account_circle,
@@ -124,9 +124,9 @@ class _AccountTabState extends ConsumerState<AccountTab> {
               title: "Privacy & Security",
               onTap: () {},
             ),
-      
+            
             const SizedBox(height: 30),
-      
+            
             // ⭐ Support Section
             Text(
               "Support",
@@ -135,7 +135,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
               ),
             ),
             const SizedBox(height: 16),
-      
+            
             _buildSettingItem(
               icon: Icons.question_mark,
               title: "Help Center",
@@ -153,9 +153,9 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 );
               },
             ),
-      
+            
             const SizedBox(height: 40),
-      
+            
             // ⭐ Logout button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -178,7 +178,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 ),
               ),
             ),
-      
+            
             const SizedBox(height: 60),
           ],
         ),

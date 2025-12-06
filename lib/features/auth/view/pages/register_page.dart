@@ -46,10 +46,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(registerNotifierProvider);
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(title: const Text("ምዝገባ")),
-        body: Padding(
+    return Scaffold(
+      appBar: AppBar(title: const Text("ምዝገባ")),
+      body: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
@@ -108,7 +108,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           validator: (value) => value == null ? "ፆታ ይምረጡ" : null,
                         ),
                         const SizedBox(height: 16),
-      
+            
                         // Previous Learnings (Tags)
                         const Text(
                           "ከዚህ በፊት የቀሩት ኪታቦች",
@@ -175,7 +175,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           ],
                         ),
                         const SizedBox(height: 24),
-      
+            
                         // Submit
                         ElevatedButton(
                           onPressed: () async {

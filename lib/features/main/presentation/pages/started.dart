@@ -47,12 +47,12 @@ class _StartedState extends ConsumerState<Started>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("የተጀመሩ ደርሶች"),
-        ),
-        body: Padding(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("የተጀመሩ ደርሶች"),
+      ),
+      body: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: ref.watch(startedNotifierProvider).map(
                 // initial: (_) => const SizedBox(),

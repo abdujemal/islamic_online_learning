@@ -34,14 +34,14 @@ class _VerifyOtpPageState extends ConsumerState<VerifyOtpPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(signInNotifierProvider);
     
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          title: const Text("ኮዱን ያረጋግጡ", ),
-          
-        ),
-        body: Padding(
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        title: const Text("ኮዱን ያረጋግጡ", ),
+        
+      ),
+      body: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

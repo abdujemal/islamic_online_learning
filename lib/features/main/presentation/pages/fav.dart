@@ -33,12 +33,12 @@ class _FavState extends ConsumerState<Fav>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("የተመረጡ"),
-        ),
-        body: Center(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("የተመረጡ"),
+      ),
+      body: SafeArea(
+        child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Builder(

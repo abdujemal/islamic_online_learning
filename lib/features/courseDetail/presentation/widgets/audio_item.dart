@@ -80,7 +80,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
           await ref.read(cdNotifierProvider.notifier).isDownloaded(
                 "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3",
                 "Audio",
-                widget.audioId,
+                // widget.audioId,
                 context,
                 int.parse(
                   widget.courseModel.audioSizes.split(",")[widget.index - 1],

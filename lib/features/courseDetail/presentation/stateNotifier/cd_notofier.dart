@@ -82,13 +82,12 @@ class CDNotifier extends StateNotifier<bool> {
     return url;
   }
 
-  Future<bool> isDownloaded(String fileName, String folderName, String url,
+  Future<bool> isDownloaded(String fileName, String folderName, 
       BuildContext context, [int fileSize = 0]) async {
     bool isAvailable = false;
     final res = await courseDetailRepo.checkIfTheFileIsDownloaded(
       fileName,
       folderName,
-      url,
       fileSize,
     );
 

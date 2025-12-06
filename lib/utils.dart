@@ -22,6 +22,67 @@ import 'package:flutter/material.dart';
 //   }
 // }
 
+DateTime subtractBusinessDays(DateTime date, int daysToSubtract) {
+  DateTime result = date;
+  int count = 0;
+
+  while (count < daysToSubtract) {
+    result = result.subtract(const Duration(days: 1));
+
+    if (result.weekday != DateTime.friday &&
+        result.weekday != DateTime.saturday &&
+        result.weekday != DateTime.sunday) {
+      count++;
+    }
+  }
+
+  return result;
+}
+
+DateTime addDaysIgnoringWeekend(DateTime date, int daysToAdd) {
+  DateTime result = date;
+  int count = 0;
+
+  while (count < daysToAdd) {
+    result = result.add(const Duration(days: 1));
+
+    if (result.weekday != DateTime.friday &&
+        result.weekday != DateTime.saturday &&
+        result.weekday != DateTime.sunday) {
+      count++;
+    }
+  }
+
+  return result;
+}
+
+int businessDaysBetween(DateTime start, DateTime end) {
+  int count = 0;
+
+  // Ensure start <= end
+  if (start.isAfter(end)) {
+    final temp = start;
+    start = end;
+    end = temp;
+    // return null;
+  }
+
+  DateTime current = start;
+
+  while (current.isBefore(end)) {
+    // Weekday: Monday = 1, Sunday = 7
+    if (current.weekday != DateTime.friday &&
+        current.weekday != DateTime.saturday &&
+        current.weekday != DateTime.sunday) {
+      count++;
+    }
+
+    current = current.add(const Duration(days: 1));
+  }
+
+  return count;
+}
+
 Color userIdToColor(String id) {
   int hash = 0;
   for (int i = 0; i < id.length; i++) {

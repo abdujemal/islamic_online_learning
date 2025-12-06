@@ -11,11 +11,9 @@ class GroupChatPage extends ConsumerStatefulWidget {
 class _GroupChatPageState extends ConsumerState<GroupChatPage> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Group Chat"),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Group Chat"),
       ),
     );
   }

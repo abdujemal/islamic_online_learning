@@ -59,95 +59,93 @@ class _ContentsState extends ConsumerState<Contents> {
         if (processState == ProcessingState.idle) {
           showTopAudio = false;
         }
-        return SafeArea(
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text("ማውጫ"),
-              bottom: PreferredSize(
-                preferredSize: Size(
-                  MediaQuery.of(context).size.width,
-                  showTopAudio ? 40 : 0,
-                ),
-                child: showTopAudio
-                    ? CurrentAudioView(metaData as MediaItem)
-                    : const SizedBox(),
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("ማውጫ"),
+            bottom: PreferredSize(
+              preferredSize: Size(
+                MediaQuery.of(context).size.width,
+                showTopAudio ? 40 : 0,
               ),
+              child: showTopAudio
+                  ? CurrentAudioView(metaData as MediaItem)
+                  : const SizedBox(),
             ),
-            body: SafeArea(
-              child: isLoading
-                  ? ListView.builder(
-                      itemCount: 5,
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) => Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Shimmer.fromColors(
-                          baseColor: Theme.of(context)
-                              .chipTheme
-                              .backgroundColor!
-                              .withAlpha(150),
-                          highlightColor:
-                              Theme.of(context).chipTheme.backgroundColor!,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 15.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Theme.of(context)
-                                        .chipTheme
-                                        .backgroundColor!,
-                                  ),
+          ),
+          body: SafeArea(
+            child: isLoading
+                ? ListView.builder(
+                    itemCount: 5,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Shimmer.fromColors(
+                        baseColor: Theme.of(context)
+                            .chipTheme
+                            .backgroundColor!
+                            .withAlpha(150),
+                        highlightColor:
+                            Theme.of(context).chipTheme.backgroundColor!,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Theme.of(context)
+                                      .chipTheme
+                                      .backgroundColor!,
                                 ),
                               ),
-                              child: ListTile(
-                                leading: Container(
-                                  height: 30,
-                                  width: 30,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor,
-                                    shape: BoxShape.circle,
-                                  ),
+                            ),
+                            child: ListTile(
+                              leading: Container(
+                                height: 30,
+                                width: 30,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  shape: BoxShape.circle,
                                 ),
-                                title: Container(
-                                  height: 10,
-                                  width: 150,
-                                  margin: const EdgeInsets.only(right: 30),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor,
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
+                              ),
+                              title: Container(
+                                height: 10,
+                                width: 150,
+                                margin: const EdgeInsets.only(right: 30),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    )
-                  : ListView.builder(
-                      itemCount: contents.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          dense: true,
-                          leading: Text("${index + 1}"),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (c) => FilteredCourses(
-                                  "title",
-                                  contents[index],
-                                ),
-                              ),
-                            );
-                          },
-                          trailing: const Icon(Icons.arrow_outward),
-                          title: Text(
-                            contents[index],
-                          ),
-                        );
-                      },
                     ),
-            ),
+                  )
+                : ListView.builder(
+                    itemCount: contents.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        dense: true,
+                        leading: Text("${index + 1}"),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (c) => FilteredCourses(
+                                "title",
+                                contents[index],
+                              ),
+                            ),
+                          );
+                        },
+                        trailing: const Icon(Icons.arrow_outward),
+                        title: Text(
+                          contents[index],
+                        ),
+                      );
+                    },
+                  ),
           ),
         );
       },

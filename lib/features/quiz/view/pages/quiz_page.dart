@@ -33,12 +33,12 @@ class _QuizPageState extends ConsumerState<QuizPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("ጥያቄዎች"),
-        ),
-        body: ref.watch(quizNotifierProvider).map(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("ጥያቄዎች"),
+      ),
+      body: SafeArea(
+        child: ref.watch(quizNotifierProvider).map(
               loading: (_) => ListView.builder(
                 itemCount: 1,
                 itemBuilder: (context, index) => QuestionItemShimmer(),

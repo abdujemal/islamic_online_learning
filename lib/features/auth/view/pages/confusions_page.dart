@@ -63,14 +63,15 @@ class _ConfusionsPageState extends ConsumerState<ConfusionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Confusion Message"),
-          centerTitle: true,
-          elevation: 0,
-        ),
-        body: ref.watch(confusionsNotifierProvider).map(
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Text("Confusion Message"),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: ref.watch(confusionsNotifierProvider).map(
               loading: (_) => Center(
                 child: CircularProgressIndicator(),
               ),

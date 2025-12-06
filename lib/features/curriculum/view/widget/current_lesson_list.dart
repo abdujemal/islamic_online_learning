@@ -8,6 +8,7 @@ import 'package:islamic_online_learning/features/curriculum/view/controller/prov
 import 'package:islamic_online_learning/features/curriculum/view/widget/discussion_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/exam_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/lesson_card.dart';
+import 'package:islamic_online_learning/features/curriculum/view/widget/rest_card.dart';
 
 class CurrentLessonList2 extends ConsumerStatefulWidget {
   final AssignedCourse assignedCourse;
@@ -27,12 +28,25 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
     LessonCardStatus status = LessonCardStatus.NONE;
     final state = ref.watch(assignedCoursesNotifierProvider);
     final authState = ref.watch(authNotifierProvider);
-    List<int> lessonStructure =
-        ref.read(assignedCoursesNotifierProvider.notifier).getLessonStructure(
-              authState.user!.group.noOfLessonsPerDay,
-              authState.user!.group.courseStartDate!,
-              state.curriculum!.lessons!.length,
-            );
+    List<dynamic> lessonStructureWRest = ref
+        .read(assignedCoursesNotifierProvider.notifier)
+        .getLessonStructureWRest(
+      authState.user!.group.courseStartDate!,
+      state.curriculum!.lessons!.length,
+      authState.user!.group.noOfLessonsPerDay,
+      [
+        Rest(
+          id: 0,
+          reason: "ረመዳን",
+          date: authState.user!.group.courseStartDate!.add(
+            Duration(days: 21),
+          ),
+          amount: 30,
+        )
+      ],
+    );
+    List<Rest> rests = lessonStructureWRest[1] as List<Rest>;
+    List<int> lessonStructure = lessonStructureWRest[0] as List<int>;
     final currentLessonNum = authState.courseRelatedData?.lessonNum ?? 0;
     final currentLessonIndexes = List.generate(
       authState.user!.group.noOfLessonsPerDay,
@@ -44,21 +58,21 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(children: [
-        if(notOpenedYet)
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            vertical: 15,
+        if (notOpenedYet)
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              vertical: 15,
+            ),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.amber),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              "ሰኞ ቂራት ይጀመራል። ኢንሻአላህ!",
+              textAlign: TextAlign.center,
+            ),
           ),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.amber),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            "ሰኞ ቂራት ይጀመራል። ኢንሻአላህ!",
-            textAlign: TextAlign.center,
-          ),
-        ),
         ...List.generate(
           state.curriculum!.lessons!.length,
           (index) {
@@ -68,14 +82,7 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
             bool isPastLesson = lesson.order < currentLessonNum;
             bool isLocked = (lesson.order > currentLessonIndexes.last);
 
-            // if (isCurrentLesson && isTodayDiscussion) {
-            //   isCurrentLesson = false;
-            //   isPastLesson = true;
-            // }
-            // if (!isTodayLesson && isCurrentLesson) {
-            //   isCurrentLesson = false;
-            //   isPastLesson = true;
-            // }
+            final rest = rests.where((e) => e.afterLesson == index).firstOrNull;
 
             final hasExam =
                 ref.read(assignedCoursesNotifierProvider.notifier).hasExam(
@@ -192,7 +199,13 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
                       isPastLesson, //&& status != LessonCardStatus.LESSON,
                   isLocked: isLocked, // && status != LessonCardStatus.LESSON,
                 ),
-                if (hasDiscussion)
+                if (rest != null)
+                  RestCard(
+                    rest: rest,
+                    isLocked: isLocked,
+                  ),
+                // Text("Rest date:${rest.date} for: ${rest.amount}"),
+                if (hasDiscussion && rest == null)
                   DiscussionCard(
                     discussionData: discussionData!,
                     afterLesson: index,
@@ -201,7 +214,7 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
                     isCurrent: isCurrentLesson &&
                         status == LessonCardStatus.DISCUSSION,
                   ),
-                if (hasExam)
+                if (hasExam && rest == null)
                   ExamCard(
                     examData: examData!,
                     afterLesson: index,
