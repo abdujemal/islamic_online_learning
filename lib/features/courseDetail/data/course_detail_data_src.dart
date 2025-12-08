@@ -14,6 +14,7 @@ abstract class CourseDetailDataSrc {
     String fileId,
     String fileName,
     String folderName,
+    int fileSize,
     CancelToken cancelToken,
     Ref ref,
   );
@@ -45,6 +46,7 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
     String fileId,
     String fileName,
     String folderName,
+    int fileSize,
     CancelToken cancelToken,
     Ref ref,
   ) async {
@@ -60,6 +62,13 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
 
     final filePath = "${dir.path}/$folderName/$fileName";
     final file = File(filePath);
+
+    final fileDownloaded =
+        await checkIfTheFileIsDownloaded(fileName, folderName, fileSize);
+    
+    if(fileDownloaded){
+      return file;
+    }
 
     // int downloadedBytes = 0;
 
@@ -85,8 +94,8 @@ class ICourseDatailDataSrc extends CourseDetailDataSrc {
       savePath: filePath,
       cancelToken: cancelToken,
       onProgress: (received, totalBytes) {
-        double progress = (received / totalBytes) * 100;        
-        ref.read(downloadProgressProvider.notifier).update((state) {        
+        double progress = (received / totalBytes) * 100;
+        ref.read(downloadProgressProvider.notifier).update((state) {
           return state
               .map(
                 (e) => e.filePath == filePath

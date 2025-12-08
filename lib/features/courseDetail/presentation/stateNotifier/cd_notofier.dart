@@ -20,10 +20,11 @@ class CDNotifier extends StateNotifier<bool> {
     String folderName,
     CancelToken cancelToken,
     BuildContext context,
+    {int fileSize = 0}
   ) async {
     toast("ትንሽ ይጠብቁን...", ToastType.normal, context);
     final res = await courseDetailRepo.downloadFile(
-        fileId, fileName, folderName, cancelToken, ref);
+        fileId, fileName, folderName, fileSize, cancelToken, ref);
 
     File? file;
 

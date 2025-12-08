@@ -6,6 +6,7 @@ import 'package:islamic_online_learning/features/auth/view/controller/provider.d
 import 'package:islamic_online_learning/features/auth/view/pages/confusions_page.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/edit_profile_page.dart';
 import 'package:islamic_online_learning/features/auth/view/widget/hijri_streak_calender_dialog.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/aboutus.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/utils.dart';
@@ -37,7 +38,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
           padding: const EdgeInsets.all(20),
           children: [
             const SizedBox(height: 20),
-            
+
             // ⭐ Profile Header
             Center(
               child: Column(
@@ -72,9 +73,9 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // ⭐ Section Title
             Text(
               "Account Settings",
@@ -83,7 +84,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // ⭐ Settings Cards
             _buildSettingItem(
               icon: Icons.account_circle,
@@ -124,9 +125,9 @@ class _AccountTabState extends ConsumerState<AccountTab> {
               title: "Privacy & Security",
               onTap: () {},
             ),
-            
+
             const SizedBox(height: 30),
-            
+
             // ⭐ Support Section
             Text(
               "Support",
@@ -135,7 +136,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             _buildSettingItem(
               icon: Icons.question_mark,
               title: "Help Center",
@@ -153,9 +154,9 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 );
               },
             ),
-            
+
             const SizedBox(height: 40),
-            
+
             // ⭐ Logout button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -178,7 +179,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 60),
           ],
         ),
@@ -252,10 +253,12 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 Spacer(),
                 IconButton(
                   onPressed: () {
-                    //TODO: streak dialog will appear
+                    final rests =
+                        ref.read(assignedCoursesNotifierProvider).rests;
                     showDialog(
                       context: context,
                       builder: (_) => HijriStreakCalenderDialog(
+                        rests: rests,
                         discussionWDay:
                             getWeekDayFromText(currentUser.group.discussionDay),
                       ),

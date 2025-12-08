@@ -59,7 +59,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
   }
 
   Future<String?> getPdfPath(
-      WidgetRef ref, CourseModel course, String title, int volume) async {
+      WidgetRef ref, CourseModel course, String title, int volume, int fileSize) async {
     final cdNotifier = ref.read(cdNotifierProvider.notifier);
     String? pdfUrl;
 
@@ -73,6 +73,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
             : "${course.title}.pdf",
         "PDF",
         cancelToken,
+        fileSize: fileSize,
         ref.context,
       );
       if (file != null && i - 1 == volume) {
@@ -94,7 +95,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
     print("mmmmmmm courseModel: $courseModel");
     if (courseModel == null) return;
     String? pdfUrl =
-        await getPdfPath(ref, courseModel, course.title, lesson.volume);
+        await getPdfPath(ref, courseModel, course.title, lesson.volume, course.course!.pdfSize[lesson.volume]);
     state = state.copyWith(
       isDownloading: false,
       pdfPath: pdfUrl,

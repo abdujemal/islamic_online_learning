@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:hijri_calendar/hijri_calendar.dart' as h;
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 
 class HijriStreakCalenderDialog extends ConsumerStatefulWidget {
   final int discussionWDay;
-  const HijriStreakCalenderDialog({
-    super.key,
-    required this.discussionWDay,
-  });
+  final List<Rest> rests;
+  const HijriStreakCalenderDialog(
+      {super.key, required this.discussionWDay, required this.rests});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -211,8 +211,24 @@ class _HijriStreakCalenderDialogState
                             _isSameHijriDay(currentDayHijri, todayHijri);
                         final isStreak = hijriStreaks.contains(day);
 
+                        final isDayHasRest = widget.rests.any((r) {
+                          int i = 0;
+                          while (i <= r.numOfDays) {
+                            final restHijri = HijriCalendar.fromDate(
+                                r.startDate.add(Duration(days: i)));
+                            if (_isSameHijriDay(restHijri, currentDayHijri)) {
+                              return true;
+                            }
+                            i++;
+                          }
+                          final restHijri = HijriCalendar.fromDate(r.startDate);
+                          return _isSameHijriDay(restHijri, currentDayHijri);
+                        });
+
                         final isRest = currentDayHijri.weekDay() >= 5 &&
-                            currentDayHijri.weekDay() != widget.discussionWDay;
+                                currentDayHijri.weekDay() !=
+                                    widget.discussionWDay ||
+                            isDayHasRest;
 
                         return _buildDayTile(day, isToday, isStreak,
                             isRest: isRest);
@@ -271,8 +287,8 @@ class _HijriStreakCalenderDialogState
                   ? Icon(
                       Icons.coffee,
                       color: Theme.of(context) == ThemeData.dark()
-                          ? Colors.black26
-                          : Colors.white24,
+                          ? Colors.white24
+                          : Colors.black26,
                       // color: Colors.orange,
                     )
                   : Text(

@@ -30,12 +30,13 @@ class ICourseDetailRepo extends CourseDetailRepo {
 
   @override
   FutureEither<File> downloadFile(String fileId, String fileName,
-      String folderName, CancelToken cancelToken, Ref ref) async {
+      String folderName, int fileSize, CancelToken cancelToken, Ref ref) async {
     try {
       final res = await courseDetailDataSrc.downloadFile(
         fileId,
         fileName,
         folderName,
+        fileSize,
         cancelToken,
         ref,
       );
