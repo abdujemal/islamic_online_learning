@@ -7,6 +7,7 @@ import 'package:islamic_online_learning/features/auth/view/controller/auth_state
 // import 'package:islamic_online_learning/core/constants.dart';
 
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_service.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_state.dart';
 import 'package:islamic_online_learning/utils.dart';
@@ -29,6 +30,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       final testAttempts = curriculumNGroup.testAttempts;
       final discussions = curriculumNGroup.discussions;
       final group = curriculumNGroup.group;
+      final rests = curriculumNGroup.rests;
       if (curriculum == null) {
         throw Exception("No curriculum assigned yet");
       }
@@ -43,6 +45,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
         scores: scores,
         testAttempts: testAttempts,
         discussions: discussions,
+        rests: rests,
       );
     } catch (e) {
       print("Error: $e");
@@ -137,13 +140,13 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     List<dynamic> mainLessonStructure = [];
     // console.log("Started...");
     for (Rest rest in rests) {
-      if (rest.date
+      if (rest.startDate
               .compareTo(addDaysIgnoringWeekend(courseStartDay, noOfLessons)) ==
           1) {
         print("rest: ${rest.id} is jumped");
         continue;
       }
-      final lessonLen = businessDaysBetween(rest.date, startDay);
+      final lessonLen = businessDaysBetween(rest.startDate, startDay);
       print("rest: ${rest.id} lessonLen: $lessonLen is jumped");
 
       //differenceInBusinessDays(rest.date, startDay) - differenceInWeeks(rest.date, startDay)
@@ -158,7 +161,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
           .toList();
       final restIndex = cleanMainStructure.reduce((pv, cv) => pv + cv) - 1;
       mainLessonStructure.add(rest.copyWith(afterLesson: restIndex));
-      startDay = addDaysIgnoringWeekend(rest.date, rest.amount);
+      startDay = addDaysIgnoringWeekend(rest.startDate, rest.numOfDays);
       print("mainLessonStructure: $mainLessonStructure");
 
       // if(getDay(startDay) == 5){
@@ -729,37 +732,6 @@ class ExamData {
     required this.lessonTo,
     required this.discussionIndex,
   });
-}
-
-class Rest {
-  final int id;
-  final DateTime date;
-  final int amount;
-  final String reason;
-  final int? afterLesson;
-  Rest({
-    required this.id,
-    required this.date,
-    required this.amount,
-    required this.reason,
-    this.afterLesson,
-  });
-
-  Rest copyWith({
-    int? id,
-    DateTime? date,
-    int? amount,
-    String? reason,
-    int? afterLesson,
-  }) {
-    return Rest(
-      id: id ?? this.id,
-      date: date ?? this.date,
-      amount: amount ?? this.amount,
-      reason: reason ?? this.reason,
-      afterLesson: afterLesson ?? this.afterLesson,
-    );
-  }
 }
 
 enum LessonCardStatus { NONE, LESSON, DISCUSSION, EXAM }

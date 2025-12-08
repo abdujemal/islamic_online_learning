@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hijri_calendar/hijri_calendar.dart';
-import 'package:islamic_online_learning/core/constants.dart';
-import 'package:islamic_online_learning/core/lib/static_datas.dart';
-import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
-import 'package:islamic_online_learning/features/auth/model/const_score.dart';
-import 'package:islamic_online_learning/features/auth/model/score.dart';
-import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
-import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
-import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
-import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
-import 'package:islamic_online_learning/features/quiz/view/pages/question_page.dart';
 
 class RestCard extends ConsumerStatefulWidget {
   final Rest rest;
@@ -31,12 +22,12 @@ class _RestCardState extends ConsumerState<RestCard> {
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
     // final authState = ref.watch(authNotifierProvider);
-    final starthijri = HijriCalendarConfig.fromGregorian(widget.rest.date);
+    final starthijri = HijriCalendarConfig.fromGregorian(widget.rest.startDate);
     final startArabicDate = "${starthijri.toFormat("DD, MM dd, yyyy")} هـ";
     final endhijri = HijriCalendarConfig.fromGregorian(
-      widget.rest.date.add(
+      widget.rest.startDate.add(
         Duration(
-          days: widget.rest.amount,
+          days: widget.rest.numOfDays,
         ),
       ),
     );
@@ -124,7 +115,7 @@ class _RestCardState extends ConsumerState<RestCard> {
                                     borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: Text(
-                                    "ለ ${widget.rest.amount} ቀን",
+                                    "ለ ${widget.rest.numOfDays} ቀን",
                                     // style: TextStyle(fontSize: 10),
                                   ),
                                 ),

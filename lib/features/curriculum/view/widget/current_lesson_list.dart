@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
+import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/discussion_card.dart';
@@ -31,20 +32,11 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
     List<dynamic> lessonStructureWRest = ref
         .read(assignedCoursesNotifierProvider.notifier)
         .getLessonStructureWRest(
-      authState.user!.group.courseStartDate!,
-      state.curriculum!.lessons!.length,
-      authState.user!.group.noOfLessonsPerDay,
-      [
-        Rest(
-          id: 0,
-          reason: "ረመዳን",
-          date: authState.user!.group.courseStartDate!.add(
-            Duration(days: 21),
-          ),
-          amount: 30,
-        )
-      ],
-    );
+          authState.user!.group.courseStartDate!,
+          state.curriculum!.lessons!.length,
+          authState.user!.group.noOfLessonsPerDay,
+          state.rests,
+        );
     List<Rest> rests = lessonStructureWRest[1] as List<Rest>;
     List<int> lessonStructure = lessonStructureWRest[0] as List<int>;
     final currentLessonNum = authState.courseRelatedData?.lessonNum ?? 0;

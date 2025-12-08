@@ -9,7 +9,9 @@ import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
+import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_db_helper.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
 import 'package:islamic_online_learning/features/meeting/model/discussion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -89,8 +91,9 @@ class CurriculumService {
           curriculum: currData,
           discussions: currNGroup.discussions,
           group: currNGroup.group,
-          scores: [],//currNGroup.scores,
-          testAttempts: [],//currNGroup.testAttempts,
+          scores: currNGroup.scores,
+          testAttempts: currNGroup.testAttempts,
+          rests: currNGroup.rests,
         );
       }
     } else {
@@ -107,12 +110,14 @@ class CurriculumNGroup {
   final List<Score> scores;
   final List<Discussion> discussions;
   final List<TestAttempt> testAttempts;
+  final List<Rest> rests;
   CurriculumNGroup({
     required this.curriculum,
     required this.group,
     required this.scores,
     required this.testAttempts,
     required this.discussions,
+    required this.rests,
   });
 
   Map<String, dynamic> toMap() {
@@ -122,31 +127,37 @@ class CurriculumNGroup {
       'scores': scores.map((e) => e.toMap()),
       'testAttempts': testAttempts.map((e) => e.toMap()),
       "discussions": discussions.map((e) => e.toMap()),
+      "rests": rests.map((e) => e.toMap()),
     };
   }
 
   factory CurriculumNGroup.fromMap(Map<String, dynamic> map) {
     printMap(map);
     return CurriculumNGroup(
-        curriculum: map['currentCurriculum'] != null
-            ? Curriculum.fromMap(
-                map['currentCurriculum'] as Map<String, dynamic>)
-            : null,
-        group: CourseRelatedData.fromMap(map['group'] as Map<String, dynamic>),
-        scores: List<Score>.from(
-          (map["scores"] as List<dynamic>).map(
-            (e) => Score.fromMap(e),
-          ),
+      curriculum: map['currentCurriculum'] != null
+          ? Curriculum.fromMap(map['currentCurriculum'] as Map<String, dynamic>)
+          : null,
+      group: CourseRelatedData.fromMap(map['group'] as Map<String, dynamic>),
+      scores: List<Score>.from(
+        (map["scores"] as List<dynamic>).map(
+          (e) => Score.fromMap(e),
         ),
-        discussions:
-            List<Discussion>.from((map["discussions"] as List<dynamic>).map(
-          (e) => Discussion.fromMap(e, null, null),
-        )),
-        testAttempts: List<TestAttempt>.from(
-          (map["testAttempts"] as List<dynamic>).map(
-            (e) => TestAttempt.fromMap(e),
-          ),
-        ));
+      ),
+      discussions:
+          List<Discussion>.from((map["discussions"] as List<dynamic>).map(
+        (e) => Discussion.fromMap(e, null, null),
+      )),
+      testAttempts: List<TestAttempt>.from(
+        (map["testAttempts"] as List<dynamic>).map(
+          (e) => TestAttempt.fromMap(e),
+        ),
+      ),
+      rests: List<Rest>.from(
+        (map["rests"] as List<dynamic>).map(
+          (e) => Rest.fromMap(e),
+        ),
+      ),
+    );
   }
 
   String toJson() => json.encode(toMap());

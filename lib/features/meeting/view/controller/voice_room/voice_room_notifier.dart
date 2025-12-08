@@ -190,6 +190,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
       final roomOptions = RoomOptions(
         adaptiveStream: true,
         dynacast: true,
+        
 
         // ... your room options
       );
