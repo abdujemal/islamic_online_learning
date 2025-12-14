@@ -29,7 +29,6 @@ const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
 const String getQuizzesApi = "$baseUrl/curriculums/{lessonId}/quizzes";
 //confusions
 const String confusionsApi = "$baseUrl/confusions";
-
 //discussions
 const String discussionsApi = "$baseUrl/discussions";
 const String discussionQuizzesApi = "$discussionsApi/quizzes";
@@ -58,6 +57,10 @@ const String updateMyInfoApi = "$baseUrl/auth/user/me";
 const String getMyCourseInfoApi = "$baseUrl/auth/user/courseData";
 const String getScoresApi = "$baseUrl/auth/user/scores";
 const String getStreakNumApi = "$baseUrl/auth/user/streak";
+//payments
+const String paymentProvidersApi = "$baseUrl/payments/providers";///payments/prices
+const String paymentPricesApi = "$baseUrl/payments/prices";
+const String paymentApi = "$baseUrl/payments";
 
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 

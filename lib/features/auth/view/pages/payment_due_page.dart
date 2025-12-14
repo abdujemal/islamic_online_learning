@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/payments/view/pages/pricing_page.dart';
 
 class PaymentDuePage extends StatefulWidget {
   const PaymentDuePage({super.key});
@@ -39,7 +40,12 @@ class _PaymentDuePageState extends State<PaymentDuePage>
     await _controller.reverse();
     await _controller.forward();
 
-    // TODO: navigate to your payment page
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PricingPage(),
+      ),
+    );
   }
 
   @override
@@ -94,9 +100,9 @@ class _PaymentDuePageState extends State<PaymentDuePage>
                         color: Colors.white,
                       ),
                     ),
-    
+
                     const SizedBox(height: 30),
-    
+
                     Text(
                       "የክፍያ ጊዜ ደርሷል",
                       style: theme.textTheme.headlineMedium?.copyWith(
@@ -104,9 +110,9 @@ class _PaymentDuePageState extends State<PaymentDuePage>
                       ),
                       textAlign: TextAlign.center,
                     ),
-    
+
                     const SizedBox(height: 12),
-    
+
                     Text(
                       "ትምህርቱን ለመቀጠል እባክዎ ክፍያዎን ያድሱ።\n"
                       "ምክንያቱም እውቀት መፈለግ የማይቋረጥ ጉዞ ነው።",
@@ -118,9 +124,9 @@ class _PaymentDuePageState extends State<PaymentDuePage>
                             : Colors.grey.shade700,
                       ),
                     ),
-    
+
                     const SizedBox(height: 40),
-    
+
                     ScaleTransition(
                       scale: _scale,
                       child: GestureDetector(
@@ -151,9 +157,9 @@ class _PaymentDuePageState extends State<PaymentDuePage>
                         ),
                       ),
                     ),
-    
+
                     const SizedBox(height: 20),
-    
+
                     // TextButton(
                     //   onPressed: () {},
                     //   child: Text(

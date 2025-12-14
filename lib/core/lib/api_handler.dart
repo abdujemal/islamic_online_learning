@@ -238,6 +238,7 @@ Future<void> logout(Ref ref, BuildContext context) async {
 }
 
 Future<void> paymentIsDue(BuildContext context) async {
+  print("Mounted: ${context.mounted}");
   if (context.mounted) {
     Navigator.push(
       context,

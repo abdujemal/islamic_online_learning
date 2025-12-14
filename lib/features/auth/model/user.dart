@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'package:islamic_online_learning/features/auth/model/group.dart';
+import 'package:islamic_online_learning/features/auth/model/subscription.dart';
 
 class User {
   final String id;
@@ -15,6 +16,7 @@ class User {
   final int numOfStreaks;
   final List<String> previousLearning;
   final Group group;
+  final Subscription subscription;
   User({
     required this.id,
     required this.name,
@@ -25,6 +27,7 @@ class User {
     required this.numOfStreaks,
     required this.previousLearning,
     required this.group,
+    required this.subscription,
   });
 
   User copyWith({
@@ -37,18 +40,19 @@ class User {
     int? numOfStreaks,
     List<String>? previousLearning,
     Group? group,
+    Subscription? subscription,
   }) {
     return User(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      phone: phone ?? this.phone,
-      timeZone: timeZone ?? this.timeZone,
-      dob: dob ?? this.dob,
-      gender: gender ?? this.gender,
-      numOfStreaks: numOfStreaks ?? this.numOfStreaks,
-      previousLearning: previousLearning ?? this.previousLearning,
-      group: group ?? this.group,
-    );
+        id: id ?? this.id,
+        name: name ?? this.name,
+        phone: phone ?? this.phone,
+        timeZone: timeZone ?? this.timeZone,
+        dob: dob ?? this.dob,
+        gender: gender ?? this.gender,
+        numOfStreaks: numOfStreaks ?? this.numOfStreaks,
+        previousLearning: previousLearning ?? this.previousLearning,
+        group: group ?? this.group,
+        subscription: subscription ?? this.subscription);
   }
 
   Map<String, dynamic> toMap() {
@@ -62,6 +66,7 @@ class User {
       'numOfStreaks': numOfStreaks,
       'previousLearning': previousLearning,
       'group': group.toMap(),
+      'subscription': subscription.toMap()
     };
   }
 
@@ -74,14 +79,21 @@ class User {
       dob: DateTime.parse(map['dob'] as String),
       gender: map['gender'] as String,
       numOfStreaks: map['numOfStreaks'] as int,
-      previousLearning: List<String>.from((map['previousLearning'] as List<dynamic>)),
-      group: Group.fromMap(map['group'] as Map<String,dynamic>),
+      previousLearning:
+          List<String>.from((map['previousLearning'] as List<dynamic>)),
+      group: Group.fromMap(
+        map['group'] as Map<String, dynamic>,
+      ),
+      subscription: Subscription.fromMap(
+        map['subscription'] as Map<String, dynamic>,
+      ),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory User.fromJson(String source) => User.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory User.fromJson(String source) =>
+      User.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -91,30 +103,29 @@ class User {
   @override
   bool operator ==(covariant User other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.name == name &&
-      other.phone == phone &&
-      other.timeZone == timeZone &&
-      other.dob == dob &&
-      other.gender == gender &&
-      other.numOfStreaks == numOfStreaks &&
-      listEquals(other.previousLearning, previousLearning) &&
-      other.group == group;
+
+    return other.id == id &&
+        other.name == name &&
+        other.phone == phone &&
+        other.timeZone == timeZone &&
+        other.dob == dob &&
+        other.gender == gender &&
+        other.numOfStreaks == numOfStreaks &&
+        listEquals(other.previousLearning, previousLearning) &&
+        other.group == group;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      name.hashCode ^
-      phone.hashCode ^
-      timeZone.hashCode ^
-      dob.hashCode ^
-      gender.hashCode ^
-      numOfStreaks.hashCode ^
-      previousLearning.hashCode ^
-      group.hashCode;
+        name.hashCode ^
+        phone.hashCode ^
+        timeZone.hashCode ^
+        dob.hashCode ^
+        gender.hashCode ^
+        numOfStreaks.hashCode ^
+        previousLearning.hashCode ^
+        group.hashCode;
   }
 }
 

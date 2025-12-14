@@ -11,6 +11,7 @@ import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dar
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/core/update_checker.dart';
+import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
@@ -20,6 +21,9 @@ import 'package:islamic_online_learning/features/main/presentation/widgets/botto
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_drawer.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/rate_us_dailog.dart';
+import 'package:islamic_online_learning/features/payments/view/pages/payment_pending_page.dart';
+import 'package:islamic_online_learning/features/payments/view/pages/payment_success_page.dart';
+import 'package:islamic_online_learning/features/payments/view/pages/pricing_page.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -258,6 +262,8 @@ class _MainPageState extends ConsumerState<MainPage>
     }
     final audioPlayer = PlaylistHelper.audioPlayer;
     final curriculumState = ref.watch(assignedCoursesNotifierProvider);
+    final isDue =
+        ref.watch(authNotifierProvider).user?.subscription.isDue() ?? false;
     return WillPopScope(
       onWillPop: () async {
         if (_tabController.index != 0) {
@@ -366,14 +372,70 @@ class _MainPageState extends ConsumerState<MainPage>
                           },
                         ),
                   bottom: PreferredSize(
-                    preferredSize: Size(
-                      MediaQuery.of(context).size.width,
-                      showTopAudio ? 40 : 0,
-                    ),
-                    child: showTopAudio
-                        ? CurrentAudioView(metaData as MediaItem)
-                        : const SizedBox(),
-                  ),
+                      preferredSize: Size(
+                        MediaQuery.of(context).size.width,
+                        showTopAudio
+                            ? isDue
+                                ? 80 + 40
+                                : 40
+                            : isDue
+                                ? 80
+                                : 0,
+                      ),
+                      child: Column(
+                        children: [
+                          showTopAudio
+                              ? CurrentAudioView(metaData as MediaItem)
+                              : const SizedBox(),
+                          isDue
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                  ),
+                                  child: Container(
+                                    width: double.infinity,
+                                    margin: EdgeInsets.only(
+                                      right: 20,
+                                      left: 20,
+                                      top: 15,
+                                    ),
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        border: Border.all(
+                                          color: Colors.amber,
+                                        ),
+                                        borderRadius: BorderRadius.circular(5)),
+                                    child: Row(
+                                      children: [
+                                        Text("Payment is Due"),
+                                        Spacer(),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => PricingPage(),
+                                              ),
+                                            );
+                                          },
+                                          child: Text("Add Payment"),
+                                        )
+                                        // InkWell(
+                                        //   onTap: () {},
+                                        //   child: Ink(
+                                        //     child: Text("Add Payment", col),
+                                        //   ),
+                                        // )
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : SizedBox()
+                        ],
+                      )),
                   actions: [
                     currentIndex != 1
                         ? IconButton(
@@ -381,7 +443,11 @@ class _MainPageState extends ConsumerState<MainPage>
                               // Navigator.push(
                               //   context,
                               //   MaterialPageRoute(
-                              //     builder: (_) => NewLessonStructure(),
+                              //     builder: (_) => PaymentPendingPage(
+                              //       amount: "100",
+                              //       reference: "reference",
+                              //       bank: "bank",
+                              //     ),
                               //   ),
                               // );
                             },
