@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/payments/models/payment_provider.dart';
 import 'package:islamic_online_learning/features/payments/models/tier.dart';
 import 'package:islamic_online_learning/features/payments/service/payment_service.dart';
@@ -85,6 +86,7 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
           ),
         );
       } else {
+        ref.read(authNotifierProvider.notifier).setSubscription(subscription);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
