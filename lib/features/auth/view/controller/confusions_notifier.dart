@@ -17,7 +17,7 @@ class ConfusionsNotifier extends StateNotifier<ConfusionsState> {
       if (state.hasNoMore) return;
       state = state.copyWith(page: state.page + 1);
     } else {
-      state = state.copyWith(page: 1);
+      state = state.copyWith(page: 1, hasNoMore: false);
     }
     try {
       if (!loadMore) {

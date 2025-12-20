@@ -17,6 +17,7 @@ class ProviderDetailDialog extends ConsumerStatefulWidget {
 class _ProviderDetailDialogState extends ConsumerState<ProviderDetailDialog> {
   final TextEditingController _tnxidController = TextEditingController();
   final FocusNode _tnxidFocusNode = FocusNode();
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(paymentNotifierProvider);
@@ -83,15 +84,18 @@ class _ProviderDetailDialogState extends ConsumerState<ProviderDetailDialog> {
                 ),
               ),
               const SizedBox(height: 5),
-              TextFormField(
-                controller: _tnxidController,
-                focusNode: _tnxidFocusNode,
-                decoration: const InputDecoration(
-                  labelText: "Transaction ID (Ref No)",
-                  border: OutlineInputBorder(),
+              Form(
+                key: _formKey,
+                child: TextFormField(
+                  controller: _tnxidController,
+                  focusNode: _tnxidFocusNode,
+                  decoration: const InputDecoration(
+                    labelText: "Transaction ID (Ref No)",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "ይህን ቦታ ይሙሉ!" : null,
                 ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? "ይህን ቦታ ይሙሉ!" : null,
               ),
               const SizedBox(height: 15),
               if (state.submitting) ...[
@@ -104,8 +108,12 @@ class _ProviderDetailDialogState extends ConsumerState<ProviderDetailDialog> {
                         backgroundColor: primaryColor,
                         foregroundColor: Colors.white),
                     onPressed: () {
-                      ref.read(paymentNotifierProvider.notifier).submitPayment(
-                          _tnxidController.text, widget.provider.code, context);
+                      if (_formKey.currentState!.validate()) {
+                        ref
+                            .read(paymentNotifierProvider.notifier)
+                            .submitPayment(_tnxidController.text,
+                                widget.provider.code, context);
+                      }
                     },
                     child: const Text("Submit"),
                   ),
@@ -114,10 +122,11 @@ class _ProviderDetailDialogState extends ConsumerState<ProviderDetailDialog> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).cardColor,
-                        side: BorderSide(
-                          color: primaryColor,
-                        ),),
+                      backgroundColor: Theme.of(context).cardColor,
+                      side: BorderSide(
+                        color: primaryColor,
+                      ),
+                    ),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },

@@ -9,6 +9,7 @@ import 'package:islamic_online_learning/features/auth/view/widget/hijri_streak_c
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/aboutus.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:islamic_online_learning/features/payments/view/pages/payments_page.dart';
 import 'package:islamic_online_learning/utils.dart';
 import 'package:lottie/lottie.dart';
 
@@ -118,7 +119,14 @@ class _AccountTabState extends ConsumerState<AccountTab> {
             _buildSettingItem(
               icon: Icons.payment,
               title: "Payments",
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PaymentsPage(),
+                  ),
+                );
+              },
             ),
             _buildSettingItem(
               icon: Icons.security,

@@ -111,4 +111,80 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
       );
     }
   }
+
+  Future<void> getPayments(BuildContext context,
+      {bool loadMore = false}) async {
+    if (state.paymentsIsLoadingMore) return;
+    if (loadMore) {
+      if (state.paymentsHasNoMore) return;
+      state = state.copyWith(paymentsPage: state.paymentsPage + 1);
+    } else {
+      state = state.copyWith(
+        paymentsPage: 1,
+        paymentsHasNoMore: false,
+      );
+    }
+    try {
+      if (!loadMore) {
+        state = state.copyWith(paymentsLoading: true);
+      } else {
+        state = state.copyWith(paymentsIsLoadingMore: true);
+      }
+      final payments =
+          await paymentService.getPayments(page: state.paymentsPage);
+      // print(payments);
+      if (!loadMore) {
+        state = state.copyWith(
+          paymentsLoading: false,
+          payments: payments,
+        );
+      } else {
+        state = state.copyWith(
+          paymentsIsLoadingMore: false,
+          paymentsHasNoMore: payments.isEmpty,
+          payments: [
+            ...state.payments,
+            ...payments,
+          ],
+        );
+      }
+    } on ConnectivityException catch (err) {
+      // toast(err.message, ToastType.error, context)
+      if (!loadMore) {
+        state = state.copyWith(
+          paymentsLoading: false,
+          paymentsError: err.message,
+        );
+      } else {
+        state = state.copyWith(
+          paymentsIsLoadingMore: false,
+        );
+        toast(err.message, ToastType.error, context);
+      }
+    } catch (e) {
+      final errorMsg = getErrorMsg(
+        e.toString(),
+        "Error on loading payment!",
+      );
+      handleError(
+        e.toString(),
+        context,
+        ref,
+        () async {
+          print("Error: $e");
+          if (!loadMore) {
+            state = state.copyWith(
+              paymentsLoading: false,
+              paymentsError: errorMsg,
+            );
+          } else {
+            state = state.copyWith(
+              paymentsIsLoadingMore: false,
+            );
+            toast(errorMsg, ToastType.error, context);
+          }
+        },
+      );
+    }
+  }
 }

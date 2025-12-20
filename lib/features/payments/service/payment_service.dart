@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/subscription.dart';
+import 'package:islamic_online_learning/features/payments/models/payment.dart';
 import 'package:islamic_online_learning/features/payments/models/payment_provider.dart';
 import 'package:islamic_online_learning/features/payments/models/tier.dart';
 
@@ -61,6 +62,20 @@ class PaymentService {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
       throw Exception('Failed to submit payment: ${response.body}');
+    }
+  }
+
+  Future<List<Payment>> getPayments({int page = 1}) async {
+     final response = await customGetRequest(
+      "$paymentApi?page=$page",
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      return Payment.listFromJson(response.body);
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to load payments: ${response.body}');
     }
   }
 }

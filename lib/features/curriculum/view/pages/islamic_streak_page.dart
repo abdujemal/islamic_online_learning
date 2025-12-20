@@ -1,216 +1,202 @@
 import 'package:flutter/material.dart';
+import 'package:islamic_online_learning/core/constants.dart';
 import 'package:lottie/lottie.dart';
 
-class IslamicStreakPage extends StatefulWidget {
-  final int streakDays;
-  const IslamicStreakPage({super.key, required this.streakDays});
+enum StreakType { Lesson, Discussion, Test }
 
-  @override
-  State<IslamicStreakPage> createState() => _IslamicStreakPageState();
-}
+class IslamicStreakPage extends StatelessWidget {
+  final int streak;
+  final int lessonsCompleted;
+  final String type;
 
-class _IslamicStreakPageState extends State<IslamicStreakPage>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _buttonController;
-  late Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _buttonController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 160),
-      lowerBound: 0.92,
-      upperBound: 1,
-    );
-
-    _scale = CurvedAnimation(
-      parent: _buttonController,
-      curve: Curves.easeOutBack,
-    );
-  }
-
-  @override
-  void dispose() {
-    _buttonController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _onContinue() async {
-    await _buttonController.reverse();
-    await _buttonController.forward();
-
-    // TODO: Navigate to next page
-  }
+  const IslamicStreakPage({
+    super.key,
+    required this.streak,
+    required this.lessonsCompleted,
+    required this.type,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // final Color primary = const Color(0xFF0F6F4F); // Islamic emerald
+    final Color gold = const Color(0xFFD4AF37);
 
     return Scaffold(
-      backgroundColor: theme.brightness == Brightness.dark
-          ? const Color(0xff0D141B)
-          : const Color(0xffF2EFE5),
-      body: Stack(
-        children: [
-          /// 🕌 Soft Islamic pattern in background
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.08,
-              child: Image.asset(
-                "assets/islamic_pattern.png", // Add your image
-                fit: BoxFit.cover,
+      // backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Soft geometric islamic pattern background (Lottie recommended)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: 0.15,
+                  child: Lottie.asset(
+                    "assets/animations/Ramadan_Wheel.json",
+                    repeat: true,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
-          ),
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Lottie.asset(
-              "assets/animations/Confetti.json",
-              height: 220,
-            ),
-          ),
-
-          SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                /// 🕌 Arabic Bismillah Calligraphy
-                Text(
-                  "﷽",
-                  style: TextStyle(
-                    fontSize: 60,
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w700,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 15,
-                        color: Colors.black12,
-                        offset: Offset(0, 3),
+        
+            SafeArea(
+              child: Stack(
+                children: [
+                  Lottie.asset(
+                    "assets/animations/Confetti.json",
+                    repeat: true,
+                  ),
+                  Column(
+                    children: [
+                      const SizedBox(height: 40),
+        
+                      // Crescent Moon or Islamic learning animation
+        
+                      SizedBox(
+                        height: 150,
+                        child: Lottie.asset(
+                          "assets/animations/Streak.json",
+                          repeat: false,
+                        ),
+                      ),
+        
+                      const SizedBox(height: 10),
+        
+                      Text(
+                        "$streak-Day Streak",
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w900,
+                          color: primaryColor,
+                        ),
+                      ),
+        
+                      const SizedBox(height: 10),
+        
+                      Text(
+                        "Masha’Allah! You’re remaining consistent.",
+                        style: TextStyle(
+                          fontSize: 17,
+                          // color: Colors.grey.shade800,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+        
+                      const SizedBox(height: 25),
+                      _islamicCard(primaryColor, gold),
+                      const Spacer(),
+        
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 35),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              "Continue",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
                       )
                     ],
                   ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _islamicCard(Color primary, Color gold) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: primary.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: primary.withOpacity(.15)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(Icons.auto_stories, color: primary, size: 30),
+              const SizedBox(width: 12),
+              Text(
+                "Today's ${type} Complete",
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: primary,
                 ),
-
-                const SizedBox(height: 20),
-
-                /// ۞ Rub el Hizb Icon (Islamic)
-                Container(
-                  padding: const EdgeInsets.all(40),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xffD4AF37), // gold
-                        Color(0xffC49B2D),
-                      ],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.amber.withOpacity(0.5),
-                        blurRadius: 40,
-                        spreadRadius: 8,
-                      ),
-                    ],
-                  ),
-                  child: const Text(
-                    "۞",
-                    style: TextStyle(
-                      fontSize: 80,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 35),
-
-                Text(
-                  "ዛሬም ትምህርትዎን አጠናቀቁ!",
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  "የእውቀት መንገድ በቀን ${widget.streakDays} ቀን ቀጥለዋል።",
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey.shade600,
-                    height: 1.5,
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                /// 📖 Beautiful Ayah / Hadith
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 26),
-                  child: Text(
-                    "“ማንም የእውቀት መንገድን ይከተል ከሆነ፣ "
-                    "አላህ የገነት መንገድን ያቀርበዋል।”\n"
-                        "— ሐዲስ",
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontStyle: FontStyle.italic,
-                      color: theme.colorScheme.primary,
-                      height: 1.6,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 40),
-
-                /// ⭐ Bounce Continue Button
-                ScaleTransition(
-                  scale: _scale,
-                  child: GestureDetector(
-                    onTapDown: (_) => _buttonController.reverse(),
-                    onTapCancel: () => _buttonController.forward(),
-                    onTapUp: (_) => _onContinue(),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 34,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xff10A37F),
-                            Color(0xff0F8F70),
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.teal.withOpacity(0.3),
-                            offset: const Offset(0, 5),
-                            blurRadius: 18,
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        "ቀጥሉ",
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _stat("Streak", "$streak Days", gold, primary),
+              // if(type == "Lesson")
+              _stat("${type}s Today", "$lessonsCompleted", gold, primary)
+              // : SizedBox(),
+            ],
+          ),
+          const SizedBox(height: 22),
+          Text(
+            "“Seeking knowledge is a path of light. Stay consistent, "
+            "and Allah will bless your journey.”",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              // color: Colors.grey.shade700,
+              height: 1.4,
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _stat(String label, String value, Color gold, Color primary) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            color: primary,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: primary.withOpacity(.7),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

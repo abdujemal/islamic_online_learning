@@ -15,14 +15,13 @@ import 'package:islamic_online_learning/features/auth/view/controller/provider.d
 import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_drawer.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/rate_us_dailog.dart';
-import 'package:islamic_online_learning/features/payments/view/pages/payment_pending_page.dart';
-import 'package:islamic_online_learning/features/payments/view/pages/payment_success_page.dart';
 import 'package:islamic_online_learning/features/payments/view/pages/pricing_page.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -440,16 +439,16 @@ class _MainPageState extends ConsumerState<MainPage>
                     currentIndex != 1
                         ? IconButton(
                             onPressed: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (_) => PaymentPendingPage(
-                              //       amount: "100",
-                              //       reference: "reference",
-                              //       bank: "bank",
-                              //     ),
-                              //   ),
-                              // );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => IslamicStreakPage(
+                                    streak: 4,
+                                    lessonsCompleted: 10,
+                                    type: "Discussion",
+                                  ),
+                                ),
+                              );
                             },
                             icon: Icon(Icons.refresh),
                           )
