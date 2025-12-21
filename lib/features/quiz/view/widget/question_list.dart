@@ -34,6 +34,7 @@ class QuestionModel {
 class MultipleQuestionQuiz extends ConsumerStatefulWidget {
   final List<QuestionModel> questions;
   final bool fromDiscussion;
+  final bool isPrerequisite;
   final Future<bool> Function(int score, Map<String, List<String>> answers)
       onFinish;
   final Function(Map<String, String> qa)? onSubmit;
@@ -44,6 +45,7 @@ class MultipleQuestionQuiz extends ConsumerStatefulWidget {
     required this.onFinish,
     this.onSubmit,
     this.fromDiscussion = false,
+    this.isPrerequisite = false,
   });
 
   @override
@@ -111,7 +113,8 @@ class _MultipleQuestionQuizState extends ConsumerState<MultipleQuestionQuiz>
     } else {
       _calculateScore();
       final go = await widget.onFinish(_score, _answers);
-      if (go && !widget.fromDiscussion) {
+      if (go) {
+        if (widget.fromDiscussion || widget.isPrerequisite) return;
         setState(() => _showReview = true);
       }
     }

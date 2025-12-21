@@ -27,6 +27,9 @@ const String curriculumsApi = "$baseUrl/curriculums/all";
 const String getCurriculumApi = "$baseUrl/curriculums";
 const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
 const String getQuizzesApi = "$baseUrl/curriculums/{lessonId}/quizzes";
+//prerequisite test
+const String getPrerequisiteTestApi =
+    "$baseUrl/custom-tests/prerequisite/{level}";
 //confusions
 const String confusionsApi = "$baseUrl/confusions";
 //discussions
@@ -58,7 +61,9 @@ const String getMyCourseInfoApi = "$baseUrl/auth/user/courseData";
 const String getScoresApi = "$baseUrl/auth/user/scores";
 const String getStreakNumApi = "$baseUrl/auth/user/streak";
 //payments
-const String paymentProvidersApi = "$baseUrl/payments/providers";///payments/prices
+const String paymentProvidersApi = "$baseUrl/payments/providers";
+
+///payments/prices
 const String paymentPricesApi = "$baseUrl/payments/prices";
 const String paymentApi = "$baseUrl/payments";
 
