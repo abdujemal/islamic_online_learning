@@ -62,6 +62,9 @@ const String getScoresApi = "$baseUrl/auth/user/scores";
 const String getStreakNumApi = "$baseUrl/auth/user/streak";
 //payments
 const String paymentProvidersApi = "$baseUrl/payments/providers";
+//chats
+const String chatsApi = "$baseUrl/chats";
+
 
 ///payments/prices
 const String paymentPricesApi = "$baseUrl/payments/prices";

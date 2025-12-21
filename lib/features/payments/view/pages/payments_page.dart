@@ -37,6 +37,12 @@ class _PaymentsPageState extends ConsumerState<PaymentsPage> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -89,7 +95,7 @@ class _PaymentsPageState extends ConsumerState<PaymentsPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("No more data"),
+                    Text("No data"),
                     IconButton(
                       onPressed: () {
                         ref

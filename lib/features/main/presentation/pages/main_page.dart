@@ -16,6 +16,7 @@ import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dar
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
+import 'package:islamic_online_learning/features/groupChat/view/pages/group_chat_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
@@ -436,6 +437,26 @@ class _MainPageState extends ConsumerState<MainPage>
                         ],
                       )),
                   actions: [
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final authState = ref.watch(authNotifierProvider);
+                        if (authState.user != null) {
+                          return IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => GroupChatPage(),
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.chat_rounded),
+                          );
+                        } else {
+                          return SizedBox();
+                        }
+                      },
+                    ),
                     currentIndex != 1
                         ? IconButton(
                             onPressed: () {

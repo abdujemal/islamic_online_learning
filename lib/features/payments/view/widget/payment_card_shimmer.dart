@@ -11,7 +11,7 @@ class PaymentCardShimmer extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.08),
@@ -21,8 +21,9 @@ class PaymentCardShimmer extends StatelessWidget {
         ],
       ),
       child: Shimmer.fromColors(
-        baseColor: Colors.grey.shade300,
-        highlightColor: Colors.grey.shade100,
+        baseColor:
+              Theme.of(context).chipTheme.backgroundColor!.withAlpha(150),
+          highlightColor: Theme.of(context).chipTheme.backgroundColor!,
         child: Row(
           children: [
             // Icon shimmer
