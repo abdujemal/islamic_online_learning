@@ -70,7 +70,7 @@ class Score {
       outOf: map['outOf'] as int,
       userId: map['userId'] as String,
       afterLesson: map["afterLesson"] as int,
-      date: DateTime.parse(map['date'] as String),
+      date: DateTime.parse(map['date'] as String).toLocal(),
     );
   }
 

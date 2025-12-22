@@ -87,9 +87,9 @@ class Payment {
       paymentType: map['paymentType'] as String,
       status: map['status'] as String,
       failedReason: map['failedReason'] != null ? map['failedReason'] as String : null,
-      startDate: DateTime.parse(map['startDate'] as String),
+      startDate: DateTime.parse(map['startDate'] as String).toLocal(),
       paymentProvider: map['paymentProvider'] as String,
-      createdAt: DateTime.parse(map['createdAt'] as String),
+      createdAt: DateTime.parse(map['createdAt'] as String).toLocal(),
     );
   }
 

@@ -129,15 +129,15 @@ class Group {
       discussionDay: map['discussionDay'] as String,
       timeZone: map['timeZone'] as String,
       startDate: map['startDate'] != null
-          ? DateTime.parse(map['startDate'] as String)
+          ? DateTime.parse(map['startDate'] as String).toLocal()
           : null,
       currStartDate: map['currStartDate'] != null
-          ? DateTime.parse(map['currStartDate'] as String)
+          ? DateTime.parse(map['currStartDate'] as String).toLocal()
           : null,
       courseStartDate: map['courseStartDate'] != null
-          ? DateTime.parse(map['courseStartDate'] as String)
+          ? DateTime.parse(map['courseStartDate'] as String).toLocal()
           : null,
-      createdAt: DateTime.parse(map['createdAt'] as String),
+      createdAt: DateTime.parse(map['createdAt'] as String).toLocal(),
       noOfMembers: map['_count'] == null ? null : map['_count']["members"],
       members: map['members'] != null
           ? List<Member>.from(

@@ -86,7 +86,7 @@ class Chat {
         message: map['message'] as String,
         chatType: map['chatType'] as String,
         chatSenderType: map['chatSenderType'] as String,
-        createdAt: DateTime.parse(map['createdAt'] as String),
+        createdAt: DateTime.parse(map['createdAt'] as String).toLocal(),
         senderId: map['senderId'] != null ? map['senderId'] as String : null,
         replyToId: map['replyToId'] != null ? map['replyToId'] as String : null,
         chatWithAdmin: map['chatWithAdmin'] as bool,

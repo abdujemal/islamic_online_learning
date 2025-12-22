@@ -17,6 +17,7 @@ const String dbPath = "/Islamic Online Learning/db/myDB.db";
 const String serverUrl = "https://ilmfelagi.com/api";
 
 //main apis
+const String mainUrl = "https://ilmfelagi-pro-backend.onrender.com";
 const String baseUrl = "https://ilmfelagi-pro-backend.onrender.com/api/v1";
 //livekit token generater
 const String LIVEKIT_URL = "wss://islamic-lms-w13mlg50.livekit.cloud";
@@ -64,7 +65,6 @@ const String getStreakNumApi = "$baseUrl/auth/user/streak";
 const String paymentProvidersApi = "$baseUrl/payments/providers";
 //chats
 const String chatsApi = "$baseUrl/chats";
-
 
 ///payments/prices
 const String paymentPricesApi = "$baseUrl/payments/prices";

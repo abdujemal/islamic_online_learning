@@ -158,6 +158,54 @@ Future<http.Response> customPutRequest(String url, Map<String, dynamic>? map,
   return response;
 }
 
+Future<http.Response> customDeleteRequest(String url, Map<String, dynamic>? map,
+    {bool authorized = false}) async {
+  final connectivityResult = await (Connectivity().checkConnectivity());
+  if (connectivityResult.contains(ConnectivityResult.none)) {
+    throw ConnectivityException("እባክዎ ኢንተርኔት ያብሩ!");
+  }
+  print("POST $url");
+  print("req body $map");
+
+  call() async {
+    final token = await getAccessToken();
+    return http.delete(
+      Uri.parse(url),
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        if (authorized) ...{
+          "authorization": "$token",
+        }
+      },
+      body: map != null ? jsonEncode(map) : null,
+    );
+  }
+
+  var response = await call();
+
+  if (authorized) {
+    if (response.statusCode == 401 && response.body.contains("auth")) {
+      // try refresh
+      final r = await refreshToken();
+      if (r['ok'] == true) {
+        // retry
+        // token = await getAccessToken();
+        response = await call();
+      } else {
+        // cannot refresh: logout
+        // await auth.logout();
+        throw Exception("logout");
+      }
+    }
+    return response;
+  }
+
+  print("res body ${response.body}");
+
+  return response;
+}
+
 Future<http.StreamedResponse> customPostWithForm(
     String url, Map<String, dynamic>? map, File file,
     {bool authorized = false}) async {

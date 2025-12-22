@@ -55,7 +55,7 @@ class Streak {
         ),
       ),
       userId: map['userId'] as String,
-      date: DateTime.parse(map['date'] as String),
+      date: DateTime.parse(map['date'] as String).toLocal(),
     );
   }
 

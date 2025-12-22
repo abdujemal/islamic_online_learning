@@ -76,7 +76,7 @@ class User {
       name: map['name'] as String,
       phone: map['phone'] as String,
       timeZone: map['timeZone'] as String,
-      dob: DateTime.parse(map['dob'] as String),
+      dob: DateTime.parse(map['dob'] as String).toLocal(),
       gender: map['gender'] as String,
       numOfStreaks: map['numOfStreaks'] as int,
       previousLearning:

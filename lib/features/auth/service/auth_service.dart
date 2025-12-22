@@ -196,7 +196,7 @@ class AuthService {
     );
     if (response.statusCode == 200) {
       final streaks = jsonDecode(response.body) as List<dynamic>;
-      return streaks.map((e) => DateTime.parse(e as String)).toList(); //token
+      return streaks.map((e) => DateTime.parse(e as String).toLocal()).toList(); //token
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");

@@ -39,4 +39,42 @@ class GroupChatService {
       throw Exception('Failed to add chat: ${response.body}');
     }
   }
+
+  Future<Chat> editGroupChat(String message, String chatId) async {
+    final response = await customPutRequest(
+      "$chatsApi/$chatId",
+      {
+        "chatWithAdmin": false,
+        "message": message,
+        // if(replyId != null)...{
+        // "replyToId": replyId,
+        // }
+      },
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      return Chat.fromMap(jsonDecode(response.body)["chat"]);
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to edit chat: ${response.body}');
+    }
+  }
+
+   Future<Chat> deleteGroupChat(String chatId) async {
+    final response = await customDeleteRequest(
+      "$chatsApi/$chatId",
+      {
+        
+      },
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      return Chat.fromMap(jsonDecode(response.body)["chat"]);
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to edit chat: ${response.body}');
+    }
+  }
 }

@@ -44,7 +44,7 @@ class CourseRelatedData {
   factory CourseRelatedData.fromMap(Map<String, dynamic> map) {
     // print("map: $map");
     return CourseRelatedData(
-      courseStartDate: DateTime.parse(map['courseStartDate'] as String),
+      courseStartDate: DateTime.parse(map['courseStartDate'] as String).toLocal(),
       courseNum: map['courseNum'] as int,
       lessonNum: map['lessonNum'] as int,
       discussionDay: map['discussionDay'] as String,

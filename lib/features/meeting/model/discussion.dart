@@ -77,7 +77,7 @@ class Discussion {
       courseNum: map['courseNum'] as int,
       curriculumId: map['curriculumId'] as String,
       title: map['title'] as String,
-      startAt: DateTime.parse(map['startAt'] as String),
+      startAt: DateTime.parse(map['startAt'] as String).toLocal(),
       groupId: map['groupId'] as String,
       discussionSecond: discussionSec,
       givenTime: givenTimeMap == null ? null : GivenTime.fromMap(givenTimeMap),

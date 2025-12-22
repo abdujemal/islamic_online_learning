@@ -81,8 +81,8 @@ class PaymentProvider {
       isActive: map['isActive'] as bool,
       logoUrl: map['logoUrl'] as String,
       guideUrl: map['guideUrl'] as String,
-      createdAt: DateTime.parse(map['createdAt'] as String),
-      updatedAt: DateTime.parse(map['updatedAt'] as String),
+      createdAt: DateTime.parse(map['createdAt'] as String).toLocal(),
+      updatedAt: DateTime.parse(map['updatedAt'] as String).toLocal(),
     );
   }
 

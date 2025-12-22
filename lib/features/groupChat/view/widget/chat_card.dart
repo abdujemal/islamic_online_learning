@@ -5,15 +5,19 @@ import 'package:islamic_online_learning/features/auth/model/group.dart';
 import 'package:islamic_online_learning/features/groupChat/model/chat.dart';
 import 'package:islamic_online_learning/utils.dart';
 
-class ChatCard extends StatelessWidget {
+class ChatCard extends StatefulWidget {
   final String senderName;
   final String message;
   final Chat? replyTo;
   final DateTime time;
   final bool isMine;
   final bool isAdmin;
+  final bool isViewed;
   final String? avatarUrl;
   final VoidCallback onReply;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final VoidCallback onView;
   final List<Member> members;
 
   const ChatCard({
@@ -24,52 +28,116 @@ class ChatCard extends StatelessWidget {
     required this.replyTo,
     this.isMine = false,
     this.isAdmin = false,
+    required this.onEdit,
     required this.onReply,
+    required this.onDelete,
+    required this.onView,
     required this.members,
+    required this.isViewed,
     this.avatarUrl,
   });
 
   @override
+  State<ChatCard> createState() => _ChatCardState();
+}
+
+class _ChatCardState extends State<ChatCard> {
+  @override
+  void initState() {
+    super.initState();
+    widget.onView();
+  }
+
+  void _showOptionMenu(BuildContext context, Offset position) async {
+    final selected = await showMenu<String>(
+      context: context,
+      color: Theme.of(context).cardColor,
+      position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, 0),
+      items: [
+        "Reply",
+        if (widget.isMine) ...[
+          "Edit",
+          "Delete",
+        ],
+      ]
+          .map((val) => PopupMenuItem<String>(
+                value: val,
+                child: Text(
+                  val,
+                  // style: TextStyle(
+                  //   fontWeight: speed == currentSpeed
+                  //       ? FontWeight.bold
+                  //       : FontWeight.normal,
+                  //   color: speed == currentSpeed ? primaryColor : null,
+                  // ),
+                ),
+              ))
+          .toList(),
+    );
+    print("selected:$selected");
+
+    if (selected == "Edit") {
+      widget.onEdit();
+    } else if (selected == "Reply") {
+      widget.onReply();
+    } else if (selected == "Delete") {
+      widget.onDelete();
+    } else {
+      print("non");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bg =
-        isMine ? theme.colorScheme.primary.withOpacity(0.15) : theme.cardColor;
+    final bg = widget.isMine
+        ? theme.colorScheme.primary.withOpacity(0.15)
+        : theme.cardColor;
 
-    final replyName = replyTo?.senderId == null
+    final replyName = widget.replyTo?.senderId == null
         ? "Admin"
-        : members.where((e) => e.id == replyTo!.senderId).first.name;
+        : widget.members
+            .where((e) => e.id == widget.replyTo!.senderId)
+            .first
+            .name;
 
     final border = RoundedRectangleBorder(
-      side: isAdmin ? BorderSide(color: primaryColor) : BorderSide.none,
+      side: widget.isAdmin ? BorderSide(color: primaryColor) : BorderSide.none,
       borderRadius: BorderRadius.only(
         topLeft: const Radius.circular(18),
         topRight: const Radius.circular(18),
-        bottomLeft:
-            isMine ? const Radius.circular(18) : const Radius.circular(4),
-        bottomRight:
-            isMine ? const Radius.circular(4) : const Radius.circular(18),
+        bottomLeft: widget.isMine
+            ? const Radius.circular(18)
+            : const Radius.circular(4),
+        bottomRight: widget.isMine
+            ? const Radius.circular(4)
+            : const Radius.circular(18),
       ),
     );
 
     return GestureDetector(
-      onLongPress: () {
-        onReply();
+      onTapDown: (td) {
+        final x = td.globalPosition.dx;
+        // -50;
+        final y = td.globalPosition.dy;
+        // -330;
+        _showOptionMenu(context, Offset(x, y));
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment:
-              isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
+              widget.isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
-            if (!isMine)
+            if (!widget.isMine)
               Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: CircleAvatar(
                   radius: 18,
-                  backgroundColor: userIdToColor(senderName),
+                  backgroundColor: userIdToColor(widget.senderName),
                   child: Text(
-                    senderName[0].toUpperCase(),
+                    widget.senderName[0].toUpperCase(),
                     style: const TextStyle(
                       color: whiteColor,
                       fontWeight: FontWeight.bold,
@@ -95,11 +163,11 @@ class ChatCard extends StatelessWidget {
                   ],
                 ),
                 child: Column(
-                  crossAxisAlignment: isMine
+                  crossAxisAlignment: widget.isMine
                       ? CrossAxisAlignment.end
                       : CrossAxisAlignment.start,
                   children: [
-                    if (replyTo != null)
+                    if (widget.replyTo != null)
                       Container(
                         decoration: BoxDecoration(
                           color: Theme.of(context)
@@ -127,22 +195,22 @@ class ChatCard extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              replyTo!.message,
+                              widget.replyTo!.message,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
-                    if (!isMine)
+                    if (!widget.isMine)
                       Row(
                         children: [
-                          if (isAdmin)
+                          if (widget.isAdmin)
                             Icon(
                               Icons.security_rounded,
                               color: theme.colorScheme.primary,
                             ),
                           Text(
-                            senderName,
+                            widget.senderName,
                             style: theme.textTheme.labelMedium!.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w600,
@@ -150,9 +218,9 @@ class ChatCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                    if (!isMine) const SizedBox(height: 4),
+                    if (!widget.isMine) const SizedBox(height: 4),
                     Text(
-                      message,
+                      widget.message,
                       style: theme.textTheme.bodyMedium!.copyWith(
                         height: 1.4,
                       ),
@@ -162,17 +230,17 @@ class ChatCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          DateFormat("dd/MM/yy h:mm a").format(time),
+                          DateFormat("h:mm a").format(widget.time),
                           style: theme.textTheme.bodySmall!.copyWith(
                             color: theme.hintColor,
                             fontSize: 11,
                           ),
                         ),
-                        if (isMine)
-                          const Padding(
+                        if (widget.isMine)
+                          Padding(
                             padding: EdgeInsets.only(left: 4),
                             child: Icon(
-                              Icons.done_all,
+                              widget.isViewed ? Icons.done_all : Icons.done,
                               size: 14,
                             ),
                           ),

@@ -49,7 +49,7 @@ class Rest {
   factory Rest.fromMap(Map<String, dynamic> map) {
     return Rest(
       id: map['id'] as String,
-      startDate: DateTime.parse(map['startDate'] as String),
+      startDate: DateTime.parse(map['startDate'] as String).toLocal(),
       endDate: DateTime.parse(map['endDate'] as String),
       numOfDays: map['numOfDays'] as int,
       reason: map['reason'] as String,

@@ -65,7 +65,7 @@ class Confusion {
       rejectedBecause: map['rejectedBecause'] != null
           ? map['rejectedBecause'] as String
           : null,
-      createdAt: DateTime.parse(map['createdAt'] as String),
+      createdAt: DateTime.parse(map['createdAt'] as String).toLocal(),
       onLesson: map['onLesson'] as int,
     );
   }
