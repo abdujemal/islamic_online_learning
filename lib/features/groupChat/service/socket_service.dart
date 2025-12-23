@@ -1,4 +1,5 @@
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
@@ -8,15 +9,15 @@ class SocketService {
   SocketService._internal();
   factory SocketService() => _instance;
 
-  void connect(String token) {
+  Future<void> connect() async {
+    final token = await getAccessToken();
     socket = IO.io(
       mainUrl,
       IO.OptionBuilder()
           .setTransports(['websocket'])
-          // .setQuery({"token": token})
-          // .enableReconnection()
-          // .enableForceNew()
-          .disableAutoConnect()
+          .setQuery({"token": token})
+          .enableReconnection()
+          .enableForceNew()
           .build(),
     );
     print("Socket connecting...");

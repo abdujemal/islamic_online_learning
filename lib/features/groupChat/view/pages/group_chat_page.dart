@@ -30,7 +30,12 @@ class _GroupChatPageState extends ConsumerState<GroupChatPage> {
     super.initState();
 
     Future.microtask(() {
-      ref.read(groupChatNotifierProvider.notifier).getGroupChat(context);
+      ref
+          .read(groupChatNotifierProvider.notifier)
+          .getGroupChat(context)
+          .then((e, ) {
+        initSocket();
+      },);
 
       _scrollController.addListener(() {
         if (_scrollController.position.pixels >=
@@ -38,38 +43,40 @@ class _GroupChatPageState extends ConsumerState<GroupChatPage> {
           loadMore();
         }
       });
+    });
+  }
 
-      final authState = ref.read(authNotifierProvider);
+  void initSocket() {
+    final authState = ref.read(authNotifierProvider);
 
-      socketService.connect(authState.user!.id);
+    socketService.connect();
 
-      socketService.joinChat(authState.user!.group.id);
+    socketService.joinChat(authState.user!.group.id);
 
-      socketService.onNewMessage((msg) {
-        ref
-            .read(groupChatNotifierProvider.notifier)
-            .addNewChatToTheList(Chat.fromMap(msg));
-      });
+    socketService.onNewMessage((msg) {
+      ref
+          .read(groupChatNotifierProvider.notifier)
+          .addNewChatToTheList(Chat.fromMap(msg));
+    });
 
-      socketService.onEditMessage((msg) {
-        ref
-            .read(groupChatNotifierProvider.notifier)
-            .editChatFromTheList(Chat.fromMap(msg));
-      });
+    socketService.onEditMessage((msg) {
+      ref
+          .read(groupChatNotifierProvider.notifier)
+          .editChatFromTheList(Chat.fromMap(msg));
+    });
 
-      socketService.onChatRead((data) {
-        ref.read(groupChatNotifierProvider.notifier).editChatViewFromTheList(
-              data["groupId"],
-              data["userId"],
-              data["chatId"],
-            );
-      });
+    socketService.onChatRead((data) {
+      ref.read(groupChatNotifierProvider.notifier).editChatViewFromTheList(
+            data["groupId"],
+            data["userId"],
+            data["chatId"],
+          );
+    });
 
-      socketService.onDeleteMessage((msg) {
-        ref
-            .read(groupChatNotifierProvider.notifier)
-            .deleteChatFromTheList(Chat.fromMap(msg));
-      });
+    socketService.onDeleteMessage((msg) {
+      ref
+          .read(groupChatNotifierProvider.notifier)
+          .deleteChatFromTheList(Chat.fromMap(msg));
     });
   }
 
