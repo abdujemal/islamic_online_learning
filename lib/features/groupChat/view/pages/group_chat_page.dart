@@ -34,8 +34,8 @@ class _GroupChatPageState extends ConsumerState<GroupChatPage> {
           .read(groupChatNotifierProvider.notifier)
           .getGroupChat(context)
           .then((e, ) {
-        initSocket();
       },);
+        initSocket();
 
       _scrollController.addListener(() {
         if (_scrollController.position.pixels >=
