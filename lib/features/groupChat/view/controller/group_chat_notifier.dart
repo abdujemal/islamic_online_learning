@@ -168,6 +168,12 @@ class GroupChatNotifier extends StateNotifier<GroupChatState> {
     }
   }
 
+  void setUnreadChats(int val) {
+    state = state.copyWith(
+      unreadChats: val,
+    );
+  }
+
   Future<bool> deleteGroupChat(
     String chatId,
     BuildContext context,

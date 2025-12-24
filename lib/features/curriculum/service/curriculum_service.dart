@@ -93,6 +93,8 @@ class CurriculumService {
           scores: currNGroup.scores,
           testAttempts: currNGroup.testAttempts,
           rests: currNGroup.rests,
+          unreadChats: currNGroup.unreadChats,
+          unReadNotifications: currNGroup.unReadNotifications,
         );
       }
     } else {
@@ -110,6 +112,8 @@ class CurriculumNGroup {
   final List<Discussion> discussions;
   final List<TestAttempt> testAttempts;
   final List<Rest> rests;
+  final int unreadChats;
+  final int unReadNotifications;
   CurriculumNGroup({
     required this.curriculum,
     required this.group,
@@ -117,6 +121,8 @@ class CurriculumNGroup {
     required this.testAttempts,
     required this.discussions,
     required this.rests,
+    required this.unreadChats,
+    required this.unReadNotifications,
   });
 
   Map<String, dynamic> toMap() {
@@ -127,6 +133,8 @@ class CurriculumNGroup {
       'testAttempts': testAttempts.map((e) => e.toMap()),
       "discussions": discussions.map((e) => e.toMap()),
       "rests": rests.map((e) => e.toMap()),
+      "unreadChats": unreadChats,
+      'unReadNotifications': unReadNotifications,
     };
   }
 
@@ -156,6 +164,8 @@ class CurriculumNGroup {
           (e) => Rest.fromMap(e),
         ),
       ),
+      unreadChats: map["unreadChats"] as int,
+      unReadNotifications: map["unReadNotifications"] as int,
     );
   }
 

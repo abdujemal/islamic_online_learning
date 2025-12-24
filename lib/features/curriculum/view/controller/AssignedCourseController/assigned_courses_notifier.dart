@@ -10,6 +10,8 @@ import 'package:islamic_online_learning/features/auth/view/controller/provider.d
 import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_service.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_state.dart';
+import 'package:islamic_online_learning/features/groupChat/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/notifications/view/controller/provider.dart';
 import 'package:islamic_online_learning/utils.dart';
 
 class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
@@ -36,6 +38,12 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       }
       // print(curriculum);
       ref.read(authNotifierProvider.notifier).setCourseRelatedData(group);
+      ref
+          .read(groupChatNotifierProvider.notifier)
+          .setUnreadChats(curriculumNGroup.unreadChats);
+      ref
+          .read(notificationNotifierProvider.notifier)
+          .setUnreadNotifications(curriculumNGroup.unReadNotifications);
       ref
           .read(authNotifierProvider.notifier)
           .setCourseStarted(CourseStarted.STARTED);

@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
@@ -18,6 +19,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       state = state.copyWith(isLoading: true);
       final user = await authService.getMyInfo();
+      FirebaseMessaging.instance.subscribeToTopic(user.id);
       await getScores(context);
       await _checkIfTheCourseStarted(context);
       state = state.copyWith(isLoading: false, user: user);
@@ -102,6 +104,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> logout() async {
     await deleteTokens();
     ref.read(curriculumNotifierProvider.notifier).getCurriculums();
+    FirebaseMessaging.instance.unsubscribeFromTopic(state.user?.id ?? "");
+
     setUserNull();
   }
 

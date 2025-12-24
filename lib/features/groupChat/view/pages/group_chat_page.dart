@@ -30,12 +30,9 @@ class _GroupChatPageState extends ConsumerState<GroupChatPage> {
     super.initState();
 
     Future.microtask(() {
-      ref
-          .read(groupChatNotifierProvider.notifier)
-          .getGroupChat(context)
-          .then((e, ) {
-      },);
-        initSocket();
+      ref.read(groupChatNotifierProvider.notifier).setUnreadChats(0);
+      ref.read(groupChatNotifierProvider.notifier).getGroupChat(context);
+      initSocket();
 
       _scrollController.addListener(() {
         if (_scrollController.position.pixels >=
@@ -54,9 +51,16 @@ class _GroupChatPageState extends ConsumerState<GroupChatPage> {
     socketService.joinChat(authState.user!.group.id);
 
     socketService.onNewMessage((msg) {
-      ref
-          .read(groupChatNotifierProvider.notifier)
-          .addNewChatToTheList(Chat.fromMap(msg));
+      final chat = Chat.fromMap(msg);
+      final authState = ref.read(authNotifierProvider);
+      ref.read(groupChatNotifierProvider.notifier).addNewChatToTheList(chat);
+      if (chat.senderId == authState.user!.id) {
+        socketService.readChat(
+          chat.groupId!,
+          chat.senderId!,
+          chat.id,
+        );
+      }
     });
 
     socketService.onEditMessage((msg) {

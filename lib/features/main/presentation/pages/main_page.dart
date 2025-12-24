@@ -9,13 +9,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/audio_providers.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
+import 'package:islamic_online_learning/core/topic_constants.dart';
 import 'package:islamic_online_learning/core/update_checker.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
-import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
+// import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
+import 'package:islamic_online_learning/features/groupChat/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/groupChat/view/pages/group_chat_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
@@ -23,6 +26,8 @@ import 'package:islamic_online_learning/features/main/presentation/widgets/botto
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_drawer.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/rate_us_dailog.dart';
+import 'package:islamic_online_learning/features/notifications/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/notifications/view/pages/notifications_page.dart';
 import 'package:islamic_online_learning/features/payments/view/pages/pricing_page.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -78,8 +83,6 @@ class _MainPageState extends ConsumerState<MainPage>
 
     _tabController = TabController(length: 3, vsync: this);
 
-    FirebaseMessaging.instance.subscribeToTopic("v1.0.1");
-
     _tabController.addListener(_handleTabChange);
 
     if (FirebaseAuth.instance.currentUser == null) {
@@ -88,49 +91,57 @@ class _MainPageState extends ConsumerState<MainPage>
       });
     }
 
-    if (mounted) {
-      ref.read(mainNotifierProvider.notifier).getTheme();
-      ref.read(sharedPrefProvider).then((pref) {
-        wantToRate = pref.getBool(PrefConsts.wantToRate);
-        ref.read(fontScaleProvider.notifier).update(
-              (state) => pref.getDouble(PrefConsts.fontScale) ?? 1.0,
-            );
-      });
+    Future.microtask(() {
+      if (mounted) {
+        ref.read(sharedPrefProvider).then((pref) {
+          bool isSubed = pref.getBool(PrefConsts.isSubed) ?? true;
+          if (isSubed) {
+            getAccessToken().then((token) {
+              final curriculumId = pref.getString(PrefConsts.curriculumId);
+              final otpId = pref.getString(PrefConsts.otpId);
+              if (token != null && curriculumId != null && otpId == null) {
+                FirebaseMessaging.instance.subscribeToTopic(proUserSub);
+                FirebaseMessaging.instance.unsubscribeFromTopic(legacySub);
+              } else {
+                FirebaseMessaging.instance.subscribeToTopic(legacySub);
+                FirebaseMessaging.instance.unsubscribeFromTopic(proUserSub);
+              }
+            });
+          }
+          FirebaseMessaging.instance.subscribeToTopic(versionSub);
+        });
 
-      ref.read(sharedPrefProvider).then((pref) {
-        ref.read(showGuideProvider.notifier).update(
-          (state) {
-            show = bool.parse(
-                pref.getString(PrefConsts.showGuide)?.split(",").first ??
-                    "true");
-            return [
-              show,
-              bool.parse(
-                  pref.getString(PrefConsts.showGuide)?.split(",").last ??
-                      "true")
-            ];
-          },
-        );
-      });
+        ref.read(mainNotifierProvider.notifier).getTheme();
+        ref.read(sharedPrefProvider).then((pref) {
+          wantToRate = pref.getBool(PrefConsts.wantToRate);
+          ref.read(fontScaleProvider.notifier).update(
+                (state) => pref.getDouble(PrefConsts.fontScale) ?? 1.0,
+              );
+        });
 
-      ref.read(sharedPrefProvider).then((pref) {
-        bool isSubed = pref.getBool(PrefConsts.isSubed) ?? true;
-        if (isSubed) {
-          FirebaseMessaging.instance.subscribeToTopic("ders");
-        }
-      });
+        ref.read(sharedPrefProvider).then((pref) {
+          ref.read(showGuideProvider.notifier).update(
+            (state) {
+              show = bool.parse(
+                  pref.getString(PrefConsts.showGuide)?.split(",").first ??
+                      "true");
+              return [
+                show,
+                bool.parse(
+                    pref.getString(PrefConsts.showGuide)?.split(",").last ??
+                        "true")
+              ];
+            },
+          );
+        });
+      }
+    });
 
-      // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      //   menuIndexWatch = ref.watch(menuIndexProvider.notifier);
-      //   menuIndexWatch?.addListener(refChangeHandler);
-      // });
-
-      AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-        if (!isAllowed) {
-          AwesomeNotifications().requestPermissionToSendNotifications();
-        }
-      });
-    }
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (mounted) {
@@ -151,15 +162,6 @@ class _MainPageState extends ConsumerState<MainPage>
               }
             }
           }
-
-          // state.mapOrNull(loaded: (_) {
-          //   // showDialog(
-          //   //   context: context,
-          //   //   builder: (context) => UpdateAllCourses(
-          //   //     _.courses,
-          //   //   ),
-          //   // );
-          // });
         });
       }
     });
@@ -440,17 +442,43 @@ class _MainPageState extends ConsumerState<MainPage>
                     Consumer(
                       builder: (context, ref, child) {
                         final authState = ref.watch(authNotifierProvider);
+                        final groupChatState =
+                            ref.watch(groupChatNotifierProvider);
+                        final noUnreadChats = groupChatState.unreadChats;
                         if (authState.user != null) {
-                          return IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => GroupChatPage(),
+                          return Stack(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => GroupChatPage(),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.chat_rounded),
+                              ),
+                              if (noUnreadChats > 0)
+                                Positioned(
+                                  right: 6,
+                                  bottom: 4,
+                                  child: Container(
+                                    padding: EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: primaryColor,
+                                    ),
+                                    child: Text(
+                                      "$noUnreadChats",
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              );
-                            },
-                            icon: Icon(Icons.chat_rounded),
+                            ],
                           );
                         } else {
                           return SizedBox();
@@ -458,21 +486,59 @@ class _MainPageState extends ConsumerState<MainPage>
                       },
                     ),
                     currentIndex != 1
-                        ? IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => IslamicStreakPage(
-                                    streak: 4,
-                                    lessonsCompleted: 10,
-                                    type: "Discussion",
+                        ? Consumer(builder: (context, ref, child) {
+                            final authState = ref.watch(authNotifierProvider);
+                            final notificationState =
+                                ref.watch(notificationNotifierProvider);
+                            final unreadNotifications =
+                                notificationState.unreadNotifications;
+                            if (authState.user != null) {
+                              return Stack(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => NotificationsPage()
+
+                                            // IslamicStreakPage(
+                                            //   streak: 4,
+                                            //   lessonsCompleted: 10,
+                                            //   type: "Discussion",
+                                            // ),
+                                            ),
+                                      );
+                                    },
+                                    icon: Icon(
+                                      Icons.notifications_rounded,
+                                    ),
                                   ),
-                                ),
+                                  if (unreadNotifications > 0)
+                                    Positioned(
+                                      right: 6,
+                                      bottom: 4,
+                                      child: Container(
+                                        padding: EdgeInsets.all(4),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: primaryColor,
+                                        ),
+                                        child: Text(
+                                          "$unreadNotifications",
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               );
-                            },
-                            icon: Icon(Icons.refresh),
-                          )
+                            } else {
+                              return SizedBox();
+                            }
+                          })
                         : IconButton(
                             onPressed: () {
                               Navigator.push(

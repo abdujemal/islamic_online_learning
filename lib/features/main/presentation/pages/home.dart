@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:app_links/app_links.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -111,9 +110,6 @@ class _HomeState extends ConsumerState<Home>
     });
 
     // tabController = TabController(length: 3, vsync: this);
-
-    FirebaseMessaging.instance.subscribeToTopic("v1.0.1");
-
     // tabController.addListener(_handleTabChange);
 
     if (FirebaseAuth.instance.currentUser == null) {
@@ -143,21 +139,6 @@ class _HomeState extends ConsumerState<Home>
           },
         );
       });
-
-      ref.read(sharedPrefProvider).then((pref) {
-        bool isSubed = pref.getBool(PrefConsts.isSubed) ?? true;
-        if (isSubed) {
-          FirebaseMessaging.instance.subscribeToTopic("ders");
-        }
-      });
-
-      // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      //   ref.watch(menuIndexProvider.notifier).addListener(
-      //     (state) {
-      //       tabController.animateTo(state);
-      //     },
-      //   );
-      // });
 
       AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
         if (!isAllowed) {

@@ -4,12 +4,14 @@ import 'package:islamic_online_learning/features/groupChat/model/chat.dart';
 class GroupChatState {
   final bool isLoading, isLoadingMore, hasNoMore, initial, chatAdding;
   final int page;
+  final int unreadChats;
   final List<Chat> groupChats;
   final String? error;
 
   GroupChatState({
     this.initial = true,
     this.page = 1,
+    this.unreadChats = 0,
     this.isLoading = false,
     this.hasNoMore = false,
     this.chatAdding = false,
@@ -45,6 +47,7 @@ class GroupChatState {
     bool? hasNoMore,
     bool? chatAdding,
     int? page,
+    int? unreadChats,
     List<Chat>? groupChats,
     String? error,
   }) {
@@ -54,6 +57,7 @@ class GroupChatState {
       hasNoMore: hasNoMore ?? this.hasNoMore,
       isLoading: isLoading ?? this.isLoading,
       groupChats: groupChats ?? this.groupChats,
+      unreadChats: unreadChats ?? this.unreadChats,
       page: page ?? this.page,
       chatAdding: chatAdding ?? this.chatAdding,
       error: error,
