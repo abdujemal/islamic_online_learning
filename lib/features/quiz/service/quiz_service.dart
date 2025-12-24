@@ -92,7 +92,7 @@ class QuizService {
     }
   }
 
-  Future<void> submitTest(String testId, List<QA> QAs) async {
+  Future<StreakWNo> submitTest(String testId, List<QA> QAs) async {
     final res = await customPostRequest(
       submitTestApi,
       {
@@ -108,8 +108,8 @@ class QuizService {
     );
 
     if (res.statusCode == 200) {
-      // final streak = Streak.fromJson(res.body);
-      // return streak;
+      final streak = StreakWNo.fromJson(res.body);
+      return streak;
     } else {
       print("res status code ${res.statusCode}");
       print("res body ${res.body}");
@@ -117,7 +117,7 @@ class QuizService {
     }
   }
 
-  Future<Streak> submitQuizzes(Lesson lesson, List<String> answers) async {
+  Future<StreakWNo> submitQuizzes(Lesson lesson, List<String> answers) async {
     final res = await customPostRequest(
       submitQuizApi,
       {
@@ -130,7 +130,7 @@ class QuizService {
     );
 
     if (res.statusCode == 200) {
-      final streak = Streak.fromJson(res.body);
+      final streak = StreakWNo.fromJson(res.body);
       return streak;
     } else {
       print("res status code ${res.statusCode}");

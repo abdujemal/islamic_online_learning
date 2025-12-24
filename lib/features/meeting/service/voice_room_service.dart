@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/auth/model/streak.dart';
 import 'package:islamic_online_learning/features/quiz/model/question.dart';
 import 'package:islamic_online_learning/features/quiz/model/quiz.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
@@ -48,7 +49,7 @@ class VoiceRoomService {
     return Question.listFromJson(res.body);
   }
 
-  Future<void> submit(List<QA> qas, List<QuizAns> quizAns) async {
+  Future<StreakWNo> submitDiscussionTasks(List<QA> qas, List<QuizAns> quizAns) async {
     final res = await customPostRequest(
       submitDiscussionTasksApi,
       {
@@ -58,7 +59,10 @@ class VoiceRoomService {
       },
       authorized: true,
     );
-    if (res.statusCode != 200) {
+    if (res.statusCode == 200) {
+      final streak = StreakWNo.fromJson(res.body);
+      return streak;
+    } else {
       throw Exception('Failed to submit discussion tasks: ${res.body}');
     }
     // return Question.listFromJson(res.body);

@@ -41,7 +41,7 @@ class Streak {
       'streakType': streakType,
       'scores': scores.map((x) => x.toMap()).toList(),
       'userId': userId,
-      'date': date.millisecondsSinceEpoch,
+      'date': date.toString(),
     };
   }
 
@@ -88,4 +88,57 @@ class Streak {
         userId.hashCode ^
         date.hashCode;
   }
+}
+
+class StreakWNo {
+  final Streak streak;
+  final int streakNo;
+  StreakWNo({
+    required this.streak,
+    required this.streakNo,
+  });
+  
+
+  StreakWNo copyWith({
+    Streak? streak,
+    int? streakNo,
+  }) {
+    return StreakWNo(
+      streak: streak ?? this.streak,
+      streakNo: streakNo ?? this.streakNo,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'streak': streak.toMap(),
+      'streakNo': streakNo,
+    };
+  }
+
+  factory StreakWNo.fromMap(Map<String, dynamic> map) {
+    return StreakWNo(
+      streak: Streak.fromMap(map['streak'] as Map<String,dynamic>),
+      streakNo: map['streakNo'] as int,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory StreakWNo.fromJson(String source) => StreakWNo.fromMap(json.decode(source)["streakInfo"] as Map<String, dynamic>);
+
+  @override
+  String toString() => 'StreakWNo(streak: $streak, streakNo: $streakNo)';
+
+  @override
+  bool operator ==(covariant StreakWNo other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.streak == streak &&
+      other.streakNo == streakNo;
+  }
+
+  @override
+  int get hashCode => streak.hashCode ^ streakNo.hashCode;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
@@ -429,12 +430,13 @@ class _MultipleQuestionQuizState extends ConsumerState<MultipleQuestionQuiz>
           ),
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
+              // final streakWNo = ref.read(currentStreakProvider);
+              // print("streak: $streakWNo");
+              Navigator.pushReplacement(
+                ref.context,
                 MaterialPageRoute(
-                  builder: (_) => MainPage(),
+                  builder: (_) => IslamicStreakPage(type: "Lesson"),
                 ),
-                (_) => false,
               );
             },
             style: ElevatedButton.styleFrom(
@@ -444,7 +446,7 @@ class _MultipleQuestionQuizState extends ConsumerState<MultipleQuestionQuiz>
               ),
             ),
             child: Text(
-              "ወደ ዋናው ገፅ ተመለስ",
+              "Next",
               style: TextStyle(
                 color: whiteColor,
               ),

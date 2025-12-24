@@ -4,6 +4,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
+import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/quiz_state.dart';
 
 class QuizNotifier extends StateNotifier<QuizState> {
@@ -36,11 +37,13 @@ class QuizNotifier extends StateNotifier<QuizState> {
       Lesson lesson, List<String> answers, WidgetRef ref) async {
     try {
       state = state.copyWith(isSubmitting: true);
-      await quizService.submitQuizzes(lesson, answers);
+      final streakWithNo = await quizService.submitQuizzes(lesson, answers);
 
       state = state.copyWith(
         isSubmitting: false,
       );
+
+      ref.read(currentStreakProvider.notifier).setStreak(streakWithNo);
     } catch (err) {
       // if(err)
       String errMsg = getErrorMsg(err.toString(), "ሙከራውን ማስረከብ አልተቻለም!");

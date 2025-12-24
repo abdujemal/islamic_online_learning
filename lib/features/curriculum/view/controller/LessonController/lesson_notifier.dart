@@ -139,7 +139,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
             context);
         if (state.currentLesson == null) return;
         // await PlaylistHelper.audioPlayer.stop();
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (_) => QuizPage(state.currentLesson!),
@@ -555,7 +555,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () async {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (_) => QuizPage(state.currentLesson!),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 // import 'package:islamic_online_learning/core/constants.dart';
 
@@ -77,6 +78,11 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
         },
       );
     }
+  }
+
+  void addScore(Score score) {
+    if (state.scores.where((e) => e.id == score.id).isNotEmpty) return;
+    state = state.copyWith(scores: [...state.scores, score]);
   }
 
   void changeExpandedCourse(int order) {

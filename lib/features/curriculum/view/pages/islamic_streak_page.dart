@@ -1,20 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
+import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
 import 'package:lottie/lottie.dart';
 
 enum StreakType { Lesson, Discussion, Test }
 
-class IslamicStreakPage extends StatelessWidget {
-  final int streak;
-  final int lessonsCompleted;
+class IslamicStreakPage extends ConsumerStatefulWidget {
   final String type;
-
   const IslamicStreakPage({
     super.key,
-    required this.streak,
-    required this.lessonsCompleted,
     required this.type,
   });
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _IslamicStreakPageState();
+}
+
+class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
+  int streak = 0;
+  int lessonsCompleted = 0;
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      final currentStreak = ref.read(currentStreakProvider);
+      streak = currentStreak!.streakNo;
+      lessonsCompleted = currentStreak.streak.scores.length;
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +56,7 @@ class IslamicStreakPage extends StatelessWidget {
                 ),
               ),
             ),
-        
+
             SafeArea(
               child: Stack(
                 children: [
@@ -50,9 +67,9 @@ class IslamicStreakPage extends StatelessWidget {
                   Column(
                     children: [
                       const SizedBox(height: 40),
-        
+
                       // Crescent Moon or Islamic learning animation
-        
+
                       SizedBox(
                         height: 150,
                         child: Lottie.asset(
@@ -60,9 +77,9 @@ class IslamicStreakPage extends StatelessWidget {
                           repeat: false,
                         ),
                       ),
-        
+
                       const SizedBox(height: 10),
-        
+
                       Text(
                         "$streak-Day Streak",
                         style: TextStyle(
@@ -71,9 +88,9 @@ class IslamicStreakPage extends StatelessWidget {
                           color: primaryColor,
                         ),
                       ),
-        
+
                       const SizedBox(height: 10),
-        
+
                       Text(
                         "Masha’Allah! You’re remaining consistent.",
                         style: TextStyle(
@@ -82,11 +99,11 @@ class IslamicStreakPage extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-        
+
                       const SizedBox(height: 25),
                       _islamicCard(primaryColor, gold),
                       const Spacer(),
-        
+
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 35),
@@ -101,10 +118,17 @@ class IslamicStreakPage extends StatelessWidget {
                               ),
                             ),
                             onPressed: () {
-                              Navigator.pop(context);
+                              // Navigator.pop(context);
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MainPage(),
+                                ),
+                                (_) => false,
+                              );
                             },
                             child: const Text(
-                              "Continue",
+                              "Back to Home Page",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -141,7 +165,7 @@ class IslamicStreakPage extends StatelessWidget {
               Icon(Icons.auto_stories, color: primary, size: 30),
               const SizedBox(width: 12),
               Text(
-                "Today's ${type} Complete",
+                "Today's ${widget.type} Complete",
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
@@ -155,8 +179,8 @@ class IslamicStreakPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _stat("Streak", "$streak Days", gold, primary),
-              // if(type == "Lesson")
-              _stat("${type}s Today", "$lessonsCompleted", gold, primary)
+              // if(widget.type == "Lesson")
+              _stat("${widget.type}s Today", "$lessonsCompleted", gold, primary)
               // : SizedBox(),
             ],
           ),

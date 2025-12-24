@@ -158,13 +158,13 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                         await ref
                             .read(voiceRoomNotifierProvider.notifier)
                             .submitDiscussionTask(ref);
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => MainPage(),
-                          ),
-                          (_) => false,
-                        );
+                        // Navigator.pushAndRemoveUntil(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (_) => MainPage(),
+                        //   ),
+                        //   (_) => false,
+                        // );
                       },
                       child: const Text(
                         "አስረክብ ና ውጣ",

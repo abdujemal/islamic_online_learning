@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/question_state.dart';
@@ -73,12 +74,23 @@ class QuestionNotifier extends StateNotifier<QuestionState> {
   Future<void> submitTest(BuildContext context) async {
     try {
       state = state.copyWith(isSubmitting: true);
-      // final streak =
-      await quizService.submitTest(state.testAttempt!.id, state.answers);
+      final streakWithNo =
+          await quizService.submitTest(state.testAttempt!.id, state.answers);
+
+      ref.read(currentStreakProvider.notifier).setStreak(streakWithNo);
 
       state = state.copyWith(
         isSubmitting: false,
       );
+
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => IslamicStreakPage(type: "Test"),
+          ),
+        );
+      }
       toast("ማሻአላህ! ፈተናዎን በተሳካ ሁኔታ ተረክበናል፤ ኢንሻአላህ በ24 ሰዓት ውስጥ ኡስታዞቻችን ያርሙታል።",
           ToastType.success, context,
           isLong: true);
