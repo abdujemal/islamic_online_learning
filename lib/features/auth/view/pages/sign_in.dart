@@ -4,6 +4,7 @@ import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/main/presentation/widgets/the_end.dart';
 
 class SignIn extends ConsumerStatefulWidget {
   final String? curriculumId;
@@ -68,7 +69,7 @@ class _SignInState extends ConsumerState<SignIn> {
                       ),
                       fillColor: Theme.of(context).chipTheme.backgroundColor ??
                           Colors.grey.shade100),
-              
+
                   pickerDialogStyle: PickerDialogStyle(
                       listTileDivider: Divider(color: whiteColor)),
                   initialCountryCode: 'ET', // Ethiopia default
@@ -82,25 +83,25 @@ class _SignInState extends ConsumerState<SignIn> {
                     return null;
                   },
                 ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: GestureDetector(
-                    onTap: () {
-                      ref.read(signInNotifierProvider.notifier).toggleMode();
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "በኢሜል ይሁንልኝ",
-                        style: TextStyle(
-                          color: primaryColor,
-                          decoration: TextDecoration.underline,
-                          decorationColor: primaryColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                // Align(
+                //   alignment: Alignment.bottomRight,
+                //   child: GestureDetector(
+                //     onTap: () {
+                //       ref.read(signInNotifierProvider.notifier).toggleMode();
+                //     },
+                //     child: Padding(
+                //       padding: const EdgeInsets.all(8.0),
+                //       child: Text(
+                //         "በኢሜል ይሁንልኝ",
+                //         style: TextStyle(
+                //           color: primaryColor,
+                //           decoration: TextDecoration.underline,
+                //           decorationColor: primaryColor,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 20),
               ] else ...[
                 TextField(
@@ -108,25 +109,25 @@ class _SignInState extends ConsumerState<SignIn> {
                   decoration: _inputDecoration("ኢሜል"),
                   keyboardType: TextInputType.emailAddress,
                 ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: GestureDetector(
-                    onTap: () {
-                      ref.read(signInNotifierProvider.notifier).toggleMode();
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "በስልክ ይሁንልኝ",
-                        style: TextStyle(
-                          color: primaryColor,
-                          decoration: TextDecoration.underline,
-                          decorationColor: primaryColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                // Align(
+                //   alignment: Alignment.bottomRight,
+                //   child: GestureDetector(
+                //     onTap: () {
+                //       ref.read(signInNotifierProvider.notifier).toggleMode();
+                //     },
+                //     child: Padding(
+                //       padding: const EdgeInsets.all(8.0),
+                //       child: Text(
+                //         "በስልክ ይሁንልኝ",
+                //         style: TextStyle(
+                //           color: primaryColor,
+                //           decoration: TextDecoration.underline,
+                //           decorationColor: primaryColor,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 20),
               ],
               ElevatedButton(
@@ -134,7 +135,7 @@ class _SignInState extends ConsumerState<SignIn> {
                   if (state.isLoading) {
                     return;
                   }
-              
+
                   ref.read(signInNotifierProvider.notifier).sendOtp(
                         _emailController.text,
                         widget.curriculumId,
@@ -154,6 +155,47 @@ class _SignInState extends ConsumerState<SignIn> {
                         color: whiteColor,
                       )
                     : const Text("ቀጥል"),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              TheEnd(
+                text: "OR",
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Align(
+                child: ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(signInNotifierProvider.notifier)
+                          .signWithGoogle(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      side: BorderSide(color: primaryColor),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      foregroundColor:
+                          Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          "assets/google2.png",
+                          // color:  Colors.grey,
+                          height: 30,
+                          width: 30,
+                        ),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        state.isSigningWGoogle
+                            ? CircularProgressIndicator()
+                            : Text("Sign in with Google"),
+                      ],
+                    )),
               ),
             ],
           ),

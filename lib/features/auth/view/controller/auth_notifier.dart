@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/Questionaire/model/questionnaire.dart';
+import 'package:islamic_online_learning/features/Questionaire/view/pages/questionnaire_screen.dart';
 import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
 import 'package:islamic_online_learning/features/auth/model/subscription.dart';
 import 'package:islamic_online_learning/features/auth/service/auth_service.dart';
@@ -22,6 +24,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       FirebaseMessaging.instance.subscribeToTopic(user.id);
       await getScores(context);
       await _checkIfTheCourseStarted(context);
+      checkQuestionnaireAndDisplay(context);
       state = state.copyWith(isLoading: false, user: user);
     } on ConnectivityException catch (err) {
       state = state.copyWith(isLoading: false, error: err.toString());
@@ -43,6 +46,76 @@ class AuthNotifier extends StateNotifier<AuthState> {
         },
       );
     }
+  }
+
+  Future<void> checkQuestionnaireAndDisplay(BuildContext context) async {
+    final List<Questionnaire> questionnaires =
+        await authService.getActiveQuestionnaire();
+
+    if (questionnaires.isNotEmpty) {
+      final bool? accepted = await showSurveyPermissionDialog(context);
+      if (accepted == true) {
+        final questions =
+            questionnaires.map((e) => e.questions).expand((i) => i).toList();
+        if (context.mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => QuestionnaireScreen(
+                questions: questions,
+              ),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<bool?> showSurveyPermissionDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // user must explicitly choose
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.feedback_rounded,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(child: const Text('የዳሰሳ ጥናት')),
+            ],
+          ),
+          content: const Text(
+            'የእርስዎ ልምድ ለእኛ አስፈላጊ ነው።\n\n'
+            'አገልግሎታችንን ለማሻሻል እንዲረዳን አጭር የዳሰሳ ጥናት ለማድረግ ፈቃደኛ ይሆናሉ? '
+            'ጥቂት ደቂቃዎችን ብቻ ነው የሚወስደው፣ እና የእርስዎ ምላሾች ሚስጥራዊ ሆነው ይቆያሉ።',
+          ),
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('ሌላ ጊዜ'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+               style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: whiteColor,
+              ),
+              child: const Text('እሺ, ለማገዝ እፈልጋለሁ'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> updateMyInfo(BuildContext context, String name, int age) async {
@@ -103,6 +176,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     await deleteTokens();
+    await AuthService.googleSignIn.signOut();
     ref.read(curriculumNotifierProvider.notifier).getCurriculums();
     FirebaseMessaging.instance.unsubscribeFromTopic(state.user?.id ?? "");
 

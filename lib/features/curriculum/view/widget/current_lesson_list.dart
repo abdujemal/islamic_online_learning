@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
@@ -9,18 +10,19 @@ import 'package:islamic_online_learning/features/curriculum/view/controller/prov
 import 'package:islamic_online_learning/features/curriculum/view/widget/discussion_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/exam_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/lesson_card.dart';
+import 'package:islamic_online_learning/features/curriculum/view/widget/monthly_score_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/rest_card.dart';
 
-class CurrentLessonList2 extends ConsumerStatefulWidget {
+class CurrentLessonList extends ConsumerStatefulWidget {
   final AssignedCourse assignedCourse;
-  const CurrentLessonList2({super.key, required this.assignedCourse});
+  const CurrentLessonList({super.key, required this.assignedCourse});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _CurrentLessonList2State();
+      _CurrentLessonListState();
 }
 
-class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
+class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
   @override
   Widget build(BuildContext context) {
     // int realIndex = -1;
@@ -38,6 +40,7 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
           state.rests,
         );
     List<Rest> rests = lessonStructureWRest[1] as List<Rest>;
+    List<MonthlyScore> monthlyScores = state.monthlyScores;
     List<int> lessonStructure = lessonStructureWRest[0] as List<int>;
     final currentLessonNum = authState.courseRelatedData?.lessonNum ?? 0;
     final currentLessonIndexes = List.generate(
@@ -199,6 +202,8 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
                 // Text("Rest date:${rest.date} for: ${rest.amount}"),
                 if (hasDiscussion && rest == null)
                   DiscussionCard(
+                    examData: examData,
+                    assignedCourse: widget.assignedCourse,
                     discussionData: discussionData!,
                     afterLesson: index,
                     isLocked:
@@ -213,9 +218,14 @@ class _CurrentLessonList2State extends ConsumerState<CurrentLessonList2> {
                     discussionData: discussionData!,
                     isLastExam: index + 1 == state.curriculum!.lessons!.length,
                     isLocked:
-                        isExamLocked, //|| status != LessonCardStatus.EXAM,
-                    isCurrent:
-                        isCurrentLesson && status == LessonCardStatus.EXAM,
+                        isDiscussionLocked, //|| status != LessonCardStatus.EXAM,
+                    isCurrent: isCurrentLesson &&
+                        status == LessonCardStatus.DISCUSSION,
+                  ),
+                if (monthlyScores.any((ms) => ms.endLesson == index))
+                  MonthlyScoreCard(
+                    monthlyScore:
+                        monthlyScores.firstWhere((ms) => ms.endLesson == index),
                   ),
               ],
             );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
 import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
@@ -9,6 +10,7 @@ class AssignedCoursesState {
   final bool isLoading, initial, isErrorAuth, isErrorPayment;
   final Curriculum? curriculum;
   final List<Score> scores;
+  final List<MonthlyScore> monthlyScores;
   final List<TestAttempt> testAttempts;
   final List<Discussion> discussions;
   final List<Rest> rests;
@@ -21,6 +23,7 @@ class AssignedCoursesState {
     this.isErrorAuth = false,
     this.isErrorPayment = false,
     this.scores = const [],
+    this.monthlyScores = const [],
     this.testAttempts = const [],
     this.discussions = const [],
     this.rests = const [],
@@ -62,6 +65,7 @@ class AssignedCoursesState {
     bool? isErrorPayment,
     Curriculum? curriculum,
     List<Score>? scores,
+    List<MonthlyScore>? monthlyScores,
     List<TestAttempt>? testAttempts,
     List<Discussion>? discussions,
     List<Rest>? rests,
@@ -73,6 +77,7 @@ class AssignedCoursesState {
       isLoading: isLoading ?? this.isLoading,
       curriculum: curriculum ?? this.curriculum,
       scores: scores ?? this.scores,
+      monthlyScores: monthlyScores ?? this.monthlyScores,
       testAttempts: testAttempts ?? this.testAttempts,
       discussions: discussions ?? this.discussions,
       isErrorAuth: isErrorAuth ?? false,

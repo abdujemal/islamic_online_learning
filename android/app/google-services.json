@@ -10,10 +10,15 @@
       "client_info": {
         "mobilesdk_app_id": "1:289944837560:android:b64fc8b263d01445be834d",
         "android_client_info": {
-          "package_name": "com.aj.islamic_online_learning_dev"
+          "package_name": "com.aj.islamic_online_learning"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBiA2vITeod4WsEGK_pO1bWQPl_Vwa5vAA"
@@ -21,7 +26,49 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289944837560:android:880afe85a3998b73be834d",
+        "android_client_info": {
+          "package_name": "com.aj.islamic_online_learning_dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "289944837560-8u9cm76g1g4d6h187a59ral1n9jvovva.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aj.islamic_online_learning_dev",
+            "certificate_hash": "cdea4213ebb23ba51b5162c8ceead98c40066cb2"
+          }
+        },
+        {
+          "client_id": "289944837560-8u9cm76g1g4d6h187a59ral1n9jvovva.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiA2vITeod4WsEGK_pO1bWQPl_Vwa5vAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -40,6 +87,10 @@
             "package_name": "com.example.ders_admin",
             "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
           }
+        },
+        {
+          "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -49,7 +100,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -60,7 +116,12 @@
           "package_name": "com.example.ders_admin2"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBiA2vITeod4WsEGK_pO1bWQPl_Vwa5vAA"
@@ -68,7 +129,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

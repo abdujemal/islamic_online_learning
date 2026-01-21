@@ -9,7 +9,7 @@ import 'package:islamic_online_learning/features/auth/view/controller/provider.d
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
-import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
+// import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
 import 'package:islamic_online_learning/features/quiz/view/pages/question_page.dart';
 
 class ExamCard extends ConsumerStatefulWidget {
@@ -37,40 +37,40 @@ class _ExamCardState extends ConsumerState<ExamCard> {
   ConstScore? constScore;
   Score? getScore() {
     final isPastLesson = !widget.isCurrent && !widget.isLocked;
-    final testResult = ref
-        .watch(assignedCoursesNotifierProvider)
-        .testAttempts
-        .where(
-          (e) => e.afterLessonNum == widget.examData.lessonTo,
-        )
-        .toList();
-    // print(
-    //     "testResult: $testResult, $isPastLesson ${widget.examData.lessonFrom}");
-    TestAttempt? testAttempt = testResult.isNotEmpty ? testResult.first : null;
+    // final testResult = ref
+    //     .watch(assignedCoursesNotifierProvider)
+    //     .testAttempts
+    //     .where(
+    //       (e) => e.afterLessonNum == widget.examData.lessonTo,
+    //     )
+    //     .toList();
+    // // print(
+    // //     "testResult: $testResult, $isPastLesson ${widget.examData.lessonFrom}");
+    // TestAttempt? testAttempt = testResult.isNotEmpty ? testResult.first : null;
 
-    if (testAttempt == null) {
-      if (isPastLesson) {
-        final score = Score(
-          id: "id",
-          targetType: "IndividualAssignment",
-          targetId: "testAttempt.id",
-          score: 0,
-          afterLesson: widget.afterLesson,
-          gradeWaiting: false,
-          outOf: constScore?.totalScore ?? 0,
-          userId: "userId",
-          date: DateTime.now(),
-        );
-        return score;
-      }
-      return null;
-    }
+    // if (testAttempt == null) {
+      // if (isPastLesson) {
+      //   final score = Score(
+      //     id: "id",
+      //     targetType: "IndividualAssignment",
+      //     targetId: "testAttempt.id",
+      //     score: 0,
+      //     afterLesson: widget.afterLesson,
+      //     gradeWaiting: false,
+      //     outOf: constScore?.totalScore ?? 0,
+      //     userId: "userId",
+      //     date: DateTime.now(),
+      //   );
+      //   return score;
+      // }
+    //   return null;
+    // }
 
     final scoresResult = ref
         .watch(assignedCoursesNotifierProvider)
         .scores
         .where(
-          (e) => e.targetId == testAttempt.id,
+          (e) => e.afterLesson == widget.afterLesson && e.targetType == "IndividualAssignment",
         )
         .toList();
     // print("scoresResult: $scoresResult");
@@ -80,7 +80,7 @@ class _ExamCardState extends ConsumerState<ExamCard> {
       score = Score(
         id: "id",
         targetType: "IndividualAssignment",
-        targetId: testAttempt.id,
+        targetId: 'testAttempt.id',
         score: 0,
         gradeWaiting: false,
         outOf: constScore?.totalScore ?? 0,
@@ -212,37 +212,37 @@ class _ExamCardState extends ConsumerState<ExamCard> {
                         )
                       ],
                     ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: widget.isCurrent && score == null
-                          ? BouncyElevatedButton(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          QuestionPage(widget.examData.title),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.purple,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                ),
-                                child: const Text(
-                                  "ፈተናውን ጀምር",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: whiteColor,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : SizedBox(),
-                    ),
+                    // SizedBox(
+                    //   width: double.infinity,
+                    //   child: widget.isCurrent && score == null
+                    //       ? BouncyElevatedButton(
+                    //           child: ElevatedButton(
+                    //             onPressed: () {
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (_) =>
+                                  //         QuestionPage(widget.examData.title),
+                                  //   ),
+                                  // );
+                    //             },
+                    //             style: ElevatedButton.styleFrom(
+                    //               backgroundColor: Colors.purple,
+                    //               shape: RoundedRectangleBorder(
+                    //                 borderRadius: BorderRadius.circular(50),
+                    //               ),
+                    //             ),
+                    //             child: const Text(
+                    //               "ፈተናውን ጀምር",
+                    //               style: TextStyle(
+                    //                 fontSize: 16,
+                    //                 color: whiteColor,
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         )
+                    //       : SizedBox(),
+                    // ),
                   ],
                 ),
                 if (widget.isLocked)
@@ -264,5 +264,6 @@ class _ExamCardState extends ConsumerState<ExamCard> {
         ],
       ),
     );
+  
   }
 }

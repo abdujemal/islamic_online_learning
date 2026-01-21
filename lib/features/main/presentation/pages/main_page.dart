@@ -20,6 +20,7 @@ import 'package:islamic_online_learning/features/curriculum/view/pages/curriculu
 // import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
 import 'package:islamic_online_learning/features/groupChat/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/groupChat/view/pages/group_chat_page.dart';
+// import 'package:islamic_online_learning/features/groupChat/view/pages/group_chat_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
@@ -60,6 +61,66 @@ class _MainPageState extends ConsumerState<MainPage>
   // final GlobalKey _courseUstaz = GlobalKey();
   // final GlobalKey _courseCategory = GlobalKey();
   // final GlobalKey _bookmarkey = GlobalKey();
+
+  // final List<QuestionnaireQuestion> sampleQuestions = [
+  //   QuestionnaireQuestion(
+  //     id: 'q_pay',
+  //     text: 'Would you pay for this service?',
+  //     type: QuestionType.singleChoice,
+  //     required: true,
+  //     options: [
+  //       QuestionOption(
+  //         id: 'opt_yes',
+  //         label: 'Yes, I would pay',
+  //         value: 'YES_PAY',
+  //         // order: 1,
+  //       ),
+  //       QuestionOption(
+  //         id: 'opt_maybe',
+  //         label: 'Maybe, depends on price',
+  //         value: 'MAYBE',
+  //         // order: 2,
+  //       ),
+  //       QuestionOption(
+  //         id: 'opt_no',
+  //         label: 'No, I would not pay',
+  //         value: 'WONT_PAY',
+  //         // order: 3,
+  //       ),
+  //     ],
+  //     triggers: [
+  //       QuestionCondition(
+  //         sourceQuestionId: 'q_pay',
+  //         triggerValue: 'WONT_PAY',
+  //         targetQuestionId: 'q_why_not',
+  //       ),
+  //       QuestionCondition(
+  //         sourceQuestionId: 'q_pay',
+  //         triggerValue: 'MAYBE',
+  //         targetQuestionId: 'q_price',
+  //       ),
+  //     ],
+  //   ),
+  //   QuestionnaireQuestion(
+  //     id: 'q_why_not',
+  //     text: 'Why would you not pay? What should we improve to convince you?',
+  //     type: QuestionType.longText,
+  //     required: true,
+  //   ),
+  //   QuestionnaireQuestion(
+  //     id: 'q_price',
+  //     text: 'How much would you be willing to pay per month?',
+  //     type: QuestionType.priceInput,
+  //     required: true,
+  //     // currency: 'USD',
+  //   ),
+  //   QuestionnaireQuestion(
+  //     id: 'q_rating',
+  //     text: 'How valuable do you think this service is?',
+  //     type: QuestionType.rating,
+  //     required: true,
+  //   ),
+  // ];
 
   bool show = false;
 
@@ -454,6 +515,9 @@ class _MainPageState extends ConsumerState<MainPage>
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => GroupChatPage(),
+                                      //     QuestionnaireScreen(
+                                      //   questions: sampleQuestions,
+                                      // ),
                                     ),
                                   );
                                 },

@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/features/Questionaire/model/questionnaire.dart';
 import 'package:islamic_online_learning/features/auth/model/confusion.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
@@ -29,6 +32,78 @@ class AuthService {
       print("Response body: $error");
 
       throw Exception(error);
+    }
+  }
+
+  static GoogleSignIn googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+      'profile',
+    ],
+    // IMPORTANT: request serverAuthCode
+    serverClientId: dotenv.get(
+        "ANDROID_CLIENT_ID"), //"YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+  );
+
+  Future<Map> signInWGoogle() async {
+    // await _googleSignIn.signOut();
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+    if (googleUser == null) throw Exception("googleUser is null");
+
+    // final auth = await googleUser.authentication;
+
+    final auth = await googleUser.authentication;
+    // if (serverAuthCode == null) throw Exception("No serverAuthCode");
+
+    // Send the code to your backendGoogleSignInAccount
+    final response = await customPostRequest(
+      googleAuthApi,
+      {
+        "idToken": auth.idToken,
+      },
+    );
+    // final res = await http.post(
+    //   Uri.parse("https://yourapi.com/auth/google"),
+    //   headers: {"Content-Type": "application/json"},
+    //   body: jsonEncode({
+    //     "code": serverAuthCode,
+    //   }),
+    // );
+    if (response.statusCode == 200) {
+      final data = (jsonDecode(response.body))["data"];
+      final user = (jsonDecode(response.body))["user"];
+      // final token = (jsonDecode(response.body))["token"];
+      // print(data);
+      if (data['ok'] == true &&
+          data['token'] != null &&
+          data['refreshToken'] != null) {
+        await storage.write(
+          key: 'access_token',
+          value: "Bearer ${data['token']}",
+        );
+        await storage.write(
+          key: 'refresh_token',
+          value: data['refreshToken'],
+        );
+        await storage.write(
+          key: 'phone',
+          value: data['email'],
+        );
+      }
+      if (user == null) {
+        return {"data": data};
+      } else {
+        return {"user": user, "data": data};
+      }
+      // // print(response.body);
+      // throw Exception('Failed to verifying otp');
+    } else if (response.statusCode == 400) {
+      throw Exception((jsonDecode(response.body))["error"]);
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to signin with google: ${response.body}');
     }
   }
 
@@ -135,6 +210,65 @@ class AuthService {
     }
   }
 
+  Future<List<Questionnaire>> getActiveQuestionnaire() async {
+    final response = await customGetRequest(
+      getActiveQuestionnaireApi,
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      List<Questionnaire> questionnaires =
+          Questionnaire.listFromJson(response.body);
+      return questionnaires; //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to get active questionnaire: ${response.body}');
+    }
+  }
+
+  Future<void> submitQuestionnaire(
+      Map<String, dynamic> data) async {
+    final response = await customPostRequest(
+      submitFeedbackApi,
+      data,
+      authorized: true,
+    );
+
+     if (response.statusCode == 200) {
+      // List<Questionnaire> questionnaires =
+      //     Questionnaire.listFromJson(response.body);
+      // return questionnaires; //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to submit questionnaire: ${response.body}');
+    }
+
+  }
+
+  Future<void> submitFeedback(String text, int? lessonNum) async {
+    final response = await customPostRequest(
+      submitFeedbackApi,
+      {
+        "text": text,
+        if (lessonNum != null) ...{
+          "lessonNum": lessonNum,
+        }
+      },
+      authorized: true,
+    );
+
+    if (response.statusCode == 200) {
+      // List<Questionnaire> questionnaires =
+      //     Questionnaire.listFromJson(response.body);
+      // return questionnaires; //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to submit feedback: ${response.body}');
+    }
+  }
+
   Future<User> updateMyInfo(String name, int age) async {
     final dob = DateTime.now().subtract(Duration(days: age * 365));
     final response = await customPutRequest(
@@ -196,7 +330,9 @@ class AuthService {
     );
     if (response.statusCode == 200) {
       final streaks = jsonDecode(response.body) as List<dynamic>;
-      return streaks.map((e) => DateTime.parse(e as String).toLocal()).toList(); //token
+      return streaks
+          .map((e) => DateTime.parse(e as String).toLocal())
+          .toList(); //token
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");

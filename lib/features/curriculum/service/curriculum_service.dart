@@ -1,19 +1,21 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
+import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_db_helper.dart';
-import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
 import 'package:islamic_online_learning/features/meeting/model/discussion.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
 
 class CurriculumService {
   Future<List<Curriculum>> fetchCurriculums() async {
@@ -56,8 +58,16 @@ class CurriculumService {
     );
 
     if (response.statusCode == 200) {
-      final currNGroup = CurriculumNGroup.fromJson(response.body);
+      CurriculumNGroup currNGroup = CurriculumNGroup.fromJson(response.body);
       // return currNGroup;
+
+      // getting the archived scores
+      final urls = currNGroup.monthlyScores.map((e) => e.archiveUrl).toList();
+      final archivedScores = await Score.fetchArchivedScoresMultiple(urls);
+
+      currNGroup = currNGroup.copyWith(
+        scores: [...currNGroup.scores, ...archivedScores],
+      );
 
       if (currNGroup.curriculum != null) {
         await pref.setString(
@@ -91,6 +101,7 @@ class CurriculumService {
           discussions: currNGroup.discussions,
           group: currNGroup.group,
           scores: currNGroup.scores,
+          monthlyScores: currNGroup.monthlyScores,
           testAttempts: currNGroup.testAttempts,
           rests: currNGroup.rests,
           unreadChats: currNGroup.unreadChats,
@@ -109,6 +120,7 @@ class CurriculumNGroup {
   final Curriculum? curriculum;
   final CourseRelatedData group;
   final List<Score> scores;
+  final List<MonthlyScore> monthlyScores;
   final List<Discussion> discussions;
   final List<TestAttempt> testAttempts;
   final List<Rest> rests;
@@ -118,6 +130,7 @@ class CurriculumNGroup {
     required this.curriculum,
     required this.group,
     required this.scores,
+    required this.monthlyScores,
     required this.testAttempts,
     required this.discussions,
     required this.rests,
@@ -139,7 +152,8 @@ class CurriculumNGroup {
   }
 
   factory CurriculumNGroup.fromMap(Map<String, dynamic> map) {
-    printMap(map);
+    // printMap(map);
+
     return CurriculumNGroup(
       curriculum: map['currentCurriculum'] != null
           ? Curriculum.fromMap(map['currentCurriculum'] as Map<String, dynamic>)
@@ -148,6 +162,11 @@ class CurriculumNGroup {
       scores: List<Score>.from(
         (map["scores"] as List<dynamic>).map(
           (e) => Score.fromMap(e),
+        ),
+      ),
+      monthlyScores: List<MonthlyScore>.from(
+        (map["monthlyScores"] as List<dynamic>).map(
+          (e) => MonthlyScore.fromMap(e),
         ),
       ),
       discussions:
@@ -173,4 +192,28 @@ class CurriculumNGroup {
 
   factory CurriculumNGroup.fromJson(String source) =>
       CurriculumNGroup.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  CurriculumNGroup copyWith({
+    Curriculum? curriculum,
+    CourseRelatedData? group,
+    List<Score>? scores,
+    List<MonthlyScore>? monthlyScores,
+    List<Discussion>? discussions,
+    List<TestAttempt>? testAttempts,
+    List<Rest>? rests,
+    int? unreadChats,
+    int? unReadNotifications,
+  }) {
+    return CurriculumNGroup(
+      curriculum: curriculum ?? this.curriculum,
+      group: group ?? this.group,
+      scores: scores ?? this.scores,
+      monthlyScores: monthlyScores ?? this.monthlyScores,
+      discussions: discussions ?? this.discussions,
+      testAttempts: testAttempts ?? this.testAttempts,
+      rests: rests ?? this.rests,
+      unreadChats: unreadChats ?? this.unreadChats,
+      unReadNotifications: unReadNotifications ?? this.unReadNotifications,
+    );
+  }
 }

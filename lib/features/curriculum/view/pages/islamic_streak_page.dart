@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/Questionaire/view/pages/feedback_screen.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
 import 'package:lottie/lottie.dart';
@@ -22,12 +23,14 @@ class IslamicStreakPage extends ConsumerStatefulWidget {
 class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
   int streak = 0;
   int lessonsCompleted = 0;
+  int? lessonNum;
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
       final currentStreak = ref.read(currentStreakProvider);
       streak = currentStreak!.streakNo;
+      lessonNum = currentStreak.streak.scores[0].afterLesson;
       lessonsCompleted = currentStreak.streak.scores.length;
       setState(() {});
     });
@@ -103,10 +106,49 @@ class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
                       const SizedBox(height: 25),
                       _islamicCard(primaryColor, gold),
                       const Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => FeedbackScreen(
+                                    lessonNum: lessonNum,
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadiusGeometry.circular(10),
+                                side: BorderSide(
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              "አስተያየት መስጫ",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
 
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 35),
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         child: SizedBox(
                           width: double.infinity,
                           height: 55,

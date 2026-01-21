@@ -120,6 +120,9 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
               },
               onFinish: (i, answers) async {
                 // await Future.delayed(Duration(seconds: 1));
+                ref
+                    .read(voiceRoomNotifierProvider.notifier)
+                    .changeVoiceRoomStatus(VoiceRoomStatus.choiceDone);
                 toast(
                     "You have finished the Multiple Choice questions. Please wait for the countdown to end.",
                     ToastType.success,
@@ -199,6 +202,9 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
             },
             onFinish: (answers) async {
               print("answers: $answers");
+              ref
+                  .read(voiceRoomNotifierProvider.notifier)
+                  .changeVoiceRoomStatus(VoiceRoomStatus.shortDone);
               toast(
                   "You have finished the short answer Questions. Please wait for the countdown to end.",
                   ToastType.success,
@@ -247,10 +253,39 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
         // else
         if (widget.status == VoiceRoomStatus.discussing)
           _buildDiscussionUI()
+
         else if (widget.status == VoiceRoomStatus.choice)
           _buildChoiceUI()
+        else if(widget.status == VoiceRoomStatus.choiceDone)
+          Expanded( 
+            child: Center(
+              child: Text(
+                //give me islamic motivational text
+                "ማሻአላህ! የምርጫውን ክፍል አጠናቀዋል። በትዕግስት ይቆዩ እና ለሚቀጥለው ይዘጋጁ።",
+                // "You have finished the Choice part. Please wait for the next part.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          )
         else if (widget.status == VoiceRoomStatus.short)
-          _buildShortAnswerUI(voiceRoomState),
+          _buildShortAnswerUI(voiceRoomState)
+        else if (widget.status == VoiceRoomStatus.shortDone)
+          Expanded( 
+            child: Center(
+              child: Text(
+                "ማሻአላህ! የጥያቄዎቹን አጠናቀዋል። ደቂቃው እስኪያልቅ በትዕግስት ይጠብቁ።",
+                
+                // "You have finished the Short answer part. Please wait for the next part.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          )
       ],
     );
   }

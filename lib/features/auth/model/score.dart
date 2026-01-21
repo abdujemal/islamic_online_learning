@@ -1,5 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 
 class Score {
   final String id;
@@ -72,6 +75,51 @@ class Score {
       afterLesson: map["afterLesson"] as int,
       date: DateTime.parse(map['date'] as String).toLocal(),
     );
+  }
+
+  //from archive url to dart model class
+  static Future<List<Score>> fetchArchivedScores(String url) async {
+    final httpClient = HttpClient();
+
+    final request = await httpClient.getUrl(Uri.parse(url));
+    final response = await request.close();
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to download archive');
+    }
+
+    // 1. Read compressed bytes
+    final compressedBytes = await consolidateHttpClientResponseBytes(response);
+
+    // 2. Decompress gzip
+    final decompressedBytes = gzip.decode(compressedBytes);
+
+    // 3. Convert bytes → String
+    final jsonString = utf8.decode(decompressedBytes);
+
+    // 4. Decode JSON → Map
+    final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+
+    final List<dynamic> scoresJson = jsonMap['scores'];
+    final List<dynamic> streaksJson = jsonMap['streaks'];
+
+    // 5. Map → Dart model
+    final List<Score> scores = scoresJson
+        .map((e) => Score.fromMap(e as Map<String, dynamic>))
+        .toList();
+
+    for (final data in streaksJson) {
+      for (final scoreData in data["scores"]) {
+        scores.add(Score.fromMap(scoreData));
+      }
+    }
+
+    return scores;
+  }
+
+  static Future<List<Score>> fetchArchivedScoresMultiple(List<String> urls){
+    return Future.wait(urls.map((url) => fetchArchivedScores(url)))
+        .then((lists) => lists.expand((i) => i).toList());
   }
 
   String toJson() => json.encode(toMap());

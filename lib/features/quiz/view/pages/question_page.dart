@@ -108,7 +108,7 @@ class _QuestionPageState extends ConsumerState<QuestionPage> {
                     setState(() {
                       canPop = true;
                     });
-                    Navigator.pop(context);
+                    // Navigator.pop(context);
                 
                     // List<String> quizAnswers = [];
                     // for (var ans in answers) {

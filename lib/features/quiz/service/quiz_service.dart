@@ -97,6 +97,7 @@ class QuizService {
       submitTestApi,
       {
         "testId": testId,
+        "streakPass": dotenv.get("STREAK_PASS"),
         "questionAttempts": QAs.map(
           (e) => {
             "questionId": e.questionId,

@@ -2,7 +2,6 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 
@@ -73,6 +72,7 @@ class Curriculum {
   }
 
   factory Curriculum.fromMap(Map<String, dynamic> map, {bool fromDb = false}) {
+  
     return Curriculum(
       id: map['id'] as String,
       title: map['title'] as String,

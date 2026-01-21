@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
-import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
+// import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_notifier.dart';

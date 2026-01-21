@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
-import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
+// import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
 import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_notifier.dart';
 
 class DiscussionCompletedUi extends ConsumerStatefulWidget {
-  const DiscussionCompletedUi({super.key});
+  // final ExamData? examData;
+  const DiscussionCompletedUi({
+    super.key,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -17,7 +20,6 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       backgroundColor:
           isDark ? const Color(0xFF0F2027) : const Color(0xFFF8F9FA),
@@ -54,9 +56,9 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     size: 90,
                   ),
                 ),
-            
+
                 const SizedBox(height: 35),
-            
+
                 // Title
                 Text(
                   "ውይይቱ ተጠናቀቀ",
@@ -66,9 +68,9 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     color: isDark ? Colors.white : Colors.grey.shade900,
                   ),
                 ),
-            
+
                 const SizedBox(height: 16),
-            
+
                 // Quote
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -87,18 +89,18 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     ),
                   ),
                 ),
-            
+
                 const SizedBox(height: 25),
-            
+
                 // Divider
                 Container(
                   width: 130,
                   height: 2,
                   color: isDark ? Colors.white12 : Colors.grey.shade300,
                 ),
-            
+
                 const SizedBox(height: 25),
-            
+
                 // Message
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -115,7 +117,7 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     ),
                   ),
                 ),
-            
+
                 const SizedBox(height: 25),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -131,9 +133,9 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                     ),
                   ),
                 ),
-            
+
                 const SizedBox(height: 15),
-            
+
                 // Button
                 Consumer(builder: (context, ref, _) {
                   final isSubmitting = ref.watch(isSubmittingProvider);
@@ -168,13 +170,13 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                       },
                       child: const Text(
                         "አስረክብ ና ውጣ",
-                        style:
-                            TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.w600),
                       ),
                     ),
                   );
                 }),
-            
+
                 const SizedBox(height: 60),
               ],
             ),

@@ -46,13 +46,59 @@ class SignInNotifier extends StateNotifier<SignInState> {
           ),
         );
       }
-    }on ConnectivityException catch (err) {
+    } on ConnectivityException catch (err) {
       state = state.copyWith(isLoading: false, error: err.toString());
       toast(err.message, ToastType.error, context);
     } catch (err) {
       print("Error: $err");
       toast("ኮድ በመላክ ላይ ሳለ ስህተት ተከስቷል።", ToastType.error, context);
       state = state.copyWith(isLoading: false, error: err.toString());
+    }
+  }
+
+  Future<void> signWithGoogle(BuildContext context) async {
+    try {
+      state = state.copyWith(isSigningWGoogle: true);
+      final data = await authService.signInWGoogle();
+      final pref = await ref.read(sharedPrefProvider);
+      print("Data: ${data.toString()}");
+      if (data["user"] == null) {
+        pref.setString(PrefConsts.otpId, data["data"]["otpId"] as String);
+        state = state.copyWith(isSigningWGoogle: false);
+        // pref.setString(PrefConsts.token, "Bearer ${data["data"]["token"] as String}");
+        // if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (_) => RegisterPage(
+              otpId: data["data"]["otpId"],
+              isGoogle: data["data"]["googleAuth"],
+            ),
+          ),
+          (route) => false,
+        );
+        // }
+      } else {
+        // pref.setString(PrefConsts.token, "Bearer ${data["token"] as String}");
+        state = state.copyWith(isSigningWGoogle: false);
+
+        // if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MainPage(),
+          ),
+          (route) => false,
+        );
+        // }
+      }
+    } on ConnectivityException catch (err) {
+      state = state.copyWith(isSigningWGoogle: false);
+      toast(err.message, ToastType.error, context);
+    } catch (err) {
+      state = state.copyWith(isSigningWGoogle: false);
+      print(err.toString());
+      toast(err.toString(), ToastType.error, context);
     }
   }
 
@@ -91,7 +137,7 @@ class SignInNotifier extends StateNotifier<SignInState> {
         );
         // }
       }
-    }on ConnectivityException catch (err) {
+    } on ConnectivityException catch (err) {
       state = state.copyWith(isLoading: false, error: err.toString());
       toast(err.message, ToastType.error, context);
     } catch (err) {

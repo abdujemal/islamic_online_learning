@@ -6,9 +6,11 @@ import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_notifier.dart';
 import 'package:islamic_online_learning/features/meeting/view/pages/voice_room.dart';
 
 class DiscussionCard extends ConsumerStatefulWidget {
@@ -19,13 +21,15 @@ class DiscussionCard extends ConsumerStatefulWidget {
   // final bool isExamCurrent;
   // final bool isLastDiscussion;
   // final bool hasExam;
-  // final ExamData? examData;
+  final ExamData? examData;
   final DiscussionData discussionData;
+  final AssignedCourse assignedCourse;
   const DiscussionCard({
     super.key,
     // required this.isExamCurrent,
     // required this.isExamLocked,
-    // required this.examData,
+    required this.examData,
+    required this.assignedCourse,
     // required this.hasExam,
     // required this.isLastDiscussion,
     required this.discussionData,
@@ -66,24 +70,26 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
     final authState = ref.watch(authNotifierProvider);
     final constScore =
         ConstScore.get(ScoreNames.Discussion, ref, authState.scores ?? []);
-    final discussions = ref
+    // final discussions = ref
+    //     .watch(assignedCoursesNotifierProvider)
+    //     .discussions
+    //     .where(
+    //       (e) => e.toLesson == widget.discussionData.lessonTo,
+    //     )
+    //     .toList();
+    Score? score;
+    // if (discussions.isNotEmpty) {
+    final scoresResult = ref
         .watch(assignedCoursesNotifierProvider)
-        .discussions
+        .scores
         .where(
-          (e) => e.toLesson == widget.discussionData.lessonTo,
+          (e) =>
+              e.afterLesson == widget.afterLesson &&
+              e.targetType == "Discussion",
         )
         .toList();
-    Score? score;
-    if (discussions.isNotEmpty) {
-      final scoresResult = ref
-          .watch(assignedCoursesNotifierProvider)
-          .scores
-          .where(
-            (e) => e.targetId == discussions.first.id,
-          )
-          .toList();
-      score = scoresResult.isNotEmpty ? scoresResult.first : null;
-    }
+    score = scoresResult.isNotEmpty ? scoresResult.first : null;
+    // }
 
     if (!widget.isCurrent && !widget.isLocked && score == null) {
       score = Score(
@@ -216,6 +222,15 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                                       //     builder: (_) => DiscussionCompletedUi(),
                                       //   ),
                                       // );
+                                      ref
+                                          .read(voiceRoomNotifierProvider
+                                              .notifier)
+                                          .setExamData(widget.examData);
+                                      ref
+                                          .read(voiceRoomNotifierProvider
+                                              .notifier)
+                                          .setAssignedCourse(
+                                              widget.assignedCourse);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(

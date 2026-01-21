@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 class TheEnd extends StatelessWidget {
-  const TheEnd({super.key});
+  final String? text;
+  const TheEnd({super.key, this.text});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
+    return  Padding(
       padding: EdgeInsets.only(
         bottom: 0,
         top: 5,
@@ -21,7 +22,7 @@ class TheEnd extends StatelessWidget {
               endIndent: 20,
             ),
           ),
-          Text("አለቀ"),
+          Text(text ?? "አለቀ"),
           Expanded(
             child: Divider(
               height: 10,

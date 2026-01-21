@@ -145,7 +145,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
             if (widget.isFutureCourse) ...[
               Text("ዝግ ነው! እዚህ ጋር ሲደርሱ ይከፈታል!"),
             ] else if (widget.isCurrentCourse) ...[
-              CurrentLessonList2(assignedCourse: widget.assignedCourse,)
+              CurrentLessonList(assignedCourse: widget.assignedCourse,)
             ] else ...[
               PastLessonList()
             ]

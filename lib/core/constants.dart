@@ -18,9 +18,10 @@ const String serverUrl = "https://ilmfelagi.com/api";
 
 //main apis
 const String mainUrl = "https://ilmfelagi-pro-backend.onrender.com";
-const String baseUrl = "https://ilmfelagi-pro-backend.onrender.com/api/v1";
+const String baseUrl = "$mainUrl/api/v1";
 //livekit token generater
 const String LIVEKIT_URL = "wss://islamic-lms-w13mlg50.livekit.cloud";
+// const String LIVEKIT_URL = "wss://livekit.ilmfelagi.com";
 const String TOKEN_ENDPOINT = "$baseUrl/discussions/livekit/token";
 //sub apis
 //curriculums
@@ -53,6 +54,7 @@ const String getStreaksApi = "$baseUrl/streaks/{year}/{month}";
 //auth
 const String refreshTokenApi = "$baseUrl/auth/otp/refresh-token";
 const String requestOtpApi = "$baseUrl/auth/otp";
+const String googleAuthApi = "$baseUrl/auth/google";
 const String verifyOtpApi = "$baseUrl/auth/otp/verify";
 const String similarGroupsApi = "$baseUrl/auth/user/groups";
 const String registerApi = "$baseUrl/auth/user";
@@ -69,10 +71,15 @@ const String chatsApi = "$baseUrl/chats";
 const String notificationsApi = "$baseUrl/notifications";
 const String readNotificationsApi = "$baseUrl/notifications/readAll";
 
-
 ///payments
 const String paymentPricesApi = "$baseUrl/payments/prices";
 const String paymentApi = "$baseUrl/payments";
+
+//questinnaire
+const String getActiveQuestionnaireApi = "$baseUrl/questionnaires";
+const String submitQuestionnaireApi = "$baseUrl/questionnaires/submit";
+//feedback
+const String submitFeedbackApi = "$baseUrl/feedback/submit";
 
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 

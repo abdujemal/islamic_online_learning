@@ -79,6 +79,7 @@ int businessDaysBetween(DateTime start, DateTime end) {
 
     current = current.add(const Duration(days: 1));
   }
+  print("count: $count");
 
   return count;
 }

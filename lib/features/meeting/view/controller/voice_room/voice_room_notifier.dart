@@ -7,6 +7,8 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
 import 'package:islamic_online_learning/features/quiz/model/question.dart';
@@ -17,6 +19,7 @@ import 'package:islamic_online_learning/features/meeting/service/voice_room_serv
 import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_state.dart';
 import 'package:islamic_online_learning/features/meeting/view/widget/discussion_completed_ui.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/quiz/view/pages/question_page.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,7 +59,9 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
         Navigator.pushReplacement(
           ref.context,
           MaterialPageRoute(
-            builder: (_) => DiscussionCompletedUi(),
+            builder: (_) => DiscussionCompletedUi(
+              
+            ),
           ),
         );
         // _showTimeUpDialog();
@@ -69,6 +74,10 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
         // });
       }
     });
+  }
+
+  void changeVoiceRoomStatus(VoiceRoomStatus status) {
+    state = state.copyWith(status: status);
   }
 
   void changeStatus(
@@ -129,6 +138,18 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     final discussion =
         await voiceRoomService.createDiscussion(title, fromLesson);
     return discussion;
+  }
+
+  void togglePdfShown() {
+    state = state.copyWith(pdfShown: !state.pdfShown);
+  }
+
+  void setExamData(ExamData? examData) {
+    state = state.copyWith(examData: examData);
+  }
+
+  void setAssignedCourse(AssignedCourse? assignedCourse) {
+    state = state.copyWith(assignedCourse: assignedCourse);
   }
 
   Future<void> _ensureMicPermission() async {
@@ -315,7 +336,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     //   room: null,
     //   participants: [],
     // );
-    state = VoiceRoomState();
+    state = VoiceRoomState(examData: state.examData, assignedCourse: state.assignedCourse);
     print('Disconnected from room ${state.room == null}');
     // setState(() {
     //   _room = null;
@@ -474,16 +495,27 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
           await voiceRoomService.submitDiscussionTasks(qas, quizAns);
 
       ref.read(currentStreakProvider.notifier).setStreak(streakWithNo);
+      ref.read(isSubmittingProvider.notifier).state = false;
 
       if (ref.context.mounted) {
-        Navigator.pushReplacement(
-          ref.context,
-          MaterialPageRoute(
-            builder: (_) => IslamicStreakPage(type: "Discussion"),
-          ),
-        );
+        if (state.examData != null) {
+          Navigator.push(
+            ref.context,
+            MaterialPageRoute(
+              builder: (_) => QuestionPage(state.examData!.title),
+            ),
+          );
+        } else {
+          Navigator.pushReplacement(
+            ref.context,
+            MaterialPageRoute(
+              builder: (_) => IslamicStreakPage(type: "Discussion"),
+            ),
+          );
+        }
       }
     } catch (e) {
+      ref.read(isSubmittingProvider.notifier).state = false;
       handleError(e.toString(), ref.context, this.ref, () {
         toast(getErrorMsg(e.toString(), e.toString()), ToastType.error,
             ref.context);
@@ -498,7 +530,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     state.room?.dispose();
     state.listener?.dispose();
     state.timer?.cancel();
-    state = VoiceRoomState();
+    state = VoiceRoomState(examData: state.examData, assignedCourse: state.assignedCourse);
     super.dispose();
   }
 }

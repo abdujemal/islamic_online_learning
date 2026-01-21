@@ -8,6 +8,7 @@ import 'package:islamic_online_learning/features/meeting/view/controller/voice_r
 import 'package:islamic_online_learning/features/meeting/view/widget/discussion_task_ui.dart';
 import 'package:islamic_online_learning/utils.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:pdfx/pdfx.dart';
 
 class VoiceRoomPage extends ConsumerStatefulWidget {
   final String title;
@@ -27,6 +28,8 @@ class VoiceRoomPage extends ConsumerStatefulWidget {
 class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
   bool canPop = false;
 
+  late PdfController _pdfController;
+
   // Room? room;
   // EventsListener<RoomEvent>? listener;
 
@@ -35,11 +38,18 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
     super.initState();
     Future.microtask(() {
       final voiceRoomNotifier = ref.read(voiceRoomNotifierProvider.notifier);
+      final voiceRoomState = ref.read(voiceRoomNotifierProvider);
       voiceRoomNotifier.connect(
         ref,
         widget.title,
         widget.fromLesson,
       );
+      _pdfController = PdfController(
+          initialPage: 0,
+          document: PdfDocument.openFile(//voiceRoomState.assignedCourse!.course!.pdfId)
+             "/data/user/0/com.aj.islamic_online_learning_dev/files/PDF/ሹሩጡ ላኢላሀ ኢለላህ.pdf")
+          //"https://b2.ilmfelagi.com/file/ilm-Felagi2/%E1%8A%90%E1%88%B2%E1%88%90%E1%89%B2%20%E1%88%8A%E1%8A%A0%E1%88%85%E1%88%8A%20%E1%88%B1%E1%8A%93%20%E1%89%A0%E1%8A%A0%E1%89%A1%20%E1%88%99%E1%88%B5%E1%88%8A%E1%88%9D/%D9%86%D8%B5%D9%8A%D8%AD%D8%AA%D9%8A_%D9%84%D8%A3%D9%87%D9%84_%D8%A7%D9%84%D8%B3%D9%86%D8%A9.pdf"),
+          );
     });
   }
 
@@ -58,6 +68,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
     final identity = p.identity;
     final isMe = p.runtimeType != RemoteParticipant;
     final isSpeaking = p.isSpeaking;
+    // final isRest = p.isDisposed;
     final initials = identity.isEmpty ? 'U' : identity[0].toUpperCase();
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -180,15 +191,18 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
             // Mute/unmute
             FloatingActionButton(
               heroTag: 'mute',
-              backgroundColor: state.isMuted ? Colors.redAccent : Colors.white,
+              backgroundColor: state.isMuted
+                  ? Colors.redAccent
+                  : Theme.of(context).cardColor,
               onPressed: () {
                 if (connected) {
                   ref.read(voiceRoomNotifierProvider.notifier).toggleMute(ref);
                 }
               },
               // connected ? ref.read(voiceRoomNotifierProvider.notifier).toggleMute : null,
+              foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
               child: Icon(state.isMuted ? Icons.mic_off : Icons.mic,
-                  color: state.isMuted ? Colors.white : Colors.black),
+                  color: state.isMuted ? Colors.white : null),
             ),
             const SizedBox(width: 12),
             // Leave / Join
@@ -219,9 +233,10 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
                       ? 'በመገናኘት ላይ...'
                       : (connected ? 'ጥሪውን ዝጋው' : 'ጥሪውን ጀምር'),
                   style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -229,12 +244,14 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
             // More (raise hand / settings) placeholder
             FloatingActionButton(
               heroTag: 'more',
-              backgroundColor: Colors.white12,
+              foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
+              backgroundColor: Theme.of(context).cardColor,
+              // backgroundColor: Colors.white12,
               onPressed: () {
                 // future actions
                 _showError('Not implemented yet — settings');
               },
-              child: const Icon(Icons.more_vert, color: Colors.white),
+              child: const Icon(Icons.more_vert, color: null),
             ),
           ],
         ),
@@ -244,41 +261,72 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
 
   Widget _buildTopBar(VoiceRoomState state) {
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.tealAccent,
-              child: const Icon(Icons.mic, color: Colors.black),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'የውይይት መድረክ',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    (state.room != null)
-                        ? 'በ${state.identity} ስም አየር ላይ ኖት'
-                        : 'አልተገናኘም',
-                    style: TextStyle(
-                      fontSize: 12,
-                      // color: Colors.white70,
-                    ),
-                  ),
-                ],
+      child: Column(
+        children: [
+          if (state.examData != null)
+            Container(
+              width: double.infinity,
+              color: Colors.amberAccent,
+              child: Text(
+                "ከዚህ ውይይት ቡሃላ ፈተና ይኖራል።",
+                textAlign: TextAlign.center,
               ),
             ),
-          ],
-        ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.tealAccent,
+                  child: const Icon(Icons.mic, color: Colors.black),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'የውይይት መድረክ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        (state.room != null)
+                            ? 'በ${state.identity} ስም አየር ላይ ኖት'
+                            : 'አልተገናኘም',
+                        style: TextStyle(
+                          fontSize: 12,
+                          // color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Consumer(builder: (context, ref, _) {
+                  final isPdfShown =
+                      ref.watch(voiceRoomNotifierProvider).pdfShown;
+                  return isPdfShown
+                      ? SizedBox()
+                      : ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(voiceRoomNotifierProvider.notifier)
+                                .togglePdfShown();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.tealAccent,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text("ኪታቡን አሳይ"),
+                        );
+                })
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -338,8 +386,54 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
                   children: [
                     _buildMainArea(voiceRoomState),
                     Expanded(
-                      child: DiscussionTaskUi(
-                        status: voiceRoomState.status,
+                      child: Consumer(
+                        builder: (context, ref, _) {
+                          final isPdfShown =
+                              ref.watch(voiceRoomNotifierProvider).pdfShown;
+
+                          //   // PdfPage(
+                          //   //   path: "https://b2.ilmfelagi.com/file/ilm-Felagi2/%E1%8A%90%E1%88%B2%E1%88%90%E1%89%B2%20%E1%88%8A%E1%8A%A0%E1%88%85%E1%88%8A%20%E1%88%B1%E1%8A%93%20%E1%89%A0%E1%8A%A0%E1%89%A1%20%E1%88%99%E1%88%B5%E1%88%8A%E1%88%9D/%D9%86%D8%B5%D9%8A%D8%AD%D8%AA%D9%8A_%D9%84%D8%A3%D9%87%D9%84_%D8%A7%D9%84%D8%B3%D9%86%D8%A9.pdf",
+                          //   //   volume: 1,
+                          //   //   courseModel: voiceRoomState.assignedCourse,
+                          //   // );
+                          // }
+
+                          return Stack(
+                            children: [
+                              DiscussionTaskUi(
+                                status: voiceRoomState.status,
+                              ),
+                              if (isPdfShown)
+                                Stack(
+                                  children: [
+                                    PdfView(
+                                      controller: _pdfController,
+                                      pageSnapping: false,
+                                      scrollDirection: Axis.vertical,
+                                    ),
+                                    Positioned(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            ref
+                                                .read(voiceRoomNotifierProvider
+                                                    .notifier)
+                                                .togglePdfShown();
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                     _buildBottomControls(voiceRoomState),

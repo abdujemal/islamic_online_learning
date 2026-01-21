@@ -30,6 +30,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       final curriculumNGroup = await service.fetchCurriculum();
       final curriculum = curriculumNGroup.curriculum;
       final scores = curriculumNGroup.scores;
+      final monthlyScore = curriculumNGroup.monthlyScores;
       final testAttempts = curriculumNGroup.testAttempts;
       final discussions = curriculumNGroup.discussions;
       final group = curriculumNGroup.group;
@@ -52,6 +53,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
         isLoading: false,
         curriculum: curriculum,
         scores: scores,
+        monthlyScores: monthlyScore,
         testAttempts: testAttempts,
         discussions: discussions,
         rests: rests,
@@ -115,7 +117,10 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
   }
 
   List<int> getLessonStructure(
-      int lessonPerDay, DateTime courseStartDay, int noOfLessons) {
+    int lessonPerDay,
+    DateTime courseStartDay,
+    int noOfLessons,
+  ) {
     final lastLessonDay = courseStartDay.add(Duration(
         days: 4 -
             courseStartDay
@@ -138,14 +143,56 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
             .add(noOfLessons - lessonStructure.reduce((pv, cv) => pv + cv));
         continue;
       }
-      if (lessonStructure.length % 4 == 0) {
-        lessonStructure.add(3 * lessonPerDay);
-        continue;
-      }
+      // if (lessonStructure.length % 4 == 0) {
+      //   lessonStructure.add(3 * lessonPerDay);
+      //   continue;
+      // }
       lessonStructure.add(4 * lessonPerDay);
     }
     print("lessonStructure: $lessonStructure");
     return lessonStructure;
+  }
+
+  int countDiscussionUpToExam(List<dynamic> mainLessonStructure) {
+    List<int> lessonStructure = [];
+    // List<dynamic> outComingRests = [];
+
+    final totalLessonDays =
+        mainLessonStructure.where((e) => e.runtimeType == int).length;
+    int i = 0;
+    int j = 0;
+    int noOfDiscussionUpToExam = 0;
+    while (j < mainLessonStructure.length) {
+      if (totalLessonDays == 0) {
+        break;
+      }
+
+      var ws = mainLessonStructure[j];
+
+      if (ws.runtimeType == int) {
+        if (j < mainLessonStructure.length - 1 &&
+            mainLessonStructure[j].runtimeType != int) {
+          print("REst found ${mainLessonStructure[j]}");
+          i--;
+        } else {
+          i++;
+        }
+      } else {
+        i--;
+        // outComingRests.push(ws)
+        continue;
+      }
+      if (i % 4 == 0 && ws == 4) {
+        lessonStructure.add(3);
+        noOfDiscussionUpToExam = 0;
+      } else {
+        lessonStructure.add(ws);
+        noOfDiscussionUpToExam++;
+      }
+      j++;
+    }
+
+    return noOfDiscussionUpToExam == 0 ? 0 : noOfDiscussionUpToExam - 1;
   }
 
   List<dynamic> getLessonStructureWRest(DateTime courseStartDay,
@@ -153,8 +200,14 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     DateTime startDay = courseStartDay;
     List<dynamic> mainLessonStructure = [];
     // console.log("Started...");
+    rests.sort((a, b) => a.startDate.compareTo(b.startDate));
     for (Rest rest in rests) {
-      if (rest.startDate
+      if (rest.startDate.compareTo(courseStartDay) == -1) {
+        print("rest: ${rest.id} is jumped");
+        continue;
+      }
+
+      if (rest.endDate
               .compareTo(addDaysIgnoringWeekend(courseStartDay, noOfLessons)) ==
           1) {
         print("rest: ${rest.id} is jumped");
@@ -175,7 +228,8 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
           .toList();
       final restIndex = cleanMainStructure.reduce((pv, cv) => pv + cv) - 1;
       mainLessonStructure.add(rest.copyWith(afterLesson: restIndex));
-      startDay = addDaysIgnoringWeekend(rest.startDate, rest.numOfDays);
+      startDay = nextBusinessDay(rest.startDate.add(Duration(days: rest.numOfDays)));
+     
       print("mainLessonStructure: $mainLessonStructure");
 
       // if(getDay(startDay) == 5){
@@ -216,6 +270,15 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     print({"mainLessonStructure": mainLessonStructure});
     print("mainLessonStructure: ${[cleanMainStructure, cleanRestStructure]}");
     return [cleanMainStructure, cleanRestStructure];
+  }
+
+  DateTime nextBusinessDay(DateTime date) {
+    // Advance to the next day that's not Friday(5), Saturday(6) or Sunday(7)
+    DateTime d = date.add(const Duration(days: 1));
+    while ([5, 6, 7].contains(d.weekday)) {
+      d = d.add(const Duration(days: 1));
+    }
+    return d;
   }
 
   bool hasDiscussion(List<int> lessonStructure, int noOfLesson, int index) {

@@ -50,7 +50,7 @@ class Rest {
     return Rest(
       id: map['id'] as String,
       startDate: DateTime.parse(map['startDate'] as String).toLocal(),
-      endDate: DateTime.parse(map['endDate'] as String),
+      endDate: DateTime.parse(map['endDate'] as String).toLocal(),
       numOfDays: map['numOfDays'] as int,
       reason: map['reason'] as String,
       afterLesson: map['afterLesson'] != null ? map['afterLesson'] as int : null,

@@ -7,7 +7,8 @@ import 'package:islamic_online_learning/features/auth/view/widget/group_card.dar
 
 class RegisterPage extends ConsumerStatefulWidget {
   final String otpId;
-  const RegisterPage({super.key, required this.otpId});
+  final bool isGoogle;
+  const RegisterPage({super.key, required this.otpId, this.isGoogle = false});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _RegisterPageState();
@@ -67,8 +68,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             labelText: "ስም",
                             border: OutlineInputBorder(),
                           ),
-                          validator: (value) =>
-                              value == null || value.isEmpty ? "ስምዎን ያስገቡ" : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? "ስምዎን ያስገቡ"
+                              : null,
                         ),
                         const SizedBox(height: 16),
                         // Age
@@ -95,20 +97,21 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         // Gender
                         DropdownButtonFormField<String>(
                           value: _gender,
-                          
                           decoration: const InputDecoration(
                             labelText: "ፆታ",
                             border: OutlineInputBorder(),
                           ),
                           items: const [
                             DropdownMenuItem(value: "Male", child: Text("ወንድ")),
-                            DropdownMenuItem(value: "Female", child: Text("ሴት")),
+                            DropdownMenuItem(
+                                value: "Female", child: Text("ሴት")),
                           ],
                           onChanged: (value) => setState(() => _gender = value),
-                          validator: (value) => value == null ? "ፆታ ይምረጡ" : null,
+                          validator: (value) =>
+                              value == null ? "ፆታ ይምረጡ" : null,
                         ),
                         const SizedBox(height: 16),
-            
+
                         // Previous Learnings (Tags)
                         const Text(
                           "ከዚህ በፊት የቀሩት ኪታቦች",
@@ -157,7 +160,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                       ),
                                       child: GestureDetector(
                                         onTap: () {
-                                          _addLearning(_learningController.text);
+                                          _addLearning(
+                                              _learningController.text);
                                         },
                                         child: Chip(
                                           label: Row(
@@ -175,7 +179,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           ],
                         ),
                         const SizedBox(height: 24),
-            
+
                         // Submit
                         ElevatedButton(
                           onPressed: () async {
@@ -316,7 +320,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                   ElevatedButton(
                                     onPressed: () {
                                       ref
-                                          .read(registerNotifierProvider.notifier)
+                                          .read(
+                                              registerNotifierProvider.notifier)
                                           .toggleAddingGroup();
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -353,9 +358,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           ? BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                               border: Border.all(
-                                color:
-                                    Theme.of(context).chipTheme.backgroundColor ??
-                                        Colors.grey,
+                                color: Theme.of(context)
+                                        .chipTheme
+                                        .backgroundColor ??
+                                    Colors.grey,
                               ),
                             )
                           : null,

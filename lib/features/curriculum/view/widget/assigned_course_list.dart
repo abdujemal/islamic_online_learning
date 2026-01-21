@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hijri_calendar/hijri_calendar.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/lesson_shimmer.dart';
@@ -50,16 +52,28 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
       final numOfDiscussions = ref
           .read(assignedCoursesNotifierProvider.notifier)
           .getNumOfDiscussionUpToIndex(currentLessonIndex, ref);
-      final numOfExams = 
-      ref
+      final numOfExams = ref
           .read(assignedCoursesNotifierProvider.notifier)
           .numOfExamsUpToIndex(currentLessonIndex, ref);
+      List<Rest> rests = ref.read(assignedCoursesNotifierProvider).rests;
+      rests = rests
+          .where((rest) =>
+              rest.afterLesson != null &&
+              rest.afterLesson! < currentLessonIndex)
+          .toList();
+      List<MonthlyScore> monthlyScores =
+          ref.read(assignedCoursesNotifierProvider).monthlyScores;
+      monthlyScores = monthlyScores
+          .where((score) => score.endLesson < currentLessonIndex)
+          .toList();
       print("discussions: $numOfDiscussions");
       print("exams: $numOfExams");
       final offset = (currentCourseIndex * 104.0) +
           (currentLessonIndex * 123) +
           (numOfDiscussions * 76.0) +
-          (numOfExams * 76.0);
+          (numOfExams * 76.0) +
+          (rests.length * 123) +
+          (monthlyScores.length * 123);
       _lessonScrollController.animateTo(
         offset,
         duration: const Duration(milliseconds: 400),
