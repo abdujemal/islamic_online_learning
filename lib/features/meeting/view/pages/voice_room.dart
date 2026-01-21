@@ -38,7 +38,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
     super.initState();
     Future.microtask(() {
       final voiceRoomNotifier = ref.read(voiceRoomNotifierProvider.notifier);
-      final voiceRoomState = ref.read(voiceRoomNotifierProvider);
+      // final voiceRoomState = ref.read(voiceRoomNotifierProvider);
       voiceRoomNotifier.connect(
         ref,
         widget.title,

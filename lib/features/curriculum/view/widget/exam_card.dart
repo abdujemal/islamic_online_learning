@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/static_datas.dart';
-import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
+// import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
@@ -10,7 +10,7 @@ import 'package:islamic_online_learning/features/curriculum/view/controller/Assi
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 // import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
-import 'package:islamic_online_learning/features/quiz/view/pages/question_page.dart';
+// import 'package:islamic_online_learning/features/quiz/view/pages/question_page.dart';
 
 class ExamCard extends ConsumerStatefulWidget {
   final bool isLastExam;

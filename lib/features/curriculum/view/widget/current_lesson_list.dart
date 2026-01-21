@@ -129,7 +129,7 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
                 );
 
             bool isDiscussionLocked = isLocked;
-            bool isExamLocked = isLocked;
+            // bool isExamLocked = isLocked;
 
 //
 
@@ -138,14 +138,14 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
               status = LessonCardStatus.LESSON;
               if (isCurrentLesson) {
                 isDiscussionLocked = true;
-                isExamLocked = true;
+                // isExamLocked = true;
               }
             }
             if (isTodayDiscussion) {
               status = LessonCardStatus.DISCUSSION;
               if (isCurrentLesson) {
                 isDiscussionLocked = false;
-                isExamLocked = true;
+                // isExamLocked = true;
                 isPastLesson = true;
               }
             }
@@ -153,7 +153,7 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
               status = LessonCardStatus.EXAM;
               if (isCurrentLesson) {
                 isPastLesson = true;
-                isExamLocked = false;
+                // isExamLocked = false;
                 isDiscussionLocked = false;
               }
             }
@@ -167,7 +167,7 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
 
             if (isCurrentLesson && bnLessonNDis) {
               isDiscussionLocked = true;
-              isExamLocked = true;
+              // isExamLocked = true;
             }
 
             if (notOpenedYet) {
