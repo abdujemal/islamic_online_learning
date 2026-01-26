@@ -9,6 +9,8 @@ class Confusion {
   final String? rejectedBecause;
   final DateTime createdAt;
   final int onLesson;
+  final int courseNum;
+  final String curriculumId;
   Confusion({
     required this.id,
     required this.userId,
@@ -17,6 +19,8 @@ class Confusion {
     this.rejectedBecause,
     required this.createdAt,
     required this.onLesson,
+    required this.courseNum,
+    required this.curriculumId,
   });
 
   Confusion copyWith({
@@ -27,6 +31,8 @@ class Confusion {
     String? rejectedBecause,
     DateTime? createdAt,
     int? onLesson,
+    int? courseNum,
+    String? curriculumId,
   }) {
     return Confusion(
       id: id ?? this.id,
@@ -36,6 +42,8 @@ class Confusion {
       rejectedBecause: rejectedBecause ?? this.rejectedBecause,
       createdAt: createdAt ?? this.createdAt,
       onLesson: onLesson ?? this.onLesson,
+      courseNum: courseNum ?? this.courseNum,
+      curriculumId: curriculumId ?? this.curriculumId,
     );
   }
 
@@ -53,6 +61,8 @@ class Confusion {
       'rejectedBecause': rejectedBecause,
       'createdAt': createdAt.toString(),
       'onLesson': onLesson,
+      "courseNum": courseNum,
+      "curriculumId": curriculumId,
     };
   }
 
@@ -67,6 +77,8 @@ class Confusion {
           : null,
       createdAt: DateTime.parse(map['createdAt'] as String).toLocal(),
       onLesson: map['onLesson'] as int,
+      courseNum: map['courseNum'] as int,
+      curriculumId: map['curriculumId'] as String,
     );
   }
 
@@ -77,7 +89,7 @@ class Confusion {
 
   @override
   String toString() {
-    return 'Confusion(id: $id, userId: $userId, audioUrl: $audioUrl, response: $response, rejectedBecause: $rejectedBecause, createdAt: $createdAt, onLesson: $onLesson)';
+    return 'Confusion(id: $id, userId: $userId, audioUrl: $audioUrl, response: $response, rejectedBecause: $rejectedBecause, createdAt: $createdAt, onLesson: $onLesson, courseNum: $courseNum, curriculumId: $curriculumId)';
   }
 
   @override
@@ -90,7 +102,9 @@ class Confusion {
         other.response == response &&
         other.rejectedBecause == rejectedBecause &&
         other.createdAt == createdAt &&
-        other.onLesson == onLesson;
+        other.onLesson == onLesson &&
+        other.courseNum == courseNum &&
+        other.curriculumId == curriculumId;
   }
 
   @override
@@ -101,6 +115,8 @@ class Confusion {
         response.hashCode ^
         rejectedBecause.hashCode ^
         createdAt.hashCode ^
-        onLesson.hashCode;
+        courseNum.hashCode ^
+        onLesson.hashCode ^
+        curriculumId.hashCode;
   }
 }

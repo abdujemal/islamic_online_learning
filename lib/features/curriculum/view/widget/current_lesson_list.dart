@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/features/auth/model/confusion.dart';
 import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
@@ -7,6 +8,7 @@ import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/curriculum/view/widget/confusion_display.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/discussion_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/exam_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/lesson_card.dart';
@@ -41,6 +43,7 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
         );
     List<Rest> rests = lessonStructureWRest[1] as List<Rest>;
     List<MonthlyScore> monthlyScores = state.monthlyScores;
+    List<Confusion> confusions = state.confusions;
     List<int> lessonStructure = lessonStructureWRest[0] as List<int>;
     final currentLessonNum = authState.courseRelatedData?.lessonNum ?? 0;
     final currentLessonIndexes = List.generate(
@@ -227,6 +230,11 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
                     monthlyScore:
                         monthlyScores.firstWhere((ms) => ms.endLesson == index),
                   ),
+                if (confusions.any((c) => c.onLesson == index))
+                  ConfusionDisplay(
+                    confusion:
+                        confusions.firstWhere((c) => c.onLesson == index),
+                  )
               ],
             );
           },

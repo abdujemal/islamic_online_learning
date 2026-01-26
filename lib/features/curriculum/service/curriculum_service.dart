@@ -1,6 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:islamic_online_learning/features/auth/model/confusion.dart';
+import 'package:islamic_online_learning/features/auth/model/course_score.dart';
+import 'package:islamic_online_learning/features/auth/model/curriculum_score.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
@@ -101,11 +104,14 @@ class CurriculumService {
           discussions: currNGroup.discussions,
           group: currNGroup.group,
           scores: currNGroup.scores,
+          courseScores: currNGroup.courseScores,
+          curriculumScores: currNGroup.curriculumScores,
           monthlyScores: currNGroup.monthlyScores,
           testAttempts: currNGroup.testAttempts,
           rests: currNGroup.rests,
           unreadChats: currNGroup.unreadChats,
           unReadNotifications: currNGroup.unReadNotifications,
+          confusions: currNGroup.confusions,
         );
       }
     } else {
@@ -121,21 +127,27 @@ class CurriculumNGroup {
   final CourseRelatedData group;
   final List<Score> scores;
   final List<MonthlyScore> monthlyScores;
+  final List<CourseScore> courseScores;
+  final List<CurriculumScore> curriculumScores;
   final List<Discussion> discussions;
   final List<TestAttempt> testAttempts;
   final List<Rest> rests;
+  final List<Confusion> confusions;
   final int unreadChats;
   final int unReadNotifications;
   CurriculumNGroup({
     required this.curriculum,
     required this.group,
     required this.scores,
+    required this.courseScores,
+    required this.curriculumScores,
     required this.monthlyScores,
     required this.testAttempts,
     required this.discussions,
     required this.rests,
     required this.unreadChats,
     required this.unReadNotifications,
+    required this.confusions,
   });
 
   Map<String, dynamic> toMap() {
@@ -143,11 +155,14 @@ class CurriculumNGroup {
       'curriculum': curriculum?.toMap(),
       'group': group.toMap(),
       'scores': scores.map((e) => e.toMap()),
+      "courseScores": courseScores.map((e) => e.toMap()),
+      "curriculumScores": curriculumScores.map((e) => e.toMap()),
       'testAttempts': testAttempts.map((e) => e.toMap()),
       "discussions": discussions.map((e) => e.toMap()),
       "rests": rests.map((e) => e.toMap()),
       "unreadChats": unreadChats,
       'unReadNotifications': unReadNotifications,
+      "confusions": confusions,
     };
   }
 
@@ -167,6 +182,21 @@ class CurriculumNGroup {
       monthlyScores: List<MonthlyScore>.from(
         (map["monthlyScores"] as List<dynamic>).map(
           (e) => MonthlyScore.fromMap(e),
+        ),
+      ),
+      courseScores: List<CourseScore>.from(
+        (map["courseScores"] as List<dynamic>).map(
+          (e) => CourseScore.fromMap(e),
+        ),
+      ),
+      curriculumScores: List<CurriculumScore>.from(
+        (map["curriculumScores"] as List<dynamic>).map(
+          (e) => CurriculumScore.fromMap(e),
+        ),
+      ),
+      confusions: List<Confusion>.from(
+        (map["confusions"] as List<dynamic>).map(
+          (e) => Confusion.fromMap(e),
         ),
       ),
       discussions:
@@ -198,8 +228,11 @@ class CurriculumNGroup {
     CourseRelatedData? group,
     List<Score>? scores,
     List<MonthlyScore>? monthlyScores,
+    List<CourseScore>? courseScores,
+    List<CurriculumScore>? curriculumScores,
     List<Discussion>? discussions,
     List<TestAttempt>? testAttempts,
+    List<Confusion>? confusions,
     List<Rest>? rests,
     int? unreadChats,
     int? unReadNotifications,
@@ -209,11 +242,14 @@ class CurriculumNGroup {
       group: group ?? this.group,
       scores: scores ?? this.scores,
       monthlyScores: monthlyScores ?? this.monthlyScores,
+      courseScores: courseScores ?? this.courseScores,
+      curriculumScores: curriculumScores ?? this.curriculumScores,
       discussions: discussions ?? this.discussions,
       testAttempts: testAttempts ?? this.testAttempts,
       rests: rests ?? this.rests,
       unreadChats: unreadChats ?? this.unreadChats,
       unReadNotifications: unReadNotifications ?? this.unReadNotifications,
+      confusions: confusions ?? this.confusions,
     );
   }
 }

@@ -58,8 +58,8 @@ class LessonNotifier extends StateNotifier<LessonState> {
     player.play();
   }
 
-  Future<String?> getPdfPath(
-      WidgetRef ref, CourseModel course, String title, int volume, int fileSize) async {
+  Future<String?> getPdfPath(WidgetRef ref, CourseModel course, String title,
+      int volume, int fileSize) async {
     final cdNotifier = ref.read(cdNotifierProvider.notifier);
     String? pdfUrl;
 
@@ -94,8 +94,8 @@ class LessonNotifier extends StateNotifier<LessonState> {
         await DatabaseHelper().getSingleCourse(course.course!.courseId);
     print("mmmmmmm courseModel: $courseModel");
     if (courseModel == null) return;
-    String? pdfUrl =
-        await getPdfPath(ref, courseModel, course.title, lesson.volume, course.course!.pdfSize[lesson.volume]);
+    String? pdfUrl = await getPdfPath(ref, courseModel, course.title,
+        lesson.volume, course.course!.pdfSize[lesson.volume]);
     state = state.copyWith(
       isDownloading: false,
       pdfPath: pdfUrl,
@@ -127,8 +127,16 @@ class LessonNotifier extends StateNotifier<LessonState> {
     try {
       state = state.copyWith(isUploadingConfusion: true);
 
-      final res = await customPostWithForm(confusionsApi, null, File(path),
-          authorized: true);
+      final res = await customPostWithForm(
+        confusionsApi,
+        {
+          "onLesson": "${state.currentLesson!.order}",
+          "courseNum": "${state.currentCourse!.order}",
+          "curriculumId": state.currentCourse!.curriculumId,
+        },
+        File(path),
+        authorized: true,
+      );
 
       if (res.statusCode == 200) {
         state = state.copyWith(isUploadingConfusion: false);

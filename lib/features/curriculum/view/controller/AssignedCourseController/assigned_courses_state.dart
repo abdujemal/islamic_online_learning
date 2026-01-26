@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:islamic_online_learning/features/auth/model/confusion.dart';
+import 'package:islamic_online_learning/features/auth/model/course_score.dart';
+import 'package:islamic_online_learning/features/auth/model/curriculum_score.dart';
 import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
@@ -11,9 +14,12 @@ class AssignedCoursesState {
   final Curriculum? curriculum;
   final List<Score> scores;
   final List<MonthlyScore> monthlyScores;
+  final List<CourseScore> courseScores;
+  final List<CurriculumScore> curriculumScores;
   final List<TestAttempt> testAttempts;
   final List<Discussion> discussions;
   final List<Rest> rests;
+  final List<Confusion> confusions;
   final int? expandedCourseOrder;
   final String? error;
 
@@ -24,9 +30,12 @@ class AssignedCoursesState {
     this.isErrorPayment = false,
     this.scores = const [],
     this.monthlyScores = const [],
+    this.courseScores = const [],
+    this.curriculumScores = const [],
     this.testAttempts = const [],
     this.discussions = const [],
     this.rests = const [],
+    this.confusions = const [],
     this.curriculum,
     this.expandedCourseOrder,
     this.error,
@@ -66,8 +75,11 @@ class AssignedCoursesState {
     Curriculum? curriculum,
     List<Score>? scores,
     List<MonthlyScore>? monthlyScores,
+    List<CourseScore>? courseScores,
+    List<CurriculumScore>? curriculumScores,
     List<TestAttempt>? testAttempts,
     List<Discussion>? discussions,
+    List<Confusion>? confusions,
     List<Rest>? rests,
     int? expandedCourseOrder,
     String? error,
@@ -78,11 +90,14 @@ class AssignedCoursesState {
       curriculum: curriculum ?? this.curriculum,
       scores: scores ?? this.scores,
       monthlyScores: monthlyScores ?? this.monthlyScores,
+      courseScores: courseScores ?? this.courseScores,
+      curriculumScores: curriculumScores ?? this.curriculumScores,
       testAttempts: testAttempts ?? this.testAttempts,
       discussions: discussions ?? this.discussions,
       isErrorAuth: isErrorAuth ?? false,
       isErrorPayment: isErrorPayment ?? false,
       rests: rests ?? this.rests,
+      confusions: confusions ?? this.confusions,
       expandedCourseOrder: expandedCourseOrder ?? this.expandedCourseOrder,
       error: error,
     );

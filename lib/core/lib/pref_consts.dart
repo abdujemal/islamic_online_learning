@@ -1,4 +1,5 @@
 class PrefConsts {
+  static final String userId = 'userId';
   static final String otpId = "otpId";
   static final String curriculumId = "curriculumId";
   static final String token = "token";
@@ -11,5 +12,4 @@ class PrefConsts {
   static final String curriculumDate = "curriculum_date";
   static final String discussionQuestions = "discussion_questions";
   static final String discussionQuizzes = "discussion_quizzes";
-
 }

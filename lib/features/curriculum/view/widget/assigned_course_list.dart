@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hijri_calendar/hijri_calendar.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/auth/model/confusion.dart';
 import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
@@ -66,6 +67,10 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
       monthlyScores = monthlyScores
           .where((score) => score.endLesson < currentLessonIndex)
           .toList();
+      List<Confusion> confusions =
+          ref.read(assignedCoursesNotifierProvider).confusions;
+      confusions =
+          confusions.where((con) => con.onLesson < currentLessonIndex).toList();
       print("discussions: $numOfDiscussions");
       print("exams: $numOfExams");
       final offset = (currentCourseIndex * 104.0) +
@@ -73,7 +78,8 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
           (numOfDiscussions * 76.0) +
           (numOfExams * 76.0) +
           (rests.length * 123) +
-          (monthlyScores.length * 123);
+          (monthlyScores.length * 123) +
+          (confusions.length * 123);
       _lessonScrollController.animateTo(
         offset,
         duration: const Duration(milliseconds: 400),

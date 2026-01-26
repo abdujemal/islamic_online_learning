@@ -89,7 +89,7 @@ class _ConfusionCardState extends ConsumerState<ConfusionCard> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 // color: Colors.blue.shade50,
-                border: Border.all(color: Colors.blue.shade50),
+                border: Border.all(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.blue.shade50 ),
               ),
               child: Column(
                 children: [
@@ -134,7 +134,9 @@ class _ConfusionCardState extends ConsumerState<ConfusionCard> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   // color: Colors.green.shade50,
-                  border: Border.all(color: Colors.green.shade50),
+                border: Border.all(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.blue.shade50 ),
+
+                  // border: Border.all(color: Colors.green.shade50),
                 ),
                 child: Column(
                   children: [

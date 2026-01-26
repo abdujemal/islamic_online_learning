@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/Questionaire/model/questionnaire.dart';
 import 'package:islamic_online_learning/features/Questionaire/view/pages/questionnaire_screen.dart';
 import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
@@ -11,6 +12,7 @@ import 'package:islamic_online_learning/features/auth/service/auth_service.dart'
 import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/register_page.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService authService;
@@ -21,6 +23,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       state = state.copyWith(isLoading: true);
       final user = await authService.getMyInfo();
+      final pref = await ref.read(sharedPrefProvider);
+      await pref.setString(PrefConsts.userId, user.id);
       FirebaseMessaging.instance.subscribeToTopic(user.id);
       await getScores(context);
       await _checkIfTheCourseStarted(context);
@@ -106,7 +110,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, true),
-               style: ElevatedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 foregroundColor: whiteColor,
               ),
@@ -178,7 +182,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await deleteTokens();
     await AuthService.googleSignIn.signOut();
     ref.read(curriculumNotifierProvider.notifier).getCurriculums();
-    FirebaseMessaging.instance.unsubscribeFromTopic(state.user?.id ?? "");
+    final pref = await ref.read(sharedPrefProvider);
+    final userId = pref.getString(PrefConsts.userId);
+    if (userId != null) {
+      FirebaseMessaging.instance.unsubscribeFromTopic(userId);
+      await pref.remove(PrefConsts.userId);
+    }
 
     setUserNull();
   }

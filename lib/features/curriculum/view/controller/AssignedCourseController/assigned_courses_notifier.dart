@@ -31,10 +31,13 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       final curriculum = curriculumNGroup.curriculum;
       final scores = curriculumNGroup.scores;
       final monthlyScore = curriculumNGroup.monthlyScores;
+      final courseScores = curriculumNGroup.courseScores;
+      final curriculumScores = curriculumNGroup.curriculumScores;
       final testAttempts = curriculumNGroup.testAttempts;
       final discussions = curriculumNGroup.discussions;
       final group = curriculumNGroup.group;
       final rests = curriculumNGroup.rests;
+      final confusions = curriculumNGroup.confusions;
       if (curriculum == null) {
         throw Exception("No curriculum assigned yet");
       }
@@ -54,9 +57,12 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
         curriculum: curriculum,
         scores: scores,
         monthlyScores: monthlyScore,
+        courseScores: courseScores,
+        curriculumScores: curriculumScores,
         testAttempts: testAttempts,
         discussions: discussions,
         rests: rests,
+        confusions: confusions,
       );
     } catch (e) {
       print("Error: $e");
@@ -228,8 +234,9 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
           .toList();
       final restIndex = cleanMainStructure.reduce((pv, cv) => pv + cv) - 1;
       mainLessonStructure.add(rest.copyWith(afterLesson: restIndex));
-      startDay = nextBusinessDay(rest.startDate.add(Duration(days: rest.numOfDays)));
-     
+      startDay =
+          nextBusinessDay(rest.startDate.add(Duration(days: rest.numOfDays)));
+
       print("mainLessonStructure: $mainLessonStructure");
 
       // if(getDay(startDay) == 5){
