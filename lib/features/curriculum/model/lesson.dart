@@ -62,6 +62,7 @@ class Lesson {
   }
 
   factory Lesson.fromMap(Map<String, dynamic> map) {
+    print("Lesson.fromMap");
     return Lesson(
       id: map['id'] as String,
       order: map['order'] as int,

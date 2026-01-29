@@ -27,7 +27,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await pref.setString(PrefConsts.userId, user.id);
       FirebaseMessaging.instance.subscribeToTopic(user.id);
       await getScores(context);
-      await _checkIfTheCourseStarted(context);
+      _checkIfTheCourseStarted(context);
       checkQuestionnaireAndDisplay(context);
       state = state.copyWith(isLoading: false, user: user);
     } on ConnectivityException catch (err) {
@@ -187,6 +187,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (userId != null) {
       FirebaseMessaging.instance.unsubscribeFromTopic(userId);
       await pref.remove(PrefConsts.userId);
+      await ref.read(bootstrapCacheProvider).clear();
     }
 
     setUserNull();

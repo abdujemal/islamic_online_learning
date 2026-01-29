@@ -1,15 +1,15 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:islamic_online_learning/features/auth/model/confusion.dart';
-import 'package:islamic_online_learning/features/auth/model/course_score.dart';
-import 'package:islamic_online_learning/features/auth/model/curriculum_score.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
+import 'package:islamic_online_learning/features/auth/model/confusion.dart';
 import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
+import 'package:islamic_online_learning/features/auth/model/course_score.dart';
+import 'package:islamic_online_learning/features/auth/model/curriculum_score.dart';
 import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
@@ -33,6 +33,22 @@ class CurriculumService {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
       throw Exception('Failed to load curriculums: ${response.body}');
+    }
+  }
+
+  Future<bool> checkPaymentStatus() async {
+    final response = await customGetRequest(
+      paymentStatusApi,
+      authorized: true,
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['status'] ?? false;
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to check payment: ${response.body}');
     }
   }
 
@@ -72,35 +88,35 @@ class CurriculumService {
         scores: [...currNGroup.scores, ...archivedScores],
       );
 
-      if (currNGroup.curriculum != null) {
-        await pref.setString(
-            PrefConsts.curriculumDate, currNGroup.curriculum!.updatedOn);
+      // if (currNGroup.curriculum != null) {
+      //   await pref.setString(
+      //       PrefConsts.curriculumDate, currNGroup.curriculum!.updatedOn);
 
-        await CurriculumDbHelper.instance
-            .insertCurriculum(currNGroup.curriculum!.toMap());
-        for (AssignedCourse course
-            in currNGroup.curriculum!.assignedCourses ?? []) {
-          await CurriculumDbHelper.instance
-              .insertAssignedCourse(course.toMap());
-        }
-        for (Lesson lesson in currNGroup.curriculum!.lessons ?? []) {
-          await CurriculumDbHelper.instance.insertLesson(lesson.toMap());
-        }
+      //   await CurriculumDbHelper.instance
+      //       .insertCurriculum(currNGroup.curriculum!.toMap());
+      //   for (AssignedCourse course
+      //       in currNGroup.curriculum!.assignedCourses ?? []) {
+      //     await CurriculumDbHelper.instance
+      //         .insertAssignedCourse(course.toMap());
+      //   }
+      //   for (Lesson lesson in currNGroup.curriculum!.lessons ?? []) {
+      //     await CurriculumDbHelper.instance.insertLesson(lesson.toMap());
+      //   }
 
-        return currNGroup;
-      } else {
-        final currsFromDb =
-            await CurriculumDbHelper.instance.getCurriculumWithDetails(
-          currNGroup.group.curriculumId,
-          currNGroup.group.courseNum,
-        );
+      //   return currNGroup;
+      // } else {
+        // final currsFromDb =
+        //     await CurriculumDbHelper.instance.getCurriculumWithDetails(
+        //   currNGroup.group.curriculumId,
+        //   currNGroup.group.courseNum,
+        // );
         // print("currsFromDb: $currsFromDb");
-        final currData = currsFromDb != null
-            ? Curriculum.fromMap(currsFromDb, fromDb: true)
-            : null;
+        // final currData = currsFromDb != null
+        //     ? Curriculum.fromMap(currsFromDb, fromDb: true)
+        //     : null;
 
         return CurriculumNGroup(
-          curriculum: currData,
+          curriculum: currNGroup.curriculum,
           discussions: currNGroup.discussions,
           group: currNGroup.group,
           scores: currNGroup.scores,
@@ -113,7 +129,7 @@ class CurriculumService {
           unReadNotifications: currNGroup.unReadNotifications,
           confusions: currNGroup.confusions,
         );
-      }
+      // }
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
@@ -152,14 +168,15 @@ class CurriculumNGroup {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'curriculum': curriculum?.toMap(),
+      'currentCurriculum': curriculum?.toMap(),
       'group': group.toMap(),
-      'scores': scores.map((e) => e.toMap()),
-      "courseScores": courseScores.map((e) => e.toMap()),
-      "curriculumScores": curriculumScores.map((e) => e.toMap()),
-      'testAttempts': testAttempts.map((e) => e.toMap()),
-      "discussions": discussions.map((e) => e.toMap()),
-      "rests": rests.map((e) => e.toMap()),
+      'scores': scores.map((e) => e.toMap()).toList(),
+      "courseScores": courseScores.map((e) => e.toMap()).toList(),
+      "curriculumScores": curriculumScores.map((e) => e.toMap()).toList(),
+      'monthlyScores': monthlyScores.map((e)=>e.toMap()).toList(),
+      'testAttempts': testAttempts.map((e) => e.toMap()).toList(),
+      "discussions": discussions.map((e) => e.toMap()).toList(),
+      "rests": rests.map((e) => e.toMap()).toList(),
       "unreadChats": unreadChats,
       'unReadNotifications': unReadNotifications,
       "confusions": confusions,
@@ -251,5 +268,10 @@ class CurriculumNGroup {
       unReadNotifications: unReadNotifications ?? this.unReadNotifications,
       confusions: confusions ?? this.confusions,
     );
+  }
+
+  @override
+  String toString() {
+    return 'CurriculumNGroup(curriculum: $curriculum, group: $group, scores: $scores, monthlyScores: $monthlyScores, courseScores: $courseScores, curriculumScores: $curriculumScores, discussions: $discussions, testAttempts: $testAttempts, rests: $rests, confusions: $confusions, unreadChats: $unreadChats, unReadNotifications: $unReadNotifications)';
   }
 }

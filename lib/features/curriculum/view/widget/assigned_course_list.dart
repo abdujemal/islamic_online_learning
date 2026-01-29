@@ -28,12 +28,12 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
       // final authState = ref.watch(authNotifierProvider);
       // currentCourseIndex = authState.user?.group.courseNum ?? 0;
       // lessonIndex = authState.user?.group.lessonNum ?? 0;
 
-      setState(() {});
+      // setState(() {});
       // Scroll to current course
       // ref.listen<AssignedCoursesState>(
       //   assignedCoursesNotifierProvider,
@@ -45,7 +45,7 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
       //     }
       //   },
       // );
-    });
+    // });
   }
 
   void _scrollToCurrentLesson(int currentLessonIndex, int currentCourseIndex) {
@@ -117,7 +117,8 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
     // }
 
     return Expanded(
-      child: ref.watch(assignedCoursesNotifierProvider).map(
+      child:// Text("AssignedCourseList")
+      ref.watch(assignedCoursesNotifierProvider).map(
             loading: (_) => ListView(
               children: [
                 Column(
@@ -231,6 +232,7 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
               ),
             ),
           ),
+    
     );
   }
 }

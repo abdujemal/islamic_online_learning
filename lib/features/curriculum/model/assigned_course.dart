@@ -47,12 +47,13 @@ class AssignedCourse {
       'order': order,
       'description': description,
       "curriculumId": curriculumId,
-      'Course': course != null ? jsonEncode(course!.toMap()) : null,
+      'Course': course?.toMap(),
     };
   }
 
   factory AssignedCourse.fromMap(Map<String, dynamic> map,
       {bool fromDb = false}) {
+    print("AssignedCourse.fromMap");
     return AssignedCourse(
       id: map['id'] as String,
       courseId: map['courseId'] as int,
@@ -178,7 +179,7 @@ class Course {
         other.pdfId == pdfId &&
         other.image == image &&
         other.ustaz == ustaz &&
-        other.pdfSize == pdfSize&&
+        other.pdfSize == pdfSize &&
         other.category == category;
   }
 
@@ -188,7 +189,7 @@ class Course {
         pdfId.hashCode ^
         image.hashCode ^
         ustaz.hashCode ^
-        pdfSize.hashCode^
+        pdfSize.hashCode ^
         category.hashCode;
   }
 }

@@ -56,12 +56,12 @@ class Curriculum {
       'id': id,
       'title': title,
       'description': description,
-      'active': active ? 1 : 0,
-      'prerequisite': prerequisite ? 1 : 0,
+      'active': active,
+      'prerequisite': prerequisite,
       'level': level,
       'updatedOn': updatedOn,
-      // 'assignedCourses': assignedCourses?.map((x) => x.toMap()).toList(),
-      // 'lessons': lessons?.map((x) => x.toMap()).toList(),
+      'assignedCourses': assignedCourses?.map((x) => x.toMap()).toList(),
+      'lessons': lessons?.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -72,7 +72,7 @@ class Curriculum {
   }
 
   factory Curriculum.fromMap(Map<String, dynamic> map, {bool fromDb = false}) {
-  
+    print("Curriculum.fromMap");
     return Curriculum(
       id: map['id'] as String,
       title: map['title'] as String,
@@ -87,8 +87,9 @@ class Curriculum {
       assignedCourses: map['assignedCourses'] != null
           ? List<AssignedCourse>.from(
               (map['assignedCourses'] as List<dynamic>).map<AssignedCourse>(
-                (x) => AssignedCourse.fromMap(x as Map<String, dynamic>,
-                    fromDb: fromDb),
+                (x) => AssignedCourse.fromMap(
+                  x as Map<String, dynamic>,
+                ),
               ),
             )
           : null,

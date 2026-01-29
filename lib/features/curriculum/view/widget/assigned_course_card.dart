@@ -96,7 +96,7 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                     weight: 1,
                     color: widget.isCurrentCourse
                         ? whiteColor
-                        : Theme.of(context).textTheme.bodyMedium?.color,
+                        : primaryColor,
                   ),
                 ),
                 SizedBox(

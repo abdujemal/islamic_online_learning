@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/curriculum/service/assigned_course_service.dart';
+import 'package:islamic_online_learning/features/curriculum/service/bootstrap_cache_service.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_service.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_state.dart';
@@ -17,6 +18,10 @@ final curriculumServiceProvider = Provider<CurriculumService>((ref) {
 
 final assignedCourseServiceProvider = Provider<AssignedCourseService>((ref) {
   return AssignedCourseService();
+});
+
+final bootstrapCacheProvider = Provider<BootstrapCacheService>((ref) {
+  return BootstrapCacheService();
 });
 
 // Provide the state notifier
@@ -38,7 +43,8 @@ final pastLessonStateProvider =
   return PastLessonNotifier(service, ref);
 });
 
-final lessonNotifierProvider = StateNotifierProvider<LessonNotifier, LessonState>((ref) {
+final lessonNotifierProvider =
+    StateNotifierProvider<LessonNotifier, LessonState>((ref) {
   // final service = ref.watch(assignedCourseServiceProvider);
   // return LessonNotifier(service);
   return LessonNotifier(ref);

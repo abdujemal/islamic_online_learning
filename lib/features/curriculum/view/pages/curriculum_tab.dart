@@ -57,16 +57,20 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (authState.tokenIsNull && !authState.isLoading)
+             if (authState.tokenIsNull && !authState.isLoading)
+            //  Text("CurriculumList"),
                 CurriculumList(),
               if (!authState.tokenIsNull &&
                   !authState.initial &&
                   authState.courseStarted != CourseStarted.STARTED)
+            //  Text("GroupMembersStatus"),
                 GroupMembersStatus(),
+
               if (!authState.tokenIsNull &&
                   authState.user != null &&
                   authState.courseStarted == CourseStarted.STARTED &&
                   authState.error == null)
+            //  Text("AssignedCourseList"),
                 AssignedCourseList()
             ],
           ),

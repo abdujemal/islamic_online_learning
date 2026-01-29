@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:islamic_online_learning/core/constants.dart';
 
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
@@ -11,6 +12,7 @@ import 'package:islamic_online_learning/features/auth/view/controller/provider.d
 import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/curriculum/service/curriculum_service.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_state.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/groupChat/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/notifications/view/controller/provider.dart';
 import 'package:islamic_online_learning/utils.dart';
@@ -21,50 +23,77 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
   AssignedCoursesNotifier(this.service, this.ref)
       : super(AssignedCoursesState());
 
+  void populate(CurriculumNGroup curriculumNGroup) {
+    final curriculum = curriculumNGroup.curriculum;
+    final scores = curriculumNGroup.scores;
+    final monthlyScore = curriculumNGroup.monthlyScores;
+    final courseScores = curriculumNGroup.courseScores;
+    final curriculumScores = curriculumNGroup.curriculumScores;
+    final testAttempts = curriculumNGroup.testAttempts;
+    final discussions = curriculumNGroup.discussions;
+    final group = curriculumNGroup.group;
+    final rests = curriculumNGroup.rests;
+    final confusions = curriculumNGroup.confusions;
+    state = state.copyWith(
+      isLoading: false,
+      curriculum: curriculum,
+      scores: scores,
+      monthlyScores: monthlyScore,
+      courseScores: courseScores,
+      curriculumScores: curriculumScores,
+      testAttempts: testAttempts,
+      discussions: discussions,
+      rests: rests,
+      confusions: confusions,
+    );
+
+    ref.read(authNotifierProvider.notifier).setCourseRelatedData(group);
+    ref
+        .read(groupChatNotifierProvider.notifier)
+        .setUnreadChats(curriculumNGroup.unreadChats);
+    ref
+        .read(notificationNotifierProvider.notifier)
+        .setUnreadNotifications(curriculumNGroup.unReadNotifications);
+    ref
+        .read(authNotifierProvider.notifier)
+        .setCourseStarted(CourseStarted.STARTED);
+  }
+
   Future<void> getCurriculum(BuildContext context) async {
     try {
       state = state.copyWith(isLoading: true);
       ref
           .read(authNotifierProvider.notifier)
           .setCourseStarted(CourseStarted.LOADING);
-      final curriculumNGroup = await service.fetchCurriculum();
-      final curriculum = curriculumNGroup.curriculum;
-      final scores = curriculumNGroup.scores;
-      final monthlyScore = curriculumNGroup.monthlyScores;
-      final courseScores = curriculumNGroup.courseScores;
-      final curriculumScores = curriculumNGroup.curriculumScores;
-      final testAttempts = curriculumNGroup.testAttempts;
-      final discussions = curriculumNGroup.discussions;
-      final group = curriculumNGroup.group;
-      final rests = curriculumNGroup.rests;
-      final confusions = curriculumNGroup.confusions;
-      if (curriculum == null) {
-        throw Exception("No curriculum assigned yet");
+      await service.checkPaymentStatus();
+      // await ref.read(bootstrapCacheProvider).clear();
+      final data = await ref.read(bootstrapCacheProvider).load();
+      if (data != null) {
+        final currNGroup = CurriculumNGroup.fromMap(data);
+        print(currNGroup.toString());
+        populate(currNGroup);
+        // toast("cached data is loaded", ToastType.success, context);
+        state = state.copyWith(isLoading: false);
+        // notifyL
+        // showRefreshingSnack(context);
       }
+
+      final curriculumNGroup = await service.fetchCurriculum();
+      await ref.read(bootstrapCacheProvider).save(curriculumNGroup.toMap());
+      populate(curriculumNGroup);
+      state = state.copyWith(isLoading: false);
+      toast("Successfully synced.", ToastType.success, context);
+      // if (data != null) {
+      //   hideSnack(context);
+      // }
+      // final curriculum = curriculumNGroup.curriculum;
+
+      // if (curriculum == null) {
+      //   throw Exception("No curriculum assigned yet");
+      // }
       // print(curriculum);
-      ref.read(authNotifierProvider.notifier).setCourseRelatedData(group);
-      ref
-          .read(groupChatNotifierProvider.notifier)
-          .setUnreadChats(curriculumNGroup.unreadChats);
-      ref
-          .read(notificationNotifierProvider.notifier)
-          .setUnreadNotifications(curriculumNGroup.unReadNotifications);
-      ref
-          .read(authNotifierProvider.notifier)
-          .setCourseStarted(CourseStarted.STARTED);
-      state = state.copyWith(
-        isLoading: false,
-        curriculum: curriculum,
-        scores: scores,
-        monthlyScores: monthlyScore,
-        courseScores: courseScores,
-        curriculumScores: curriculumScores,
-        testAttempts: testAttempts,
-        discussions: discussions,
-        rests: rests,
-        confusions: confusions,
-      );
     } catch (e) {
+      // hideSnack(context);
       print("Error: $e");
       if (e.toString().contains("course_is_not_started")) {
         ref
@@ -99,6 +128,20 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
     } else {
       state = state.copyWith(expandedCourseOrder: order);
     }
+  }
+
+  void showRefreshingSnack(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Refreshing…'),
+        duration: Duration(days: 1), // stays until dismissed
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void hideSnack(BuildContext context) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
   }
 
   double getProgress(WidgetRef ref) {

@@ -74,6 +74,7 @@ const String readNotificationsApi = "$baseUrl/notifications/readAll";
 ///payments
 const String paymentPricesApi = "$baseUrl/payments/prices";
 const String paymentApi = "$baseUrl/payments";
+const String paymentStatusApi = "$baseUrl/payments/status";
 
 //questinnaire
 const String getActiveQuestionnaireApi = "$baseUrl/questionnaires";
