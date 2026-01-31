@@ -275,9 +275,12 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
               if (widget.isLocked)
                 Positioned.fill(
                   child: Container(
-                    color: theme == ThemeMode.light
-                        ? Colors.white60
-                        : Colors.black54,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme == ThemeMode.light
+                          ? Colors.white60
+                          : Colors.black54,
+                    ),
                   ),
                 ),
             ],

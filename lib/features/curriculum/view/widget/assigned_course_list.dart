@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hijri_calendar/hijri_calendar.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/auth/model/confusion.dart';
+import 'package:islamic_online_learning/features/auth/model/curriculum_score.dart';
 import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_card.dart';
+import 'package:islamic_online_learning/features/curriculum/view/widget/certificate_card.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/lesson_shimmer.dart';
 
 class AssignedCourseList extends ConsumerStatefulWidget {
@@ -29,22 +31,22 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
   void initState() {
     super.initState();
     // WidgetsBinding.instance.addPostFrameCallback((_) {
-      // final authState = ref.watch(authNotifierProvider);
-      // currentCourseIndex = authState.user?.group.courseNum ?? 0;
-      // lessonIndex = authState.user?.group.lessonNum ?? 0;
+    // final authState = ref.watch(authNotifierProvider);
+    // currentCourseIndex = authState.user?.group.courseNum ?? 0;
+    // lessonIndex = authState.user?.group.lessonNum ?? 0;
 
-      // setState(() {});
-      // Scroll to current course
-      // ref.listen<AssignedCoursesState>(
-      //   assignedCoursesNotifierProvider,
-      //   (previous, next) {
-      //     if (previous?.isLoading == true &&
-      //         next.isLoading == false &&
-      //         next.curriculum != null) {
-      //       _scrollToCurrentLesson(lessonIndex!, currentCourseIndex!);
-      //     }
-      //   },
-      // );
+    // setState(() {});
+    // Scroll to current course
+    // ref.listen<AssignedCoursesState>(
+    //   assignedCoursesNotifierProvider,
+    //   (previous, next) {
+    //     if (previous?.isLoading == true &&
+    //         next.isLoading == false &&
+    //         next.curriculum != null) {
+    //       _scrollToCurrentLesson(lessonIndex!, currentCourseIndex!);
+    //     }
+    //   },
+    // );
     // });
   }
 
@@ -90,6 +92,14 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
     }
   }
 
+  void _scrollToTheBottom() {
+    _lessonScrollController.jumpTo(
+      _lessonScrollController.position.maxScrollExtent,
+    );
+    scrollingDone = true;
+    print("Scrolled to certificate");
+  }
+
   bool scrollingDone = false;
   @override
   Widget build(BuildContext context) {
@@ -103,10 +113,23 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
     int currentCourseIndex = authState.courseRelatedData?.courseNum ?? 0;
     int lessonIndex = authState.courseRelatedData?.lessonNum ?? 0;
 
-    if (state.curriculum != null && !scrollingDone) {
+    CurriculumScore? curriculumScore;
+    if (state.curriculumScores.isNotEmpty) {
+      final s = state.curriculumScores
+          .where((e) => e.curriculumId == state.curriculum?.id);
+      curriculumScore = s.isNotEmpty ? s.first : null;
+    }
+    if (state.curriculum != null && !scrollingDone && curriculumScore == null) {
       Future.delayed(
         Duration(seconds: 1),
         () => _scrollToCurrentLesson(lessonIndex, currentCourseIndex),
+      );
+    }
+
+    if (curriculumScore != null && !scrollingDone) {
+      Future.delayed(
+        Duration(seconds: 1),
+        () => _scrollToTheBottom(),
       );
     }
 
@@ -117,122 +140,128 @@ class _AssignedCourseListState extends ConsumerState<AssignedCourseList> {
     // }
 
     return Expanded(
-      child:// Text("AssignedCourseList")
-      ref.watch(assignedCoursesNotifierProvider).map(
-            loading: (_) => ListView(
-              children: [
-                Column(
-                  children: List.generate(
-                    10,
-                    (index) => LessonShimmer(),
+      child: // Text("AssignedCourseList")
+          ref.watch(assignedCoursesNotifierProvider).map(
+                loading: (_) => ListView(
+                  children: [
+                    Column(
+                      children: List.generate(
+                        10,
+                        (index) => LessonShimmer(),
+                      ),
+                    ),
+                  ],
+                ),
+                loaded: (_) => RefreshIndicator(
+                  onRefresh: () async {
+                    scrollingDone = false;
+                    await ref
+                        .read(assignedCoursesNotifierProvider.notifier)
+                        .getCurriculum(context);
+                    // currentCourseIndex = ref
+                    //         .read(authNotifierProvider)
+                    //         .courseRelatedData
+                    //         ?.courseNum ??
+                    //     currentCourseIndex;
+                    // lessonIndex = ref
+                    //         .read(authNotifierProvider)
+                    //         .courseRelatedData
+                    //         ?.courseNum ??
+                    //     lessonIndex;
+                    // print('''
+                    //   {
+                    //     currentCourseIndex: $currentCourseIndex,
+                    //     lessonIndex: $lessonIndex
+                    //   }
+                    // ''');
+                  },
+                  child: ListView.builder(
+                      controller: _lessonScrollController,
+                      itemCount:
+                          (_.curriculum?.assignedCourses?.length ?? 0) + 2,
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return Column(
+                            children: [
+                              Text(
+                                "السلام عليكم ورحمة الله وبركاته",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryColor,
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                arabicDate,
+                                textAlign: TextAlign.center,
+                                // style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              const SizedBox(height: 8),
+                              LinearProgressIndicator(
+                                value: ref
+                                    .read(assignedCoursesNotifierProvider
+                                        .notifier)
+                                    .getProgress(ref),
+                                minHeight: 16,
+                                color: primaryColor,
+                                backgroundColor: Theme.of(context).cardColor,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                          );
+                        } else if (index ==
+                            (_.curriculum?.assignedCourses?.length ?? 0) + 1) {
+                          return CertificateCard(
+                            curriculumScore: curriculumScore,
+                          );
+                        } else {
+                          final bool isCurrentCourse =
+                              (index - 1) == currentCourseIndex;
+                          // final bool isPastCourse = (index - 1)< currentCourseIndex;
+                          final bool isFutureCourse =
+                              (index - 1) > currentCourseIndex;
+
+                          return AssignedCourseCard(
+                            key: index == 0 ? _courseCardKey : null,
+                            isCurrentCourse: isCurrentCourse,
+                            isFutureCourse: isFutureCourse,
+                            assignedCourse:
+                                _.curriculum!.assignedCourses![index - 1],
+                          );
+                        }
+                      }),
+                ),
+                empty: (_) => Center(
+                  child: Text("ምንም የለም"),
+                ),
+                error: (_) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _.error ?? "",
+                        style: TextStyle(
+                          color: Colors.red,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () async {
+                          scrollingDone = false;
+                          await ref
+                              .read(assignedCoursesNotifierProvider.notifier)
+                              .getCurriculum(context);
+                        },
+                        icon: Icon(Icons.refresh),
+                      )
+                    ],
                   ),
                 ),
-              ],
-            ),
-            loaded: (_) => RefreshIndicator(
-              onRefresh: () async {
-                scrollingDone = false;
-                await ref
-                    .read(assignedCoursesNotifierProvider.notifier)
-                    .getCurriculum(context);
-                // currentCourseIndex = ref
-                //         .read(authNotifierProvider)
-                //         .courseRelatedData
-                //         ?.courseNum ??
-                //     currentCourseIndex;
-                // lessonIndex = ref
-                //         .read(authNotifierProvider)
-                //         .courseRelatedData
-                //         ?.courseNum ??
-                //     lessonIndex;
-                // print('''
-                //   {
-                //     currentCourseIndex: $currentCourseIndex,
-                //     lessonIndex: $lessonIndex
-                //   }
-                // ''');
-              },
-              child: ListView.builder(
-                  controller: _lessonScrollController,
-                  itemCount: (_.curriculum?.assignedCourses?.length ?? 0) + 1,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return Column(
-                        children: [
-                          Text(
-                            "السلام عليكم ورحمة الله وبركاته",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: primaryColor,
-                                ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            arabicDate,
-                            textAlign: TextAlign.center,
-                            // style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          LinearProgressIndicator(
-                            value: ref
-                                .read(assignedCoursesNotifierProvider.notifier)
-                                .getProgress(ref),
-                            minHeight: 16,
-                            color: primaryColor,
-                            backgroundColor: Theme.of(context).cardColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      );
-                    } else {
-                      final bool isCurrentCourse =
-                          (index - 1) == currentCourseIndex;
-                      // final bool isPastCourse = (index - 1)< currentCourseIndex;
-                      final bool isFutureCourse =
-                          (index - 1) > currentCourseIndex;
-
-                      return AssignedCourseCard(
-                        key: index == 0 ? _courseCardKey : null,
-                        isCurrentCourse: isCurrentCourse,
-                        isFutureCourse: isFutureCourse,
-                        assignedCourse:
-                            _.curriculum!.assignedCourses![index - 1],
-                      );
-                    }
-                  }),
-            ),
-            empty: (_) => Center(
-              child: Text("ምንም የለም"),
-            ),
-            error: (_) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _.error ?? "",
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      scrollingDone = false;
-                      await ref
-                          .read(assignedCoursesNotifierProvider.notifier)
-                          .getCurriculum(context);
-                    },
-                    icon: Icon(Icons.refresh),
-                  )
-                ],
               ),
-            ),
-          ),
-    
     );
   }
 }

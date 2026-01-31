@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/auth/model/course_score.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/current_lesson_list.dart';
@@ -37,10 +38,26 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
   //     }
   //   });
   // }
+  Color getColor(double prcnt) {
+    prcnt = prcnt * 100;
+    if (prcnt < 50) {
+      return Colors.red;
+    } else {
+      return primaryColor;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // final coursesState = ref.watch(assignedCoursesNotifierProvider);
+    final coursesState = ref.watch(assignedCoursesNotifierProvider);
+
+    CourseScore? courseScore;
+    if (!widget.isCurrentCourse && !widget.isFutureCourse) {
+      final s = coursesState.courseScores
+          .where((e) => e.courseId == widget.assignedCourse.id)
+          .toList();
+      courseScore = s.isNotEmpty ? s.first : null;
+    }
 
     return Column(
       key: _key,
@@ -50,13 +67,13 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
           shape: BeveledRectangleBorder(),
           onExpansionChanged: (value) {
             // ref.read(assignedCoursesNotifierProvider.notifier).changeExpandedCourse(widget.assignedCourse!.order);
-            if (!widget.isCurrentCourse && !widget.isFutureCourse) {
-              if (value) {
-                ref
-                    .read(pastLessonStateProvider.notifier)
-                    .getLessonForCourse(widget.assignedCourse.id, context);
-              }
-            }
+            // if (!widget.isCurrentCourse && !widget.isFutureCourse) {
+            //   if (value) {
+            //     ref
+            //         .read(pastLessonStateProvider.notifier)
+            //         .getLessonForCourse(widget.assignedCourse.id, context);
+            //   }
+            // }
           },
           initiallyExpanded: widget.isCurrentCourse,
           title: Padding(
@@ -96,7 +113,9 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                     weight: 1,
                     color: widget.isCurrentCourse
                         ? whiteColor
-                        : primaryColor,
+                        : widget.isFutureCourse
+                            ? Theme.of(context).textTheme.bodyMedium?.color
+                            : primaryColor,
                   ),
                 ),
                 SizedBox(
@@ -123,14 +142,47 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
                   width: 5,
                 ),
                 Expanded(
-                  child: Text(
-                    widget.assignedCourse.title,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: widget.isFutureCourse ? Colors.grey : primaryColor,
-                    ),
+                  child: Column(
+                    children: [
+                      if (courseScore != null)
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 3,
+                              vertical: .5,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: getColor(
+                                  courseScore.score / courseScore.outOf,
+                                ),
+                              ),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            child: Text(
+                              "${courseScore.score}/${courseScore.outOf} ነጥብ",
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: getColor(
+                                  courseScore.score / courseScore.outOf,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      Text(
+                        widget.assignedCourse.title,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: widget.isFutureCourse
+                              ? Colors.grey
+                              : primaryColor,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // if (widget.isFutureCourse)
@@ -145,7 +197,9 @@ class _AssignedCourseCardState extends ConsumerState<AssignedCourseCard> {
             if (widget.isFutureCourse) ...[
               Text("ዝግ ነው! እዚህ ጋር ሲደርሱ ይከፈታል!"),
             ] else if (widget.isCurrentCourse) ...[
-              CurrentLessonList(assignedCourse: widget.assignedCourse,)
+              CurrentLessonList(
+                assignedCourse: widget.assignedCourse,
+              )
             ] else ...[
               PastLessonList()
             ]
