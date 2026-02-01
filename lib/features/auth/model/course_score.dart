@@ -62,6 +62,7 @@ class CourseScore {
   }
 
   factory CourseScore.fromMap(Map<String, dynamic> map) {
+    print("CourseScore.fromMap");
     return CourseScore(
       id: map['id'] as String,
       courseId: map['courseId'] as String,
@@ -77,7 +78,8 @@ class CourseScore {
 
   String toJson() => json.encode(toMap());
 
-  factory CourseScore.fromJson(String source) => CourseScore.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CourseScore.fromJson(String source) =>
+      CourseScore.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -87,29 +89,28 @@ class CourseScore {
   @override
   bool operator ==(covariant CourseScore other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.courseId == courseId &&
-      other.curriculumId == curriculumId &&
-      other.score == score &&
-      other.outOf == outOf &&
-      other.noOfLessonPerDay == noOfLessonPerDay &&
-      other.startDate == startDate &&
-      other.endDate == endDate &&
-      other.userId == userId;
+
+    return other.id == id &&
+        other.courseId == courseId &&
+        other.curriculumId == curriculumId &&
+        other.score == score &&
+        other.outOf == outOf &&
+        other.noOfLessonPerDay == noOfLessonPerDay &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        other.userId == userId;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      courseId.hashCode ^
-      curriculumId.hashCode ^
-      score.hashCode ^
-      outOf.hashCode ^
-      noOfLessonPerDay.hashCode ^
-      startDate.hashCode ^
-      endDate.hashCode ^
-      userId.hashCode;
+        courseId.hashCode ^
+        curriculumId.hashCode ^
+        score.hashCode ^
+        outOf.hashCode ^
+        noOfLessonPerDay.hashCode ^
+        startDate.hashCode ^
+        endDate.hashCode ^
+        userId.hashCode;
   }
 }

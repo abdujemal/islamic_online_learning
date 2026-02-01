@@ -36,6 +36,7 @@ const String getPrerequisiteTestApi =
 const String confusionsApi = "$baseUrl/confusions";
 //discussions
 const String discussionsApi = "$baseUrl/discussions";
+const String callAdminsApi = "$discussionsApi/callAdmin";
 const String discussionQuizzesApi = "$discussionsApi/quizzes";
 const String discussionQuestionsApi = "$discussionsApi/questions";
 const String submitDiscussionTasksApi = "$discussionsApi/submit";
@@ -63,6 +64,7 @@ const String updateMyInfoApi = "$baseUrl/auth/user/me";
 const String getMyCourseInfoApi = "$baseUrl/auth/user/courseData";
 const String getScoresApi = "$baseUrl/auth/user/scores";
 const String getStreakNumApi = "$baseUrl/auth/user/streak";
+const String getMyCertificateApi = "$baseUrl/auth/user/certificates";
 //payments
 const String paymentProvidersApi = "$baseUrl/payments/providers";
 //chats

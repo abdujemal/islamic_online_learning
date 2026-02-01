@@ -65,6 +65,7 @@ class TestAttempt {
 
   factory TestAttempt.fromMap(Map<String, dynamic> map) {
     // print("location: TestAttempt");
+    print("TestAttempt.fromMap");
     return TestAttempt(
       id: map['id'] as String,
       afterLessonNum: map['afterLessonNum'] as int,

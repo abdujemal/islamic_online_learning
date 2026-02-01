@@ -8,7 +8,7 @@ import 'package:islamic_online_learning/features/meeting/view/controller/voice_r
 
 class ShortAnswerQuiz extends ConsumerStatefulWidget {
   final List<Map<String, dynamic>> questions;
-  final Duration timeLimit;
+  final Duration? timeLimit;
   final bool fromDiscussion;
   final Function(List<Map<String, String>>) onFinish;
   final Function(Map<String, String>) onSubmit;
@@ -18,7 +18,7 @@ class ShortAnswerQuiz extends ConsumerStatefulWidget {
     required this.questions,
     required this.onFinish,
     required this.onSubmit,
-    required this.timeLimit,
+    this.timeLimit,
     this.fromDiscussion = false,
   });
 
@@ -31,8 +31,9 @@ class _ShortAnswerQuizState extends ConsumerState<ShortAnswerQuiz> {
   int currentIndex = 0;
   final Map<int, String> answers = {};
   final TextEditingController controller = TextEditingController();
+  Duration? _timeLimit;
   late Timer _timer;
-  late int _remainingSeconds;
+  int? _remainingSeconds;
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -43,7 +44,7 @@ class _ShortAnswerQuizState extends ConsumerState<ShortAnswerQuiz> {
         }
       } else {
         setState(() {
-          _remainingSeconds--;
+          _remainingSeconds = _remainingSeconds! - 1;
         });
       }
     });
@@ -97,12 +98,21 @@ class _ShortAnswerQuizState extends ConsumerState<ShortAnswerQuiz> {
   @override
   void initState() {
     super.initState();
-    _remainingSeconds = widget.timeLimit.inSeconds;
-    _startTimer();
-    if (widget.fromDiscussion) {
-      initAnswers();
-    }
-    controller.text = answers[currentIndex] ?? '';
+    Future.microtask(() {
+      if (widget.timeLimit != null) {
+        _timeLimit = widget.timeLimit!;
+      } else {
+        final remainingSeconds = ref.watch(remainingSecondsProvider);
+        _timeLimit = Duration(seconds: remainingSeconds);
+      }
+      setState(() {});
+      _remainingSeconds = _timeLimit!.inSeconds;
+      _startTimer();
+      if (widget.fromDiscussion) {
+        initAnswers();
+      }
+      controller.text = answers[currentIndex] ?? '';
+    });
   }
 
   void initAnswers() {
@@ -187,23 +197,24 @@ class _ShortAnswerQuizState extends ConsumerState<ShortAnswerQuiz> {
         child: Column(
           children: [
             // Progress bar
-
-            LinearProgressIndicator(
-              value: _remainingSeconds / widget.timeLimit.inSeconds,
-              color: _remainingSeconds <= 10 ? Colors.red : Colors.tealAccent,
-              // backgroundColor: Colors.red.shade100,
-              backgroundColor: Colors.white12,
-              // minHeight: 6,
-              borderRadius: BorderRadius.circular(30),
-            ),
-
-            Text(
-              formatTime(_remainingSeconds),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: _remainingSeconds < 60 ? Colors.red : null,
+            if (_timeLimit != null && _remainingSeconds != null)
+              LinearProgressIndicator(
+                value: _remainingSeconds! / _timeLimit!.inSeconds,
+                color:
+                    _remainingSeconds! <= 10 ? Colors.red : Colors.tealAccent,
+                // backgroundColor: Colors.red.shade100,
+                backgroundColor: Colors.white12,
+                // minHeight: 6,
+                borderRadius: BorderRadius.circular(30),
               ),
-            ),
+            if (_remainingSeconds != null)
+              Text(
+                formatTime(_remainingSeconds!),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: _remainingSeconds! < 60 ? Colors.red : null,
+                ),
+              ),
             const SizedBox(height: 20),
 
             // Question number

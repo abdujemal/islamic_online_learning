@@ -47,19 +47,22 @@ class Rest {
   }
 
   factory Rest.fromMap(Map<String, dynamic> map) {
+    print("Rest.fromMap");
     return Rest(
       id: map['id'] as String,
       startDate: DateTime.parse(map['startDate'] as String).toLocal(),
       endDate: DateTime.parse(map['endDate'] as String).toLocal(),
       numOfDays: map['numOfDays'] as int,
       reason: map['reason'] as String,
-      afterLesson: map['afterLesson'] != null ? map['afterLesson'] as int : null,
+      afterLesson:
+          map['afterLesson'] != null ? map['afterLesson'] as int : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Rest.fromJson(String source) => Rest.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Rest.fromJson(String source) =>
+      Rest.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -69,23 +72,22 @@ class Rest {
   @override
   bool operator ==(covariant Rest other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.startDate == startDate &&
-      other.endDate == endDate &&
-      other.numOfDays == numOfDays &&
-      other.reason == reason &&
-      other.afterLesson == afterLesson;
+
+    return other.id == id &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        other.numOfDays == numOfDays &&
+        other.reason == reason &&
+        other.afterLesson == afterLesson;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      startDate.hashCode ^
-      endDate.hashCode ^
-      numOfDays.hashCode ^
-      reason.hashCode ^
-      afterLesson.hashCode;
+        startDate.hashCode ^
+        endDate.hashCode ^
+        numOfDays.hashCode ^
+        reason.hashCode ^
+        afterLesson.hashCode;
   }
 }

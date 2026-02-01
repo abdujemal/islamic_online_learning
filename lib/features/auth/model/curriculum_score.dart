@@ -5,6 +5,7 @@ class CurriculumScore {
   final String id;
   final String userId;
   final String curriculumId;
+  final String curriculumTitle;
   final String? certificateUrl;
   final int score;
   final int outOf;
@@ -14,6 +15,7 @@ class CurriculumScore {
     required this.id,
     required this.userId,
     required this.curriculumId,
+    required this.curriculumTitle,
     this.certificateUrl,
     required this.score,
     required this.outOf,
@@ -25,6 +27,7 @@ class CurriculumScore {
     String? id,
     String? userId,
     String? curriculumId,
+    String? curriculumTitle,
     String? certificateUrl,
     int? score,
     int? outOf,
@@ -35,6 +38,7 @@ class CurriculumScore {
       id: id ?? this.id,
       userId: userId ?? this.userId,
       curriculumId: curriculumId ?? this.curriculumId,
+      curriculumTitle: curriculumTitle ?? this.curriculumTitle,
       certificateUrl: certificateUrl ?? this.certificateUrl,
       score: score ?? this.score,
       outOf: outOf ?? this.outOf,
@@ -43,11 +47,17 @@ class CurriculumScore {
     );
   }
 
+  static List<CurriculumScore> listFromJson(String responseBody) {
+    final parsed = jsonDecode(responseBody) as List<dynamic>;
+    return parsed.map((json) => CurriculumScore.fromMap(json)).toList();
+  }
+
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
       'userId': userId,
       'curriculumId': curriculumId,
+      "curriculumTitle": curriculumTitle,
       'certificateUrl': certificateUrl,
       'score': score,
       'outOf': outOf,
@@ -57,10 +67,12 @@ class CurriculumScore {
   }
 
   factory CurriculumScore.fromMap(Map<String, dynamic> map) {
+    print("CurriculumScore.fromMap");
     return CurriculumScore(
       id: map['id'] as String,
       userId: map['userId'] as String,
       curriculumId: map['curriculumId'] as String,
+      curriculumTitle: map['curriculumTitle'] as String,
       certificateUrl: map['certificateUrl'] != null
           ? map['certificateUrl'] as String
           : null,
@@ -78,7 +90,7 @@ class CurriculumScore {
 
   @override
   String toString() {
-    return 'CurriculumScore(id: $id, userId: $userId, curriculumId: $curriculumId, certificateUrl: $certificateUrl, score: $score, outOf: $outOf, startDate: $startDate, endDate: $endDate)';
+    return 'CurriculumScore(id: $id, userId: $userId, curriculumId: $curriculumId, curriculumTitle: $curriculumTitle, certificateUrl: $certificateUrl, score: $score, outOf: $outOf, startDate: $startDate, endDate: $endDate)';
   }
 
   @override
@@ -88,6 +100,7 @@ class CurriculumScore {
     return other.id == id &&
         other.userId == userId &&
         other.curriculumId == curriculumId &&
+        other.curriculumTitle == curriculumTitle &&
         other.certificateUrl == certificateUrl &&
         other.score == score &&
         other.outOf == outOf &&
@@ -100,6 +113,7 @@ class CurriculumScore {
     return id.hashCode ^
         userId.hashCode ^
         curriculumId.hashCode ^
+        curriculumTitle.hashCode ^
         certificateUrl.hashCode ^
         score.hashCode ^
         outOf.hashCode ^

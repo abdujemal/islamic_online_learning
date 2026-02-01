@@ -49,7 +49,19 @@ class VoiceRoomService {
     return Question.listFromJson(res.body);
   }
 
-  Future<StreakWNo> submitDiscussionTasks(List<QA> qas, List<QuizAns> quizAns) async {
+  Future<void> callAdmin() async {
+    final res = await customPostRequest(
+      callAdminsApi,
+      {},
+      authorized: true,
+    );
+    if (res.statusCode != 200) {
+      throw Exception('Failed to callAdmins: ${res.body}');
+    }
+  }
+
+  Future<StreakWNo> submitDiscussionTasks(
+      List<QA> qas, List<QuizAns> quizAns) async {
     final res = await customPostRequest(
       submitDiscussionTasksApi,
       {

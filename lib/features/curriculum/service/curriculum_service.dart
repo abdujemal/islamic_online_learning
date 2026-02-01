@@ -12,11 +12,11 @@ import 'package:islamic_online_learning/features/auth/model/course_score.dart';
 import 'package:islamic_online_learning/features/auth/model/curriculum_score.dart';
 import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
-import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
+// import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
-import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
+// import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 import 'package:islamic_online_learning/features/curriculum/model/rest.dart';
-import 'package:islamic_online_learning/features/curriculum/service/curriculum_db_helper.dart';
+// import 'package:islamic_online_learning/features/curriculum/service/curriculum_db_helper.dart';
 import 'package:islamic_online_learning/features/meeting/model/discussion.dart';
 import 'package:islamic_online_learning/features/quiz/model/test_attempt.dart';
 
@@ -218,7 +218,7 @@ class CurriculumNGroup {
       ),
       discussions:
           List<Discussion>.from((map["discussions"] as List<dynamic>).map(
-        (e) => Discussion.fromMap(e, null, null),
+        (e) => Discussion.fromMap(e, null, null, null),
       )),
       testAttempts: List<TestAttempt>.from(
         (map["testAttempts"] as List<dynamic>).map(

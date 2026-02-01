@@ -110,6 +110,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
         MaterialPageRoute(
           builder: (_) => PdfPage(
               path: pdfUrl,
+              pageNum: lesson.startPage,
               volume: lesson.volume.toDouble(),
               courseModel: courseModel,
               isFromPro: true,

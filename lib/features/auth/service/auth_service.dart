@@ -7,6 +7,7 @@ import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/features/Questionaire/model/questionnaire.dart';
 import 'package:islamic_online_learning/features/auth/model/confusion.dart';
+import 'package:islamic_online_learning/features/auth/model/curriculum_score.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
 import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
@@ -368,6 +369,21 @@ class AuthService {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
       throw Exception('Failed to get confusions: ${response.body}');
+    }
+  }
+
+  Future<List<CurriculumScore>> getCertificates() async {
+    final response = await customGetRequest(
+      getMyCertificateApi,
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      List<CurriculumScore> curriculumScores = CurriculumScore.listFromJson(response.body);
+      return curriculumScores; //token
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to get curriculumScores: ${response.body}');
     }
   }
 }

@@ -159,10 +159,10 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
       }
       final questions = ref.watch(discussionQuestionsProvider);
       if (voiceRoomState.givenTime == null) return SizedBox();
-      final discussionSeconds = voiceRoomState.givenTime!.segments.assignment >
-              voiceRoomState.discussionSec
-          ? voiceRoomState.discussionSec
-          : voiceRoomState.givenTime!.segments.assignment;
+      // final discussionSeconds = voiceRoomState.givenTime!.segments.assignment >
+      //         voiceRoomState.discussionSec
+      //     ? voiceRoomState.discussionSec
+      //     : voiceRoomState.givenTime!.segments.assignment;
       if (questions == null) {
         return Center(
           child: CircularProgressIndicator(),
@@ -176,9 +176,9 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
       return Expanded(
         child: SingleChildScrollView(
           child: ShortAnswerQuiz(
-            timeLimit: Duration(
-              seconds: discussionSeconds,
-            ),
+            // timeLimit: Duration(
+            //   seconds: discussionSeconds,
+            // ),
             fromDiscussion: true,
             questions: questions
                 .map(

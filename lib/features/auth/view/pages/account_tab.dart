@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/auth/view/pages/certificates_page.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/confusions_page.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/edit_profile_page.dart';
 import 'package:islamic_online_learning/features/auth/view/widget/hijri_streak_calender_dialog.dart';
@@ -111,11 +112,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 );
               },
             ),
-            _buildSettingItem(
-              icon: Icons.question_mark_rounded,
-              title: "My Tests",
-              onTap: () {},
-            ),
+
             _buildSettingItem(
               icon: Icons.payment,
               title: "Payments",
@@ -124,6 +121,18 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => PaymentsPage(),
+                  ),
+                );
+              },
+            ),
+            _buildSettingItem(
+              icon: Icons.card_membership_rounded,
+              title: "My Certificates",
+              onTap: () {
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CertificatesPage(),
                   ),
                 );
               },
@@ -261,16 +270,16 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 Spacer(),
                 IconButton(
                   onPressed: () {
-                    final rests =
-                        ref.read(assignedCoursesNotifierProvider).rests;
-                    showDialog(
-                      context: context,
-                      builder: (_) => HijriStreakCalenderDialog(
-                        rests: rests,
-                        discussionWDay:
-                            getWeekDayFromText(currentUser.group.discussionDay),
-                      ),
-                    );
+                    // final rests =
+                    //     ref.read(assignedCoursesNotifierProvider).rests;
+                    // showDialog(
+                    //   context: context,
+                    //   builder: (_) => HijriStreakCalenderDialog(
+                    //     rests: rests,
+                    //     discussionWDay:
+                    //         getWeekDayFromText(currentUser.group.discussionDay),
+                    //   ),
+                    // );
                   },
                   icon: Icon(
                     Icons.calendar_month,

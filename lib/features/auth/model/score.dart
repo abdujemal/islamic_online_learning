@@ -64,6 +64,7 @@ class Score {
   }
 
   factory Score.fromMap(Map<String, dynamic> map) {
+    print("Score.fromMap");
     return Score(
       id: map['id'] as String,
       targetType: map['targetType'] as String,
@@ -117,7 +118,7 @@ class Score {
     return scores;
   }
 
-  static Future<List<Score>> fetchArchivedScoresMultiple(List<String> urls){
+  static Future<List<Score>> fetchArchivedScoresMultiple(List<String> urls) {
     return Future.wait(urls.map((url) => fetchArchivedScores(url)))
         .then((lists) => lists.expand((i) => i).toList());
   }

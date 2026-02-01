@@ -1,5 +1,6 @@
-class MonthlyScore {//generate model class
-  final String id; 
+class MonthlyScore {
+  //generate model class
+  final String id;
   final String courseId;
   final String curriculumId;
   final String archiveUrl;
@@ -45,6 +46,7 @@ class MonthlyScore {//generate model class
   }
 
   factory MonthlyScore.fromMap(Map<String, dynamic> map) {
+    print("MonthlyScore.fromMap");
     return MonthlyScore(
       id: map['id'] as String,
       courseId: map['courseId'] as String,
@@ -60,5 +62,4 @@ class MonthlyScore {//generate model class
       userId: map['userId'] as String,
     );
   }
-
 }

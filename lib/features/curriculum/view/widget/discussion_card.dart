@@ -7,6 +7,7 @@ import 'package:islamic_online_learning/features/auth/model/const_score.dart';
 import 'package:islamic_online_learning/features/auth/model/score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
+import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
@@ -16,7 +17,7 @@ import 'package:islamic_online_learning/features/meeting/view/pages/voice_room.d
 class DiscussionCard extends ConsumerStatefulWidget {
   final bool isLocked;
   final bool isCurrent;
-  final int afterLesson;
+  // final int afterLesson;
   // final bool isExamLocked;
   // final bool isExamCurrent;
   // final bool isLastDiscussion;
@@ -24,18 +25,19 @@ class DiscussionCard extends ConsumerStatefulWidget {
   final ExamData? examData;
   final DiscussionData discussionData;
   final AssignedCourse assignedCourse;
+  final Lesson afterLesson;
   const DiscussionCard({
     super.key,
     // required this.isExamCurrent,
     // required this.isExamLocked,
     required this.examData,
     required this.assignedCourse,
+    required this.afterLesson,
     // required this.hasExam,
     // required this.isLastDiscussion,
     required this.discussionData,
     required this.isLocked,
     required this.isCurrent,
-    required this.afterLesson,
   });
 
   @override
@@ -84,7 +86,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
         .scores
         .where(
           (e) =>
-              e.afterLesson == widget.afterLesson &&
+              e.afterLesson == widget.afterLesson.order &&
               e.targetType == "Discussion",
         )
         .toList();
@@ -97,7 +99,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
         targetType: "Discussion",
         targetId: "discussions.first.id",
         score: 0,
-        afterLesson: widget.afterLesson,
+        afterLesson: widget.afterLesson.order,
         gradeWaiting: false,
         outOf: constScore?.totalScore ?? 0,
         userId: "userId",
@@ -236,6 +238,9 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                                         MaterialPageRoute(
                                           builder: (_) => VoiceRoomPage(
                                             title: widget.discussionData.title,
+                                            currentCourse:
+                                                widget.assignedCourse,
+                                            currentLesson: widget.afterLesson,
                                             afterLessonNo:
                                                 widget.discussionData.lessonTo,
                                             fromLesson: widget

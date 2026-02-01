@@ -59,9 +59,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
         Navigator.pushReplacement(
           ref.context,
           MaterialPageRoute(
-            builder: (_) => DiscussionCompletedUi(
-              
-            ),
+            builder: (_) => DiscussionCompletedUi(),
           ),
         );
         // _showTimeUpDialog();
@@ -219,7 +217,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
 
       final room = Room(roomOptions: roomOptions);
 
-      await room.connect(LIVEKIT_URL, token);
+      await room.connect(discussion.url!, token);
 
       startTimer(ref, discussion.discussionSecond ?? 0, discussion);
 
@@ -336,7 +334,8 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     //   room: null,
     //   participants: [],
     // );
-    state = VoiceRoomState(examData: state.examData, assignedCourse: state.assignedCourse);
+    state = VoiceRoomState(
+        examData: state.examData, assignedCourse: state.assignedCourse);
     print('Disconnected from room ${state.room == null}');
     // setState(() {
     //   _room = null;
@@ -524,13 +523,33 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     }
   }
 
+  Future<void> callAdmins(BuildContext context) async {
+    try {
+      toast("calling...", ToastType.normal, context);
+      await voiceRoomService.callAdmin();
+      toast(
+        "Admin will join your call soon.",
+        ToastType.success,
+        context,
+        isLong: true,
+      );
+    } catch (err) {
+      handleError(err.toString(), context, this.ref, () {
+        toast(getErrorMsg(err.toString(), err.toString()), ToastType.error,
+            context);
+        print(err);
+      });
+    }
+  }
+
   @override
   void dispose() {
     state.room?.disconnect();
     state.room?.dispose();
     state.listener?.dispose();
     state.timer?.cancel();
-    state = VoiceRoomState(examData: state.examData, assignedCourse: state.assignedCourse);
+    state = VoiceRoomState(
+        examData: state.examData, assignedCourse: state.assignedCourse);
     super.dispose();
   }
 }

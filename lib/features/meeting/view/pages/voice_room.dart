@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/database_helper.dart';
+import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
+import 'package:islamic_online_learning/features/curriculum/model/lesson.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_notifier.dart';
 import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_state.dart';
 import 'package:islamic_online_learning/features/meeting/view/widget/discussion_task_ui.dart';
@@ -14,21 +18,26 @@ class VoiceRoomPage extends ConsumerStatefulWidget {
   final String title;
   final int afterLessonNo;
   final int fromLesson;
+  final Lesson currentLesson;
+  final AssignedCourse currentCourse;
   const VoiceRoomPage({
     super.key,
     required this.title,
     required this.afterLessonNo,
     required this.fromLesson,
+    required this.currentCourse,
+    required this.currentLesson,
   });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _VoiceRoomPageState();
 }
 
-class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
+class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
+    with WidgetsBindingObserver {
   bool canPop = false;
 
-  late PdfController _pdfController;
+  PdfController? _pdfController;
 
   // Room? room;
   // EventsListener<RoomEvent>? listener;
@@ -36,6 +45,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future.microtask(() {
       final voiceRoomNotifier = ref.read(voiceRoomNotifierProvider.notifier);
       // final voiceRoomState = ref.read(voiceRoomNotifierProvider);
@@ -44,24 +54,23 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
         widget.title,
         widget.fromLesson,
       );
-      _pdfController = PdfController(
-          initialPage: 0,
-          document: PdfDocument.openFile(//voiceRoomState.assignedCourse!.course!.pdfId)
-             "/data/user/0/com.aj.islamic_online_learning_dev/files/PDF/ሹሩጡ ላኢላሀ ኢለላህ.pdf")
-          //"https://b2.ilmfelagi.com/file/ilm-Felagi2/%E1%8A%90%E1%88%B2%E1%88%90%E1%89%B2%20%E1%88%8A%E1%8A%A0%E1%88%85%E1%88%8A%20%E1%88%B1%E1%8A%93%20%E1%89%A0%E1%8A%A0%E1%89%A1%20%E1%88%99%E1%88%B5%E1%88%8A%E1%88%9D/%D9%86%D8%B5%D9%8A%D8%AD%D8%AA%D9%8A_%D9%84%D8%A3%D9%87%D9%84_%D8%A7%D9%84%D8%B3%D9%86%D8%A9.pdf"),
-          );
     });
   }
 
-  // @override
-  // void dispose() {
-  //   ref.read(voiceRoomNotifierProvider.notifier).disconnect();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    // ref.read(voiceRoomNotifierProvider.notifier).disconnect();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
-  void _showError(String msg) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached ||
+        state == AppLifecycleState.inactive) {
+      ref.read(voiceRoomNotifierProvider.notifier).disconnect(ref);
+    }
   }
 
   Widget _buildParticipantTile(Participant p, bool isLarge) {
@@ -180,6 +189,37 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
     );
   }
 
+  void _showOptionMenu(BuildContext context, Offset position) async {
+    final selected = await showMenu<String>(
+      context: context,
+      color: Theme.of(context).cardColor,
+      position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, 0),
+      items: [
+        "Call Admins",
+      ]
+          .map((val) => PopupMenuItem<String>(
+                value: val,
+                child: Text(
+                  val,
+                  // style: TextStyle(
+                  //   fontWeight: speed == currentSpeed
+                  //       ? FontWeight.bold
+                  //       : FontWeight.normal,
+                  //   color: speed == currentSpeed ? primaryColor : null,
+                  // ),
+                ),
+              ))
+          .toList(),
+    );
+    print("selected:$selected");
+
+    if (selected == "Call Admins") {
+      ref.read(voiceRoomNotifierProvider.notifier).callAdmins(context);
+    } else {
+      print("non");
+    }
+  }
+
   Widget _buildBottomControls(VoiceRoomState state) {
     final connected = state.room != null;
     print('VoiceRoomPage: connected=$connected, isMuted=${state.isMuted}');
@@ -242,16 +282,29 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
             ),
             const SizedBox(width: 12),
             // More (raise hand / settings) placeholder
-            FloatingActionButton(
-              heroTag: 'more',
-              foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
-              backgroundColor: Theme.of(context).cardColor,
-              // backgroundColor: Colors.white12,
-              onPressed: () {
-                // future actions
-                _showError('Not implemented yet — settings');
+            GestureDetector(
+              onTapDown: (td) {
+                final x = td.globalPosition.dx - 50;
+                final y = td.globalPosition.dy - 100;
+
+                _showOptionMenu(context, Offset(x, y));
               },
-              child: const Icon(Icons.more_vert, color: null),
+              child: Container(
+                width: 55,
+                height: 55,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                // heroTag: 'more',
+                // foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
+                // backgroundColor: Theme.of(context).cardColor,
+                // // backgroundColor: Colors.white12,
+                // onPressed: () {
+                //   // future actions
+                // },
+                child: const Icon(Icons.more_vert, color: null),
+              ),
             ),
           ],
         ),
@@ -311,7 +364,45 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
                   return isPdfShown
                       ? SizedBox()
                       : ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            if (_pdfController != null) {
+                              ref
+                                  .read(voiceRoomNotifierProvider.notifier)
+                                  .togglePdfShown();
+                              return;
+                            }
+                            toast("Loading...", ToastType.normal, context,
+                                isLong: true);
+                            final pdfId = widget.currentCourse.course?.pdfId;
+                            // final courseModel = state.currentCourse?.course;
+                            print("mmmmmmm pdfId: $pdfId");
+                            if (pdfId == null) return;
+                            final courseModel = await DatabaseHelper()
+                                .getSingleCourse(
+                                    widget.currentCourse.course!.courseId);
+                            print("mmmmmmm courseModel: $courseModel");
+                            if (courseModel == null) return;
+                            String? pdfPath = await ref
+                                .read(lessonNotifierProvider.notifier)
+                                .getPdfPath(
+                                  ref,
+                                  courseModel,
+                                  widget.currentCourse.title,
+                                  widget.currentLesson.volume,
+                                  widget.currentCourse.course!
+                                      .pdfSize[widget.currentLesson.volume],
+                                );
+                            if (pdfPath == null) {
+                              toast("ማሳየት አልተቻለም!", ToastType.error, context);
+                              return;
+                            }
+                            print(
+                                "Page num: ${widget.currentLesson.startPage}");
+                            _pdfController = PdfController(
+                              initialPage: widget.currentLesson.startPage,
+                              document: PdfDocument.openFile(pdfPath),
+                            );
+                            setState(() {});
                             ref
                                 .read(voiceRoomNotifierProvider.notifier)
                                 .togglePdfShown();
@@ -406,11 +497,12 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
                               if (isPdfShown)
                                 Stack(
                                   children: [
-                                    PdfView(
-                                      controller: _pdfController,
-                                      pageSnapping: false,
-                                      scrollDirection: Axis.vertical,
-                                    ),
+                                    if (_pdfController != null)
+                                      PdfView(
+                                        controller: _pdfController!,
+                                        pageSnapping: false,
+                                        scrollDirection: Axis.vertical,
+                                      ),
                                     Positioned(
                                       child: Padding(
                                         padding:

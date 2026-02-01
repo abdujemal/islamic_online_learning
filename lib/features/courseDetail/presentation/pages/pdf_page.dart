@@ -81,7 +81,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
     courseModel = widget.courseModel;
 
     _controller = PdfController(
-      initialPage: courseModel.pdfPage.toInt() - 1,
+      initialPage: widget.isFromPro ? widget.pageNum : courseModel.pdfPage.toInt() - 1,
       document: PdfDocument.openFile(widget.path),
     );
     print(

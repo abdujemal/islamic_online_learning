@@ -208,7 +208,7 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
                     examData: examData,
                     assignedCourse: widget.assignedCourse,
                     discussionData: discussionData!,
-                    afterLesson: index,
+                    afterLesson: lesson,
                     isLocked:
                         isDiscussionLocked, //|| status != LessonCardStatus.DISCUSSION,
                     isCurrent: isCurrentLesson &&

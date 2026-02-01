@@ -67,6 +67,7 @@ class Confusion {
   }
 
   factory Confusion.fromMap(Map<String, dynamic> map) {
+    print("Confusion.fromMap");
     return Confusion(
       id: map['id'] as String,
       userId: map['userId'] as String,

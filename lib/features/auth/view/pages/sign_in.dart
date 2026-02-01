@@ -156,47 +156,48 @@ class _SignInState extends ConsumerState<SignIn> {
                       )
                     : const Text("ቀጥል"),
               ),
-              SizedBox(
-                height: 20,
-              ),
-              TheEnd(
-                text: "OR",
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Align(
-                child: ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(signInNotifierProvider.notifier)
-                          .signWithGoogle(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      side: BorderSide(color: primaryColor),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      foregroundColor:
-                          Theme.of(context).textTheme.bodyMedium?.color,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          "assets/google2.png",
-                          // color:  Colors.grey,
-                          height: 30,
-                          width: 30,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        state.isSigningWGoogle
-                            ? CircularProgressIndicator()
-                            : Text("Sign in with Google"),
-                      ],
-                    )),
-              ),
+              // SizedBox(
+              //   height: 20,
+              // ),
+              // TheEnd(
+              //   text: "OR",
+              // ),
+              // SizedBox(
+              //   height: 20,
+              // ),
+              // Align(
+              //   child: ElevatedButton(
+              //       onPressed: () {
+              //         ref
+              //             .read(signInNotifierProvider.notifier)
+              //             .signWithGoogle(context);
+              //       },
+              //       style: ElevatedButton.styleFrom(
+              //         side: BorderSide(color: primaryColor),
+              //         padding:
+              //             EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              //         foregroundColor:
+              //             Theme.of(context).textTheme.bodyMedium?.color,
+              //       ),
+              //       child: Row(
+              //         mainAxisSize: MainAxisSize.min,
+              //         children: [
+              //           Image.asset(
+              //             "assets/google2.png",
+              //             // color:  Colors.grey,
+              //             height: 30,
+              //             width: 30,
+              //           ),
+              //           SizedBox(
+              //             width: 15,
+              //           ),
+              //           state.isSigningWGoogle
+              //               ? CircularProgressIndicator()
+              //               : Text("Sign in with Google"),
+              //         ],
+              //       )),
+              // ),
+            
             ],
           ),
         ),

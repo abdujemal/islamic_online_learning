@@ -1,8 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:islamic_online_learning/core/constants.dart';
-
 class Discussion {
   final String id;
   final int fromLesson;
@@ -14,6 +12,7 @@ class Discussion {
   final DateTime startAt;
   final String groupId;
   final GivenTime? givenTime;
+  final String? url;
   Discussion({
     required this.id,
     required this.fromLesson,
@@ -25,6 +24,7 @@ class Discussion {
     required this.startAt,
     required this.groupId,
     required this.givenTime,
+    required this.url,
   });
 
   Discussion copyWith({
@@ -37,6 +37,7 @@ class Discussion {
     DateTime? startAt,
     String? groupId,
     GivenTime? givenTime,
+    String? url,
   }) {
     return Discussion(
       id: id ?? this.id,
@@ -49,6 +50,7 @@ class Discussion {
       startAt: startAt ?? this.startAt,
       groupId: groupId ?? this.groupId,
       givenTime: givenTime ?? this.givenTime,
+      url: url ?? this.url,
     );
   }
 
@@ -61,15 +63,17 @@ class Discussion {
       'discussionSecond': discussionSecond,
       'curriculumId': curriculumId,
       'title': title,
-      'startAt': startAt.millisecondsSinceEpoch,
+      'startAt': startAt.toString(),
       'groupId': groupId,
       'givenTime': givenTime?.toMap(),
+      "live_kit_url": url,
     };
   }
 
   factory Discussion.fromMap(Map<String, dynamic> map, int? discussionSec,
-      Map<String, dynamic>? givenTimeMap) {
-    printMap(map);
+      Map<String, dynamic>? givenTimeMap, String? url) {
+    // printMap(map);
+    print("Discussion.fromMap");
     return Discussion(
       id: map['id'] as String,
       fromLesson: map['fromLesson'] as int,
@@ -81,6 +85,7 @@ class Discussion {
       groupId: map['groupId'] as String,
       discussionSecond: discussionSec,
       givenTime: givenTimeMap == null ? null : GivenTime.fromMap(givenTimeMap),
+      url: url,
     );
   }
 
@@ -90,6 +95,7 @@ class Discussion {
         json.decode(source)["result"]["discussion"] as Map<String, dynamic>,
         json.decode(source)["result"]["discussionTime"] as int,
         json.decode(source)["result"]["givenTime"] as Map<String, dynamic>,
+        json.decode(source)["result"]["live_kit_url"] as String,
       );
 
   @override
@@ -149,6 +155,7 @@ class GivenTime {
   }
 
   factory GivenTime.fromMap(Map<String, dynamic> map) {
+    print("GivenTime.fromMap");
     return GivenTime(
       totalTime: map['totalTime'] as int,
       segments: Segments.fromMap(map['segments'] as Map<String, dynamic>),
