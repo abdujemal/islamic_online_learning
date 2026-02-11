@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
+import 'package:islamic_online_learning/core/lib/translations.dart';
+import 'package:islamic_online_learning/features/auth/model/city.dart';
+import 'package:islamic_online_learning/features/auth/model/user.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/auth/view/widget/add_new_group.dart';
 import 'package:islamic_online_learning/features/auth/view/widget/group_card.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   final String otpId;
@@ -17,14 +24,17 @@ class RegisterPage extends ConsumerStatefulWidget {
 class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _ageController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _cityFocusNode = FocusNode();
   final _learningController = TextEditingController();
   final _nameFocusNode = FocusNode();
-  final _ageFocusNode = FocusNode();
+
+  City? selectedCity;
 
   final List<String> _previousLearnings = [];
 
   String? _gender;
+  String? _ageRange;
   bool showAdd = false;
   Map<String, Object>? userData;
 
@@ -44,11 +54,67 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     });
   }
 
+  Widget cityDropDown() {
+    return TypeAheadField<City>(
+      debounceDuration: const Duration(milliseconds: 400),
+      builder: (context, controller, focusNode) {
+        return TextField(
+          controller: controller,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            labelText: 'የሚኖሩበት ከተማ',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+        );
+      },
+      suggestionsCallback: (query) async {
+        try {
+          return await ref
+              .read(authNotifierProvider.notifier)
+              .searchCities(query, context);
+        } catch (_) {
+          return [];
+        }
+      },
+      itemBuilder: (context, city) {
+        return ListTile(
+          title: Text(city.name),
+          subtitle: Text(city.country),
+        );
+      },
+      onSelected: (city) {
+        setState(() {
+          selectedCity = city;
+          _cityController.text = city.name;
+        });
+        Navigator.pop(context);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(registerNotifierProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text("ምዝገባ")),
+      appBar: AppBar(
+        title: const Text("ምዝገባ"),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final pref = await ref.read(sharedPrefProvider);
+              pref.remove(PrefConsts.otpId);
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => MainPage()),
+                (_) => false,
+              );
+            },
+            icon: Icon(Icons.logout),
+          )
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -74,24 +140,25 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         ),
                         const SizedBox(height: 16),
                         // Age
-                        TextFormField(
-                          controller: _ageController,
-                          focusNode: _ageFocusNode,
+                        DropdownButtonFormField<String>(
+                          value: _ageRange,
                           decoration: const InputDecoration(
                             labelText: "እድሜ",
                             border: OutlineInputBorder(),
                           ),
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "እድሜዎን ያስገቡ";
-                            }
-                            final age = int.tryParse(value);
-                            if (age == null || age <= 0) {
-                              return "ትክክለኛ እድሜዎን ያስገቡ";
-                            }
-                            return null;
-                          },
+                          items: SafeAgeRange.values
+                              .toList()
+                              .map(
+                                (age) => DropdownMenuItem(
+                                  value: age.name,
+                                  child: Text(Translations.get(age.name)),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) =>
+                              setState(() => _ageRange = value),
+                          validator: (value) =>
+                              value == null ? "እድሜ ይምረጡ" : null,
                         ),
                         const SizedBox(height: 16),
                         // Gender
@@ -112,6 +179,56 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         ),
                         const SizedBox(height: 16),
 
+                        TextFormField(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 10,
+                                        left: 10,
+                                        bottom: 20,
+                                        top: 5),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          "ከተማ መምረጫ",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 15,
+                                        ),
+                                        cityDropDown(),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          readOnly: true,
+                          controller: _cityController,
+                          focusNode: _cityFocusNode,
+                          decoration: const InputDecoration(
+                            labelText: "የሚኖሩበትን ከተማ",
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.text,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "የሚኖሩበትን ከተማ ይምረጡ!";
+                            }
+
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
                         // Previous Learnings (Tags)
                         const Text(
                           "ከዚህ በፊት የቀሩት ኪታቦች",
@@ -181,45 +298,78 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         const SizedBox(height: 24),
 
                         // Submit
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              if (_gender == null) {
-                                toast("ፆታ ይምረጡ", ToastType.error, context);
-                                return;
+
+                        Consumer(builder: (context, ref, _) {
+                          final isSaving =
+                              ref.watch(registerNotifierProvider).isSaving;
+                          return ElevatedButton(
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                if (_gender == null) {
+                                  toast("ፆታ ይምረጡ", ToastType.error, context);
+                                  return;
+                                }
+
+                                if (_ageRange == null) {
+                                  toast("እድሜ ይምረጡ", ToastType.error, context);
+                                  return;
+                                }
+                                // final data = {
+                                //   "name": _nameController.text.trim(),
+                                //   "age": int.tryParse(_ageController.text) ?? 0,
+                                //   "gender": _gender!,
+                                //   "previousLearnings": _previousLearnings,
+                                //   "city": selectedCity!.name,
+                                //   "country": selectedCity!.country,
+                                // };
+
+                                ref
+                                    .read(registerNotifierProvider.notifier)
+                                    .register(
+                                      _ageRange!,
+                                      _nameController.text.trim(),
+                                      _gender!,
+                                      // state.groups[index].discussionTime,
+                                      // state.groups[index].discussionDay,
+                                      null, //state.groups[index].id,
+                                      _previousLearnings,
+                                      selectedCity!.name,
+                                      selectedCity!.country,
+                                      context,
+                                      ref,
+                                    );
+                                // setState(() {
+                                //   userData = data;
+                                // });
+                                // ref.read(sharedPrefProvider).then((pref) {
+                                //   pref.remove(PrefConsts.otpId);
+                                //   pref.remove(PrefConsts.token);
+                                // });
+                                // ref
+                                //     .read(registerNotifierProvider.notifier)
+                                //     .getGroups(
+                                //       int.tryParse(_ageController.text) ?? 0,
+                                //       _gender!,
+                                //       selectedCity!.name,
+                                //       context,
+                                //     );
                               }
-                              final data = {
-                                "name": _nameController.text.trim(),
-                                "age": int.tryParse(_ageController.text) ?? 0,
-                                "gender": _gender!,
-                                "previousLearnings": _previousLearnings,
-                              };
-                              setState(() {
-                                userData = data;
-                              });
-                              // ref.read(sharedPrefProvider).then((pref) {
-                              //   pref.remove(PrefConsts.otpId);
-                              //   pref.remove(PrefConsts.token);
-                              // });
-                              ref
-                                  .read(registerNotifierProvider.notifier)
-                                  .getGroups(
-                                    int.tryParse(_ageController.text) ?? 0,
-                                    _gender!,
-                                    context,
-                                  );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              minimumSize: const Size(double.infinity, 56),
                             ),
-                            minimumSize: const Size(double.infinity, 56),
-                          ),
-                          child: const Text("ቀጣይ"),
-                        ),
+                            child: isSaving
+                                ? CircularProgressIndicator(
+                                    color: whiteColor,
+                                  )
+                                : const Text("መዝግብ"),
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -246,11 +396,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       IconButton(
                         icon: Icon(Icons.refresh),
                         onPressed: () {
-                          ref.read(registerNotifierProvider.notifier).getGroups(
-                                int.tryParse(_ageController.text) ?? 0,
-                                _gender!,
-                                context,
-                              );
+                          // ref.read(registerNotifierProvider.notifier).getGroups(
+                          //       int.tryParse(_ageController.text) ?? 0,
+                          //       _gender!,
+                          //       selectedCity!.name,
+                          //       context,
+                          //     );
                         },
                       ),
                     ],
@@ -281,19 +432,21 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             return GroupCard(
                               group: state.groups[index],
                               onJoin: () async {
-                                ref
-                                    .read(registerNotifierProvider.notifier)
-                                    .register(
-                                      int.parse(_ageController.text.trim()),
-                                      _nameController.text.trim(),
-                                      _gender!,
-                                      state.groups[index].discussionTime,
-                                      state.groups[index].discussionDay,
-                                      state.groups[index].id,
-                                      _previousLearnings,
-                                      context,
-                                      ref,
-                                    );
+                                // ref
+                                //     .read(registerNotifierProvider.notifier)
+                                //     .register(
+                                //       int.parse(_ageController.text.trim()),
+                                //       _nameController.text.trim(),
+                                //       _gender!,
+                                //       // state.groups[index].discussionTime,
+                                //       // state.groups[index].discussionDay,
+                                //       state.groups[index].id,
+                                //       _previousLearnings,
+                                //       selectedCity!.name,
+                                //       selectedCity!.country,
+                                //       context,
+                                //       ref,
+                                //     );
                               },
                             );
                           }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/translations.dart';
+import 'package:islamic_online_learning/features/auth/model/user.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
@@ -13,14 +15,31 @@ class EditProfilePage extends ConsumerStatefulWidget {
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final _nameController = TextEditingController();
-  final _ageController = TextEditingController();
+  // final _ageController = TextEditingController();
   final _emailController = TextEditingController();
+  // String? _ageRange;
 
   Future saveProfile() async {
+    if (_nameController.text.trim().isEmpty) {
+      toast(
+        "ስምዎን ያስገቡ",
+        ToastType.error,
+        context,
+      );
+      return;
+    }
+    // if (_ageRange == null) {
+    //   toast(
+    //     "እድሜዎን ያስገቡ",
+    //     ToastType.error,
+    //     context,
+    //   );
+    //   return;
+    // }
+
     ref.read(authNotifierProvider.notifier).updateMyInfo(
           context,
           _nameController.text.trim(),
-          int.parse(_ageController.text.trim()),
         );
   }
 
@@ -32,8 +51,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       if (user != null) {
         _nameController.text = user.name;
         _emailController.text = user.phone;
-        _ageController.text =
-            "${(DateTime.now().difference(user.dob).inDays / 365).floor()}";
+        // _ageRange = user.ageRange;
+        setState(() {
+          
+        });
       }
     });
   }
@@ -53,7 +74,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 30),
-            
+
               TextFormField(
                 controller: _nameController,
                 // focusNode: _nameFocusNode,
@@ -64,9 +85,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 validator: (value) =>
                     value == null || value.isEmpty ? "ስምዎን ያስገቡ" : null,
               ),
-            
+
               const SizedBox(height: 15),
-            
+
               TextFormField(
                 controller: _emailController,
                 // focusNode: _nameFocusNode,
@@ -78,33 +99,32 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 validator: (value) =>
                     value == null || value.isEmpty ? "ኢሜል ያስገቡ" : null,
               ),
-            
+
               const SizedBox(height: 15),
-            
-              TextFormField(
-                controller: _ageController,
-                // focusNode: _ageFocusNode,
-                decoration: const InputDecoration(
-                  labelText: "እድሜ",
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "እድሜዎን ያስገቡ";
-                  }
-                  final age = int.tryParse(value);
-                  if (age == null || age <= 0) {
-                    return "ትክክለኛ እድሜዎን ያስገቡ";
-                  }
-                  return null;
-                },
-              ),
-            
-              const SizedBox(height: 15),
-            
+
+              // DropdownButtonFormField<String>(
+              //   value: _ageRange,
+              //   decoration: const InputDecoration(
+              //     labelText: "እድሜ",
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   items: AgeRange.values
+              //       .toList()
+              //       .map(
+              //         (age) => DropdownMenuItem(
+              //           value: age.name,
+              //           child: Text(Translations.get(age.name)),
+              //         ),
+              //       )
+              //       .toList(),
+              //   onChanged: (value) => setState(() => _ageRange = value),
+              //   validator: (value) => value == null ? "እድሜ ይምረጡ" : null,
+              // ),
+
+              // const SizedBox(height: 15),
+
               const SizedBox(height: 30),
-            
+
               // 💾 Save Button
               SizedBox(
                 width: double.infinity,

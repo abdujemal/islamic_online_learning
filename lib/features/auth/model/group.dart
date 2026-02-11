@@ -15,7 +15,6 @@ class Group {
   final String ageGroup;
   final String discussionTime;
   final String discussionDay;
-  final String timeZone;
   final DateTime? startDate;
   final DateTime? currStartDate;
   final DateTime? courseStartDate;
@@ -34,7 +33,6 @@ class Group {
     required this.ageGroup,
     required this.discussionTime,
     required this.discussionDay,
-    required this.timeZone,
     required this.noOfLessonsPerDay,
     this.startDate,
     this.currStartDate,
@@ -56,7 +54,6 @@ class Group {
     String? ageGroup,
     String? discussionTime,
     String? discussionDay,
-    String? timeZone,
     DateTime? startDate,
     DateTime? currStartDate,
     DateTime? courseStartDate,
@@ -76,7 +73,6 @@ class Group {
       ageGroup: ageGroup ?? this.ageGroup,
       discussionTime: discussionTime ?? this.discussionTime,
       discussionDay: discussionDay ?? this.discussionDay,
-      timeZone: timeZone ?? this.timeZone,
       startDate: startDate ?? this.startDate,
       currStartDate: currStartDate ?? this.currStartDate,
       courseStartDate: courseStartDate ?? this.courseStartDate,
@@ -104,7 +100,6 @@ class Group {
       'discussionTime': discussionTime,
       'discussionDay': discussionDay,
       'noOfLessonsPerDay': noOfLessonsPerDay,
-      'timeZone': timeZone,
       'startDate': startDate,
       'currStartDate': currStartDate,
       'courseStartDate': courseStartDate,
@@ -116,6 +111,8 @@ class Group {
   }
 
   factory Group.fromMap(Map<String, dynamic> map) {
+    print("Group.fromMap");
+
     return Group(
       id: map['id'] as String,
       name: map['name'] as String,
@@ -127,7 +124,6 @@ class Group {
       ageGroup: map['ageGroup'] as String,
       discussionTime: map['discussionTime'] as String,
       discussionDay: map['discussionDay'] as String,
-      timeZone: map['timeZone'] as String,
       startDate: map['startDate'] != null
           ? DateTime.parse(map['startDate'] as String).toLocal()
           : null,
@@ -160,7 +156,7 @@ class Group {
 
   @override
   String toString() {
-    return 'Group(id: $id, name: $name, lessonNum: $lessonNum, noOfLessonsPerDay: $noOfLessonsPerDay, courseNum: $courseNum, curriculumId: $curriculumId, gender: $gender, ageGroup: $ageGroup, discussionTime: $discussionTime, discussionDay: $discussionDay, timeZone: $timeZone, startDate: $startDate, currStartDate: $currStartDate, courseStartDate: $courseStartDate, createdAt: $createdAt, noOfMembers: $noOfMembers, members: $members, groupUpdateRequest: $groupUpdateRequest)';
+    return 'Group(id: $id, name: $name, lessonNum: $lessonNum, noOfLessonsPerDay: $noOfLessonsPerDay, courseNum: $courseNum, curriculumId: $curriculumId, gender: $gender, ageGroup: $ageGroup, discussionTime: $discussionTime, discussionDay: $discussionDay, startDate: $startDate, currStartDate: $currStartDate, courseStartDate: $courseStartDate, createdAt: $createdAt, noOfMembers: $noOfMembers, members: $members, groupUpdateRequest: $groupUpdateRequest)';
   }
 
   @override
@@ -177,7 +173,6 @@ class Group {
         other.ageGroup == ageGroup &&
         other.discussionTime == discussionTime &&
         other.discussionDay == discussionDay &&
-        other.timeZone == timeZone &&
         other.startDate == startDate &&
         other.currStartDate == currStartDate &&
         other.courseStartDate == courseStartDate &&
@@ -199,7 +194,6 @@ class Group {
         ageGroup.hashCode ^
         discussionTime.hashCode ^
         discussionDay.hashCode ^
-        timeZone.hashCode ^
         startDate.hashCode ^
         currStartDate.hashCode ^
         courseStartDate.hashCode ^
@@ -236,6 +230,8 @@ class Member {
   }
 
   factory Member.fromMap(Map<String, dynamic> map) {
+    print("Member.fromMap");
+
     return Member(
       id: map['id'] as String,
       name: map['name'] as String,

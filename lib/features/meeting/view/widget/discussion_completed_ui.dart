@@ -61,7 +61,7 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
 
                 // Title
                 Text(
-                  "ውይይቱ ተጠናቀቀ",
+                  "ጥያቄዎቹ ተጠናቀቀ",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Text(
-                    "የዛሬው የቡድን ውይይት ተጠናቋል።\n"
+                    "የዛሬው የሳምንታዎ ጥያቄዎች ተጠናቋል።\n"
                     "ጀዛከላሁ ኸይረን በቅንነት ለመሳተፍዎ።",
                     textAlign: TextAlign.center,
                     style: TextStyle(

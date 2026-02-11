@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hijri_calendar/hijri_calendar.dart';
 import 'package:islamic_online_learning/features/auth/model/confusion.dart';
 import 'package:islamic_online_learning/features/auth/model/monthly_score.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
@@ -33,6 +34,9 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
     LessonCardStatus status = LessonCardStatus.NONE;
     final state = ref.watch(assignedCoursesNotifierProvider);
     final authState = ref.watch(authNotifierProvider);
+    String courseStartDate = HijriCalendarConfig.fromGregorian(
+            authState.user!.group.courseStartDate!).toFormat("DDDD dd,MM yyyy")
+        .toString();
     List<dynamic> lessonStructureWRest = ref
         .read(assignedCoursesNotifierProvider.notifier)
         .getLessonStructureWRest(
@@ -67,7 +71,7 @@ class _CurrentLessonListState extends ConsumerState<CurrentLessonList> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              "ሰኞ ቂራት ይጀመራል። ኢንሻአላህ!",
+              "$courseStartDate ቂራት ይጀመራል። ኢንሻአላህ!",
               textAlign: TextAlign.center,
             ),
           ),

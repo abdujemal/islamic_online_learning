@@ -17,6 +17,7 @@ const String dbPath = "/Islamic Online Learning/db/myDB.db";
 const String serverUrl = "https://ilmfelagi.com/api";
 
 //main apis
+const String privacyPolicyUrl = "https://ilmfelagi-pro-backend.onrender.com";
 const String mainUrl = "https://ilmfelagi-pro-backend.onrender.com";
 const String baseUrl = "$mainUrl/api/v1";
 //livekit token generater
@@ -61,6 +62,7 @@ const String similarGroupsApi = "$baseUrl/auth/user/groups";
 const String registerApi = "$baseUrl/auth/user";
 const String getMyInfoApi = "$baseUrl/auth/user/me";
 const String updateMyInfoApi = "$baseUrl/auth/user/me";
+const String deleteMyAccountApi = "$baseUrl/auth/user/me";
 const String getMyCourseInfoApi = "$baseUrl/auth/user/courseData";
 const String getScoresApi = "$baseUrl/auth/user/scores";
 const String getStreakNumApi = "$baseUrl/auth/user/streak";
@@ -275,9 +277,9 @@ String emailBlopper(String email) {
   final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
   if (emailRegex.hasMatch(email)) {
-    final firstSegment = email.split(".").first.substring(0, 3);
+    final firstSegment = email.split(".").first.substring(0, 6);
     final middleSegment =
-        List.generate(email.split(".").first.substring(3).length, (i) => "*")
+        List.generate(email.split(".").first.substring(5).length, (i) => "*")
             .join("");
 
     return "$firstSegment$middleSegment.${email.split(".").last}";

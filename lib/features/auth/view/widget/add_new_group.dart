@@ -21,7 +21,7 @@ class _AddNewGroupState extends ConsumerState<AddNewGroup> {
   final GlobalKey<FormState> _groupKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
-    // final state = ref.watch(registerNotifierProvider);
+    final state = ref.watch(registerNotifierProvider);
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 15,
@@ -102,10 +102,12 @@ class _AddNewGroupState extends ConsumerState<AddNewGroup> {
                         widget.userData!["age"],
                         widget.userData!["name"],
                         widget.userData!["gender"],
-                        _discussionTime!,
-                        _discussionDay!,
+                        // _discussionTime!,
+                        // _discussionDay!,
                         null,
-                        widget.userData!["_previousLearnings"],
+                        widget.userData!["previousLearnings"],
+                        widget.userData!["city"],
+                        widget.userData!["country"],                       
                         context,
                         ref,
                       );
@@ -119,7 +121,11 @@ class _AddNewGroupState extends ConsumerState<AddNewGroup> {
                 ),
                 // minimumSize: const Size(80, 56),
               ),
-              child: const Text("መዝግብ"),
+              child: state.isSaving
+                  ? CircularProgressIndicator(
+                      color: whiteColor,
+                    )
+                  : const Text("መዝግብ"),
             ),
           ],
         ),

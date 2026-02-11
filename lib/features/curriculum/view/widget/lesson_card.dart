@@ -127,7 +127,7 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                                 spacing: 3,
                                 children: [
                                   Text(
-                                    "ትምህርት ${widget.lesson.order}",
+                                    "ትምህርት",
                                     style: TextStyle(
                                       fontSize: 11,
                                     ),

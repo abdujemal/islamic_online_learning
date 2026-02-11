@@ -14,7 +14,7 @@ enum CourseStarted {
 }
 
 class AuthState {
-  final bool isLoading, isUpdating, initial, isSigningWGoogle, tokenIsNull;
+  final bool isLoading, isUpdating, initial, isSigningWGoogle, tokenIsNull, isDeleting;
   final User? user;
   final CourseStarted courseStarted;
   final CourseRelatedData? courseRelatedData;
@@ -28,6 +28,7 @@ class AuthState {
     this.courseStarted = CourseStarted.INITIAL,
     this.tokenIsNull = true,
     this.isSigningWGoogle = false,
+    this.isDeleting = false,
     this.scores,
     this.user,
     this.error,
@@ -57,6 +58,7 @@ class AuthState {
   AuthState copyWith({
     bool? isLoading,
     bool? isUpdating,
+    bool? isDeleting,
     CourseStarted? courseStarted,
     bool? tokenIsNull,
     bool? isSigningWGoogle,
@@ -70,6 +72,7 @@ class AuthState {
       courseStarted: courseStarted ?? this.courseStarted,
       isLoading: isLoading ?? this.isLoading,
       isUpdating: isUpdating ?? this.isUpdating,
+      isDeleting: isDeleting ?? this.isDeleting,
       user: user ?? this.user,
       scores: scores ?? this.scores,
       isSigningWGoogle: isSigningWGoogle ?? this.isSigningWGoogle,

@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:islamic_online_learning/features/curriculum/model/assigned_course.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_notifier.dart';
 import 'package:islamic_online_learning/features/meeting/model/discussion.dart';
-import 'package:livekit_client/livekit_client.dart';
+// import 'package:livekit_client/livekit_client.dart';
 
 enum VoiceRoomStatus {
   initial,
@@ -20,7 +20,7 @@ class VoiceRoomState {
   bool isConnecting;
   VoiceRoomStatus status;
   bool pdfShown;
-  Room? room;
+  // Room? room;
   bool isMuted;
   GivenTime? givenTime;
   int discussionSec;
@@ -28,11 +28,11 @@ class VoiceRoomState {
   String identity;
   String roomName;
   ExamData? examData;
-  EventsListener<RoomEvent>? listener;
+  // EventsListener<RoomEvent>? listener;
   AssignedCourse? assignedCourse;
 
   VoiceRoomState({
-    this.room,
+    // this.room,
     this.isConnecting = false,
     this.isMuted = false,
     this.pdfShown = false,
@@ -41,21 +41,21 @@ class VoiceRoomState {
     this.identity = "",
     this.givenTime,
     this.status = VoiceRoomStatus.initial,
-    this.listener,
+    // this.listener,
     this.timer,
     this.examData,
     this.assignedCourse,
   });
 
   VoiceRoomState copyWith({
-    Room? room,
+    // Room? room,
     Timer? timer,
     bool? isConnecting,
     bool? isMuted,
     String? identity,
     GivenTime? givenTime,
     String? roomName,
-    EventsListener<RoomEvent>? listener,
+    // EventsListener<RoomEvent>? listener,
     VoiceRoomStatus? status,
     int? discussionSec,
     ExamData? examData,
@@ -63,12 +63,12 @@ class VoiceRoomState {
     AssignedCourse? assignedCourse,
   }) {
     return VoiceRoomState(
-      room: room ?? this.room,
+      // room: room ?? this.room,
       isConnecting: isConnecting ?? this.isConnecting,
       isMuted: isMuted ?? this.isMuted,
       identity: identity ?? this.identity,
       roomName: roomName ?? this.roomName,
-      listener: listener ?? this.listener,
+      // listener: listener ?? this.listener,
       givenTime: givenTime ?? this.givenTime,
       timer: timer ?? this.timer,
       status: status ?? this.status,

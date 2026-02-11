@@ -20,7 +20,7 @@ import 'package:islamic_online_learning/features/meeting/view/controller/voice_r
 import 'package:islamic_online_learning/features/meeting/view/widget/discussion_completed_ui.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/quiz/view/pages/question_page.dart';
-import 'package:livekit_client/livekit_client.dart';
+// import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -84,7 +84,7 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     GivenTime givenTime = state.givenTime!;
     int sec = givenTime.totalTime - remainingSeconds;
     int discussion = 0;
-    int quiz = discussion + givenTime.segments.quiz;
+    int quiz = discussion + givenTime.segments.discussion;
     int assignment = givenTime.segments.assignment;
     print("$sec $discussion $quiz $assignment");
 
@@ -111,8 +111,9 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     GivenTime givenTime = state.givenTime!;
     int sec = givenTime.totalTime - seconds;
     int discussion = 0;
-    int quiz = discussion + givenTime.segments.quiz;
+    int quiz = discussion + givenTime.segments.discussion;
     int assignment = givenTime.segments.assignment;
+    print("sec: $sec, discussion: $discussion, quiz: $quiz, assignment: $assignment");
     if (sec > assignment) {
       getDiscussionShortAnswers(ref);
       state = state.copyWith(status: VoiceRoomStatus.short);
@@ -204,85 +205,85 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
 
       initAnswer(ref);
 
-      final token = await _fetchToken(state.identity, state.roomName);
+      // final token = await _fetchToken(state.identity, state.roomName);
 
       // Connect to LiveKit. In typical LiveKit Cloud flow you pass the WSS URL
       // and the server-generated token (JWT).
-      final roomOptions = RoomOptions(
-        adaptiveStream: true,
-        dynacast: true,
+      // final roomOptions = RoomOptions(
+      //   adaptiveStream: true,
+      //   dynacast: true,
 
-        // ... your room options
-      );
+      //   // ... your room options
+      // );
 
-      final room = Room(roomOptions: roomOptions);
+      // final room = Room(roomOptions: roomOptions);
 
-      await room.connect(discussion.url!, token);
+      // await room.connect(discussion.url!, token);
 
       startTimer(ref, discussion.discussionSecond ?? 0, discussion);
 
-      await room.localParticipant?.setMicrophoneEnabled(true);
+      // await room.localParticipant?.setMicrophoneEnabled(true);
 
-      void updateParticipants() {
-        final remote = room.remoteParticipants;
-        // convert to RemoteParticipant list snapshot:
-        print("remote participants: ${remote.length}");
-        final list = remote.values.whereType<RemoteParticipant>().toList();
+      // void updateParticipants() {
+      //   final remote = room.remoteParticipants;
+      //   // convert to RemoteParticipant list snapshot:
+      //   print("remote participants: ${remote.length}");
+      //   final list = remote.values.whereType<RemoteParticipant>().toList();
 
-        List<dynamic> _participants = [
-          ...list,
-        ];
-        if (room.localParticipant != null) {
-          _participants = [..._participants, room.localParticipant];
-        }
-        if (_participants.isNotEmpty) {
-          _participants.sort((dynamic a, dynamic b) {
-            final aSpeaking = a.isSpeaking ? 1 : 0;
-            final bSpeaking = b.isSpeaking ? 1 : 0;
-            return bSpeaking - aSpeaking;
-          });
-        }
+      //   List<dynamic> _participants = [
+      //     ...list,
+      //   ];
+      //   if (room.localParticipant != null) {
+      //     _participants = [..._participants, room.localParticipant];
+      //   }
+      //   if (_participants.isNotEmpty) {
+      //     _participants.sort((dynamic a, dynamic b) {
+      //       final aSpeaking = a.isSpeaking ? 1 : 0;
+      //       final bSpeaking = b.isSpeaking ? 1 : 0;
+      //       return bSpeaking - aSpeaking;
+      //     });
+      //   }
 
-        // state = state.copyWith(participants: _participants);
-        ref.read(participantsProvider.notifier).state = _participants;
-      }
+      //   // state = state.copyWith(participants: _participants);
+      //   ref.read(participantsProvider.notifier).state = _participants;
+      // }
 
-      state = state.copyWith(listener: room.createListener());
-      state.listener!
-        ..on<RoomDisconnectedEvent>((_) {
-          // handle disconnect
-          print('Disconnected: ${_.reason}');
-          // _stopSpeakerPoll();
-          // setState(() {
-          //   _participants = [];
-          // });
-          ref.read(participantsProvider.notifier).state = [];
-        })
-        ..on<ParticipantConnectedEvent>((e) {
-          updateParticipants();
-          print("participant joined: ${e.participant.identity}");
-        })
-        ..on<ParticipantDisconnectedEvent>((e) {
-          updateParticipants();
-          print("participant left: ${e.participant.identity}");
-        })
-        ..on<ParticipantEvent>((e) {
-          updateParticipants();
-          print("participant Event changed");
-        })
-        ..on<ActiveSpeakersChangedEvent>((e) {
-          updateParticipants();
-          print("participant speaking changed");
-        });
-      // ..on<Participant>((e) {
-      //    print("participant data changed: ${e.identity}");
-      //   updateParticipants();
-      // });
+      // state = state.copyWith(listener: room.createListener());
+      // state.listener!
+      //   ..on<RoomDisconnectedEvent>((_) {
+      //     // handle disconnect
+      //     print('Disconnected: ${_.reason}');
+      //     // _stopSpeakerPoll();
+      //     // setState(() {
+      //     //   _participants = [];
+      //     // });
+      //     ref.read(participantsProvider.notifier).state = [];
+      //   })
+      //   ..on<ParticipantConnectedEvent>((e) {
+      //     updateParticipants();
+      //     print("participant joined: ${e.participant.identity}");
+      //   })
+      //   ..on<ParticipantDisconnectedEvent>((e) {
+      //     updateParticipants();
+      //     print("participant left: ${e.participant.identity}");
+      //   })
+      //   ..on<ParticipantEvent>((e) {
+      //     updateParticipants();
+      //     print("participant Event changed");
+      //   })
+      //   ..on<ActiveSpeakersChangedEvent>((e) {
+      //     updateParticipants();
+      //     print("participant speaking changed");
+      //   });
+      // // ..on<Participant>((e) {
+      // //    print("participant data changed: ${e.identity}");
+      // //   updateParticipants();
+      // // });
 
-      // Keep participants in local state
+      // // Keep participants in local state
 
-      // initial snapshot
-      updateParticipants();
+      // // initial snapshot
+      // updateParticipants();
 
       // subscribe to participant events (SDK exposes participant events; this uses a simple poll)
       // _speakerPollTimer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -290,26 +291,26 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
       // });
 
       // Automatically enable mic (local publish)
-      try {
-        await state.room!.localParticipant
-            ?.setMicrophoneEnabled(!state.isMuted);
-      } catch (e) {
-        print('Could not enable mic: $e');
-      }
+      // try {
+      //   await state.room!.localParticipant
+      //       ?.setMicrophoneEnabled(!state.isMuted);
+      // } catch (e) {
+      //   print('Could not enable mic: $e');
+      // }
 
       // setState(() {
       //   _room = room;
       //   _isConnecting = false;
       // });
       state = state.copyWith(
-        room: room,
+        // room: room,
         isConnecting: false,
       );
     } catch (e) {
       // setState(() => _isConnecting = false);
       state = state.copyWith(isConnecting: false);
       if (e.toString().contains("Meeting already done")) {
-        toast('ውይይቱ አልቋል!', ToastType.error, ref.context);
+        toast('ጥያቄዎቹ አልቋል!', ToastType.error, ref.context);
         return;
       }
       handleError(e.toString(), ref.context, this.ref, () {});
@@ -325,8 +326,8 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
   Future<void> disconnect(WidgetRef ref) async {
     // _stopSpeakerPoll();
     try {
-      await state.room?.disconnect();
-      await state.listener?.dispose();
+      // await state.room?.disconnect();
+      // await state.listener?.dispose();
       ref.read(participantsProvider.notifier).state = [];
       state.timer?.cancel();
     } catch (_) {}
@@ -336,25 +337,25 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     // );
     state = VoiceRoomState(
         examData: state.examData, assignedCourse: state.assignedCourse);
-    print('Disconnected from room ${state.room == null}');
+    // print('Disconnected from room ${state.room == null}');
     // setState(() {
     //   _room = null;
     //   _participants = [];
     // });
   }
 
-  Future<void> toggleMute(WidgetRef ref) async {
-    try {
-      final newMuted = !state.isMuted;
-      await state.room?.localParticipant?.setMicrophoneEnabled(!newMuted);
-      // setState(() {
-      //   _isMuted = newMuted;
-      // });
-      state = state.copyWith(isMuted: newMuted);
-    } catch (e) {
-      toast('Failed to toggle mic: $e', ToastType.error, ref.context);
-    }
-  }
+  // Future<void> toggleMute(WidgetRef ref) async {
+  //   try {
+  //     final newMuted = !state.isMuted;
+  //     await state.room?.localParticipant?.setMicrophoneEnabled(!newMuted);
+  //     // setState(() {
+  //     //   _isMuted = newMuted;
+  //     // });
+  //     state = state.copyWith(isMuted: newMuted);
+  //   } catch (e) {
+  //     toast('Failed to toggle mic: $e', ToastType.error, ref.context);
+  //   }
+  // }
 
   Future<void> getDiscussionQuizzes(WidgetRef ref) async {
     try {
@@ -544,9 +545,9 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
 
   @override
   void dispose() {
-    state.room?.disconnect();
-    state.room?.dispose();
-    state.listener?.dispose();
+    // state.room?.disconnect();
+    // state.room?.dispose();
+    // state.listener?.dispose();
     state.timer?.cancel();
     state = VoiceRoomState(
         examData: state.examData, assignedCourse: state.assignedCourse);

@@ -489,7 +489,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
 
     if (discussions.isEmpty || lessons.isEmpty) {
       return ExamData(
-        title: "ምንም ውልውል የለም",
+        title: "ምንም የለም",
         lessonFrom: 0,
         lessonTo: 0,
         discussionIndex: 0,
@@ -498,8 +498,7 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       final startLesson = lessons[discussions[0].lessonFrom];
       final endLesson = lessons[discussions.last.lessonTo];
       return ExamData(
-        title:
-            "ከ${startLesson.title}${discussions[0].lessonFrom} እስክ ${endLesson.title}${discussions.last.lessonTo} ድረስ",
+        title: "ከ${startLesson.title} እስክ ${endLesson.title} ድረስ",
         lessonFrom: discussions[0].lessonFrom,
         lessonTo: discussions.last.lessonTo,
         discussionIndex: discussions.last.discussionIndex,

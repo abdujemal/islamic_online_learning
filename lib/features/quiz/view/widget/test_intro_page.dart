@@ -132,7 +132,7 @@ class TestIntroPage extends StatelessWidget {
               const SizedBox(height: 45),
               // 🌙 Motivational Text
               const Text(
-                "አላህ ግልፅነት፣ ትኩረት እና ስኬት ይስጥህ 🌙",
+                "አላህ ግልፅነት፣ ትኩረት እና ስኬት ይስጦት 🌙",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 15.5,

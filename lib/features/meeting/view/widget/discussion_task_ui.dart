@@ -83,7 +83,7 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
           );
         } else if (quizzes.isEmpty) {
           return Center(
-            child: Text("ምንም ጥያቄ የለም. ውይይቱን ቀጥሉ."),
+            child: Text("ምንም ይተሳሳቱት ጥያቄ የለም። እስኪቀይር ይጠብቁ።"),
           );
         } else {
           return SingleChildScrollView(

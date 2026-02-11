@@ -31,13 +31,14 @@ class RegisterNotifier extends StateNotifier<RegisterState> {
   Future<void> getGroups(
     int age,
     String gender,
+    String city,
     BuildContext context,
   ) async {
     try {
       state = state.copyWith(
         isLoadingGroups: true,
       );
-      final timeZone = await getDeviceTimeZone();
+      // final timeZone = await getDeviceTimeZone();
 
       final pref = await ref.read(sharedPrefProvider);
       final curriculumId = pref.getString("curriculumId");
@@ -47,7 +48,7 @@ class RegisterNotifier extends StateNotifier<RegisterState> {
       }
 
       final groups =
-          await authService.fetchGroups(age, gender, timeZone, curriculumId);
+          await authService.fetchGroups(age, gender, city, curriculumId);
       state = state.copyWith(
         isLoadingGroups: false,
         groups: groups,
@@ -65,33 +66,34 @@ class RegisterNotifier extends StateNotifier<RegisterState> {
   }
 
   Future<void> register(
-    int age,
+    String ageRange,
     String name,
     String gender,
-    String discussionTime,
-    String discussionDay,
+    // String discussionTime,
+    // String discussionDay,
     String? groupId,
     List<String> pl,
+    String city,
+    String country,
     BuildContext context,
     WidgetRef ref,
   ) async {
     final pref = await ref.read(sharedPrefProvider);
     final otpId = pref.getString(PrefConsts.otpId);
     final curriculumId = pref.getString(PrefConsts.curriculumId);
-    final dob = DateTime.now().subtract(Duration(days: 365 * age)).toString();
-    final timeZone = await getDeviceTimeZone();
-
+    
     UserInput userInput = UserInput(
       name: name,
-      dob: dob,
       gender: gender,
+      ageRange: ageRange,
       previousLearning: pl,
-      discussionTime: discussionTime,
-      discussionDay: discussionDay,
+      // discussionTime: discussionTime,
+      // discussionDay: discussionDay,
       otpId: otpId!,
       curriculumId: curriculumId!,
       groupId: groupId,
-      timeZone: timeZone,
+      city: city,
+      country: country,
     );
     try {
       state = state.copyWith(isSaving: true);

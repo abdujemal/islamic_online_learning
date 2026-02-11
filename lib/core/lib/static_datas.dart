@@ -1,10 +1,11 @@
 class StaticDatas {
   static final List<String> discussionTime = [
-    "AfterSubhi",
-    "AfterZuhur",
-    "AfterAsr",
-    "AfterMeghrib",
-    "AfterEsha",
+    "H06M00_AM",
+    "H10M00_AM",
+    "H02M00_PM",
+    "H06M00_PM",
+    "H10M00_PM",
+    "H02M00_AM",
   ];
   static final List<String> discussionDay = [
     "Friday",

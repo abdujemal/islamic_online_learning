@@ -128,7 +128,7 @@ class _ConfusionsPageState extends ConsumerState<ConfusionsPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("No more data"),
+                    Text("ምንም የለም"),
                     IconButton(
                       onPressed: () {
                         ref

@@ -11,7 +11,7 @@ import 'package:islamic_online_learning/features/meeting/view/controller/voice_r
 import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_state.dart';
 import 'package:islamic_online_learning/features/meeting/view/widget/discussion_task_ui.dart';
 import 'package:islamic_online_learning/utils.dart';
-import 'package:livekit_client/livekit_client.dart';
+// import 'package:livekit_clientlivekit_client.dart';
 import 'package:pdfx/pdfx.dart';
 
 class VoiceRoomPage extends ConsumerStatefulWidget {
@@ -69,125 +69,125 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached ||
         state == AppLifecycleState.inactive) {
-      ref.read(voiceRoomNotifierProvider.notifier).disconnect(ref);
+      // ref.read(voiceRoomNotifierProvider.notifier).disconnect(ref);
     }
   }
 
-  Widget _buildParticipantTile(Participant p, bool isLarge) {
-    final identity = p.identity;
-    final isMe = p.runtimeType != RemoteParticipant;
-    final isSpeaking = p.isSpeaking;
-    // final isRest = p.isDisposed;
-    final initials = identity.isEmpty ? 'U' : identity[0].toUpperCase();
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8.0,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 100),
-                padding: EdgeInsets.all(isSpeaking ? 5 : 0),
-                margin: EdgeInsets.all(isSpeaking ? 0 : 5),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isSpeaking ? Colors.tealAccent : Colors.transparent,
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: userIdToColor(identity),
-                        // borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSpeaking
-                              ? Colors.tealAccent
-                              : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                      width: 48,
-                      height: 48,
-                      child: Center(
-                        child: Text(
-                          initials,
-                          style: TextStyle(
-                            fontSize: isLarge ? 28 : 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        padding: EdgeInsets.all(p.isMuted ? 2 : 0),
-                        decoration: BoxDecoration(
-                          color: Colors.black45,
-                          shape: BoxShape.circle,
-                        ),
-                        child: p.isMuted
-                            ? Icon(
-                                Icons.mic_off,
-                                size: 12,
-                                color: Colors.white,
-                              )
-                            : p.connectionQuality == ConnectionQuality.poor
-                                ? Icon(
-                                    Icons
-                                        .signal_cellular_connected_no_internet_0_bar,
-                                    size: 12,
-                                    color: Colors.redAccent,
-                                  )
-                                : Container(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 5),
-          Text(
-            "$identity ${isMe ? "(እርሶ)" : ""}",
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(height: 6),
-        ],
-      ),
-    );
-  }
+  // Widget _buildParticipantTile(Participant p, bool isLarge) {
+  //   final identity = p.identity;
+  //   final isMe = p.runtimeType != RemoteParticipant;
+  //   final isSpeaking = p.isSpeaking;
+  //   // final isRest = p.isDisposed;
+  //   final initials = identity.isEmpty ? 'U' : identity[0].toUpperCase();
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(
+  //       horizontal: 8.0,
+  //     ),
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Stack(
+  //           children: [
+  //             AnimatedContainer(
+  //               duration: const Duration(milliseconds: 100),
+  //               padding: EdgeInsets.all(isSpeaking ? 5 : 0),
+  //               margin: EdgeInsets.all(isSpeaking ? 0 : 5),
+  //               decoration: BoxDecoration(
+  //                 shape: BoxShape.circle,
+  //                 border: Border.all(
+  //                   color: isSpeaking ? Colors.tealAccent : Colors.transparent,
+  //                 ),
+  //               ),
+  //               child: Stack(
+  //                 children: [
+  //                   Container(
+  //                     decoration: BoxDecoration(
+  //                       shape: BoxShape.circle,
+  //                       color: userIdToColor(identity),
+  //                       // borderRadius: BorderRadius.circular(12),
+  //                       border: Border.all(
+  //                         color: isSpeaking
+  //                             ? Colors.tealAccent
+  //                             : Colors.transparent,
+  //                         width: 2,
+  //                       ),
+  //                     ),
+  //                     width: 48,
+  //                     height: 48,
+  //                     child: Center(
+  //                       child: Text(
+  //                         initials,
+  //                         style: TextStyle(
+  //                           fontSize: isLarge ? 28 : 18,
+  //                           color: Colors.white,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   Positioned(
+  //                     right: 0,
+  //                     bottom: 0,
+  //                     child: Container(
+  //                       padding: EdgeInsets.all(p.isMuted ? 2 : 0),
+  //                       decoration: BoxDecoration(
+  //                         color: Colors.black45,
+  //                         shape: BoxShape.circle,
+  //                       ),
+  //                       child: p.isMuted
+  //                           ? Icon(
+  //                               Icons.mic_off,
+  //                               size: 12,
+  //                               color: Colors.white,
+  //                             )
+  //                           : p.connectionQuality == ConnectionQuality.poor
+  //                               ? Icon(
+  //                                   Icons
+  //                                       .signal_cellular_connected_no_internet_0_bar,
+  //                                   size: 12,
+  //                                   color: Colors.redAccent,
+  //                                 )
+  //                               : Container(),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         const SizedBox(height: 5),
+  //         Text(
+  //           "$identity ${isMe ? "(እርሶ)" : ""}",
+  //           style: TextStyle(
+  //             fontSize: 13,
+  //             fontWeight: FontWeight.w600,
+  //             overflow: TextOverflow.ellipsis,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 6),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildMainArea(VoiceRoomState state) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 15,
-      ),
-      child: Consumer(builder: (context, ref, _) {
-        final participants = ref.watch(participantsProvider);
-        return Row(
-          children: List.generate(
-            participants.length,
-            (index) => _buildParticipantTile(
-              participants[index],
-              false,
-            ),
-          ),
-        );
-      }),
-    );
-  }
+  // Widget _buildMainArea(VoiceRoomState state) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(
+  //       top: 15,
+  //     ),
+  //     child: Consumer(builder: (context, ref, _) {
+  //       final participants = ref.watch(participantsProvider);
+  //       return Row(
+  //         children: List.generate(
+  //           participants.length,
+  //           (index) => _buildParticipantTile(
+  //             participants[index],
+  //             false,
+  //           ),
+  //         ),
+  //       );
+  //     }),
+  //   );
+  // }
 
   void _showOptionMenu(BuildContext context, Offset position) async {
     final selected = await showMenu<String>(
@@ -221,29 +221,29 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
   }
 
   Widget _buildBottomControls(VoiceRoomState state) {
-    final connected = state.room != null;
-    print('VoiceRoomPage: connected=$connected, isMuted=${state.isMuted}');
+    final connected = state.timer != null;
+    // print('VoiceRoomPage: connected=$connected, isMuted=${state.isMuted}');
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
         child: Row(
           children: [
             // Mute/unmute
-            FloatingActionButton(
-              heroTag: 'mute',
-              backgroundColor: state.isMuted
-                  ? Colors.redAccent
-                  : Theme.of(context).cardColor,
-              onPressed: () {
-                if (connected) {
-                  ref.read(voiceRoomNotifierProvider.notifier).toggleMute(ref);
-                }
-              },
-              // connected ? ref.read(voiceRoomNotifierProvider.notifier).toggleMute : null,
-              foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
-              child: Icon(state.isMuted ? Icons.mic_off : Icons.mic,
-                  color: state.isMuted ? Colors.white : null),
-            ),
+            // FloatingActionButton(
+            //   heroTag: 'mute',
+            //   backgroundColor: state.isMuted
+            //       ? Colors.redAccent
+            //       : Theme.of(context).cardColor,
+            //   onPressed: () {
+            //     if (connected) {
+            //       ref.read(voiceRoomNotifierProvider.notifier).toggleMute(ref);
+            //     }
+            //   },
+            //   // connected ? ref.read(voiceRoomNotifierProvider.notifier).toggleMute : null,
+            //   foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
+            //   child: Icon(state.isMuted ? Icons.mic_off : Icons.mic,
+            //       color: state.isMuted ? Colors.white : null),
+            // ),
             const SizedBox(width: 12),
             // Leave / Join
             Expanded(
@@ -271,7 +271,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
                 child: Text(
                   state.isConnecting
                       ? 'በመገናኘት ላይ...'
-                      : (connected ? 'ጥሪውን ዝጋው' : 'ጥሪውን ጀምር'),
+                      : (connected ? 'አቁም' : 'ጀምር'),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -282,30 +282,31 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
             ),
             const SizedBox(width: 12),
             // More (raise hand / settings) placeholder
-            GestureDetector(
-              onTapDown: (td) {
-                final x = td.globalPosition.dx - 50;
-                final y = td.globalPosition.dy - 100;
+            // GestureDetector(
+            //   onTapDown: (td) {
+            //     final x = td.globalPosition.dx - 50;
+            //     final y = td.globalPosition.dy - 100;
 
-                _showOptionMenu(context, Offset(x, y));
-              },
-              child: Container(
-                width: 55,
-                height: 55,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                // heroTag: 'more',
-                // foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
-                // backgroundColor: Theme.of(context).cardColor,
-                // // backgroundColor: Colors.white12,
-                // onPressed: () {
-                //   // future actions
-                // },
-                child: const Icon(Icons.more_vert, color: null),
-              ),
-            ),
+            //     _showOptionMenu(context, Offset(x, y));
+            //   },
+            //   child: Container(
+            //     width: 55,
+            //     height: 55,
+            //     decoration: BoxDecoration(
+            //       color: Theme.of(context).cardColor,
+            //       borderRadius: BorderRadius.circular(15),
+            //     ),
+            //     // heroTag: 'more',
+            //     // foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
+            //     // backgroundColor: Theme.of(context).cardColor,
+            //     // // backgroundColor: Colors.white12,
+            //     // onPressed: () {
+            //     //   // future actions
+            //     // },
+            //     child: const Icon(Icons.more_vert, color: null),
+            //   ),
+            // ),
+          
           ],
         ),
       ),
@@ -321,8 +322,11 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
               width: double.infinity,
               color: Colors.amberAccent,
               child: Text(
-                "ከዚህ ውይይት ቡሃላ ፈተና ይኖራል።",
+                "ከዚህ ቡሃላ ፈተና ይኖራል።",
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black
+                )
               ),
             ),
           Padding(
@@ -331,7 +335,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
               children: [
                 CircleAvatar(
                   backgroundColor: Colors.tealAccent,
-                  child: const Icon(Icons.mic, color: Colors.black),
+                  child: const Icon(Icons.question_mark, color: Colors.black),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -339,22 +343,22 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'የውይይት መድረክ',
+                        'ሳምንታዊ ጥያቄ',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        (state.room != null)
-                            ? 'በ${state.identity} ስም አየር ላይ ኖት'
-                            : 'አልተገናኘም',
-                        style: TextStyle(
-                          fontSize: 12,
-                          // color: Colors.white70,
-                        ),
-                      ),
+                      // Text(
+                      //   (state.room != null)
+                      //       ? 'በ${state.identity} ስም አየር ላይ ኖት'
+                      //       : 'አልተገናኘም',
+                      //   style: TextStyle(
+                      //     fontSize: 12,
+                      //     // color: Colors.white70,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -409,7 +413,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.tealAccent,
-                            foregroundColor: Colors.white,
+                            foregroundColor: Colors.black,
                           ),
                           child: Text("ኪታቡን አሳይ"),
                         );
@@ -454,7 +458,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
       canPop: canPop,
       onPopInvokedWithResult: (didPop, result) {
         if (canPop == false) {
-          if (voiceRoomState.room == null) {
+          if (voiceRoomState.timer == null) {
             toast("please press it again.", ToastType.normal, context);
           } else {
             ref.read(voiceRoomNotifierProvider.notifier).disconnect(ref);
@@ -475,7 +479,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
               Expanded(
                 child: Column(
                   children: [
-                    _buildMainArea(voiceRoomState),
+                    // _buildMainArea(voiceRoomState),
                     Expanded(
                       child: Consumer(
                         builder: (context, ref, _) {

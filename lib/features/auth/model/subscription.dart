@@ -67,6 +67,7 @@ class Subscription {
   }
 
   factory Subscription.fromMap(Map<String, dynamic> map) {
+    print("Subscription.fromMap");
     return Subscription(
       id: map['id'] as String,
       userId: map['userId'] as String,

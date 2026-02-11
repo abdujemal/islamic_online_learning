@@ -11,7 +11,7 @@ class User {
   final String name;
   final String phone;
   final String timeZone;
-  final DateTime dob;
+  final String ageRange;
   final String gender;
   final int numOfStreaks;
   final List<String> previousLearning;
@@ -22,7 +22,7 @@ class User {
     required this.name,
     required this.phone,
     required this.timeZone,
-    required this.dob,
+    required this.ageRange,
     required this.gender,
     required this.numOfStreaks,
     required this.previousLearning,
@@ -35,7 +35,7 @@ class User {
     String? name,
     String? phone,
     String? timeZone,
-    DateTime? dob,
+    String? ageRange,
     String? gender,
     int? numOfStreaks,
     List<String>? previousLearning,
@@ -47,7 +47,7 @@ class User {
         name: name ?? this.name,
         phone: phone ?? this.phone,
         timeZone: timeZone ?? this.timeZone,
-        dob: dob ?? this.dob,
+        ageRange: ageRange ?? this.ageRange,
         gender: gender ?? this.gender,
         numOfStreaks: numOfStreaks ?? this.numOfStreaks,
         previousLearning: previousLearning ?? this.previousLearning,
@@ -61,7 +61,7 @@ class User {
       'name': name,
       'phone': phone,
       'timeZone': timeZone,
-      'dob': dob.millisecondsSinceEpoch,
+      'ageRange': ageRange,
       'gender': gender,
       'numOfStreaks': numOfStreaks,
       'previousLearning': previousLearning,
@@ -71,12 +71,13 @@ class User {
   }
 
   factory User.fromMap(Map<String, dynamic> map) {
+    print("User.fromMap");
     return User(
       id: map['id'] as String,
       name: map['name'] as String,
       phone: map['phone'] as String,
       timeZone: map['timeZone'] as String,
-      dob: DateTime.parse(map['dob'] as String).toLocal(),
+      ageRange: map["ageRange"] as String,
       gender: map['gender'] as String,
       numOfStreaks: map['numOfStreaks'] as int,
       previousLearning:
@@ -97,7 +98,7 @@ class User {
 
   @override
   String toString() {
-    return 'User(id: $id, name: $name, phone: $phone, timeZone: $timeZone, dob: $dob, gender: $gender, numOfStreaks: $numOfStreaks, previousLearning: $previousLearning, group: $group)';
+    return 'User(id: $id, name: $name, phone: $phone, timeZone: $timeZone, ageRange: $ageRange, gender: $gender, numOfStreaks: $numOfStreaks, previousLearning: $previousLearning, group: $group)';
   }
 
   @override
@@ -108,7 +109,7 @@ class User {
         other.name == name &&
         other.phone == phone &&
         other.timeZone == timeZone &&
-        other.dob == dob &&
+        other.ageRange == ageRange &&
         other.gender == gender &&
         other.numOfStreaks == numOfStreaks &&
         listEquals(other.previousLearning, previousLearning) &&
@@ -121,7 +122,7 @@ class User {
         name.hashCode ^
         phone.hashCode ^
         timeZone.hashCode ^
-        dob.hashCode ^
+        ageRange.hashCode ^
         gender.hashCode ^
         numOfStreaks.hashCode ^
         previousLearning.hashCode ^
@@ -131,66 +132,82 @@ class User {
 
 class UserInput {
   final String name;
-  final String dob;
+  final String ageRange;
   final String gender;
   final List<String> previousLearning;
-  final String discussionTime;
-  final String discussionDay;
+  // final String discussionTime;
+  // final String discussionDay;
   final String otpId;
   final String curriculumId;
-  final String timeZone;
   final String? groupId;
+  final String city;
+  final String country;
   UserInput({
     required this.name,
-    required this.dob,
+    required this.ageRange,
     required this.gender,
     required this.previousLearning,
-    required this.discussionTime,
-    required this.discussionDay,
+    // required this.discussionTime,
+    // required this.discussionDay,
     required this.otpId,
     required this.curriculumId,
-    required this.timeZone,
     this.groupId,
+    required this.city,
+    required this.country,
   });
-
-  UserInput copyWith({
-    String? name,
-    String? dob,
-    String? gender,
-    List<String>? previousLearning,
-    String? discussionTime,
-    String? discussionDay,
-    String? otpId,
-    String? curriculumId,
-    String? groupId,
-    String? timeZone,
-  }) {
-    return UserInput(
-      name: name ?? this.name,
-      dob: dob ?? this.dob,
-      gender: gender ?? this.gender,
-      previousLearning: previousLearning ?? this.previousLearning,
-      discussionTime: discussionTime ?? this.discussionTime,
-      discussionDay: discussionDay ?? this.discussionDay,
-      otpId: otpId ?? this.otpId,
-      curriculumId: curriculumId ?? this.curriculumId,
-      groupId: groupId ?? this.groupId,
-      timeZone: timeZone ?? this.timeZone,
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'name': name,
-      'dob': dob,
       'gender': gender,
+      "ageRange": ageRange,
       'previousLearning': previousLearning,
-      'discussionTime': discussionTime,
-      'discussionDay': discussionDay,
+      // 'discussionTime': discussionTime,
+      // 'discussionDay': discussionDay,
       'otpId': otpId,
       'curriculumId': curriculumId,
-      'groupId': groupId,
-      "timeZone": timeZone,
+      'city': city,
+      'country': country,
+      if (groupId != null) ...{
+        'groupId': groupId,
+      }
     };
   }
+
+  factory UserInput.fromMap(Map<String, dynamic> map) {
+    return UserInput(
+      name: map['name'] as String,
+      gender: map['gender'] as String,
+      ageRange: map["ageRange"] as String,
+      previousLearning:
+          List<String>.from((map['previousLearning'] as List<String>)),
+      // discussionTime: map['discussionTime'] as String,
+      // discussionDay: map['discussionDay'] as String,
+      otpId: map['otpId'] as String,
+      curriculumId: map['curriculumId'] as String,
+      groupId: map['groupId'] != null ? map['groupId'] as String : null,
+      city: map['city'] as String,
+      country: map['country'] as String,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory UserInput.fromJson(String source) =>
+      UserInput.fromMap(json.decode(source) as Map<String, dynamic>);
+}
+
+enum AgeRange {
+  Under_13,
+  a13_17,
+  a18_29,
+  a30_49,
+  a50_plus,
+}
+
+enum SafeAgeRange {
+  a13_17,
+  a18_29,
+  a30_49,
+  a50_plus,
 }

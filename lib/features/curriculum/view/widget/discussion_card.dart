@@ -136,7 +136,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                           spacing: 10,
                           children: [
                             Icon(
-                              Icons.groups,
+                              Icons.question_mark,
                               color: Colors.blue,
                               size: 40,
                             ),
@@ -149,7 +149,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                                     spacing: 3,
                                     children: [
                                       Text(
-                                        "ውይይት/ሙጣለዓ",
+                                        "ሳምንታዊ ጥያቄዎች",
                                         style: TextStyle(
                                           fontSize: 11,
                                         ),
@@ -256,7 +256,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard> {
                                       ),
                                     ),
                                     child: const Text(
-                                      "ውይይቱን ጀምር",
+                                      "ጀምር",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: whiteColor,

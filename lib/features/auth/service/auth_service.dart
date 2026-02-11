@@ -5,7 +5,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
+import 'package:islamic_online_learning/core/lib/timezone_handler.dart';
 import 'package:islamic_online_learning/features/Questionaire/model/questionnaire.dart';
+import 'package:islamic_online_learning/features/auth/model/city.dart';
 import 'package:islamic_online_learning/features/auth/model/confusion.dart';
 import 'package:islamic_online_learning/features/auth/model/curriculum_score.dart';
 import 'package:islamic_online_learning/features/auth/model/group.dart';
@@ -14,11 +16,12 @@ import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthService {
   final storage = const FlutterSecureStorage();
-  Future<void> sendOtpRequest(String phone) async {
+  Future<void> sendOtpRequest(String phone, String ageRange) async {
     final response = await customPostRequest(
       requestOtpApi,
       {
         "phone": phone,
+        "ageRange": ageRange,
       },
     );
 
@@ -157,7 +160,7 @@ class AuthService {
   Future<List<Group>> fetchGroups(
     int age,
     String gender,
-    String timeZone,
+    String city,
     String curriculumId,
   ) async {
     final dob = DateTime.now().subtract(
@@ -168,7 +171,7 @@ class AuthService {
       {
         "dob": dob.toString(),
         "gender": gender,
-        "timeZone": timeZone,
+        "city": city,
         "curriculumId": curriculumId,
       },
     );
@@ -182,9 +185,13 @@ class AuthService {
   }
 
   Future<void> register(UserInput userInput) async {
+    final timeZone = await getDeviceTimeZone();
     final response = await customPostRequest(
       registerApi,
-      userInput.toMap(),
+      {
+        ...userInput.toMap(),
+        'timeZone': timeZone,
+      },
     );
     if (response.statusCode == 200) {
       // final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -227,15 +234,28 @@ class AuthService {
     }
   }
 
-  Future<void> submitQuestionnaire(
-      Map<String, dynamic> data) async {
+  Future<List<City>> searchCities(String q) async {
+    final userName = dotenv.get("GEONAMES_USER");
+
+    final res = await customGetRequest(
+        "https://secure.geonames.org/searchJSON?q=${q}&maxRows=10&featureClass=P&username=${userName}");
+
+    if (res.statusCode != 200) {
+      throw Exception('Failed to load cities');
+    }
+
+    final List data = jsonDecode(res.body)["geonames"];
+    return data.map((e) => City.fromJson(e)).toList();
+  }
+
+  Future<void> submitQuestionnaire(Map<String, dynamic> data) async {
     final response = await customPostRequest(
       submitFeedbackApi,
       data,
       authorized: true,
     );
 
-     if (response.statusCode == 200) {
+    if (response.statusCode == 200) {
       // List<Questionnaire> questionnaires =
       //     Questionnaire.listFromJson(response.body);
       // return questionnaires; //token
@@ -244,7 +264,6 @@ class AuthService {
       print("Response body: ${response.body}");
       throw Exception('Failed to submit questionnaire: ${response.body}');
     }
-
   }
 
   Future<void> submitFeedback(String text, int? lessonNum) async {
@@ -270,13 +289,12 @@ class AuthService {
     }
   }
 
-  Future<User> updateMyInfo(String name, int age) async {
-    final dob = DateTime.now().subtract(Duration(days: age * 365));
+  Future<User> updateMyInfo(String name,) async {
     final response = await customPutRequest(
       updateMyInfoApi,
       {
         "name": name,
-        "dob": dob.toString(),
+        
       },
       authorized: true,
     );
@@ -378,12 +396,29 @@ class AuthService {
       authorized: true,
     );
     if (response.statusCode == 200) {
-      List<CurriculumScore> curriculumScores = CurriculumScore.listFromJson(response.body);
+      List<CurriculumScore> curriculumScores =
+          CurriculumScore.listFromJson(response.body);
       return curriculumScores; //token
     } else {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
       throw Exception('Failed to get curriculumScores: ${response.body}');
+    }
+  }
+
+  Future<void> deleteMyProfile() async {
+    final response = await customDeleteRequest(
+      deleteMyAccountApi,
+      {},
+      authorized: true,
+    );
+    if (response.statusCode == 200) {
+      // Successfully deleted account
+      print("Account deleted successfully");
+    } else {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      throw Exception('Failed to delete account: ${response.body}');
     }
   }
 }

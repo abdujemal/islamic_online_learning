@@ -37,8 +37,8 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
 
 class MainPage extends ConsumerStatefulWidget {
-  const MainPage({super.key});
-
+  const MainPage({super.key, });
+  
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _MainPageState();
 }
@@ -500,55 +500,57 @@ class _MainPageState extends ConsumerState<MainPage>
                         ],
                       )),
                   actions: [
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final authState = ref.watch(authNotifierProvider);
-                        final groupChatState =
-                            ref.watch(groupChatNotifierProvider);
-                        final noUnreadChats = groupChatState.unreadChats;
-                        if (authState.user != null) {
-                          return Stack(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => GroupChatPage(),
-                                      //     QuestionnaireScreen(
-                                      //   questions: sampleQuestions,
-                                      // ),
-                                    ),
-                                  );
-                                },
-                                icon: Icon(Icons.chat_rounded),
-                              ),
-                              if (noUnreadChats > 0)
-                                Positioned(
-                                  right: 6,
-                                  bottom: 4,
-                                  child: Container(
-                                    padding: EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: primaryColor,
-                                    ),
-                                    child: Text(
-                                      "$noUnreadChats",
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          );
-                        } else {
-                          return SizedBox();
-                        }
-                      },
-                    ),
+                    // Consumer(
+                    //   builder: (context, ref, child) {
+                    //     final authState = ref.watch(authNotifierProvider);
+                    //     final groupChatState =
+                    //         ref.watch(groupChatNotifierProvider);
+                    //     final noUnreadChats = groupChatState.unreadChats;
+                    //     if (authState.user != null) {
+                    //       return Stack(
+                    //         children: [
+                    //           IconButton(
+                    //             onPressed: () {
+                    //               // print(authState.user);
+                    //               Navigator.push(
+                    //                 context,
+                    //                 MaterialPageRoute(
+                    //                   builder: (_) => GroupChatPage(),
+                    //                   //     QuestionnaireScreen(
+                    //                   //   questions: sampleQuestions,
+                    //                   // ),
+                    //                 ),
+                    //               );
+                    //             },
+                    //             icon: Icon(Icons.chat_rounded),
+                    //           ),
+                    //           if (noUnreadChats > 0)
+                    //             Positioned(
+                    //               right: 6,
+                    //               bottom: 4,
+                    //               child: Container(
+                    //                 padding: EdgeInsets.all(4),
+                    //                 decoration: BoxDecoration(
+                    //                   shape: BoxShape.circle,
+                    //                   color: primaryColor,
+                    //                 ),
+                    //                 child: Text(
+                    //                   "$noUnreadChats",
+                    //                   style: TextStyle(
+                    //                     fontSize: 10,
+                    //                     color: Colors.white,
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //         ],
+                    //       );
+                    //     } else {
+                    //       return SizedBox();
+                    //     }
+                    //   },
+                    // ),
+                    
                     currentIndex != 1
                         ? Consumer(builder: (context, ref, child) {
                             final authState = ref.watch(authNotifierProvider);

@@ -116,7 +116,7 @@ class _AudioBottomViewState extends ConsumerState<AudioBottomView> {
 
           return SafeArea(
             child: Container(
-              height: 140,
+              height: 145,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: const BorderRadius.vertical(

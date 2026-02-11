@@ -5,6 +5,7 @@ import 'package:islamic_online_learning/features/auth/model/user.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/certificates_page.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/confusions_page.dart';
+import 'package:islamic_online_learning/features/auth/view/pages/data_management_page.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/edit_profile_page.dart';
 import 'package:islamic_online_learning/features/auth/view/widget/hijri_streak_calender_dialog.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
@@ -13,6 +14,7 @@ import 'package:islamic_online_learning/features/main/presentation/state/provide
 import 'package:islamic_online_learning/features/payments/view/pages/payments_page.dart';
 import 'package:islamic_online_learning/utils.dart';
 import 'package:lottie/lottie.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AccountTab extends ConsumerStatefulWidget {
   const AccountTab({super.key});
@@ -129,7 +131,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
               icon: Icons.card_membership_rounded,
               title: "My Certificates",
               onTap: () {
-                 Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => CertificatesPage(),
@@ -139,8 +141,26 @@ class _AccountTabState extends ConsumerState<AccountTab> {
             ),
             _buildSettingItem(
               icon: Icons.security,
-              title: "Privacy & Security",
-              onTap: () {},
+              title: "Privacy Policy",
+              onTap: () async {
+                try {
+                  await launchUrl(Uri.parse(privacyPolicyUrl));
+                } catch (e) {
+                  toast("የግላዊነት ፖሊሲን መክፈት አልተቻለም", ToastType.error, context);
+                }
+              },
+            ),
+            _buildSettingItem(
+              icon: Icons.analytics_rounded,
+              title: "Data Management",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DataManagementPage(),
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 30),
@@ -154,11 +174,11 @@ class _AccountTabState extends ConsumerState<AccountTab> {
             ),
             const SizedBox(height: 16),
 
-            _buildSettingItem(
-              icon: Icons.question_mark,
-              title: "Help Center",
-              onTap: () {},
-            ),
+            // _buildSettingItem(
+            //   icon: Icons.question_mark,
+            //   title: "Help Center",
+            //   onTap: () {},
+            // ),
             _buildSettingItem(
               icon: Icons.info,
               title: "About",

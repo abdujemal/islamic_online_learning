@@ -6,12 +6,15 @@ import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/Questionaire/model/questionnaire.dart';
 import 'package:islamic_online_learning/features/Questionaire/view/pages/questionnaire_screen.dart';
+import 'package:islamic_online_learning/features/auth/model/city.dart';
 import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
 import 'package:islamic_online_learning/features/auth/model/subscription.dart';
 import 'package:islamic_online_learning/features/auth/service/auth_service.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/register_page.dart';
+import 'package:islamic_online_learning/features/curriculum/view/controller/AssignedCourseController/assigned_courses_state.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class AuthNotifier extends StateNotifier<AuthState> {
@@ -122,10 +125,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  Future<void> updateMyInfo(BuildContext context, String name, int age) async {
+  Future<void> updateMyInfo(
+    BuildContext context,
+    String name,
+  ) async {
     try {
       state = state.copyWith(isUpdating: true);
-      final user = await authService.updateMyInfo(name, age);
+      final user = await authService.updateMyInfo(name);
       // await getScores(context);
       // await _checkIfTheCourseStarted(context);
       state = state.copyWith(isUpdating: false, user: user);
@@ -184,6 +190,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     ref.read(curriculumNotifierProvider.notifier).getCurriculums();
     final pref = await ref.read(sharedPrefProvider);
     final userId = pref.getString(PrefConsts.userId);
+    state = AuthState();
     if (userId != null) {
       FirebaseMessaging.instance.unsubscribeFromTopic(userId);
       await pref.remove(PrefConsts.userId);
@@ -191,6 +198,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
 
     setUserNull();
+    ref.read(assignedCoursesNotifierProvider.notifier).state =
+        AssignedCoursesState();
   }
 
   void setSubscription(Subscription subscription) async {
@@ -255,6 +264,38 @@ class AuthNotifier extends StateNotifier<AuthState> {
         ),
         (v) => false,
       );
+    }
+  }
+
+  Future<List<City>> searchCities(String q, BuildContext context) async {
+    try {
+      return await authService.searchCities(q);
+    } catch (err) {
+      print(err);
+      toast("Error happened. please try again!", ToastType.error, context);
+      return [];
+    }
+  }
+
+  Future<void> deleteProfile(BuildContext context) async {
+    try {
+      if (state.isDeleting) return;
+      state = state.copyWith(isDeleting: true);
+      await authService.deleteMyProfile();
+     ref.read(menuIndexProvider.notifier).update((state) => 0);
+      logout();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const MainPage(),
+        ),
+        (v) => false,
+      );
+      state = state.copyWith(isDeleting: false);
+    } catch (err) {
+      print("Error deleting profile: $err");
+      toast("Error deleting profile", ToastType.error, context);
+      state = state.copyWith(isDeleting: false);
     }
   }
 }
