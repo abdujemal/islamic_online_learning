@@ -10,7 +10,7 @@ import 'package:islamic_online_learning/features/curriculum/view/controller/prov
 import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_notifier.dart';
 import 'package:islamic_online_learning/features/meeting/view/controller/voice_room/voice_room_state.dart';
 import 'package:islamic_online_learning/features/meeting/view/widget/discussion_task_ui.dart';
-import 'package:islamic_online_learning/utils.dart';
+// import 'package:islamic_online_learning/utils.dart';
 // import 'package:livekit_clientlivekit_client.dart';
 import 'package:pdfx/pdfx.dart';
 
@@ -189,36 +189,36 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage>
   //   );
   // }
 
-  void _showOptionMenu(BuildContext context, Offset position) async {
-    final selected = await showMenu<String>(
-      context: context,
-      color: Theme.of(context).cardColor,
-      position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, 0),
-      items: [
-        "Call Admins",
-      ]
-          .map((val) => PopupMenuItem<String>(
-                value: val,
-                child: Text(
-                  val,
-                  // style: TextStyle(
-                  //   fontWeight: speed == currentSpeed
-                  //       ? FontWeight.bold
-                  //       : FontWeight.normal,
-                  //   color: speed == currentSpeed ? primaryColor : null,
-                  // ),
-                ),
-              ))
-          .toList(),
-    );
-    print("selected:$selected");
+  // void _showOptionMenu(BuildContext context, Offset position) async {
+  //   final selected = await showMenu<String>(
+  //     context: context,
+  //     color: Theme.of(context).cardColor,
+  //     position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, 0),
+  //     items: [
+  //       "Call Admins",
+  //     ]
+  //         .map((val) => PopupMenuItem<String>(
+  //               value: val,
+  //               child: Text(
+  //                 val,
+  //                 // style: TextStyle(
+  //                 //   fontWeight: speed == currentSpeed
+  //                 //       ? FontWeight.bold
+  //                 //       : FontWeight.normal,
+  //                 //   color: speed == currentSpeed ? primaryColor : null,
+  //                 // ),
+  //               ),
+  //             ))
+  //         .toList(),
+  //   );
+  //   print("selected:$selected");
 
-    if (selected == "Call Admins") {
-      ref.read(voiceRoomNotifierProvider.notifier).callAdmins(context);
-    } else {
-      print("non");
-    }
-  }
+  //   if (selected == "Call Admins") {
+  //     ref.read(voiceRoomNotifierProvider.notifier).callAdmins(context);
+  //   } else {
+  //     print("non");
+  //   }
+  // }
 
   Widget _buildBottomControls(VoiceRoomState state) {
     final connected = state.timer != null;

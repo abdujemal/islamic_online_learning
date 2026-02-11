@@ -5,7 +5,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
-import 'package:islamic_online_learning/features/main/presentation/widgets/the_end.dart';
+// import 'package:islamic_online_learning/features/main/presentation/widgets/the_end.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/lib/translations.dart';

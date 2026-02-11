@@ -7,8 +7,8 @@ import 'package:islamic_online_learning/features/auth/view/pages/certificates_pa
 import 'package:islamic_online_learning/features/auth/view/pages/confusions_page.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/data_management_page.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/edit_profile_page.dart';
-import 'package:islamic_online_learning/features/auth/view/widget/hijri_streak_calender_dialog.dart';
-import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
+// import 'package:islamic_online_learning/features/auth/view/widget/hijri_streak_calender_dialog.dart';
+// import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/aboutus.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/payments/view/pages/payments_page.dart';

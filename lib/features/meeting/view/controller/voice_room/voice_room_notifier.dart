@@ -161,24 +161,24 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     }
   }
 
-  Future<String> _fetchToken(String identity, String roomName) async {
-    final resp = await customPostRequest(
-      TOKEN_ENDPOINT,
-      {"identity": identity, "room": roomName},
-      authorized: true,
-    );
+  // Future<String> _fetchToken(String identity, String roomName) async {
+  //   final resp = await customPostRequest(
+  //     TOKEN_ENDPOINT,
+  //     {"identity": identity, "room": roomName},
+  //     authorized: true,
+  //   );
 
-    if (resp.statusCode != 200) {
-      throw Exception(
-          'Token request failed (${resp.statusCode}): ${resp.body}');
-    }
-    // Accept both JSON { token } and plain string body
-    try {
-      final j = json.decode(resp.body);
-      if (j is Map && j['token'] != null) return j['token'];
-    } catch (_) {}
-    return resp.body.trim();
-  }
+  //   if (resp.statusCode != 200) {
+  //     throw Exception(
+  //         'Token request failed (${resp.statusCode}): ${resp.body}');
+  //   }
+  //   // Accept both JSON { token } and plain string body
+  //   try {
+  //     final j = json.decode(resp.body);
+  //     if (j is Map && j['token'] != null) return j['token'];
+  //   } catch (_) {}
+  //   return resp.body.trim();
+  // }
 
   Future<void> connect(WidgetRef ref, String title, int fromLesson) async {
     state = state.copyWith(isConnecting: true);

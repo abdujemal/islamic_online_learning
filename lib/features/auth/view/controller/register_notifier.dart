@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/api_handler.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
-import 'package:islamic_online_learning/core/lib/timezone_handler.dart';
+// import 'package:islamic_online_learning/core/lib/timezone_handler.dart';
 import 'package:islamic_online_learning/features/auth/model/user.dart';
 import 'package:islamic_online_learning/features/auth/service/auth_service.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/register_state.dart';
