@@ -26,7 +26,7 @@ class _CertificatesPageState extends ConsumerState<CertificatesPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text("My Certificates"),
+        title: Text("የምስክር ወረቀቶች"),
         centerTitle: true,
         elevation: 0,
       ),

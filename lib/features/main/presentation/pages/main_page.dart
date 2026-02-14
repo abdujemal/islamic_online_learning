@@ -473,7 +473,7 @@ class _MainPageState extends ConsumerState<MainPage>
                                         borderRadius: BorderRadius.circular(5)),
                                     child: Row(
                                       children: [
-                                        Text("Payment is Due"),
+                                        Text("የክፍያ ጊዜ ደርሷል!"),
                                         Spacer(),
                                         TextButton(
                                           onPressed: () {
@@ -484,7 +484,7 @@ class _MainPageState extends ConsumerState<MainPage>
                                               ),
                                             );
                                           },
-                                          child: Text("Add Payment"),
+                                          child: Text("ክፈል"),
                                         )
                                         // InkWell(
                                         //   onTap: () {},

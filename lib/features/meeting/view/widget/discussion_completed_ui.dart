@@ -61,7 +61,7 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
 
                 // Title
                 Text(
-                  "ጥያቄዎቹ ተጠናቀቀ",
+                  "ጥያቄዎቹ ተጠናቀቁ",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
@@ -76,7 +76,7 @@ class _DiscussionCompletedUiState extends ConsumerState<DiscussionCompletedUi> {
                   padding: const EdgeInsets.symmetric(horizontal: 28),
                   child: Text(
                     isDark
-                        ? "“እውቀትን ለመፈለግ የሚወስዳቸው እያንዳንዱ እርምጃ ወደ አላህ ብርሃን ያቃርብዎታል።”"
+                        ? "“እውቀትን ለመፈለግ የሚወስዷቸው እያንዳንዱ እርምጃ ወደ አላህ ብርሃን ያቃርብዎታል።”"
                         : "“እውቀትን መፈለግ ወደ ጀነት የሚወስድ መንገድ ነው።”",
                     textAlign: TextAlign.center,
                     style: TextStyle(

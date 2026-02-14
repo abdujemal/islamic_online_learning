@@ -15,7 +15,7 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Data Management"),
+          title: const Text("ዳታ አስተዳደር"),
         ),
         body: Center(
           child: Column(
@@ -31,15 +31,15 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text("Confirm Deletion"),
+                      title: const Text("መሰረዞን ማረጋገጫ"),
                       content: const Text(
-                          "Are you sure you want to delete your account and all associated data? This action cannot be undone."),
+                          "እርግጠኛ ነዎት መለያዎን እና ሁሉንም ተዛማጅ ዳታዎችን መሰረዝ ይፈልጋሉ? ይህ እርምጃ ሊቀለበስ አይችልም።"),
                       actions: [
                         TextButton(
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: const Text("Cancel"),
+                          child: const Text("ይቅር"),
                         ),
                         Consumer(
                           builder: (context, ref, _) {
@@ -67,7 +67,7 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
                                             AlwaysStoppedAnimation(Colors.white),
                                       ),
                                     )
-                                  : const Text("Delete"),
+                                  : const Text("ሰርዝ"),
                             );
                           }
                         ),
@@ -75,7 +75,7 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
                     ),
                   );
                 },
-                child: Text("Delete account & data"),
+                child: Text("መለያዬን እና ዳታዬን ሁሉ ሰርዝ"),
               )
             ],
           ),

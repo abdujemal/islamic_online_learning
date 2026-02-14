@@ -12,4 +12,5 @@ class PrefConsts {
   static final String curriculumDate = "curriculum_date";
   static final String discussionQuestions = "discussion_questions";
   static final String discussionQuizzes = "discussion_quizzes";
+  static final String scoringRulesAcceptedKey = "scoringRulesAcceptedKey";
 }

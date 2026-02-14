@@ -132,8 +132,8 @@ class _PdfPageState extends ConsumerState<PdfPage> {
 
     // ThemeMode theme = ref.read(themeProvider);
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      onPopInvokedWithResult: (didPop, t) async {
         if (kDebugMode) {
           print("currentPage:$currentPage");
           print("totalPage:$pages");
@@ -142,7 +142,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
           await PlaylistHelper.audioPlayer.stop();
           ref.read(lessonNotifierProvider.notifier).removeCurrentLesson();
 
-          return true;
+          // return true;
         }
         if (currentPage != null && pages != null) {
           if ((currentPage! + 1) / pages! == 1) {
@@ -206,7 +206,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
             );
           }
         }
-        return false;
+        // return false;
       },
       child: StreamBuilder(
           stream: myAudioStream(audioPlayer),

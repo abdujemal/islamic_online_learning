@@ -188,7 +188,7 @@ class LessonNotifier extends StateNotifier<LessonState> {
       final micStatus = await Permission.microphone.request();
       if (!micStatus.isGranted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please allow microphone access.')),
+          const SnackBar(content: Text('እባክዎ ማይክሮፎን ፈቃድ ይስጡ።')),
         );
         return;
       }

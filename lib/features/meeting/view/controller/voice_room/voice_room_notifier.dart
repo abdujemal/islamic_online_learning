@@ -76,6 +76,10 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
 
   void changeVoiceRoomStatus(VoiceRoomStatus status) {
     state = state.copyWith(status: status);
+    // if (status == VoiceRoomStatus.short) {
+      
+    //   return;
+    // }
   }
 
   void changeStatus(
@@ -113,7 +117,8 @@ class VoiceRoomNotifier extends StateNotifier<VoiceRoomState> {
     int discussion = 0;
     int quiz = discussion + givenTime.segments.discussion;
     int assignment = givenTime.segments.assignment;
-    print("sec: $sec, discussion: $discussion, quiz: $quiz, assignment: $assignment");
+    print(
+        "sec: $sec, discussion: $discussion, quiz: $quiz, assignment: $assignment");
     if (sec > assignment) {
       getDiscussionShortAnswers(ref);
       state = state.copyWith(status: VoiceRoomStatus.short);

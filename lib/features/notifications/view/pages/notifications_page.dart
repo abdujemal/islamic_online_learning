@@ -170,7 +170,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("No data"),
+                    Text("ምንም የለም"),
                     IconButton(
                       onPressed: () {
                         ref

@@ -304,6 +304,13 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                   'Audio',
                                   cancelToken,
                                   context,
+                                  fileSize: widget.courseModel.audioSizes
+                                              .split(",")[widget.index - 1]
+                                              .trim() !=
+                                          ""
+                                      ? int.parse(widget.courseModel.audioSizes
+                                          .split(",")[widget.index - 1])
+                                      : 0,
                                 );
                             isDownloading = false;
                             if (file != null) {
@@ -375,6 +382,14 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                             'Audio',
                                             cancelToken,
                                             context,
+                                            fileSize: widget.courseModel.audioSizes
+                                                        .split(",")[widget.index - 1]
+                                                        .trim() !=
+                                                    ""
+                                                ? int.parse(widget.courseModel
+                                                    .audioSizes
+                                                    .split(",")[widget.index - 1])
+                                                : 0,
                                           );
                                       isDownloading = false;
                                       if (file != null) {

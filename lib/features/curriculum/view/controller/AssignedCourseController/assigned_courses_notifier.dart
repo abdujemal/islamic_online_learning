@@ -418,12 +418,17 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
   }
 
   bool isTodayDiscussionDay(WidgetRef ref) {
-    final authState = ref.read(authNotifierProvider);
-    final discussionDay = authState.user?.group.discussionDay ?? "k";
-    final discussionWeekDay = getWeekDayFromText(discussionDay);
+    // final authState = ref.read(authNotifierProvider);
+    // final discussionDay = authState.user?.group.discussionDay ?? "k";
+    // final discussionWeekDay = getWeekDayFromText(discussionDay);
 
     DateTime today = DateTime.now();
-    return today.weekday >= discussionWeekDay;
+    // return today.weekday >= discussionWeekDay;
+    return [
+      DateTime.sunday,
+      DateTime.saturday,
+      DateTime.friday,
+    ].contains(today.weekday);
   }
 
   bool isBetweenLessonAndDiscussion(WidgetRef ref) {

@@ -55,7 +55,7 @@ class SignInNotifier extends StateNotifier<SignInState> {
       if (err.toString().contains("users_under_13_not_allowed")) {
         toast("ይህ መተግበሪያ ከ13 ዓመት በታች ለሆኑ ተጠቃሚዎች አይፈቀድም።", ToastType.error, context);
       } else {
-        toast("ኮድ በመላክ ላይ ሳለ ስህተት ተከስቷል።", ToastType.error, context);
+        toast("ኮድ በመላክ ላይ ሳለ ስህተት ተከስቷል።: $err", ToastType.error, context);
       }
       state = state.copyWith(isLoading: false, error: err.toString());
     }

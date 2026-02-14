@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/translations.dart';
 import 'package:islamic_online_learning/features/Questionaire/view/pages/feedback_screen.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
 import 'package:islamic_online_learning/features/quiz/view/controller/provider.dart';
@@ -84,7 +85,7 @@ class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
                       const SizedBox(height: 10),
 
                       Text(
-                        "$streak-Day Streak",
+                        "$streak-ቀን ኢስቲቃማ / ፅናት",
                         style: TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.w900,
@@ -95,7 +96,7 @@ class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
                       const SizedBox(height: 10),
 
                       Text(
-                        "Masha’Allah! You’re remaining consistent.",
+                        "ማሻአላህ! በፅናት እየተማሩ ነው!",
                         style: TextStyle(
                           fontSize: 17,
                           // color: Colors.grey.shade800,
@@ -170,7 +171,7 @@ class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
                               );
                             },
                             child: const Text(
-                              "Back to Home Page",
+                              "ወደ መነሻ ገፅ ተመለስ",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -207,7 +208,7 @@ class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
               Icon(Icons.auto_stories, color: primary, size: 30),
               const SizedBox(width: 12),
               Text(
-                "Today's ${widget.type} Complete",
+                "የዛሬውን ${Translations.get(widget.type)} ጨርሰዋል!",
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
@@ -220,16 +221,16 @@ class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _stat("Streak", "$streak Days", gold, primary),
+              _stat("ኢስቲቃማ / ፅናት", "$streak ቀናት", gold, primary),
               // if(widget.type == "Lesson")
-              _stat("${widget.type}s Today", "$lessonsCompleted", gold, primary)
+              _stat("የዛሬ ${Translations.get(widget.type)}ዎች", "$lessonsCompleted", gold, primary)
               // : SizedBox(),
             ],
           ),
           const SizedBox(height: 22),
           Text(
-            "“Seeking knowledge is a path of light. Stay consistent, "
-            "and Allah will bless your journey.”",
+            "“እውቀትን መፈለግ የብርሃን መንገድ ነው። በፅናት መማር ላይ ይጠንክሩ!"
+            "አላህም ጉዞዎን ይባርካሎት።”",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,

@@ -25,6 +25,14 @@ class AccountTab extends ConsumerStatefulWidget {
 
 class _AccountTabState extends ConsumerState<AccountTab> {
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(authNotifierProvider.notifier).getUsersStreakNum();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
@@ -82,7 +90,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
 
             // ⭐ Section Title
             Text(
-              "Account Settings",
+              "የመለያ ማስተካከያዎች",
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -92,7 +100,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
             // ⭐ Settings Cards
             _buildSettingItem(
               icon: Icons.account_circle,
-              title: "Edit Profile",
+              title: "ፕሮፋይሎን መቀየሪያ",
               onTap: () {
                 Navigator.push(
                   context,
@@ -104,7 +112,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
             ),
             _buildSettingItem(
               icon: Icons.question_answer,
-              title: "Confusion Messages",
+              title: "የእርሶ ጥያቄዎች",
               onTap: () {
                 Navigator.push(
                   context,
@@ -117,7 +125,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
 
             _buildSettingItem(
               icon: Icons.payment,
-              title: "Payments",
+              title: "ክፍያዎች",
               onTap: () {
                 Navigator.push(
                   context,
@@ -129,7 +137,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
             ),
             _buildSettingItem(
               icon: Icons.card_membership_rounded,
-              title: "My Certificates",
+              title: "የምስክር ወረቀቶች",
               onTap: () {
                 Navigator.push(
                   context,
@@ -141,7 +149,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
             ),
             _buildSettingItem(
               icon: Icons.security,
-              title: "Privacy Policy",
+              title: "የግላዊነት ፖሊሲ",
               onTap: () async {
                 try {
                   await launchUrl(Uri.parse(privacyPolicyUrl));
@@ -152,7 +160,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
             ),
             _buildSettingItem(
               icon: Icons.analytics_rounded,
-              title: "Data Management",
+              title: "የዳታ አስተዳደር",
               onTap: () {
                 Navigator.push(
                   context,
@@ -167,7 +175,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
 
             // ⭐ Support Section
             Text(
-              "Support",
+              "እገዛ እና መረጃ",
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -181,14 +189,13 @@ class _AccountTabState extends ConsumerState<AccountTab> {
             // ),
             _buildSettingItem(
               icon: Icons.info,
-              title: "About",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => AboutUs(),
-                  ),
-                );
+              title: "ስለ እኛ",
+              onTap: () async {
+                try {
+                  await launchUrl(Uri.parse(aboutUsUrl));
+                } catch (e) {
+                  toast("ስለ እኛን መክፈት አልተቻለም", ToastType.error, context);
+                }
               },
             ),
 
@@ -208,7 +215,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
                 ref.read(menuIndexProvider.notifier).update((state) => 1);
               },
               child: const Text(
-                "Log Out",
+                "ውጣ",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -225,92 +232,82 @@ class _AccountTabState extends ConsumerState<AccountTab> {
   }
 
   Widget _buildStreakCard(ThemeData theme, User currentUser) {
-    return FutureBuilder(
-        future: ref.read(authServiceProvider).getUsersStreakNum(),
-        builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.done) {
-            if (snap.data != null) {
-              currentUser = currentUser.copyWith(numOfStreaks: snap.data);
-              print(snap.data);
-            }
-          }
-          return Container(
-            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
-            margin: const EdgeInsets.only(top: 6),
-            decoration: BoxDecoration(
-              color: theme.cardColor.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColor.withOpacity(0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
+      margin: const EdgeInsets.only(top: 6),
+      decoration: BoxDecoration(
+        color: theme.cardColor.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Row(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // ⭐ Islamic Lottie Streak Animation
+              SizedBox(
+                width: 60,
+                height: 60,
+                child: Lottie.asset(
+                  'assets/animations/Streak.json',
+                  repeat: true,
+                  animate: currentUser.numOfStreaks == 0 ? false : true,
+                  fit: BoxFit.contain,
                 ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // ⭐ Islamic Lottie Streak Animation
-                    SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: Lottie.asset(
-                        'assets/animations/Streak.json',
-                        repeat: true,
-                        animate: currentUser.numOfStreaks == 0 ? false : true,
-                        fit: BoxFit.contain,
-                      ),
+              ),
+
+              const SizedBox(width: 16),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "ኢስቲቃማ / ፅናት",
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-
-                    const SizedBox(width: 16),
-
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Daily Streak",
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "${currentUser.numOfStreaks} Days",
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            color: primaryColor,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-                Spacer(),
-                IconButton(
-                  onPressed: () {
-                    // final rests =
-                    //     ref.read(assignedCoursesNotifierProvider).rests;
-                    // showDialog(
-                    //   context: context,
-                    //   builder: (_) => HijriStreakCalenderDialog(
-                    //     rests: rests,
-                    //     discussionWDay:
-                    //         getWeekDayFromText(currentUser.group.discussionDay),
-                    //   ),
-                    // );
-                  },
-                  icon: Icon(
-                    Icons.calendar_month,
-                    color: primaryColor,
-                    size: 40,
                   ),
-                )
-              ],
+                  Text(
+                    "${currentUser.numOfStreaks} ${currentUser.numOfStreaks < 1 ? "ቀን" : "ቀናት"}",
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: primaryColor,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+          Spacer(),
+          IconButton(
+            onPressed: () {
+              // final rests =
+              //     ref.read(assignedCoursesNotifierProvider).rests;
+              // showDialog(
+              //   context: context,
+              //   builder: (_) => HijriStreakCalenderDialog(
+              //     rests: rests,
+              //     discussionWDay:
+              //         getWeekDayFromText(currentUser.group.discussionDay),
+              //   ),
+              // );
+            },
+            icon: Icon(
+              Icons.calendar_month,
+              color: primaryColor,
+              size: 40,
             ),
-          );
-        });
+          )
+        ],
+      ),
+    );
   }
 
   int getWeekDayFromText(String text) {

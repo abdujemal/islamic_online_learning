@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/meeting/view/widget/discussion_completed_ui.dart';
 import 'package:islamic_online_learning/features/quiz/service/quiz_service.dart';
 import 'package:islamic_online_learning/features/quiz/view/widget/question_list.dart';
 import 'package:islamic_online_learning/features/quiz/view/widget/short_answer_quiz.dart';
@@ -18,59 +19,60 @@ class DiscussionTaskUi extends ConsumerStatefulWidget {
 
 class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
   Widget _buildDiscussionUI() {
-    return Consumer(builder: (context, ref, _) {
-      final topics = ref.watch(discussionTopicsProvider);
-      return Expanded(
-        child: Column(
-          children: [
-            Center(
-              child: Text(
-                "አሰላሙ አለይኩም ውራህመቱላሂ ወበረካቱሁ",
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              "ኢንሻአላህ ለ5 ደቂቃ ያክል በዚህ ሳምንት የተማራቹትን ትወያያላችሁ።",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            Center(
-              child: Text(
-                "የመወያያ ርእሶች",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Expanded(
-              child: topics == null
-                  ? CircularProgressIndicator()
-                  : SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: topics
-                            .map((e) => Text(
-                                  e,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                ))
-                            .toList(),
-                      ),
-                    ),
-            ),
-          ],
-        ),
-      );
-    });
+    return SizedBox();
+    // Consumer(builder: (context, ref, _) {
+    //   final topics = ref.watch(discussionTopicsProvider);
+    //   return Expanded(
+    //     child: Column(
+    //       children: [
+    //         Center(
+    //           child: Text(
+    //             "አሰላሙ አለይኩም ውራህመቱላሂ ወበረካቱሁ",
+    //             style: TextStyle(
+    //               fontSize: 18,
+    //             ),
+    //           ),
+    //         ),
+    //         SizedBox(
+    //           height: 10,
+    //         ),
+    //         Text(
+    //           "ኢንሻአላህ ለ5 ደቂቃ ያክል በዚህ ሳምንት የተማራቹትን ትወያያላችሁ።",
+    //           textAlign: TextAlign.center,
+    //           style: TextStyle(
+    //             fontSize: 16,
+    //           ),
+    //         ),
+    //         Center(
+    //           child: Text(
+    //             "የመወያያ ርእሶች",
+    //             style: TextStyle(
+    //               fontSize: 18,
+    //               fontWeight: FontWeight.bold,
+    //             ),
+    //           ),
+    //         ),
+    //         Expanded(
+    //           child: topics == null
+    //               ? CircularProgressIndicator()
+    //               : SingleChildScrollView(
+    //                   child: Column(
+    //                     crossAxisAlignment: CrossAxisAlignment.start,
+    //                     children: topics
+    //                         .map((e) => Text(
+    //                               e,
+    //                               style: TextStyle(
+    //                                 fontSize: 16,
+    //                               ),
+    //                             ))
+    //                         .toList(),
+    //                   ),
+    //                 ),
+    //         ),
+    //       ],
+    //     ),
+    //   );
+    // });
   }
 
   Widget _buildChoiceUI() {
@@ -120,14 +122,23 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
               },
               onFinish: (i, answers) async {
                 // await Future.delayed(Duration(seconds: 1));
+                toast(
+                  "Loading...",
+                  ToastType.normal,
+                  context,
+                  isLong: true,
+                );
+                await ref
+                    .read(voiceRoomNotifierProvider.notifier)
+                    .getDiscussionShortAnswers(ref);
                 ref
                     .read(voiceRoomNotifierProvider.notifier)
-                    .changeVoiceRoomStatus(VoiceRoomStatus.choiceDone);
-                toast(
-                    "You have finished the Multiple Choice questions. Please wait for the countdown to end.",
-                    ToastType.success,
-                    context,
-                    isLong: true);
+                    .changeVoiceRoomStatus(VoiceRoomStatus.short);
+                // toast(
+                //     "You have finished the Multiple Choice questions. Please wait for the countdown to end.",
+                //     ToastType.success,
+                //     context,
+                //     isLong: true);
                 return true;
                 // print("i: $i, answers: $answers");
                 // List<String> quizAnswers = [];
@@ -202,14 +213,25 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
             },
             onFinish: (answers) async {
               print("answers: $answers");
+              await ref
+                  .read(voiceRoomNotifierProvider.notifier)
+                  .disconnect(ref);
               ref
                   .read(voiceRoomNotifierProvider.notifier)
-                  .changeVoiceRoomStatus(VoiceRoomStatus.shortDone);
-              toast(
-                  "You have finished the short answer Questions. Please wait for the countdown to end.",
-                  ToastType.success,
-                  context,
-                  isLong: true);
+                  .changeVoiceRoomStatus(
+                    VoiceRoomStatus.end,
+                  );
+              Navigator.pushReplacement(
+                ref.context,
+                MaterialPageRoute(
+                  builder: (_) => DiscussionCompletedUi(),
+                ),
+              );
+              // toast(
+              //     "You have finished the short answer Questions. Please wait for the countdown to end.",
+              //     ToastType.success,
+              //     context,
+              //     isLong: true);
               // await ref.read(questionsNotifierProvider.notifier).submitTest(context);
               // setState(() {
               //   canPop = true;
@@ -253,11 +275,10 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
         // else
         if (widget.status == VoiceRoomStatus.discussing)
           _buildDiscussionUI()
-
         else if (widget.status == VoiceRoomStatus.choice)
           _buildChoiceUI()
-        else if(widget.status == VoiceRoomStatus.choiceDone)
-          Expanded( 
+        else if (widget.status == VoiceRoomStatus.choiceDone)
+          Expanded(
             child: Center(
               child: Text(
                 //give me islamic motivational text
@@ -273,11 +294,11 @@ class _DiscussionTaskUiState extends ConsumerState<DiscussionTaskUi> {
         else if (widget.status == VoiceRoomStatus.short)
           _buildShortAnswerUI(voiceRoomState)
         else if (widget.status == VoiceRoomStatus.shortDone)
-          Expanded( 
+          Expanded(
             child: Center(
               child: Text(
                 "ማሻአላህ! የጥያቄዎቹን አጠናቀዋል። ደቂቃው እስኪያልቅ በትዕግስት ይጠብቁ።",
-                
+
                 // "You have finished the Short answer part. Please wait for the next part.",
                 textAlign: TextAlign.center,
                 style: TextStyle(

@@ -125,7 +125,6 @@ class _CourseItemState extends ConsumerState<CourseItem> {
           await ref.read(cdNotifierProvider.notifier).isDownloaded(
                 "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
                 "Audio",
-                // widget.courseModel.courseIds[index],
                 context,
               );
       return isDownloaded;
@@ -208,6 +207,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 13,
+                                          color: Colors.black
                                         ),
                                       ),
                                     ),
@@ -271,6 +271,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                     PlaylistHelper().playList;
                                                 final audioPlayer =
                                                     PlaylistHelper.audioPlayer;
+                                                PlaylistHelper
+                                                        .mainPlayListIndexes =
+                                                    playListIndexes;
 
                                                 if (!playListIndexes.contains(
                                                     courseModel
@@ -295,9 +298,6 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       .playList
                                                       .addAll(lst);
                                                 }
-                                                PlaylistHelper
-                                                        .mainPlayListIndexes =
-                                                    playListIndexes;
                                                 if (playList.length > 0) {
                                                   int playableIndex =
                                                       playListIndexes.indexOf(
@@ -321,7 +321,6 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       seconds: courseModel
                                                           .pausedAtAudioSec,
                                                     ),
-                                                    preload: false,
                                                   );
                                                   audioPlayer.play();
 
@@ -337,13 +336,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                                           ",")
                                                                   ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
                                                                   : "${courseModel.title}.pdf",
-                                                                  
                                                               "PDF",
-                                                              // courseModel.pdfId
-                                                              //         .contains(
-                                                              //             ",")
-                                                              //     ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
-                                                              //     : "${courseModel.title}.pdf",
                                                               context,
                                                             );
                                                     print(
@@ -429,11 +422,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                             widget.courseModel.isStarted == 1 &&
                                     widget.courseModel.isScheduleOn == 1
                                 ? const Positioned(
-                                    top: 2,
-                                    right: 2,
+                                    right: 0,
                                     child: Icon(
                                       Icons.notifications_active,
-                                      color: whiteColor,
                                       size: 20,
                                     ),
                                   )

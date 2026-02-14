@@ -36,11 +36,10 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(seconds: 1))
-        .then((value) => downloadAllFiles());
+    Future.microtask(() => downloadAllFiles());
   }
 
-  downloadAllFiles() async {
+  void downloadAllFiles() async {
     if (kDebugMode) {
       print("started");
     }
@@ -84,10 +83,14 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
       }
       i++;
       final bool isAudioDownloaded = await cdNotifier.isDownloaded(
-          '${widget.courseModel.ustaz},${widget.courseModel.title} $i.mp3',
-          "Audio",
-          // audioId,
-          context);
+        '${widget.courseModel.ustaz},${widget.courseModel.title} $i.mp3',
+        "Audio",
+        // audioId,
+        context,
+        widget.courseModel.audioSizes.split(",")[i - 1].trim() != ""
+            ? int.parse(widget.courseModel.audioSizes.split(",")[i - 1])
+            : 0,
+      );
       if (kDebugMode) {
         print(isAudioDownloaded);
       }
@@ -98,6 +101,9 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
           "Audio",
           cancelToken,
           context,
+          fileSize: widget.courseModel.audioSizes.split(",")[i - 1].trim() != ""
+              ? int.parse(widget.courseModel.audioSizes.split(",")[i - 1])
+              : 0,
         );
         if (file != null) {
           widget.onSingleDownloadDone(file.path);
@@ -154,13 +160,12 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
                                   ),
                                   Align(
                                     alignment: Alignment.centerRight,
-                                    child: Text(progs[index].totalBytes == 0
-                                        ? "Loading..."
-                                        : "$received / $total",
-                                        style: TextStyle(
-                                          fontSize: 12
-                                        ),
-                                        ),
+                                    child: Text(
+                                      progs[index].totalBytes == 0
+                                          ? "Loading..."
+                                          : "$received / $total",
+                                      style: TextStyle(fontSize: 12),
+                                    ),
                                   ),
                                   // Align(
                                   //   alignment: Alignment.centerRight,
@@ -180,7 +185,7 @@ class _DownloadAllFilesState extends ConsumerState<DownloadAllFiles> {
                         onPressed: () {
                           breakIt = true;
                           cancelToken.cancel();
-                          Navigator.pop(context);
+                          // Navigator.pop(context);
                         },
                         child: const Text("አቁም"),
                       ),

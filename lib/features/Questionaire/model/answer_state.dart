@@ -17,6 +17,7 @@ class AnswerState {
       "priceValue": price,
       "priceMin": priceMin,
       "priceMax": priceMax,
+      
     }..removeWhere((_, v) => v == null || (v is List && v.isEmpty));
   }
 }

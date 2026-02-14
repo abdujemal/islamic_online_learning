@@ -144,37 +144,63 @@ class _LessonCardState extends ConsumerState<LessonCard> {
                               ),
                               Align(
                                 alignment: Alignment.centerRight,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 3,
-                                    vertical: .5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    border: score != null
-                                        ? Border.all(
-                                            color: getColor(
-                                              score.score / score.outOf,
-                                            ),
-                                          )
-                                        : Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                  child: score != null
-                                      ? Text(
-                                          "${score.score}/${score.outOf} ነጥብ",
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: getColor(
-                                              score.score / score.outOf,
-                                            ),
-                                          ),
-                                        )
-                                      : Text(
-                                          "${constScore?.totalScore ?? "..."} ነጥብ",
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                          ),
-                                        ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 3,
+                                        vertical: .5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: score != null
+                                            ? Border.all(
+                                                color: getColor(
+                                                  score.score / score.outOf,
+                                                ),
+                                              )
+                                            : Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(3),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          score != null
+                                              ? Text(
+                                                  "${score.score}/${score.outOf} ነጥብ",
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: getColor(
+                                                      score.score / score.outOf,
+                                                    ),
+                                                  ),
+                                                )
+                                              : Text(
+                                                  "${constScore?.totalScore ?? "..."} ነጥብ",
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    GestureDetector(
+                                      onTap: () {
+                                        ref
+                                            .read(authNotifierProvider.notifier)
+                                            .showScoringRulesDialog(
+                                              context,
+                                              byForce: true,
+                                            );
+                                      },
+                                      child: Icon(
+                                        Icons.info_outlined,
+                                        size: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    )
+                                  ],
                                 ),
                               )
                             ],

@@ -59,7 +59,7 @@ class _ConfusionCardState extends ConsumerState<ConfusionCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                answered ? "Answered" : "Pending",
+                answered ? "ተመልሳል" : "በመጠባበቅ ላይ",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class _ConfusionCardState extends ConsumerState<ConfusionCard> {
               child: Column(
                 children: [
                   const Text(
-                    "Question",
+                    "ጥያቄ",
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                     ),
@@ -141,7 +141,7 @@ class _ConfusionCardState extends ConsumerState<ConfusionCard> {
                 child: Column(
                   children: [
                     const Text(
-                      "Answer",
+                      "መልስ",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                       ),
@@ -179,7 +179,7 @@ class _ConfusionCardState extends ConsumerState<ConfusionCard> {
                 border: Border.all(color: Colors.yellow.shade100),
               ),
               child: const Text(
-                "Your teacher will respond soon Insha’Allah",
+                "ኢንሻላህ! የኛ ኡስታዞች መልስ ይሰጦታል።",
                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
               ),
             ),

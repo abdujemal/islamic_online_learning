@@ -18,6 +18,7 @@ const String serverUrl = "https://ilmfelagi.com/api";
 
 //main apis
 const String privacyPolicyUrl = "https://ilmfelagi-pro-backend.onrender.com";
+const String aboutUsUrl = "https://www.ilmfelagi.com/about";
 const String mainUrl = "https://ilmfelagi-pro-backend.onrender.com";
 const String baseUrl = "$mainUrl/api/v1";
 //livekit token generater
@@ -304,6 +305,8 @@ Future<bool> verifyFileLength({
     final file = File(filePath);
 
     if (!await file.exists()) return false;
+
+    if(expectedSize == 0) return true;
 
     // Step 4: Validate file size
     final actualSize = await file.length();

@@ -192,6 +192,8 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                   final playList = PlaylistHelper().playList;
                                   final audioPlayer =
                                       PlaylistHelper.audioPlayer;
+                                  PlaylistHelper.mainPlayListIndexes =
+                                      playListIndexes;
 
                                   if (!playListIndexes.contains(
                                       courseModel.pausedAtAudioNum + 1)) {
@@ -204,24 +206,19 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                     }
                                     return;
                                   }
-                                  print("len: ${playList.length}");
                                   if (!isPlayingCourseThisCourse(
                                       courseModel.courseId, ref)) {
                                     PlaylistHelper().playList.clear();
                                     PlaylistHelper().playList.addAll(lst);
-                                    print("playListIndexes: $playListIndexes");
-                                    print("playList: $lst");
-                                    print(
-                                        "PlaylistHelper().playList: ${PlaylistHelper().playList}");
                                   }
-                                  if (PlaylistHelper().playList.isNotEmpty) {
+                                  if (playList.length > 0) {
                                     int playableIndex = playListIndexes.indexOf(
                                         courseModel.pausedAtAudioNum + 1);
                                     print("playListIndexes: $playListIndexes");
                                     print("pausedAtAudioNum: $playableIndex");
                                     await PlaylistHelper.audioPlayer
                                         .setAudioSources(
-                                      PlaylistHelper().playList,
+                                      playList,
                                       initialIndex:
                                           courseModel.pausedAtAudioNum < 0
                                               ? 0
@@ -229,7 +226,6 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                       initialPosition: Duration(
                                         seconds: courseModel.pausedAtAudioSec,
                                       ),
-                                      preload: false,
                                     );
                                     audioPlayer.play();
 
@@ -241,10 +237,6 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                                 ? "${courseModel.title} ${courseModel.pdfNum.toInt()}.pdf"
                                                 : "${courseModel.title}.pdf",
                                             "PDF",
-                                            // courseModel.pdfId.contains(",")
-                                            //     ? courseModel.pdfId.split(",")[
-                                            //         courseModel.pdfNum.toInt()]
-                                            //     : courseModel.pdfId,
                                             context,
                                           );
                                       print("isPDFDownloded:- $isPDFDownloded");

@@ -9,6 +9,7 @@ import 'package:islamic_online_learning/features/main/presentation/pages/aboutus
 import 'package:islamic_online_learning/features/main/presentation/pages/faq.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../downloadedFiles/presentation/pages/downloaded_files_page.dart';
 
@@ -243,8 +244,8 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                         guide = v;
                       });
                       final pref = await ref.read(sharedPrefProvider);
-                      pref.setString(
-                          PrefConsts.showGuide, v ? "true,true" : "false,false");
+                      pref.setString(PrefConsts.showGuide,
+                          v ? "true,true" : "false,false");
                     },
                   ),
                 ),
@@ -345,8 +346,12 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                 ),
                 child: ListTile(
                   onTap: () {
-                    Share.share(playStoreUrl,
-                        subject: "የዒልም ፈላጊ መተግበሪያን ለማግኘት 👇👇👇👇");
+                    SharePlus.instance.share(
+                      ShareParams(
+                        subject: "የዒልም ፈላጊ መተግበሪያን ለማግኘት 👇👇👇👇",
+                        uri: Uri.parse(playStoreUrl),
+                      ),
+                    );
                   },
                   leading: const Icon(Icons.share_rounded),
                   title: Text(
@@ -396,13 +401,18 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   ),
                 ),
                 child: ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (ctx) => const AboutUs(),
-                      ),
-                    );
+                  onTap: () async {
+                    try {
+                      await launchUrl(Uri.parse(aboutUsUrl));
+                    } catch (e) {
+                      toast("ስለ እኛን መክፈት አልተቻለም", ToastType.error, context);
+                    }
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (ctx) => const AboutUs(),
+                    //   ),
+                    // );
                   },
                   leading: const Icon(Icons.info_rounded),
                   title: Text(

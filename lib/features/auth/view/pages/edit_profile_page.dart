@@ -63,7 +63,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Profile"),
+        title: const Text("ፕሮፋይሎን መቀየሪያ"),
         centerTitle: true,
         elevation: 0,
       ),
@@ -144,7 +144,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                             color: Colors.white,
                           )
                         : const Text(
-                            "Save Changes",
+                            "መዝግብ",
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white,

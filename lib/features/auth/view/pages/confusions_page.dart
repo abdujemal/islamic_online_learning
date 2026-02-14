@@ -66,7 +66,7 @@ class _ConfusionsPageState extends ConsumerState<ConfusionsPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Confusion Message"),
+        title: const Text("የእርሶ ጥያቄዎች"),
         centerTitle: true,
         elevation: 0,
       ),

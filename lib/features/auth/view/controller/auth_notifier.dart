@@ -9,6 +9,7 @@ import 'package:islamic_online_learning/features/Questionaire/view/pages/questio
 import 'package:islamic_online_learning/features/auth/model/city.dart';
 import 'package:islamic_online_learning/features/auth/model/course_related_data.dart';
 import 'package:islamic_online_learning/features/auth/model/subscription.dart';
+import 'package:islamic_online_learning/features/auth/model/user.dart';
 import 'package:islamic_online_learning/features/auth/service/auth_service.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/register_page.dart';
@@ -16,6 +17,7 @@ import 'package:islamic_online_learning/features/curriculum/view/controller/Assi
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/main_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService authService;
@@ -32,6 +34,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await getScores(context);
       _checkIfTheCourseStarted(context);
       checkQuestionnaireAndDisplay(context);
+      showScoringRulesDialog(context);
       state = state.copyWith(isLoading: false, user: user);
     } on ConnectivityException catch (err) {
       state = state.copyWith(isLoading: false, error: err.toString());
@@ -186,7 +189,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     await deleteTokens();
-    await AuthService.googleSignIn.signOut();
+    // await AuthService.googleSignIn.signOut();
     ref.read(curriculumNotifierProvider.notifier).getCurriculums();
     final pref = await ref.read(sharedPrefProvider);
     final userId = pref.getString(PrefConsts.userId);
@@ -267,13 +270,165 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<int?> getUsersStreakNum() async {
+    try {
+      final streakNum = await authService.getUsersStreakNum();
+      state =
+          state.copyWith(user: state.user?.copyWith(numOfStreaks: streakNum));
+      return streakNum;
+    } catch (err) {
+      print("Error getting streak num: $err");
+      return 0;
+    }
+  }
+
   Future<List<City>> searchCities(String q, BuildContext context) async {
     try {
       return await authService.searchCities(q);
     } catch (err) {
       print(err);
-      toast("Error happened. please try again!", ToastType.error, context);
+      toast("Error happened. please try again!:$err", ToastType.error, context);
       return [];
+    }
+  }
+
+  Future<void> showScoringRulesDialog(BuildContext context,
+      {bool byForce = false}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accepted = prefs.getBool(PrefConsts.scoringRulesAcceptedKey) ?? false;
+    if (accepted && !byForce) return;
+    return showDialog(
+      context: context,
+      barrierDismissible: false, // user must acknowledge
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            'የእርስዎ ነጥብ እንዴት እንደሚሰላ',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ...state.scores?.map((score) {
+                      final attendancePoints = score.scoreSegments.where(
+                        (segment) => segment.name == "attendance",
+                      );
+                      final quizPoints = score.scoreSegments.where(
+                        (segment) => segment.name == "quiz",
+                      );
+                      final shortAnswerPoints = score.scoreSegments.where(
+                        (segment) => segment.name == "assignment",
+                      );
+                      final hasSegments = attendancePoints.isNotEmpty ||
+                          quizPoints.isNotEmpty ||
+                          shortAnswerPoints.isNotEmpty;
+                      final isDiscussion = score.type == "Discussion";
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          _SectionTitle(getScoreTitle(score.type)),
+                          if (attendancePoints.isNotEmpty)
+                            Text(
+                                '• ${attendancePoints.first.score} ነጥብ በ${isDiscussion ? "ሳምንታዊ ጥያቄዎች" : "ትምህርቱ"} ላይ ለመሳተፍዎ'),
+                          if (quizPoints.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                    '• እስከ ${quizPoints.first.score} ነጥብ ${isDiscussion ? "በሳምንቱ ውስጥ ለሳቱት ጥያቄዎች" : "ትምህርቱ ሲያልቅ ያሉ ጥያቄዎች"}'),
+                                Text(
+                                    '• የጥያቄዎቹ ነጥብ = (ትክክለኛው ጥያቄ ÷ ድምር) × ${quizPoints.first.score}'),
+                              ],
+                            ),
+
+                          if (shortAnswerPoints.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                    '• እስከ ${shortAnswerPoints.first.score} ነጥብ ለደረቅ ጥያቄዎች'),
+                                Text(
+                                    '• የደረቅ ጥያቄ ነጥብ = (ትክክለኛው ጥያቄ ÷ ድምር) × ${shortAnswerPoints.first.score}'),
+                              ],
+                            ),
+                          if (hasSegments)
+                            Text("• የአጠቃላይ ነጥብ = ${score.totalScore} ነጥብ"),
+                          if (!hasSegments)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text("• እስከ ${score.totalScore} ነጥብ ለወርሃዊ ፈተና"),
+                                Text('• በአብዛኛው 16 ጥያቄዎች'),
+                                Text('• የመጨረሻ ፈተና እስከ 30 ጥያቄዎች'),
+                                Text(
+                                    '• ፈተና ነጥብ = (ትክክለኛው ጥያቄ ÷ ድምር) × ${score.totalScore}'),
+                              ],
+                            ),
+                          // Text('  Rounded to the nearest whole number'),
+                          SizedBox(height: 10),
+                        ],
+                      );
+                    }) ??
+                    [],
+                // _SectionTitle('📆 Friday – Sunday (Weekly Score)'),
+                // Text('• 5 points for attending the weekly session'),
+                // Text('• 5 points for answering missed questions'),
+                // Text('• Up to 10 points for short-answer questions'),
+                // SizedBox(height: 12),
+                // _SectionTitle('🗓 Monthly Score (After 4 Weeks)'),
+                // Text('• Up to 40 points from the monthly exam'),
+                // Text('• Usually 16 questions'),
+                // Text('• Final exam may have up to 30 questions'),
+                // SizedBox(height: 12),
+                Text(
+                  'ማሳሳብያ፡ ሙሉ ደርሱን ሲጨርሱ ከግማሽ በታች ካመጡ ደርሱን ድጋሚ ለመማር ይገደዳሉ!',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+                Divider(),
+                Text(
+                  '• ምንም የተደበቁ ቅጣቶች የሉም።\n'
+                  '• ደንቦች ቋሚ እና ለሁሉም ተጠቃሚዎች የሚታዩ ናቸው።',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                await prefs.setBool(PrefConsts.scoringRulesAcceptedKey, true);
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: whiteColor,
+              ),
+              child: const Text('ተረድቻለሁ!'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String getScoreTitle(String type) {
+    switch (type) {
+      case "Lesson":
+        return '📆 ከሰኞ - ሃሙስ (የቀኑ ነጥብ)';
+      case "Discussion":
+        return "📆 አርብ - እሁድ (ሳምንታዊ ነጥብ)";
+      case "IndividualAssignment":
+        return "🗓 ወርሃዊ ነጥብ (ከ4 ሳምንት በኋላ)";
+      default:
+        return "";
     }
   }
 
@@ -282,7 +437,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (state.isDeleting) return;
       state = state.copyWith(isDeleting: true);
       await authService.deleteMyProfile();
-     ref.read(menuIndexProvider.notifier).update((state) => 0);
+      ref.read(menuIndexProvider.notifier).update((state) => 0);
       logout();
       Navigator.pushAndRemoveUntil(
         context,
@@ -294,8 +449,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(isDeleting: false);
     } catch (err) {
       print("Error deleting profile: $err");
-      toast("Error deleting profile", ToastType.error, context);
+      toast("Error deleting profile: $err", ToastType.error, context);
       state = state.copyWith(isDeleting: false);
     }
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+      ),
+    );
   }
 }

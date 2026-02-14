@@ -246,7 +246,7 @@ class _HijriStreakCalenderDialogState
                 ),
                 onPressed: () => Navigator.pop(context),
                 child: const Text(
-                  "Close",
+                  "ዝጋ",
                   style: TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold),
                 ),
