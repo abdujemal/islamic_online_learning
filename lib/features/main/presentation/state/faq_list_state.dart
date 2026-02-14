@@ -1,17 +1,26 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'package:islamic_online_learning/features/main/data/model/faq_model.dart';
 
-import '../../../../core/failure.dart';
+class FaqListState {
+  final bool isLoading;
+  final List<FAQModel> faqs;
+  final String? error;
 
-part 'faq_list_state.freezed.dart';
+  FaqListState({
+    this.isLoading = false,
+    this.faqs = const [],
+    this.error,
+  });
 
-@freezed
-class FAQListState with _$FAQListState {
-  const factory FAQListState.initial() = _Initial;
-  const factory FAQListState.loading() = _Loading;
-  const factory FAQListState.loaded({
-    required List<FAQModel> faqs,
-  }) = _Loaded;
-  const factory FAQListState.empty({required List<FAQModel> faqs}) = _Empty;
-  const factory FAQListState.error({required Failure error}) = _Error;
+  FaqListState copyWith({
+    bool? isLoading,
+    List<FAQModel>? faqs,
+    String? error,
+  }) {
+    return FaqListState(
+      isLoading: isLoading ?? this.isLoading,
+      faqs: faqs ?? this.faqs,
+      error: error,
+    );
+  }
 }

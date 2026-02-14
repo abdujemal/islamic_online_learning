@@ -76,12 +76,16 @@ class _AudioItemState extends ConsumerState<AudioItem> {
 
   Future<bool> checkFile() async {
     if (mounted) {
-      final isDownloaded = await ref
-          .read(cdNotifierProvider.notifier)
-          .isDownloaded(
-              "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3",
-              "Audio",
-              context);
+      final isDownloaded =
+          await ref.read(cdNotifierProvider.notifier).isDownloaded(
+                "${widget.courseModel.ustaz},${widget.title} ${widget.index}.mp3",
+                "Audio",
+                // widget.audioId,
+                context,
+                int.parse(
+                  widget.courseModel.audioSizes.split(",")[widget.index - 1],
+                ),
+              );
       return isDownloaded;
     }
     return false;
@@ -204,7 +208,7 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                           return;
                         }
                         final metaData =
-                            audioPlayer.sequenceState?.currentSource?.tag;
+                            audioPlayer.sequenceState.currentSource?.tag;
                         if (metaData != null) {
                           if ((metaData as MediaItem).extras?["isFinished"] ==
                               0) {
@@ -300,6 +304,13 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                   'Audio',
                                   cancelToken,
                                   context,
+                                  fileSize: widget.courseModel.audioSizes
+                                              .split(",")[widget.index - 1]
+                                              .trim() !=
+                                          ""
+                                      ? int.parse(widget.courseModel.audioSizes
+                                          .split(",")[widget.index - 1])
+                                      : 0,
                                 );
                             isDownloading = false;
                             if (file != null) {
@@ -371,6 +382,14 @@ class _AudioItemState extends ConsumerState<AudioItem> {
                                             'Audio',
                                             cancelToken,
                                             context,
+                                            fileSize: widget.courseModel.audioSizes
+                                                        .split(",")[widget.index - 1]
+                                                        .trim() !=
+                                                    ""
+                                                ? int.parse(widget.courseModel
+                                                    .audioSizes
+                                                    .split(",")[widget.index - 1])
+                                                : 0,
                                           );
                                       isDownloading = false;
                                       if (file != null) {

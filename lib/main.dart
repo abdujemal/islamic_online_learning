@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/Schedule%20Feature/schedule.dart';
 import 'package:islamic_online_learning/core/constants.dart';
@@ -17,17 +17,29 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
+  await dotenv.load();
+
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
-    androidNotificationOngoing: true,
-    androidNotificationIcon: 'mipmap/ic_launcher',
+    // androidNotificationOngoing: true,
+    androidStopForegroundOnPause: false,
+    androidNotificationIcon: 'mipmap/launcher_icon',
   );
   //await DatabaseHelper().initializeDatabase();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await Schedule().init();
+
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+SystemChrome.setSystemUIOverlayStyle(
+  SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark, // or Brightness.light
+  ),
+);
 
   runApp(
     const ProviderScope(
@@ -53,8 +65,6 @@ class Main extends ConsumerStatefulWidget {
 }
 
 class _MainState extends ConsumerState<Main> {
-  FirebaseDynamicLinks firebaseDynamicLink = FirebaseDynamicLinks.instance;
-
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
@@ -79,7 +89,7 @@ class _MainState extends ConsumerState<Main> {
                 primary: primaryColor,
                 background: Color.fromARGB(255, 51, 51, 51),
               ),
-              dialogTheme: const DialogTheme(
+              dialogTheme: const DialogThemeData(
                 backgroundColor: darkCardColor,
               ),
               cardColor: darkCardColor,
@@ -112,7 +122,7 @@ class _MainState extends ConsumerState<Main> {
             chipTheme: const ChipThemeData(
               backgroundColor: Color.fromARGB(255, 207, 207, 207),
             ),
-            dialogTheme: const DialogTheme(
+            dialogTheme: const DialogThemeData(
               backgroundColor: cardColor,
             ),
             cardColor: cardColor,
@@ -145,20 +155,22 @@ class _MainState extends ConsumerState<Main> {
               builder: (context, snap) {
                 if (snap.data == null) {
                   return Scaffold(
-                    body: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/logo.png',
-                            height: 100,
-                            width: 100,
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const CircularProgressIndicator()
-                        ],
+                    body: SafeArea(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/logo.png',
+                              height: 100,
+                              width: 100,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const CircularProgressIndicator()
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -202,19 +214,25 @@ Future<int?> getFileSize(String url) async {
 Future<bool> checkDb() async {
   Directory directory = await getApplicationSupportDirectory();
   String path = '${directory.path}$dbPath';
-  if (File(path).existsSync()) {
-    // print("file exists");
-    // print("local len: ${File(path).lengthSync()}");
-    // int? size = await getFileSize(databaseUrl);
-    // print(size);
-    // if (size == null) {
-    //   return false;
-    // }
+  return await verifyFileLength(
+    filePath: path,
+    expectedSize: 7360512,
+    aboveTheSize: true,
+    // url: databaseUrl,
+  );
+  // if (File(path).existsSync()) {
+  //   // print("file exists");
+  //   // print("local len: ${File(path).lengthSync()}");
+  //   // int? size = await getFileSize(databaseUrl);
+  //   // print(size);
+  //   // if (size == null) {
+  //   //   return false;
+  //   // }
 
-    return true; //size == File(path).lengthSync();
-  } else {
-    return false;
-  }
+  //   return true; //size == File(path).lengthSync();
+  // } else {
+  //   return false;
+  // }
 }
 
 class MyHttpOverrides extends HttpOverrides {

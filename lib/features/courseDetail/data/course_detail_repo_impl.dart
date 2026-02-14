@@ -18,10 +18,10 @@ class ICourseDetailRepo extends CourseDetailRepo {
 
   @override
   FutureEither<bool> checkIfTheFileIsDownloaded(
-      String fileName, String folderName) async {
+      String fileName, String folderName, int fileSize) async {
     try {
       final res = await courseDetailDataSrc.checkIfTheFileIsDownloaded(
-          fileName, folderName);
+          fileName, folderName, fileSize);
       return right(res);
     } catch (e) {
       return left(Failure(messege: e.toString()));
@@ -30,10 +30,16 @@ class ICourseDetailRepo extends CourseDetailRepo {
 
   @override
   FutureEither<File> downloadFile(String fileId, String fileName,
-      String folderName, CancelToken cancelToken, Ref ref) async {
+      String folderName, int fileSize, CancelToken cancelToken, Ref ref) async {
     try {
       final res = await courseDetailDataSrc.downloadFile(
-          fileId, fileName, folderName, cancelToken, ref);
+        fileId,
+        fileName,
+        folderName,
+        fileSize,
+        cancelToken,
+        ref,
+      );
       return right(res);
     } catch (e) {
       Directory dir = await getApplicationSupportDirectory();

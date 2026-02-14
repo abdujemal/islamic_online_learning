@@ -157,79 +157,93 @@ class _FilteredCoursesState extends ConsumerState<FilteredCourses> {
                       : const SizedBox(),
                 ),
               ),
-              body: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: ref.watch(mainNotifierProvider).map(
-                      initial: (_) => const SizedBox(),
-                      loading: (_) => ListView.builder(
-                        itemCount: 10,
-                        itemBuilder: (index, context) => const CourseShimmer(),
-                      ),
-                      loaded: (_) => RefreshIndicator(
-                        onRefresh: () async {
-                          await mainNotifier.getCourses(
-                            context: context,
-                            isNew: true,
-                            key: widget.keey,
-                            val: widget.value,
-                            method: widget.value == "ተፍሲር"
-                                ? SortingMethod.nameDSC
-                                : SortingMethod.dateDSC,
-                          );
-                        },
-                        color: primaryColor,
-                        child: Stack(
-                          children: [
-                            ListView.builder(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              padding: const EdgeInsets.only(bottom: 20),
-                              controller: scrollController,
-                              itemCount: _.courses.length + 1,
-                              itemBuilder: (context, index) {
-                                if (index <= _.courses.length - 1) {
-                                  return CourseItem(_.courses[index],
-                                      keey: widget.keey, val: widget.value);
-                                } else if (_.noMoreToLoad) {
-                                  return const TheEnd();
-                                } else {
-                                  return maxExt < _.courses.length
-                                      ? const CourseShimmer()
-                                      : const SizedBox();
-                                }
-                              },
-                            ),
-                            AnimatedPositioned(
-                              right: 5,
-                              bottom: showFloatingBtn ? 5 : -57,
-                              duration: const Duration(milliseconds: 500),
-                              child: Opacity(
-                                opacity: /*showFloatingBtn ?*/ 1.0 /*: 0.0*/,
-                                child: FloatingActionButton(
-                                  onPressed: () => scrollController
-                                      .animateTo(
-                                        0.0, // Scroll to the top
-                                        curve: Curves.easeOut,
-                                        duration:
-                                            const Duration(milliseconds: 500),
-                                      )
-                                      .then((value) => setState(() {})),
-                                  child: const Icon(
-                                    Icons.arrow_upward,
-                                    color: whiteColor,
+              body: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Builder(
+                    builder: (context) {
+                      final state = ref.watch(mainNotifierProvider);
+                      if (state.isLoading) {
+                        return ListView.builder(
+                          itemCount: 10,
+                          itemBuilder: (context, index) =>
+                              const CourseShimmer(),
+                        );
+                      } else if (!state.isLoading && state.courses.isNotEmpty) {
+                        final courses = state.courses;
+                        final noMoreToLoad = state.noMoreToLoad;
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            await mainNotifier.getCourses(
+                              context: context,
+                              isNew: true,
+                              key: widget.keey,
+                              val: widget.value,
+                              method: widget.value == "ተፍሲር"
+                                  ? SortingMethod.nameDSC
+                                  : SortingMethod.dateDSC,
+                            );
+                          },
+                          color: primaryColor,
+                          child: Stack(
+                            children: [
+                              ListView.builder(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 20),
+                                controller: scrollController,
+                                itemCount: courses.length + 1,
+                                itemBuilder: (context, index) {
+                                  if (index <= courses.length - 1) {
+                                    return CourseItem(courses[index],
+                                        keey: widget.keey, val: widget.value);
+                                  } else if (noMoreToLoad) {
+                                    return const TheEnd();
+                                  } else {
+                                    return maxExt < courses.length
+                                        ? const CourseShimmer()
+                                        : const SizedBox();
+                                  }
+                                },
+                              ),
+                              AnimatedPositioned(
+                                right: 5,
+                                bottom: showFloatingBtn ? 5 : -57,
+                                duration: const Duration(milliseconds: 500),
+                                child: Opacity(
+                                  opacity: /*showFloatingBtn ?*/ 1.0 /*: 0.0*/,
+                                  child: FloatingActionButton(
+                                    onPressed: () => scrollController
+                                        .animateTo(
+                                          0.0, // Scroll to the top
+                                          curve: Curves.easeOut,
+                                          duration:
+                                              const Duration(milliseconds: 500),
+                                        )
+                                        .then((value) => setState(() {})),
+                                    child: const Icon(
+                                      Icons.arrow_upward,
+                                      color: whiteColor,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      empty: (_) => const Center(
-                        child: Text("ምንም የለም"),
-                      ),
-                      error: (_) => Center(
-                        child: Text(_.error.messege),
-                      ),
-                    ),
+                            ],
+                          ),
+                        );
+                      } else if (!state.isLoading && state.courses.isEmpty) {
+                        return const Center(
+                          child: Text("ምንም የለም"),
+                        );
+                      } else if (!state.isLoading && state.error != null) {
+                        return Center(
+                          child: Text(state.error!),
+                        );
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
+                ),
               ),
             );
           }),

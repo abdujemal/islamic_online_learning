@@ -20,10 +20,11 @@ class CDNotifier extends StateNotifier<bool> {
     String folderName,
     CancelToken cancelToken,
     BuildContext context,
+    {int fileSize = 0}
   ) async {
     toast("ትንሽ ይጠብቁን...", ToastType.normal, context);
     final res = await courseDetailRepo.downloadFile(
-        fileId, fileName, folderName, cancelToken, ref);
+        fileId, fileName, folderName, fileSize, cancelToken, ref);
 
     File? file;
 
@@ -82,11 +83,14 @@ class CDNotifier extends StateNotifier<bool> {
     return url;
   }
 
-  Future<bool> isDownloaded(
-      String fileName, String folderName, BuildContext context) async {
+  Future<bool> isDownloaded(String fileName, String folderName, 
+      BuildContext context, [int fileSize = 0]) async {
     bool isAvailable = false;
-    final res =
-        await courseDetailRepo.checkIfTheFileIsDownloaded(fileName, folderName);
+    final res = await courseDetailRepo.checkIfTheFileIsDownloaded(
+      fileName,
+      folderName,
+      fileSize,
+    );
 
     res.fold(
       (l) {
@@ -137,6 +141,64 @@ class CDNotifier extends StateNotifier<bool> {
     );
 
     return url;
+  }
+
+  void downloadDone(CourseModel courseModel) {
+    // playListIndexes.add(index);
+    // playListIndexes.sort((a, b) => a.compareTo(b));
+    // if (mounted) {
+    //   ref
+    //       .read(loadAudiosProvider.notifier)
+    //       .update((state) => playListIndexes.length);
+    // }
+    // print("indexes: ${playListIndexes}");
+    // print("index : $index");
+
+    // if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
+    //   PlaylistHelper.mainPlayListIndexes = playListIndexes;
+    // }
+    // print("playListIndexes: $playListIndexes");
+    // print(
+    //     "PlaylistHelper.mainPlayListIndexes: ${PlaylistHelper.mainPlayListIndexes}");
+
+    // int insertableIndex = playListIndexes.indexOf(index);
+    // print("inserting at $insertableIndex");
+    // print('playlistNum: ${PlaylistHelper().playList.children.length}');
+
+    // final audioSrc = AudioSource.file(
+    //   filePath,
+    //   tag: MediaItem(
+    //     id: audios[index - 1],
+    //     title: "${courseModel.title} $index",
+    //     artist: courseModel.ustaz,
+    //     album: courseModel.category,
+    //     artUri: Uri.parse(courseModel.image),
+    //     extras: courseModel.toMap(),
+    //   ),
+    // );
+    // if (insertableIndex >= PlaylistHelper().playList.length) {
+    //   print("adding at $insertableIndex");
+    //   if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
+    //     PlaylistHelper().playList.add(audioSrc);
+    //   } else {
+    //     lst.add(audioSrc);
+    //   }
+    // } else {
+    //   print("inserting at $insertableIndex");
+
+    //   if (isPlayingCourseThisCourse(courseModel.courseId, ref)) {
+    //     PlaylistHelper().playList.insert(
+    //           insertableIndex,
+    //           audioSrc,
+    //         );
+    //   } else {
+    //     lst.insert(
+    //       insertableIndex,
+    //       audioSrc,
+    //     );
+    //   }
+    // }
+    // print("num of index: ${PlaylistHelper().playList.length}");
   }
 
   // playOffline(String audioPath, String title, CourseModel courseModel,

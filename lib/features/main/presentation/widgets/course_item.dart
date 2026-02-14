@@ -134,9 +134,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
 
   @override
   Widget build(BuildContext context) {
-    percentage = getPersentage(widget.courseModel).isNaN
+    percentage = getPercentage(widget.courseModel).isNaN
         ? 1
-        : getPersentage(widget.courseModel);
+        : getPercentage(widget.courseModel);
 
     // if (widget.courseModel.isFinished == 0 && percentage == 1) {
     //   ref.read(mainNotifierProvider.notifier).saveCourse(
@@ -183,37 +183,56 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                       children: [
                         Stack(
                           children: [
-                            Hero(
-                              tag: widget.courseModel.id!,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: CachedNetworkImage(
-                                  height: 80,
-                                  width: 80,
-                                  imageUrl: widget.courseModel.image,
-                                  fit: BoxFit.fill,
-                                  progressIndicatorBuilder:
-                                      (context, url, progress) {
-                                    return Shimmer.fromColors(
-                                      baseColor: Theme.of(context)
-                                          .chipTheme
-                                          .backgroundColor!
-                                          .withAlpha(150),
-                                      highlightColor: Theme.of(context)
-                                          .chipTheme
-                                          .backgroundColor!,
-                                      child: Container(
-                                        height: 80,
-                                        width: 80,
-                                        decoration: BoxDecoration(
-                                          color: whiteColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: CachedNetworkImage(
+                                height: 80,
+                                width: 80,
+                                imageUrl: widget.courseModel.image,
+                                fit: BoxFit.fill,
+                                errorWidget: (context, url, error) => Container(
+                                  decoration: BoxDecoration(
+                                    color: whiteColor,
+                                    image: DecorationImage(
+                                      image: AssetImage('assets/bg1.png'),
+                                      fit: BoxFit.fill,
+                                      opacity: 0.6,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2),
+                                      child: Text(
+                                        widget.courseModel.title,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.black
                                         ),
                                       ),
-                                    );
-                                  },
+                                    ),
+                                  ),
                                 ),
+                                progressIndicatorBuilder:
+                                    (context, url, progress) {
+                                  return Shimmer.fromColors(
+                                    baseColor: Theme.of(context)
+                                        .chipTheme
+                                        .backgroundColor!
+                                        .withAlpha(150),
+                                    highlightColor: Theme.of(context)
+                                        .chipTheme
+                                        .backgroundColor!,
+                                    child: Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        color: whiteColor,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                             Container(
@@ -252,6 +271,9 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                     PlaylistHelper().playList;
                                                 final audioPlayer =
                                                     PlaylistHelper.audioPlayer;
+                                                PlaylistHelper
+                                                        .mainPlayListIndexes =
+                                                    playListIndexes;
 
                                                 if (!playListIndexes.contains(
                                                     courseModel
@@ -288,7 +310,7 @@ class _CourseItemState extends ConsumerState<CourseItem> {
                                                       "pausedAtAudioNum: $playableIndex");
                                                   await PlaylistHelper
                                                       .audioPlayer
-                                                      .setAudioSource(
+                                                      .setAudioSources(
                                                     playList,
                                                     initialIndex: courseModel
                                                                 .pausedAtAudioNum <

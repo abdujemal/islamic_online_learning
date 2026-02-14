@@ -7,9 +7,9 @@ import 'package:islamic_online_learning/features/main/data/model/course_model.da
 
 abstract class CourseDetailRepo {
   FutureEither<File> downloadFile(String fileId, String fileName,
-      String folderName, CancelToken cancelToken, Ref ref);
+      String folderName, int fileSize, CancelToken cancelToken, Ref ref);
   FutureEither<bool> checkIfTheFileIsDownloaded(
-      String fileName, String folderName);
+      String fileName, String folderName, int fileSize);
   FutureEither<String> loadFileOnline(String fileId, bool isAudio);
   FutureEither<bool> deleteFile(String fileName, String folderName);
   FutureEither<String> createDynamicLink(CourseModel courseModel);

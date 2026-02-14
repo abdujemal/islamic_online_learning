@@ -199,7 +199,11 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     ref.read(loadAudiosProvider.notifier).update((state) => 0);
     for (String id in audios) {
       i++;
-      if (await checkFile(i)) {
+      if (await checkFile(
+          i,
+          courseModel.audioSizes.split(",")[i - 1].trim() != ""
+              ? int.parse(courseModel.audioSizes.split(",")[i - 1])
+              : 0)) {
         String fileName = "${courseModel.ustaz},${courseModel.title} $i.mp3";
 
         if (mounted) {
@@ -234,12 +238,12 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     }
   }
 
-  Future<bool> checkFile(int index) async {
+  Future<bool> checkFile(int index, int fileSize) async {
     if (mounted) {
       final isDownloaded = await ref
           .read(cdNotifierProvider.notifier)
           .isDownloaded("${courseModel.ustaz},${courseModel.title} $index.mp3",
-              "Audio", context);
+              "Audio", context, fileSize);
       return isDownloaded;
     }
     return false;
@@ -292,8 +296,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     final audioPlayer = PlaylistHelper.audioPlayer;
 
     percentage =
-        getPersentage(courseModel).isNaN ? 1 : getPersentage(courseModel);
-
+        getPercentage(courseModel).isNaN ? 1 : getPercentage(courseModel);
     return PopScope(
       canPop: !show,
       child: StreamBuilder(
@@ -339,7 +342,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
               courseModel.courseId,
               () {
                 print("playListIndexes: $playListIndexes");
-                print("playlist: ${PlaylistHelper().playList.children}");
+                print("playlist: ${PlaylistHelper().playList}");
                 print("index: ${audioPlayer.currentIndex}");
                 print(
                     'saveable index ${playListIndexes[audioPlayer.currentIndex != null ? audioPlayer.currentIndex! : 0] - 1}');
@@ -459,7 +462,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
 
                                   print("inserting at $insertableIndex");
                                   print(
-                                      'playlistNum: ${PlaylistHelper().playList.children.length}');
+                                      'playlistNum: ${PlaylistHelper().playList.length}');
 
                                   final audioSrc = AudioSource.file(
                                     filePath,
@@ -543,6 +546,35 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       MediaQuery.of(context).size.height * 0.40,
                                   width: MediaQuery.of(context).size.width,
                                   fit: BoxFit.fill,
+                                  errorWidget: (context, url, error) => Stack(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: whiteColor,
+                                          image: DecorationImage(
+                                            image: AssetImage('assets/bg1.png'),
+                                            fit: BoxFit.fill,
+                                            opacity: 0.6,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned.fill(
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2),
+                                            child: Text(
+                                              courseModel.title,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 17,
+                                                color: Colors.black
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -662,7 +694,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                                 "playListIndexes: $playListIndexes");
                                             print(
                                                 "pausedAtAudioNum: $playableIndex");
-                                            await audioPlayer.setAudioSource(
+                                            await audioPlayer.setAudioSources(
                                               PlaylistHelper().playList,
                                               initialIndex:
                                                   courseModel.pausedAtAudioNum <
@@ -994,7 +1026,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                       playListIndexes.indexOf(index);
                                   print("inserting at $insertableIndex");
                                   print(
-                                      'playlistNum: ${PlaylistHelper().playList.children.length}');
+                                      'playlistNum: ${PlaylistHelper().playList.length}');
 
                                   final audioSrc = AudioSource.file(
                                     filePath,
@@ -1102,9 +1134,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                         courseModel.courseId, ref)) {
                                       // PlaylistHelper().playList.clear();
                                       // PlaylistHelper().playList.addAll(lst);
-                                      PlaylistHelper.nplayList =
-                                          ConcatenatingAudioSource(
-                                              children: lst);
+                                      PlaylistHelper.nplayList = lst;
                                       PlaylistHelper.mainPlayListIndexes =
                                           playListIndexes;
                                     }
@@ -1115,7 +1145,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                     print(
                                         "playingIndex: ${playListIndexes.indexOf(index)}");
 
-                                    PlaylistHelper.audioPlayer.setAudioSource(
+                                    PlaylistHelper.audioPlayer.setAudioSources(
                                       PlaylistHelper().playList,
                                       initialIndex: PlaylistHelper
                                           .mainPlayListIndexes
@@ -1247,8 +1277,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                   // PlaylistHelper().playList.clear();
                                   print(lst.length);
 
-                                  PlaylistHelper.nplayList =
-                                      ConcatenatingAudioSource(children: lst);
+                                  PlaylistHelper.nplayList = lst;
                                   PlaylistHelper.mainPlayListIndexes =
                                       playListIndexes;
                                 }
@@ -1257,7 +1286,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                                 print(
                                     "playListNum: ${PlaylistHelper().playList.length}");
 
-                                PlaylistHelper.audioPlayer.setAudioSource(
+                                PlaylistHelper.audioPlayer.setAudioSources(
                                   PlaylistHelper().playList,
                                   initialIndex: PlaylistHelper
                                       .mainPlayListIndexes

@@ -4,10 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/aboutus.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/faq.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../downloadedFiles/presentation/pages/downloaded_files_page.dart';
 
@@ -32,14 +34,14 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
     super.initState();
     if (mounted) {
       ref.read(sharedPrefProvider).then((pref) {
-        bool isSubed = pref.getBool("isSubed") ?? true;
+        bool isSubed = pref.getBool(PrefConsts.isSubed) ?? true;
         setState(() {
           notification = isSubed;
         });
       });
 
       ref.read(sharedPrefProvider).then((pref) {
-        bool show = pref.getString("showGuide") == "true,true";
+        bool show = pref.getString(PrefConsts.showGuide) == "true,true";
 
         setState(() {
           guide = show;
@@ -47,7 +49,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
       });
 
       ref.read(sharedPrefProvider).then((pref) {
-        bool? show = pref.getBool("showBeginner");
+        bool? show = pref.getBool(PrefConsts.showBeginner);
         print(show);
         ref.read(showBeginnerProvider.notifier).update((state) => show ?? true);
         setState(() {
@@ -209,7 +211,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                             .read(fontScaleProvider.notifier)
                             .update((state) => v);
                         final pref = await ref.read(sharedPrefProvider);
-                        pref.setDouble('fontScale', v);
+                        pref.setDouble(PrefConsts.fontScale, v);
                       },
                     ),
                   );
@@ -242,8 +244,8 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                         guide = v;
                       });
                       final pref = await ref.read(sharedPrefProvider);
-                      pref.setString(
-                          "showGuide", v ? "true,true" : "false,false");
+                      pref.setString(PrefConsts.showGuide,
+                          v ? "true,true" : "false,false");
                     },
                   ),
                 ),
@@ -278,7 +280,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                           .update((state) => v);
 
                       final pref = await ref.read(sharedPrefProvider);
-                      pref.setBool("showBeginner", v);
+                      pref.setBool(PrefConsts.showBeginner, v);
                     },
                   ),
                 ),
@@ -310,7 +312,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                         notification = v;
                       });
                       final pref = await ref.read(sharedPrefProvider);
-                      pref.setBool("isSubed", v);
+                      pref.setBool(PrefConsts.isSubed, v);
                       if (v) {
                         AwesomeNotifications()
                             .isNotificationAllowed()
@@ -344,8 +346,12 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                 ),
                 child: ListTile(
                   onTap: () {
-                    Share.share(playStoreUrl,
-                        subject: "የዒልም ፈላጊ መተግበሪያን ለማግኘት 👇👇👇👇");
+                    SharePlus.instance.share(
+                      ShareParams(
+                        subject: "የዒልም ፈላጊ መተግበሪያን ለማግኘት 👇👇👇👇",
+                        uri: Uri.parse(playStoreUrl),
+                      ),
+                    );
                   },
                   leading: const Icon(Icons.share_rounded),
                   title: Text(
@@ -395,13 +401,18 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   ),
                 ),
                 child: ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (ctx) => const AboutUs(),
-                      ),
-                    );
+                  onTap: () async {
+                    try {
+                      await launchUrl(Uri.parse(aboutUsUrl));
+                    } catch (e) {
+                      toast("ስለ እኛን መክፈት አልተቻለም", ToastType.error, context);
+                    }
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (ctx) => const AboutUs(),
+                    //   ),
+                    // );
                   },
                   leading: const Icon(Icons.info_rounded),
                   title: Text(

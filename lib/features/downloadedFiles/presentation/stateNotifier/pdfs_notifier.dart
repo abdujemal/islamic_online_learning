@@ -10,22 +10,18 @@ class PdfsNotifier extends StateNotifier<PdfsState> {
   final DFRepo dfRepo;
   PdfsNotifier(
     this.dfRepo,
-  ) : super(const PdfsState.initial());
+  ) : super(PdfsState());
 
   getPdfs() async {
-    state = const PdfsState.loading();
+    state = state.copyWith(isLoading: true);
     final res = await dfRepo.getPdfs();
 
     res.fold(
       (l) {
-        state = PdfsState.error(error: l);
+        state = state.copyWith(isLoading: false, error: l.messege);
       },
       (r) {
-        if (r.isEmpty) {
-          state = PdfsState.empty(pdfs: r);
-          return;
-        }
-        state = PdfsState.loaded(pdfs: r);
+        state = state.copyWith(isLoading: false, pdf: r);
       },
     );
   }

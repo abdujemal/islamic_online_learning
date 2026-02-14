@@ -107,6 +107,13 @@ class DatabaseHelper {
     }
   }
 
+  Future<int> getRowCount(String tableName) async {
+    final db = await database;
+    final result = await db!.rawQuery('SELECT COUNT(*) FROM $tableName');
+    int count = Sqflite.firstIntValue(result) ?? 0;
+    return count;
+  }
+
   Future<int> countColumnsInTable(String table) async {
     final db = await database;
 

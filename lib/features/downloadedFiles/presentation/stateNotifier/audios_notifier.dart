@@ -12,23 +12,18 @@ class AudiosNotifier extends StateNotifier<AudiosState> {
   final DFRepo dfRepo;
   AudiosNotifier(
     this.dfRepo,
-  ) : super(const AudiosState.initial());
+  ) : super(AudiosState());
 
   getAudios() async {
-    state = const AudiosState.loading();
+    state = state.copyWith(isLoading: true);
     final res = await dfRepo.getAudios();
 
     res.fold(
       (l) {
-        state = AudiosState.error(error: l);
+        state = state.copyWith(isLoading: false, error: l.messege);
       },
       (r) {
-        if (r.isEmpty) {
-          state = AudiosState.empty(audios: r);
-          return;
-        }
-
-        state = AudiosState.loaded(audios: r);
+        state = state.copyWith(isLoading: false, audios: r);
       },
     );
   }

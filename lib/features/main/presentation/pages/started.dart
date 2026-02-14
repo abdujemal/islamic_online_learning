@@ -47,52 +47,59 @@ class _StartedState extends ConsumerState<Started>
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: ref.watch(startedNotifierProvider).map(
-            initial: (_) => const SizedBox(),
-            loading: (_) => ListView.builder(
-              itemCount: 10,
-              itemBuilder: (index, context) => const CourseShimmer(),
-            ),
-            loaded: (_) => RefreshIndicator(
-              onRefresh: () async {
-                await ref.read(startedNotifierProvider.notifier).getCouses();
-              },
-              color: primaryColor,
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 20),
-                itemCount: _.courses.length,
-                itemBuilder: (context, index) {
-                  return CourseItem(
-                    _.courses[index],
-                    fromHome: false,
-                    keey: null,
-                    val: null,
-                  );
-                },
-              ),
-            ),
-            empty: (_) => Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("ምንም የለም"),
-                IconButton(
-                  onPressed: () async {
-                    await ref
-                        .read(startedNotifierProvider.notifier)
-                        .getCouses();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("የተጀመሩ ደርሶች"),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: ref.watch(startedNotifierProvider).map(
+                // initial: (_) => const SizedBox(),
+                loading: (_) => ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (index, context) => const CourseShimmer(),
+                ),
+                loaded: (_) => RefreshIndicator(
+                  onRefresh: () async {
+                    await ref.read(startedNotifierProvider.notifier).getCouses();
                   },
-                  icon: const Icon(Icons.refresh_rounded),
-                )
-              ],
-            ),
-            error: (_) => Center(
-              child: Text(_.error.messege),
-            ),
-          ),
+                  color: primaryColor,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 20),
+                    itemCount: _.courses.length,
+                    itemBuilder: (context, index) {
+                      return CourseItem(
+                        _.courses[index],
+                        fromHome: false,
+                        keey: null,
+                        val: null,
+                      );
+                    },
+                  ),
+                ),
+                empty: (_) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("ምንም የለም"),
+                    IconButton(
+                      onPressed: () async {
+                        await ref
+                            .read(startedNotifierProvider.notifier)
+                            .getCouses();
+                      },
+                      icon: const Icon(Icons.refresh_rounded),
+                    )
+                  ],
+                ),
+                error: (_) => Center(
+                  child: Text(_.error ?? ""),
+                ),
+              ),
+        ),
+      ),
     );
   }
 

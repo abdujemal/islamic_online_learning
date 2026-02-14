@@ -9,24 +9,19 @@ import '../../../../core/constants.dart';
 class FavListNotifier extends StateNotifier<FavListState> {
   final MainRepo mainRepo;
   final Ref ref;
-  FavListNotifier(this.mainRepo, this.ref)
-      : super(const FavListState.initial());
+  FavListNotifier(this.mainRepo, this.ref) : super(FavListState());
 
   getCourse() async {
-    state = const FavListState.loading();
+    state = state.copyWith(isLoading: true);
 
     final res = await mainRepo.getFavoriteCourses();
 
     res.fold(
       (l) {
-        state = FavListState.error(error: l);
+        state = state.copyWith(isLoading: false, error: l.messege);
       },
       (r) {
-        if (r.isEmpty) {
-          state = FavListState.empty(courses: r);
-        } else {
-          state = FavListState.loaded(courses: r);
-        }
+        state = state.copyWith(isLoading: false, courses: r);
       },
     );
   }

@@ -15,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "289944837560-u6l4jla2ah18o0tkms7lf8ooahljsf8k.apps.googleusercontent.com",
+          "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -28,15 +28,45 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "289944837560-u6l4jla2ah18o0tkms7lf8ooahljsf8k.apps.googleusercontent.com",
+              "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
               "client_type": 3
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289944837560:android:880afe85a3998b73be834d",
+        "android_client_info": {
+          "package_name": "com.aj.islamic_online_learning_dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "289944837560-8u9cm76g1g4d6h187a59ral1n9jvovva.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aj.islamic_online_learning_dev",
+            "certificate_hash": "cdea4213ebb23ba51b5162c8ceead98c40066cb2"
+          }
+        },
+        {
+          "client_id": "289944837560-8u9cm76g1g4d6h187a59ral1n9jvovva.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiA2vITeod4WsEGK_pO1bWQPl_Vwa5vAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
             {
-              "client_id": "289944837560-3nkucggcju4jdrqkh1sokks2mg2t02pv.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.aj.islamiclearnings"
-              }
+              "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+              "client_type": 3
             }
           ]
         }
@@ -59,7 +89,7 @@
           }
         },
         {
-          "client_id": "289944837560-u6l4jla2ah18o0tkms7lf8ooahljsf8k.apps.googleusercontent.com",
+          "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -72,15 +102,37 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "289944837560-u6l4jla2ah18o0tkms7lf8ooahljsf8k.apps.googleusercontent.com",
+              "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
               "client_type": 3
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289944837560:android:b7b1c652b858f89cbe834d",
+        "android_client_info": {
+          "package_name": "com.example.ders_admin2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiA2vITeod4WsEGK_pO1bWQPl_Vwa5vAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
             {
-              "client_id": "289944837560-3nkucggcju4jdrqkh1sokks2mg2t02pv.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.aj.islamiclearnings"
-              }
+              "client_id": "289944837560-0fsfmsnd49f19o4fdbr1iu1n3hpsbn5a.apps.googleusercontent.com",
+              "client_type": 3
             }
           ]
         }

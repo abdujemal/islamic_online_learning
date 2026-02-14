@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/database_helper.dart';
 import 'model/course_model.dart';
@@ -24,10 +23,8 @@ abstract class MainDataSrc {
 }
 
 class IMainDataSrc extends MainDataSrc {
-  final FirebaseFirestore firebaseFirestore;
-
   int page = 1;
-  IMainDataSrc(this.firebaseFirestore);
+  IMainDataSrc();
 
   int? lastCourseIndex;
 
@@ -93,9 +90,9 @@ class IMainDataSrc extends MainDataSrc {
           (page - 1) * numOfDoc,
         );
 
-        final categories = await DatabaseHelper().getCategories();
-        final ustazs = await DatabaseHelper().getUstazs();
-        final contents = await DatabaseHelper().getContent();
+        List<String> categories = await DatabaseHelper().getCategories();
+        List<String> ustazs = await DatabaseHelper().getUstazs();
+        List<String> contents = await DatabaseHelper().getContent();
 
         // final qs = await firebaseFirestore
         //     .collection(FirebaseConst.courses)
@@ -115,21 +112,26 @@ class IMainDataSrc extends MainDataSrc {
         if (courses.isNotEmpty) {
           for (var d in courses) {
             if (d["audioSizes"] != null) {
+              print("categories: ${categories.length}");
               if (!categories.contains(d['category'])) {
-                print('adding cateogry ${d['category']} from ${d['title']} be ${d['ustaz']}');
+                print(
+                    'adding cateogry ${d['category']} from ${d['title']} be ${d['ustaz']}');
                 await DatabaseHelper().insertCategory(d['category']);
+                categories.add(d['category']);
               }
 
               if (!ustazs.contains(d['ustaz'])) {
                 print('adding ustaz');
 
                 await DatabaseHelper().insertUstaz(d['ustaz']);
+                ustazs.add(d['ustaz']);
               }
 
               if (!contents.contains(d['title'])) {
                 print('adding title');
 
                 await DatabaseHelper().insertContent(d['title']);
+                contents.add(d['title']);
               }
 
               final id =
@@ -165,7 +167,6 @@ class IMainDataSrc extends MainDataSrc {
     }
 
     // await Future.delayed(const Duration(seconds: 2));
-
     final res = await DatabaseHelper()
         .getCouses(key, val, method, (page - 1) * numOfDoc);
     // if (res.isNotEmpty) {
@@ -291,28 +292,7 @@ class IMainDataSrc extends MainDataSrc {
     List<FAQModel> faqdata = await DatabaseHelper().getFaqs();
 
     try {
-      final aq =
-          await firebaseFirestore.collection(FirebaseConst.faq).count().get();
-      if (aq.count != null && faqdata.length < aq.count!) {
-        print("get data from cloud");
-        final qs = await firebaseFirestore.collection(FirebaseConst.faq).get();
-        for (var d in qs.docs) {
-          final id =
-              await DatabaseHelper().isFAQAvailable(d.data()['question']);
-          if (id != null) {
-            await DatabaseHelper().updateFaq(FAQModel(
-                id: id,
-                question: d.data()['question'],
-                answer: d.data()['answer']));
-          } else {
-            await DatabaseHelper().insertFaq(FAQModel(
-                id: null,
-                question: d.data()['question'],
-                answer: d.data()['answer']));
-          }
-        }
-        faqdata = await DatabaseHelper().getFaqs();
-      }
+      faqdata = await DatabaseHelper().getFaqs();
     } catch (e) {
       print(e);
     }

@@ -1,18 +1,25 @@
 import 'dart:io';
 
-import 'package:freezed_annotation/freezed_annotation.dart';
+class AudiosState {
+  final bool isLoading;
+  final List<File> audios;
+  final String? error;
 
-import '../../../../core/failure.dart';
+  AudiosState({
+    this.isLoading = false,
+    this.audios = const [],
+    this.error,
+  });
 
-part 'audios_state.freezed.dart';
-
-@freezed
-class AudiosState with _$AudiosState {
-  const factory AudiosState.initial() = _Initial;
-  const factory AudiosState.loading() = _Loading;
-  const factory AudiosState.loaded({
-    required List<File> audios,
-  }) = _Loaded;
-  const factory AudiosState.empty({required List<File> audios}) = _Empty;
-  const factory AudiosState.error({required Failure error}) = _Error;
+  AudiosState copyWith({
+    bool? isLoading,
+    List<File>? audios,
+    String? error,
+  }) {
+    return AudiosState(
+      isLoading: isLoading ?? this.isLoading,
+      audios: audios ?? this.audios,
+      error: error,
+    );
+  }
 }

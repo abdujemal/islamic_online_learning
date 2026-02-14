@@ -41,38 +41,39 @@ class _ContentsState extends ConsumerState<Contents> {
     final audioPlayer = PlaylistHelper.audioPlayer;
 
     return StreamBuilder(
-        stream: myAudioStream(audioPlayer),
-        builder: (context, snap) {
-          final state = snap.data?.sequenceState;
-          final processState = snap.data?.processingState;
+      stream: myAudioStream(audioPlayer),
+      builder: (context, snap) {
+        final state = snap.data?.sequenceState;
+        final processState = snap.data?.processingState;
 
-          if (state?.sequence.isEmpty ?? true) {
-            showTopAudio = false;
-          }
+        if (state?.sequence.isEmpty ?? true) {
+          showTopAudio = false;
+        }
 
-          MediaItem? metaData = state?.currentSource?.tag;
+        MediaItem? metaData = state?.currentSource?.tag;
 
-          if (metaData != null) {
-            showTopAudio = true;
-          }
+        if (metaData != null) {
+          showTopAudio = true;
+        }
 
-          if (processState == ProcessingState.idle) {
-            showTopAudio = false;
-          }
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("ማውጫ"),
-              bottom: PreferredSize(
-                preferredSize: Size(
-                  MediaQuery.of(context).size.width,
-                  showTopAudio ? 40 : 0,
-                ),
-                child: showTopAudio
-                    ? CurrentAudioView(metaData as MediaItem)
-                    : const SizedBox(),
+        if (processState == ProcessingState.idle) {
+          showTopAudio = false;
+        }
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("ማውጫ"),
+            bottom: PreferredSize(
+              preferredSize: Size(
+                MediaQuery.of(context).size.width,
+                showTopAudio ? 40 : 0,
               ),
+              child: showTopAudio
+                  ? CurrentAudioView(metaData as MediaItem)
+                  : const SizedBox(),
             ),
-            body: isLoading
+          ),
+          body: SafeArea(
+            child: isLoading
                 ? ListView.builder(
                     itemCount: 5,
                     scrollDirection: Axis.vertical,
@@ -145,7 +146,9 @@ class _ContentsState extends ConsumerState<Contents> {
                       );
                     },
                   ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }

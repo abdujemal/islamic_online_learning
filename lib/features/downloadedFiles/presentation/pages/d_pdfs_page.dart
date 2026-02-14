@@ -66,64 +66,134 @@ class _DPdfsPageState extends ConsumerState<DPdfsPage> {
           color: whiteColor,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: ref.watch(pdfsNotifierProvider).map(
-              initial: (_) => const SizedBox(),
-              loading: (_) => ListView.builder(
-                itemCount: 10,
-                itemBuilder: (index, context) => const CourseShimmer(),
-              ),
-              loaded: (_) => RefreshIndicator(
-                onRefresh: () async {
-                  await ref.read(pdfsNotifierProvider.notifier).getPdfs();
-                },
-                color: primaryColor,
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 100),
-                  itemCount: _.pdfs.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: const Icon(
-                        Icons.menu_book_rounded,
-                        size: 30,
-                      ),
-                      title: Text(getTitle(_.pdfs[index].path)),
-                      subtitle:
-                          Text(formatFileSize(_.pdfs[index].lengthSync())),
-                      trailing: IconButton(
-                        icon: const Icon(
-                          Icons.delete_rounded,
-                          color: Colors.red,
-                        ),
-                        onPressed: () async {
-                          await _.pdfs[index].delete();
-                          pdfsNotifier.getPdfs();
-                        },
-                      ),
-                    );
+      body: SafeArea(
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Builder(builder: (context) {
+              final state = ref.watch(pdfsNotifierProvider);
+              if (state.isLoading) {
+                return ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (index, context) => const CourseShimmer(),
+                );
+              } else if (!state.isLoading && state.error != null) {
+                return Center(
+                  child: Text(state.error!),
+                );
+              } else if (!state.isLoading && state.pdf.isNotEmpty) {
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await ref.read(pdfsNotifierProvider.notifier).getPdfs();
                   },
-                ),
-              ),
-              empty: (_) => Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("ምንም የለም"),
-                    IconButton(
-                      onPressed: () async {
-                        await ref.read(pdfsNotifierProvider.notifier).getPdfs();
-                      },
-                      icon: const Icon(Icons.refresh_rounded),
-                    )
-                  ],
-                ),
-              ),
-              error: (_) => Center(
-                child: Text(_.error.messege),
-              ),
+                  color: primaryColor,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 100),
+                    itemCount: state.pdf.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: const Icon(
+                          Icons.menu_book_rounded,
+                          size: 30,
+                        ),
+                        title: Text(getTitle(state.pdf[index].path)),
+                        subtitle:
+                            Text(formatFileSize(state.pdf[index].lengthSync())),
+                        trailing: IconButton(
+                          icon: const Icon(
+                            Icons.delete_rounded,
+                            color: Colors.red,
+                          ),
+                          onPressed: () async {
+                            await state.pdf[index].delete();
+                            pdfsNotifier.getPdfs();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                );
+              } else if (!state.isLoading && state.pdf.isEmpty) {
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("ምንም የለም"),
+                      IconButton(
+                        onPressed: () async {
+                          await ref
+                              .read(pdfsNotifierProvider.notifier)
+                              .getPdfs();
+                        },
+                        icon: const Icon(Icons.refresh_rounded),
+                      )
+                    ],
+                  ),
+                );
+              } else {
+                return SizedBox();
+              }
+            })
+    
+            // ref.watch(pdfsNotifierProvider).map(
+            //       initial: (_) => const SizedBox(),
+            // loading: (_) => ListView.builder(
+            //   itemCount: 10,
+            //   itemBuilder: (index, context) => const CourseShimmer(),
+            // ),
+            // loaded: (_) => RefreshIndicator(
+            //   onRefresh: () async {
+            //     await ref.read(pdfsNotifierProvider.notifier).getPdfs();
+            //   },
+            //   color: primaryColor,
+            //   child: ListView.builder(
+            //     physics: const AlwaysScrollableScrollPhysics(),
+            //     padding: const EdgeInsets.only(bottom: 100),
+            //     itemCount: state.pdf.length,
+            //     itemBuilder: (context, index) {
+            //       return ListTile(
+            //         leading: const Icon(
+            //           Icons.menu_book_rounded,
+            //           size: 30,
+            //         ),
+            //         title: Text(getTitle(_.pdfs[index].path)),
+            //         subtitle:
+            //             Text(formatFileSize(_.pdfs[index].lengthSync())),
+            //         trailing: IconButton(
+            //           icon: const Icon(
+            //             Icons.delete_rounded,
+            //             color: Colors.red,
+            //           ),
+            //           onPressed: () async {
+            //             await _.pdfs[index].delete();
+            //             pdfsNotifier.getPdfs();
+            //           },
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
+            // empty: (_) => Center(
+            //   child: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.center,
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       const Text("ምንም የለም"),
+            //       IconButton(
+            //         onPressed: () async {
+            //           await ref.read(pdfsNotifierProvider.notifier).getPdfs();
+            //         },
+            //         icon: const Icon(Icons.refresh_rounded),
+            //       )
+            //     ],
+            //   ),
+            // ),
+            // error: (_) => Center(
+            //   child: Text(_.error.messege),
+            // ),
+            //     ),
+    
             ),
       ),
     );

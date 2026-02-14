@@ -57,7 +57,8 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
     ref.read(loadAudiosProvider.notifier).update((state) => 0);
     for (String id in audios) {
       i++;
-      if (await checkFile(i)) {
+      if (await checkFile(
+          i, int.parse(courseModel.audioSizes.split(",")[i - 1]))) {
         String fileName = "${courseModel.ustaz},${courseModel.title} $i.mp3";
 
         if (mounted) {
@@ -102,14 +103,18 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
     return "${dir.path}/$folderName/$fileName";
   }
 
-  Future<bool> checkFile(int index) async {
+  Future<bool> checkFile(int index, int size) async {
     if (mounted) {
-      final isDownloaded = await ref
-          .read(cdNotifierProvider.notifier)
-          .isDownloaded(
-              "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
-              "Audio",
-              context);
+      final isDownloaded =
+          await ref.read(cdNotifierProvider.notifier).isDownloaded(
+                "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3",
+                "Audio",
+                // widget.courseModel.courseIds[index-1],
+                context,
+                size,
+              );
+      print(
+          "${widget.courseModel.ustaz},${widget.courseModel.title} $index.mp3 => $isDownloaded");
       return isDownloaded;
     }
     return false;
@@ -117,9 +122,9 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
 
   @override
   Widget build(BuildContext context) {
-    percentage = getPersentage(widget.courseModel).isNaN
+    percentage = getPercentage(widget.courseModel).isNaN
         ? 1
-        : getPersentage(widget.courseModel);
+        : getPercentage(widget.courseModel);
 
     return Padding(
       padding: const EdgeInsets.only(
@@ -187,6 +192,8 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                   final playList = PlaylistHelper().playList;
                                   final audioPlayer =
                                       PlaylistHelper.audioPlayer;
+                                  PlaylistHelper.mainPlayListIndexes =
+                                      playListIndexes;
 
                                   if (!playListIndexes.contains(
                                       courseModel.pausedAtAudioNum + 1)) {
@@ -199,7 +206,6 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                     }
                                     return;
                                   }
-                                  print("len: ${playList.length}");
                                   if (!isPlayingCourseThisCourse(
                                       courseModel.courseId, ref)) {
                                     PlaylistHelper().playList.clear();
@@ -211,7 +217,7 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                                     print("playListIndexes: $playListIndexes");
                                     print("pausedAtAudioNum: $playableIndex");
                                     await PlaylistHelper.audioPlayer
-                                        .setAudioSource(
+                                        .setAudioSources(
                                       playList,
                                       initialIndex:
                                           courseModel.pausedAtAudioNum < 0
@@ -301,6 +307,17 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                           )
                         : null,
               ),
+              Positioned(
+                  top: 29,
+                  left: 2,
+                  child: widget.courseModel.isStarted == 1 &&
+                          widget.courseModel.isScheduleOn == 1
+                      ? Icon(
+                          Icons.notifications_active,
+                          color: whiteColor,
+                          size: 20,
+                        )
+                      : const SizedBox()),
               Positioned.fill(
                 child: Align(
                   alignment: Alignment.bottomCenter,
@@ -315,78 +332,39 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                             bottom: Radius.circular(15),
                           ),
                         ),
-                        child: widget.courseModel.isStarted == 1
-                            ? Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "${(percentage * 100).toStringAsFixed(1)}%",
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: whiteColor,
-                                      ),
-                                    ),
-                                    Text(
-                                      widget.courseModel.ustaz
-                                          .replaceAll("ኡስታዝ", "ኡ")
-                                          .replaceAll("ሸይኽ", "ሸ"),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: whiteColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    widget.courseModel.ustaz
-                                        .replaceAll("ኡስታዝ", "ኡ")
-                                        .replaceAll("ሸይኽ", "ሸ"),
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: whiteColor,
-                                    ),
-                                  ),
-                                  // Row(
-                                  //   mainAxisAlignment: MainAxisAlignment.center,
-                                  //   children: [
-                                  //     const Icon(
-                                  //       Icons.music_note_rounded,
-                                  //       color: whiteColor,
-                                  //       size: 19,
-                                  //     ),
-                                  //     Text(
-                                  //       "${widget.courseModel.noOfRecord}",
-                                  //       style: const TextStyle(
-                                  //         color: whiteColor,
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                ],
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.courseModel.ustaz
+                                  .replaceAll("ኡስታዝ", "ኡ")
+                                  .replaceAll("ሸይኽ", "ሸ"),
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: whiteColor,
                               ),
+                            ),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.center,
+                            //   children: [
+                            //     const Icon(
+                            //       Icons.music_note_rounded,
+                            //       color: whiteColor,
+                            //       size: 19,
+                            //     ),
+                            //     Text(
+                            //       "${widget.courseModel.noOfRecord}",
+                            //       style: const TextStyle(
+                            //         color: whiteColor,
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                          ],
+                        ),
                       ),
-                      widget.courseModel.isStarted == 1 &&
-                              widget.courseModel.isScheduleOn == 1
-                          ? const Positioned(
-                              right: 0,
-                              child: Icon(
-                                Icons.notifications_active,
-                                size: 20,
-                              ),
-                            )
-                          : const SizedBox()
                     ],
                   ),
                 ),

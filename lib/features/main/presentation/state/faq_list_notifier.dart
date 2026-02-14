@@ -2,25 +2,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/features/main/domain/main_repo.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/faq_list_state.dart';
 
-class FaqListNotifier extends StateNotifier<FAQListState> {
+class FaqListNotifier extends StateNotifier<FaqListState> {
   MainRepo mainRepo;
-  FaqListNotifier(this.mainRepo) : super(const FAQListState.initial());
+  FaqListNotifier(this.mainRepo) : super(FaqListState());
 
   getFAQs() async {
-    state = const FAQListState.loading();
-
+    state = state.copyWith(isLoading: true);
     final res = await mainRepo.getFAQ();
 
     res.fold(
       (l) {
-        state = FAQListState.error(error: l);
+        state = state.copyWith(isLoading: false, error: l.messege);
       },
       (r) {
-        if (r.isEmpty) {
-          state = FAQListState.empty(faqs: r);
-        } else {
-          state = FAQListState.loaded(faqs: r);
-        }
+        state = state.copyWith(isLoading: false, faqs: r);
       },
     );
   }

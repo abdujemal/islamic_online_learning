@@ -1,17 +1,44 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/material.dart';
 
-import '../../../../core/failure.dart';
+class CategoryListState {
+  final bool isLoading;
+  final List<String> categories;
+  final String? error;
 
-part 'category_list_state.freezed.dart';
+  CategoryListState({
+    this.isLoading = false,
+    this.categories = const [],
+    this.error,
+  });
 
-@freezed
-class CategoryListState with _$CategoryListState {
-  const factory CategoryListState.initial() = _Initial;
-  const factory CategoryListState.loading() = _Loading;
-  const factory CategoryListState.loaded({
-    required List<String> categories,
-  }) = _Loaded;
-  const factory CategoryListState.empty({required List<String> courses}) =
-      _Empty;
-  const factory CategoryListState.error({required Failure error}) = _Error;
+  Widget map({
+    required Widget Function(CategoryListState _) loading,
+    required Widget Function(CategoryListState _) loaded,
+    required Widget Function(CategoryListState _) empty,
+    required Widget Function(CategoryListState _) error,
+  }) {
+    if (isLoading) {
+      return loading(this);
+    } else if (!isLoading && this.error != null) {
+      return error(this);
+    } else if (!isLoading && categories.isNotEmpty) {
+      return loaded(this);
+    } else if (!isLoading && categories.isEmpty) {
+      return empty(this);
+    } else {
+      return SizedBox();
+    }
+  }
+
+  CategoryListState copyWith({
+    bool? isLoading,
+    List<String>? categories,
+    String? error,
+  }) {
+    return CategoryListState(
+      isLoading: isLoading ?? this.isLoading,
+      categories: categories ?? this.categories,
+      error: error,
+    );
+  }
 }

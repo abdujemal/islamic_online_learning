@@ -10,6 +10,7 @@
       "**/*.g.dart": true,
       "**/.gitkeep": false
     },
-    "explorerExclude.backup": null
+    "explorerExclude.backup": null,
+    "cmake.sourceDirectory": "/home/aj/Flutter Projects/islamic_online_learning/linux"
   }
   

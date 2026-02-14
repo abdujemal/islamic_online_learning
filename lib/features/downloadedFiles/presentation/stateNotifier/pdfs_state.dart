@@ -1,19 +1,25 @@
 import 'dart:io';
 
-import 'package:freezed_annotation/freezed_annotation.dart';
+class PdfsState {
+  final bool isLoading;
+  final List<File> pdf;
+  final String? error;
 
-import '../../../../core/failure.dart';
+  PdfsState({
+    this.isLoading = false,
+    this.pdf = const [],
+    this.error,
+  });
 
-part 'pdfs_state.freezed.dart';
-
-@freezed
-class PdfsState with _$PdfsState {
-  const factory PdfsState.initial() = _Initial;
-  const factory PdfsState.loading() = _Loading;
-  const factory PdfsState.loaded({
-    required List<File> pdfs,
-  }) = _Loaded;
-  const factory PdfsState.empty({required List<File> pdfs}) =
-      _Empty;
-  const factory PdfsState.error({required Failure error}) = _Error;
+  PdfsState copyWith({
+    bool? isLoading,
+    List<File>? pdf,
+    String? error,
+  }) {
+    return PdfsState(
+      isLoading: isLoading ?? this.isLoading,
+      pdf: pdf ?? this.pdf,
+      error: error,
+    );
+  }
 }

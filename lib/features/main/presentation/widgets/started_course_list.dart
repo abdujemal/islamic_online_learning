@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/started.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/started_course_card.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -27,10 +28,10 @@ class _StartedCourseListState extends ConsumerState<StartedCourseList> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: ref.watch(startedNotifierProvider).map(
-            initial: (_) => SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: 177,
-            ),
+            // initial: (_) => SizedBox(
+            //   width: MediaQuery.of(context).size.width,
+            //   height: 177,
+            // ),
             loading: (_) => SizedBox(
               width: MediaQuery.of(context).size.width,
               height: 177,
@@ -89,9 +90,13 @@ class _StartedCourseListState extends ConsumerState<StartedCourseList> {
                           return Center(
                             child: TextButton(
                               onPressed: () {
-                                ref
-                                    .read(menuIndexProvider.notifier)
-                                    .update((state) => 2);
+                                // ref
+                                //     .read(menuIndexProvider.notifier)
+                                //     .update((state) => 2);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => Started()));
                               },
                               child: const Text(
                                 "ሁሉንም አሳይ",
@@ -111,7 +116,7 @@ class _StartedCourseListState extends ConsumerState<StartedCourseList> {
             },
             empty: (_) => const SizedBox(),
             error: (_) => Center(
-              child: Text(_.error.messege),
+              child: Text(_.error ?? ""),
             ),
           ),
     );

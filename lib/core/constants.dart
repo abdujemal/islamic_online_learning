@@ -1,6 +1,9 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:islamic_online_learning/core/Audio%20Feature/playlist_helper.dart';
 import 'package:islamic_online_learning/features/main/data/model/course_model.dart';
 import 'package:just_audio/just_audio.dart';
@@ -13,16 +16,83 @@ const String databaseUrl =
 const String dbPath = "/Islamic Online Learning/db/myDB.db";
 const String serverUrl = "https://ilmfelagi.com/api";
 
+//main apis
+const String privacyPolicyUrl = "https://ilmfelagi-pro-backend.onrender.com";
+const String aboutUsUrl = "https://www.ilmfelagi.com/about";
+const String mainUrl = "https://ilmfelagi-pro-backend.onrender.com";
+const String baseUrl = "$mainUrl/api/v1";
+//livekit token generater
+const String LIVEKIT_URL = "wss://islamic-lms-w13mlg50.livekit.cloud";
+// const String LIVEKIT_URL = "wss://livekit.ilmfelagi.com";
+const String TOKEN_ENDPOINT = "$baseUrl/discussions/livekit/token";
+//sub apis
+//curriculums
+const String curriculumsApi = "$baseUrl/curriculums/all";
+const String getCurriculumApi = "$baseUrl/curriculums";
+const String lessonsApi = "$baseUrl/curriculums/:courseId/lessons";
+const String getQuizzesApi = "$baseUrl/curriculums/{lessonId}/quizzes";
+//prerequisite test
+const String getPrerequisiteTestApi =
+    "$baseUrl/custom-tests/prerequisite/{level}";
+//confusions
+const String confusionsApi = "$baseUrl/confusions";
+//discussions
+const String discussionsApi = "$baseUrl/discussions";
+const String callAdminsApi = "$discussionsApi/callAdmin";
+const String discussionQuizzesApi = "$discussionsApi/quizzes";
+const String discussionQuestionsApi = "$discussionsApi/questions";
+const String submitDiscussionTasksApi = "$discussionsApi/submit";
+//tests
+const String getTestQuestionApi = "$baseUrl/tests";
+const String getGivenTimeApi = "$baseUrl/tests/givenTime";
+const String getCheckTestApi = "$baseUrl/tests/checkTest";
+const String addTestAttemptApi = "$baseUrl/tests/start";
+const String submitTestApi = "$baseUrl/tests/submit";
+//quizAttempts
+const String quizAttemptsApi = "$baseUrl/quizAttempts";
+const String submitQuizApi = "$baseUrl/quizAttempts/submit";
+//streaks
+const String addStreakApi = "$baseUrl/streaks";
+const String getStreaksApi = "$baseUrl/streaks/{year}/{month}";
+//auth
+const String refreshTokenApi = "$baseUrl/auth/otp/refresh-token";
+const String requestOtpApi = "$baseUrl/auth/otp";
+const String googleAuthApi = "$baseUrl/auth/google";
+const String verifyOtpApi = "$baseUrl/auth/otp/verify";
+const String similarGroupsApi = "$baseUrl/auth/user/groups";
+const String registerApi = "$baseUrl/auth/user";
+const String getMyInfoApi = "$baseUrl/auth/user/me";
+const String updateMyInfoApi = "$baseUrl/auth/user/me";
+const String deleteMyAccountApi = "$baseUrl/auth/user/me";
+const String getMyCourseInfoApi = "$baseUrl/auth/user/courseData";
+const String getScoresApi = "$baseUrl/auth/user/scores";
+const String getStreakNumApi = "$baseUrl/auth/user/streak";
+const String getMyCertificateApi = "$baseUrl/auth/user/certificates";
+//payments
+const String paymentProvidersApi = "$baseUrl/payments/providers";
+//chats
+const String chatsApi = "$baseUrl/chats";
+//notifications
+const String notificationsApi = "$baseUrl/notifications";
+const String readNotificationsApi = "$baseUrl/notifications/readAll";
+
+///payments
+const String paymentPricesApi = "$baseUrl/payments/prices";
+const String paymentApi = "$baseUrl/payments";
+const String paymentStatusApi = "$baseUrl/payments/status";
+
+//questinnaire
+const String getActiveQuestionnaireApi = "$baseUrl/questionnaires";
+const String submitQuestionnaireApi = "$baseUrl/questionnaires/submit";
+//feedback
+const String submitFeedbackApi = "$baseUrl/feedback/submit";
+
 const String hivePath = "/Islamic Online Learning/db/MyNoteBook";
 
 const int numOfDoc = 20;
 
 const String playStoreUrl =
-    "https://play.google.com/store/apps/details?id=com.aj.islamic_online_learning";
-
-const Color cardColor = Color(0xfffcffea);
-
-const Color darkCardColor = Color(0xff3f3f3d);
+    "https://play.google.com/store/apps/details?id=com.aj.islamic_online_learning_dev";
 
 const primaryColor = MaterialColor(
   0xFF2FA887,
@@ -39,36 +109,42 @@ const primaryColor = MaterialColor(
     900: Color(0xFF0F3D2B),
   },
 );
+const Color cardColor = Color(0xfffcffea);
+
+const Color darkCardColor = Color(0xff3f3f3d);
 
 void toast(String message, ToastType toastType, BuildContext context,
     {bool isLong = false}) {
-  // final snackbar = SnackBar(
-  //   content: Text(
-  //     message,
-  //     style: const TextStyle(color: whiteColor),
-  //   ),
-  //   duration: Duration(seconds: isLong ? 5 : 1),
-  //   backgroundColor: toastType == ToastType.error
-  //       ? Colors.red
-  //       : toastType == ToastType.success
-  //           ? primaryColor
-  //           : Colors.black,
-  // );
+  if (context.mounted) {
+    final snackbar = SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(color: whiteColor),
+      ),
+      dismissDirection: DismissDirection.down,
+      duration: Duration(milliseconds: isLong ? 4000 : 1200),
+      backgroundColor: toastType == ToastType.error
+          ? Colors.red
+          : toastType == ToastType.success
+              ? primaryColor
+              : Colors.black,
+    );
 
-  // // Show the snackbar
-  // ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  Fluttertoast.showToast(
-    msg: message,
-    toastLength: isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,
-    gravity: ToastGravity.BOTTOM,
-    backgroundColor: toastType == ToastType.error
-        ? Colors.red
-        : toastType == ToastType.success
-            ? Colors.green
-            : null,
-    textColor: Colors.white,
-    fontSize: 16.0,
-  );
+    // // Show the snackbar
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    // Fluttertoast.showToast(
+    //   msg: message,
+    //   toastLength: isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,
+    //   gravity: ToastGravity.BOTTOM,
+    //   backgroundColor: toastType == ToastType.error
+    //       ? Colors.red
+    //       : toastType == ToastType.success
+    //           ? Colors.green
+    //           : null,
+    //   textColor: Colors.white,
+    //   fontSize: 16.0,
+    // );
+  }
 }
 
 enum ToastType { success, error, normal }
@@ -132,7 +208,7 @@ TargetFocus getTutorial({
   );
 }
 
-double getPersentage(CourseModel courseModel) {
+double getPercentage(CourseModel courseModel) {
   // double percentage =
   //     (courseModel.pausedAtAudioNum + 1) / courseModel.noOfRecord;
   int numOfAudio = courseModel.courseIds.split(",").length;
@@ -146,28 +222,28 @@ double getPersentage(CourseModel courseModel) {
   return percnt > 1 ? 1 : percnt;
 }
 
-String formatFileSize(int sizeInBytes) {
+String formatFileSize(int sizeInBytes, {int toFixed = 2}) {
   if (sizeInBytes < 1024) {
     return '$sizeInBytes B';
   } else if (sizeInBytes < 1024 * 1024) {
     double sizeInKB = sizeInBytes / 1024;
-    return '${sizeInKB.toStringAsFixed(2)} KB';
+    return '${sizeInKB.toStringAsFixed(toFixed)} KB';
   } else if (sizeInBytes < 1024 * 1024 * 1024) {
     double sizeInMB = sizeInBytes / (1024 * 1024);
-    return '${sizeInMB.toStringAsFixed(2)} MB';
+    return '${sizeInMB.toStringAsFixed(toFixed)} MB';
   } else if (sizeInBytes < 1024 * 1024 * 1024 * 1024) {
     double sizeInGB = sizeInBytes / (1024 * 1024 * 1024);
-    return '${sizeInGB.toStringAsFixed(2)} GB';
+    return '${sizeInGB.toStringAsFixed(toFixed)} GB';
   } else {
     double sizeInTB = sizeInBytes / (1024 * 1024 * 1024 * 1024);
-    return '${sizeInTB.toStringAsFixed(2)} TB';
+    return '${sizeInTB.toStringAsFixed(toFixed)} TB';
   }
 }
 
 bool isPlayingCourseThisCourse(String courseId, WidgetRef refp,
     {bool alsoIsNotIdle = false}) {
   final audioPlayer = PlaylistHelper.audioPlayer;
-  final metaData = audioPlayer.sequenceState?.currentSource?.tag;
+  final metaData = audioPlayer.sequenceState.currentSource?.tag;
   if (metaData == null) {
     print('!isPlayingCourseThisCourse');
     return false;
@@ -188,4 +264,144 @@ bool isPlayingCourseThisCourse(String courseId, WidgetRef refp,
   print('!isPlayingCourseThisCourse');
 
   return false;
+}
+
+void printMap(Map<String, dynamic> map) {
+  print("{");
+  for (var kv in map.entries) {
+    print("${kv.key}: ${kv.value}");
+  }
+  print("}");
+}
+
+String emailBlopper(String email) {
+  final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
+  if (emailRegex.hasMatch(email)) {
+    final firstSegment = email.split(".").first.substring(0, 6);
+    final middleSegment =
+        List.generate(email.split(".").first.substring(5).length, (i) => "*")
+            .join("");
+
+    return "$firstSegment$middleSegment.${email.split(".").last}";
+  } else {
+    return email;
+  }
+}
+
+String formatTime(int seconds) {
+  final minutes = seconds ~/ 60;
+  final secs = seconds % 60;
+  return "${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}";
+}
+
+Future<bool> verifyFileLength({
+  // required String url,
+  required int expectedSize,
+  required String filePath,
+  bool aboveTheSize = false,
+}) async {
+  try {
+    final file = File(filePath);
+
+    if (!await file.exists()) return false;
+
+    if(expectedSize == 0) return true;
+
+    // Step 4: Validate file size
+    final actualSize = await file.length();
+
+    return aboveTheSize
+        ? actualSize >= expectedSize
+        : actualSize == expectedSize;
+  } catch (e) {
+    print("Error equating file length: $e");
+    return false;
+  }
+}
+
+Future<void> resumableDownload({
+  required String url,
+  required String savePath,
+  required CancelToken cancelToken,
+  required void Function(int received, int total) onProgress,
+  required Future<void> Function() onDone,
+  required Future<void> Function(Object error) onError, // <-- onError added
+}) async {
+  final dio = Dio();
+
+  // Allow SSL bypass if needed
+  (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+      (client) {
+    client.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+    return client;
+  };
+
+  try {
+    final file = File(savePath);
+
+    // Get already downloaded size
+    int downloadedBytes = 0;
+
+    if (await file.exists()) {
+      downloadedBytes = await file.length();
+    } else {
+      await file.create(recursive: true);
+    }
+
+    // Ask server for full size
+    final head = await dio.head(url);
+    final fullSize = int.tryParse(head.headers.value('content-length') ?? "0");
+
+    if (fullSize == null || fullSize == 0) {
+      throw Exception("Could not determine file size from server.");
+    }
+
+    // Already fully downloaded?
+    if (downloadedBytes == fullSize) {
+      await onDone();
+      return;
+    }
+
+    // Open file for appending
+    final raf = file.openSync(mode: FileMode.append);
+
+    // Stream download from last byte
+    final response = await dio.get<ResponseBody>(
+      url,
+      options: Options(
+        responseType: ResponseType.stream,
+        headers: {
+          'Range': 'bytes=$downloadedBytes-',
+        },
+      ),
+      cancelToken: cancelToken,
+    );
+
+    int received = downloadedBytes;
+
+    // Stream chunks
+    await for (var chunk in response.data!.stream) {
+      if (cancelToken.isCancelled) {
+        await raf.close();
+        return;
+      }
+
+      raf.writeFromSync(chunk);
+      received += chunk.length;
+
+      onProgress(received, fullSize);
+    }
+
+    await raf.close();
+
+    // Finished
+    if (received >= fullSize) {
+      await onDone();
+    }
+  } catch (e) {
+    await onError(e); // <--- call your onError callback
+    print("Download error: $e");
+  }
 }

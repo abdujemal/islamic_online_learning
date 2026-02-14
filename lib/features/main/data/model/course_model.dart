@@ -139,13 +139,16 @@ class CourseModel extends CourseEntity {
     };
   }
 
-  factory CourseModel.fromMap(Map map, String id, {CourseModel? copyFrom}) {
+  factory CourseModel.fromMap(Map map, String id,
+      {CourseModel? copyFrom, bool urlIsList = false}) {
     return CourseModel(
       courseId: id,
       id: map['id'] ?? (copyFrom?.id),
       author: map['author'] as String,
       category: map['category'] as String,
-      courseIds: map['courseIds'] as String,
+      courseIds: urlIsList
+          ? (map['courseIds'] as List<String>).join(",")
+          : map['courseIds'] as String,
       audioSizes: map['audioSizes'] ??
           List.generate(map['courseIds'].toString().split(",").length,
               (index) => index).join(","),
@@ -174,7 +177,7 @@ class CourseModel extends CourseEntity {
       pdfPage: map['pdfPage'] ?? (copyFrom != null ? copyFrom.pdfPage : 0.0),
       pdfNum: map['pdfNum'] ?? (copyFrom != null ? copyFrom.pdfNum : 1),
       image: map['image'],
-      totalDuration: map["totalDuration"] ?? 0,   
+      totalDuration: map["totalDuration"] ?? 0,
       isCompleted: map['isCompleted'] ?? 1,
       isBeginner: map['isBeginner'] == true || map['isBeginner'] == 1 ? 1 : 0,
     );

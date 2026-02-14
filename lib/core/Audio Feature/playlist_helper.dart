@@ -2,7 +2,7 @@ import 'package:just_audio/just_audio.dart';
 
 class PlaylistHelper {
   static PlaylistHelper? _playlistHelper;
-  static ConcatenatingAudioSource? nplayList;
+  static List<AudioSource>? nplayList;
   static AudioPlayer audioPlayer = AudioPlayer();
   static List<int> mainPlayListIndexes = []; 
 
@@ -12,11 +12,11 @@ class PlaylistHelper {
     return _playlistHelper!;
   }
 
-  ConcatenatingAudioSource initializeDatabase() {
-    return ConcatenatingAudioSource(children: []);
+  List<AudioSource> initializeDatabase() {
+    return [];
   }
 
-  ConcatenatingAudioSource get playList {
+  List<AudioSource> get playList {
     nplayList ??= initializeDatabase();
     return nplayList!;
   }

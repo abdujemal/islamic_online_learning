@@ -88,96 +88,107 @@ class _FAQState extends ConsumerState<FAQ> {
                     : const SizedBox(),
               ),
             ),
-            body: Padding(
+            body: SafeArea(
+              child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: ref.watch(faqNotifierProvider).map(
-                    initial: (_) => const SizedBox(),
-                    loading: (_) => ListView.builder(
-                      itemCount: 10,
-                      itemBuilder: (context, index) => Shimmer.fromColors(
-                        baseColor: Theme.of(context)
-                            .chipTheme
-                            .backgroundColor!
-                            .withAlpha(150),
-                        highlightColor:
-                            Theme.of(context).chipTheme.backgroundColor!,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 15.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    height: 10,
-                                    width: 150,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    height: 10,
-                                    width: 100,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                height: 30,
-                                width: 30,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ],
+              child: Builder(
+                builder: (context) {
+                final state = ref.watch(faqNotifierProvider);
+                if (state.isLoading) {
+                  return ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (context, index) => Shimmer.fromColors(
+                    baseColor: Theme.of(context)
+                      .chipTheme
+                      .backgroundColor!
+                      .withAlpha(150),
+                    highlightColor:
+                      Theme.of(context).chipTheme.backgroundColor!,
+                    child: Padding(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                        Container(
+                          height: 10,
+                          width: 150,
+                          decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                      ),
-                    ),
-                    loaded: (_) => RefreshIndicator(
-                      onRefresh: () async {
-                        await ref.read(faqNotifierProvider.notifier).getFAQs();
-                      },
-                      color: primaryColor,
-                      child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 0),
-                        itemCount: _.faqs.length,
-                        itemBuilder: (context, index) {
-                          return FaqItem(faqModel: _.faqs[index]);
-                        },
-                      ),
-                    ),
-                    empty: (_) => Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("እባክዎ ኢንተርኔት አብርተው ድጋሚ ይሞክሩ።"),
-                          IconButton(
-                            onPressed: () async {
-                              await ref
-                                  .read(faqNotifierProvider.notifier)
-                                  .getFAQs();
-                            },
-                            icon: const Icon(Icons.refresh_rounded),
-                          )
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          height: 10,
+                          width: 100,
+                          decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
                         ],
                       ),
+                      Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        shape: BoxShape.circle,
+                        ),
+                      ),
+                      ],
                     ),
-                    error: (_) => Center(
-                      child: Text(_.error.messege),
                     ),
                   ),
+                  );
+                } else if (!state.isLoading && state.faqs.isNotEmpty) {
+                  return RefreshIndicator(
+                  onRefresh: () async {
+                    await ref.read(faqNotifierProvider.notifier).getFAQs();
+                  },
+                  color: primaryColor,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 0),
+                    itemCount: state.faqs.length,
+                    itemBuilder: (context, index) {
+                    return FaqItem(faqModel: state.faqs[index]);
+                    },
+                  ),
+                  );
+                } else if (!state.isLoading && state.faqs.isEmpty) {
+                  return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                    const Text("እባክዎ ኢንተርኔት አብርተው ድጋሚ ይሞክሩ።"),
+                    IconButton(
+                      onPressed: () async {
+                      await ref
+                        .read(faqNotifierProvider.notifier)
+                        .getFAQs();
+                      },
+                      icon: const Icon(Icons.refresh_rounded),
+                    )
+                    ],
+                  ),
+                  );
+                } else if (!state.isLoading && state.error != null) {
+                  return Center(
+                  child: Text(state.error!),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+                },
+              ),
+              ),
             ),
           );
         });

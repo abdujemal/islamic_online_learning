@@ -71,78 +71,90 @@ class _DAudiosPageState extends ConsumerState<DAudiosPage> {
           color: whiteColor,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: ref.watch(audiosNotifierProvider).map(
-              initial: (_) => const SizedBox(),
-              loading: (_) => ListView.builder(
-                itemCount: 10,
-                itemBuilder: (index, context) => const CourseShimmer(),
-              ),
-              loaded: (_) => RefreshIndicator(
-                onRefresh: () async {
-                  await ref.read(audiosNotifierProvider.notifier).getAudios();
-                },
-                color: primaryColor,
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 100),
-                  itemCount: _.audios.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: SizedBox(
-                        height: 60,
-                        width: 60,
-                        child: Column(
-                          children: [
-                            const Icon(
-                              Icons.music_note_rounded,
-                              size: 30,
-                            ),
-                            Text(
-                              formatFileSize(_.audios[index].lengthSync()),
-                              style: const TextStyle(fontSize: 13),
-                            )
-                          ],
-                        ),
-                      ),
-                      title: Text(getTitle(_.audios[index].path)),
-                      subtitle: Text(getUstaz(_.audios[index].path)),
-                      trailing: IconButton(
-                        icon: const Icon(
-                          Icons.delete_rounded,
-                          color: Colors.red,
-                        ),
-                        onPressed: () async {
-                          await _.audios[index].delete();
-                          audiosNotifier.getAudios();
-                        },
-                      ),
-                    );
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Builder(
+            builder: (context) {
+              final state = ref.watch(audiosNotifierProvider);
+              // Replace 'AudiosInitial' with the correct initial state class name if it was renamed, e.g. 'AudiosStateInitial'
+             if (state.isLoading) {
+                return ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (context, index) => const CourseShimmer(),
+                );
+              } else if (!state.isLoading && state.audios.isNotEmpty) {
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await ref.read(audiosNotifierProvider.notifier).getAudios();
                   },
-                ),
-              ),
-              empty: (_) => Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("ምንም የለም"),
-                    IconButton(
-                      onPressed: () async {
-                        await ref
-                            .read(audiosNotifierProvider.notifier)
-                            .getAudios();
-                      },
-                      icon: const Icon(Icons.refresh_rounded),
-                    )
-                  ],
-                ),
-              ),
-              error: (_) => Center(
-                child: Text(_.error.messege),
-              ),
-            ),
+                  color: primaryColor,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 100),
+                    itemCount: state.audios.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.music_note_rounded,
+                                size: 30,
+                              ),
+                              Text(
+                                formatFileSize(state.audios[index].lengthSync()),
+                                style: const TextStyle(fontSize: 13),
+                              )
+                            ],
+                          ),
+                        ),
+                        title: Text(getTitle(state.audios[index].path)),
+                        subtitle: Text(getUstaz(state.audios[index].path)),
+                        trailing: IconButton(
+                          icon: const Icon(
+                            Icons.delete_rounded,
+                            color: Colors.red,
+                          ),
+                          onPressed: () async {
+                            await state.audios[index].delete();
+                            audiosNotifier.getAudios();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                );
+              } else if (!state.isLoading && state.audios.isEmpty) {
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("ምንም የለም"),
+                      IconButton(
+                        onPressed: () async {
+                          await ref
+                              .read(audiosNotifierProvider.notifier)
+                              .getAudios();
+                        },
+                        icon: const Icon(Icons.refresh_rounded),
+                      )
+                    ],
+                  ),
+                );
+              } else if (!state.isLoading && state.error != null) {
+                return Center(
+                  child: Text(state.error!),
+                );
+              } else {
+                return const SizedBox();
+              }
+            },
+          ),
+        ),
       ),
     );
   }
