@@ -14,7 +14,7 @@ enum CourseStarted {
 }
 
 class AuthState {
-  final bool isLoading, isUpdating, initial, isSigningWGoogle, tokenIsNull, isDeleting;
+  final bool isLoading, isUpdating, initial, isSigningWGoogle, tokenIsNull, isDeleting, isDue;
   final User? user;
   final CourseStarted courseStarted;
   final CourseRelatedData? courseRelatedData;
@@ -25,6 +25,7 @@ class AuthState {
     this.isLoading = false,
     this.isUpdating = false,
     this.initial = true,
+    this.isDue = false,
     this.courseStarted = CourseStarted.INITIAL,
     this.tokenIsNull = true,
     this.isSigningWGoogle = false,
@@ -59,6 +60,7 @@ class AuthState {
     bool? isLoading,
     bool? isUpdating,
     bool? isDeleting,
+    bool? isDue,
     CourseStarted? courseStarted,
     bool? tokenIsNull,
     bool? isSigningWGoogle,
@@ -69,6 +71,7 @@ class AuthState {
   }) {
     return AuthState(
       initial: false,
+      isDue: isDue ?? this.isDue,
       courseStarted: courseStarted ?? this.courseStarted,
       isLoading: isLoading ?? this.isLoading,
       isUpdating: isUpdating ?? this.isUpdating,

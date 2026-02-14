@@ -326,7 +326,8 @@ class _MainPageState extends ConsumerState<MainPage>
     final audioPlayer = PlaylistHelper.audioPlayer;
     final curriculumState = ref.watch(assignedCoursesNotifierProvider);
     final isDue =
-        ref.watch(authNotifierProvider).user?.subscription.isDue() ?? false;
+        ref.watch(authNotifierProvider).isDue;
+        print("isDue: $isDue");
     return WillPopScope(
       onWillPop: () async {
         if (_tabController.index != 0) {

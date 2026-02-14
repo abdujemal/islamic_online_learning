@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'package:islamic_online_learning/features/auth/model/group.dart';
-import 'package:islamic_online_learning/features/auth/model/subscription.dart';
+// import 'package:islamic_online_learning/features/auth/model/subscription.dart';
 
 class User {
   final String id;
@@ -16,7 +16,7 @@ class User {
   final int numOfStreaks;
   final List<String> previousLearning;
   final Group group;
-  final Subscription subscription;
+  // final Subscription subscription;
   User({
     required this.id,
     required this.name,
@@ -27,7 +27,7 @@ class User {
     required this.numOfStreaks,
     required this.previousLearning,
     required this.group,
-    required this.subscription,
+    // required this.subscription,
   });
 
   User copyWith({
@@ -40,7 +40,7 @@ class User {
     int? numOfStreaks,
     List<String>? previousLearning,
     Group? group,
-    Subscription? subscription,
+    // Subscription? subscription,
   }) {
     return User(
         id: id ?? this.id,
@@ -51,8 +51,10 @@ class User {
         gender: gender ?? this.gender,
         numOfStreaks: numOfStreaks ?? this.numOfStreaks,
         previousLearning: previousLearning ?? this.previousLearning,
-        group: group ?? this.group,
-        subscription: subscription ?? this.subscription);
+        group: group ?? this.group
+        // subscription: subscription ?? this.subscription
+        )
+        ;
   }
 
   Map<String, dynamic> toMap() {
@@ -66,7 +68,7 @@ class User {
       'numOfStreaks': numOfStreaks,
       'previousLearning': previousLearning,
       'group': group.toMap(),
-      'subscription': subscription.toMap()
+      // 'subscription': subscription.toMap()
     };
   }
 
@@ -85,9 +87,9 @@ class User {
       group: Group.fromMap(
         map['group'] as Map<String, dynamic>,
       ),
-      subscription: Subscription.fromMap(
-        map['subscription'] as Map<String, dynamic>,
-      ),
+      // subscription: Subscription.fromMap(
+      //   map['subscription'] as Map<String, dynamic>,
+      // ),
     );
   }
 

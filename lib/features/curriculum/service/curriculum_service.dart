@@ -42,14 +42,14 @@ class CurriculumService {
       authorized: true,
     );
 
-    if (response.statusCode == 200) {
+    // if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return data['status'] ?? false;
-    } else {
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
-      throw Exception('Failed to check payment: ${response.body}');
-    }
+      return data['success'] ?? false;
+    // } else {
+    //   print("Response status: ${response.statusCode}");
+    //   print("Response body: ${response.body}");
+    //   throw Exception('Failed to check payment: ${response.body}');
+    // }
   }
 
   // Future<void> loadDb() async {

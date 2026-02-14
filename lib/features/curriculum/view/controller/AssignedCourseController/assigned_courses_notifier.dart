@@ -65,7 +65,12 @@ class AssignedCoursesNotifier extends StateNotifier<AssignedCoursesState> {
       ref
           .read(authNotifierProvider.notifier)
           .setCourseStarted(CourseStarted.LOADING);
-      await service.checkPaymentStatus();
+      final r = await service.checkPaymentStatus();
+      ref.read(authNotifierProvider.notifier).setIsDue(!r);
+      print("payment status: $r");
+      if (!r) {
+        throw Exception("your_subscription_is_due");
+      }
       // await ref.read(bootstrapCacheProvider).clear();
       final data = await ref.read(bootstrapCacheProvider).load();
       if (data != null) {
