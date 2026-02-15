@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/widgets/bouncy_button.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_intro_page.dart';
+import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_list.dart';
+import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 
 class IntroPage extends ConsumerStatefulWidget {
   const IntroPage({super.key});
@@ -14,10 +16,20 @@ class IntroPage extends ConsumerStatefulWidget {
 class _IntroPageState extends ConsumerState<IntroPage> {
   @override
   Widget build(BuildContext context) {
+    final showCurriculumList = ref.watch(showCurriculumProvider);
+    if (showCurriculumList) {
+      return CurriculumList(onBack: () {
+        ref.read(showCurriculumProvider.notifier).update((state) => false);
+      });
+    }
     return Expanded(
       child: Scaffold(
         // backgroundColor: Colors.white,
-        bottomNavigationBar: _BottomCTA(),
+        bottomNavigationBar: _BottomCTA(
+          onStartTrial: () {
+            ref.read(showCurriculumProvider.notifier).update((state) => true);
+          },
+        ),
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -37,7 +49,9 @@ class _IntroPageState extends ConsumerState<IntroPage> {
                   // 'Our app began as a rich Islamic library. '
                   // 'Now, we’ve introduced structured learning paths to help you '
                   // 'stay consistent, test your knowledge, and grow step by step.',
-                  style: TextStyle(fontSize: 15, ),
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
                 ),
                 const SizedBox(height: 32),
                 _TitleSection(title: 'ከድሮው በምን ይለያል'),
@@ -158,7 +172,9 @@ class _HeroSection extends StatelessWidget {
         Text(
           'የተዋቀሩ ደርሶች፣ ዕለታዊ ትምህርቶች፣ ጥያቄዎች እና የምስክር ወረቀቶች'
           ' ያለማቋረጥ እና ግልጽነት ባለው መልኩ እንዲማሩ ለመርዳት የተነደፈ።',
-          style: TextStyle(fontSize: 16,),
+          style: TextStyle(
+            fontSize: 16,
+          ),
         ),
         SizedBox(height: 16),
         _TrialBadge(),
@@ -199,7 +215,9 @@ class _TrustSection extends StatelessWidget {
         Expanded(
           child: Text(
             'በ80,000+ ተማሪዎች የታመነ • 1,200+ ነፃ ኮርሶች',
-            style: TextStyle(fontSize: 14, ),
+            style: TextStyle(
+              fontSize: 14,
+            ),
           ),
         ),
       ],
@@ -207,53 +225,61 @@ class _TrustSection extends StatelessWidget {
   }
 }
 
-class _FeatureItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String description;
+final showCurriculumProvider = StateProvider<bool>((ref) {
+  return false;
+});
 
-  const _FeatureItem({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
+// class _FeatureItem extends StatelessWidget {
+//   final IconData icon;
+//   final String title;
+//   final String description;
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 28, color: Colors.green),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style:  TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withAlpha(200),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   const _FeatureItem({
+//     required this.icon,
+//     required this.title,
+//     required this.description,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.only(bottom: 16),
+//       child: Row(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Icon(icon, size: 28, color: Colors.green),
+//           const SizedBox(width: 12),
+//           Expanded(
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   title,
+//                   style: const TextStyle(
+//                     fontSize: 16,
+//                     fontWeight: FontWeight.w600,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 4),
+//                 Text(
+//                   description,
+//                   style: TextStyle(
+//                     fontSize: 14,
+//                     color: Theme.of(context)
+//                         .textTheme
+//                         .bodyMedium
+//                         ?.color
+//                         ?.withAlpha(200),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class _ComparisonCard extends StatelessWidget {
   @override
@@ -303,7 +329,15 @@ class _TrialInfo extends StatelessWidget {
   }
 }
 
-class _BottomCTA extends StatelessWidget {
+class _BottomCTA extends ConsumerStatefulWidget {
+  final VoidCallback onStartTrial;
+  const _BottomCTA({required this.onStartTrial});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _BottomCTAState();
+}
+
+class _BottomCTAState extends ConsumerState<_BottomCTA> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -324,9 +358,7 @@ class _BottomCTA extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: () {
-                    // TODO: Navigate to subscription / trial flow
-                  },
+                  onPressed: widget.onStartTrial,
                   child: const Text(
                     'የ7-ቀን ነጻ ሙከራ ይጀምሩ',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -336,7 +368,7 @@ class _BottomCTA extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                // TODO: Continue with free library
+                ref.read(menuIndexProvider.notifier).update((state) => 1);
               },
               child: const Text('በነጻው የደርስ ቤተ-መጽሐፍት ይቀጥሉ'),
             ),

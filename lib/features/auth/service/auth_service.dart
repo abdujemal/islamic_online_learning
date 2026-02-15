@@ -16,9 +16,10 @@ import 'package:islamic_online_learning/features/auth/model/user.dart';
 
 class AuthService {
   final storage = const FlutterSecureStorage();
-  Future<void> sendOtpRequest(String phone, String ageRange) async {
+  Future<void> sendOtpRequest(
+      String phone, String? ageRange, bool isSignIn) async {
     final response = await customPostRequest(
-      requestOtpApi,
+      isSignIn ? requestOtpSignInApi : requestOtpApi,
       {
         "phone": phone,
         "ageRange": ageRange,
@@ -289,12 +290,13 @@ class AuthService {
     }
   }
 
-  Future<User> updateMyInfo(String name,) async {
+  Future<User> updateMyInfo(
+    String name,
+  ) async {
     final response = await customPutRequest(
       updateMyInfoApi,
       {
         "name": name,
-        
       },
       authorized: true,
     );

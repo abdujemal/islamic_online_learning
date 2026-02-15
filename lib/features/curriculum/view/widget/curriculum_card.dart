@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/sign_in.dart';
 import 'package:islamic_online_learning/features/curriculum/model/curriculum.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/intro_page.dart';
 import 'package:islamic_online_learning/features/prerequisiteTest/view/pages/prerequisite_test_page.dart';
 
 class CurriculumCard extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _CurriculumCardState extends ConsumerState<CurriculumCard> {
             toast("ይህ ክፍል ገና አልተጀመረም።", ToastType.error, context);
             return;
           }
+
           if (widget.curriculum.prerequisite) {
             Navigator.push(
               context,
@@ -43,6 +45,7 @@ class _CurriculumCardState extends ConsumerState<CurriculumCard> {
               ),
             );
           }
+          ref.read(showCurriculumProvider.notifier).update((state) => false);
         },
         child: Ink(
           decoration: BoxDecoration(

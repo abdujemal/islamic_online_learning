@@ -25,7 +25,7 @@ class SignInNotifier extends StateNotifier<SignInState> {
   Future<void> sendOtp(
     String phone,
     String? curriculumId,
-    String ageRange,
+    String? ageRange,
     BuildContext context,
   ) async {
     if (curriculumId != null) {
@@ -35,7 +35,7 @@ class SignInNotifier extends StateNotifier<SignInState> {
 
     try {
       state = state.copyWith(isLoading: true);
-      await authService.sendOtpRequest(phone, ageRange);
+      await authService.sendOtpRequest(phone, ageRange, curriculumId == null);
       state = state.copyWith(isLoading: false);
       if (mounted) {
         Navigator.push(
@@ -54,7 +54,12 @@ class SignInNotifier extends StateNotifier<SignInState> {
       print("Error: $err");
       if (err.toString().contains("users_under_13_not_allowed")) {
         toast("ይህ መተግበሪያ ከ13 ዓመት በታች ለሆኑ ተጠቃሚዎች አይፈቀድም።", ToastType.error, context);
-      } else {
+      } else if(err.toString().contains("user_not_found")){
+        toast("ኢሜሎ አልተመዘገበም።", ToastType.error, context);
+      } else if(err.toString().contains("already_registered")){
+        toast("ይህ ኢሜል ተመዝግበዋል።", ToastType.error, context);
+      }
+      else {
         toast("ኮድ በመላክ ላይ ሳለ ስህተት ተከስቷል።: $err", ToastType.error, context);
       }
       state = state.copyWith(isLoading: false, error: err.toString());

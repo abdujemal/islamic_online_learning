@@ -57,6 +57,8 @@ const String getStreaksApi = "$baseUrl/streaks/{year}/{month}";
 //auth
 const String refreshTokenApi = "$baseUrl/auth/otp/refresh-token";
 const String requestOtpApi = "$baseUrl/auth/otp";
+const String requestOtpSignInApi = "$baseUrl/auth/otp/sign-in";
+
 const String googleAuthApi = "$baseUrl/auth/google";
 const String verifyOtpApi = "$baseUrl/auth/otp/verify";
 const String similarGroupsApi = "$baseUrl/auth/user/groups";

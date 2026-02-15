@@ -7,7 +7,7 @@ import 'package:islamic_online_learning/features/auth/view/controller/provider.d
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/intro_page.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_list.dart';
-import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_list.dart';
+// import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_list.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/group_members_status.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 

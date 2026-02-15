@@ -5,7 +5,9 @@ import 'package:islamic_online_learning/features/curriculum/view/widget/curricul
 import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_shimmer.dart';
 
 class CurriculumList extends ConsumerStatefulWidget {
-  const CurriculumList({super.key});
+  final VoidCallback onBack;
+
+  const CurriculumList({super.key, required this.onBack});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _CurriculumListState();
@@ -21,9 +23,20 @@ class _CurriculumListState extends ConsumerState<CurriculumList> {
     return Expanded(
       child: Column(
         children: [
-          Text(
-            "ክፍሎች",
-            style: TextStyle(fontSize: 20),
+          Row(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                onPressed: widget.onBack,
+                icon: Icon(Icons.arrow_back),
+              ),
+              Spacer(),
+              Text(
+                "ክፍሎች",
+                style: TextStyle(fontSize: 20),
+              ),
+              Spacer(),
+            ],
           ),
           Expanded(
             child: ref.watch(curriculumNotifierProvider).map(

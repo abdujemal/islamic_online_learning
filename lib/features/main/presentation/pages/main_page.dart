@@ -15,6 +15,7 @@ import 'package:islamic_online_learning/core/topic_constants.dart';
 import 'package:islamic_online_learning/core/update_checker.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dart';
+import 'package:islamic_online_learning/features/auth/view/pages/sign_in.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
 // import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
@@ -37,8 +38,10 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import '../../../../core/Audio Feature/current_audio_view.dart';
 
 class MainPage extends ConsumerStatefulWidget {
-  const MainPage({super.key, });
-  
+  const MainPage({
+    super.key,
+  });
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _MainPageState();
 }
@@ -325,9 +328,8 @@ class _MainPageState extends ConsumerState<MainPage>
     }
     final audioPlayer = PlaylistHelper.audioPlayer;
     final curriculumState = ref.watch(assignedCoursesNotifierProvider);
-    final isDue =
-        ref.watch(authNotifierProvider).isDue;
-        print("isDue: $isDue");
+    final isDue = ref.watch(authNotifierProvider).isDue;
+    print("isDue: $isDue");
     return WillPopScope(
       onWillPop: () async {
         if (_tabController.index != 0) {
@@ -551,7 +553,30 @@ class _MainPageState extends ConsumerState<MainPage>
                     //     }
                     //   },
                     // ),
-                    
+                    Consumer(builder: (context, ref, child) {
+                      final authState = ref.watch(authNotifierProvider);
+                      if (authState.user != null) {
+                        return SizedBox();
+                      }
+                      return TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignIn(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'ይግቡ',
+                          style: TextStyle(
+                            color: Color(0xFF0E7A57),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      );
+                    }),
+
                     currentIndex != 1
                         ? Consumer(builder: (context, ref, child) {
                             final authState = ref.watch(authNotifierProvider);
