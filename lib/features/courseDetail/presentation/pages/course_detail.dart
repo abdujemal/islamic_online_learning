@@ -341,6 +341,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
             bottomNavigationBar: AudioBottomView(
               courseModel.courseId,
               () {
+                
                 print("playListIndexes: $playListIndexes");
                 print("playlist: ${PlaylistHelper().playList}");
                 print("index: ${audioPlayer.currentIndex}");

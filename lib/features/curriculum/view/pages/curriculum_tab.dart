@@ -5,6 +5,7 @@ import 'package:islamic_online_learning/core/lib/pref_consts.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/auth_state.dart';
 import 'package:islamic_online_learning/features/auth/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/intro_page.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/assigned_course_list.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/curriculum_list.dart';
 import 'package:islamic_online_learning/features/curriculum/view/widget/group_members_status.dart';
@@ -61,7 +62,7 @@ class _CurriculumTabState extends ConsumerState<CurriculumTab>
               //     "authState.tokenIsNull:${authState.tokenIsNull} && !authState.isLoading:${!authState.isLoading}"),
               if (authState.tokenIsNull && !authState.isLoading)
                 // Text("CurriculumList"),
-              CurriculumList(),
+              IntroPage(),
               if (!authState.tokenIsNull &&
                   !authState.initial &&
                   authState.courseStarted != CourseStarted.STARTED)

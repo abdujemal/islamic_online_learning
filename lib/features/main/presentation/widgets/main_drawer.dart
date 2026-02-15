@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islamic_online_learning/core/constants.dart';
 import 'package:islamic_online_learning/core/lib/pref_consts.dart';
-import 'package:islamic_online_learning/features/main/presentation/pages/aboutus.dart';
+// import 'package:islamic_online_learning/features/main/presentation/pages/aboutus.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/faq.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:share_plus/share_plus.dart';

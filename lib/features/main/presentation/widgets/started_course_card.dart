@@ -159,7 +159,7 @@ class _StartedCourseCardState extends ConsumerState<StartedCourseCard> {
                   image: DecorationImage(
                     image: CachedNetworkImageProvider(
                       widget.courseModel.image,
-                    ),
+                    ),                    
                     fit: BoxFit.fill,
                   ),
                 ),

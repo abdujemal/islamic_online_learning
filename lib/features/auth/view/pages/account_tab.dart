@@ -136,7 +136,7 @@ class _AccountTabState extends ConsumerState<AccountTab> {
               },
             ),
             _buildSettingItem(
-              icon: Icons.card_membership_rounded,
+              icon: Icons.workspace_premium_rounded,
               title: "የምስክር ወረቀቶች",
               onTap: () {
                 Navigator.push(
