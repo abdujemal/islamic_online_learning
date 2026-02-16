@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -77,9 +76,9 @@ class _MainState extends ConsumerState<Main> {
               // cardColor: Theme.of(context).dialogTheme.backgroundColor,
               colorScheme: const ColorScheme.dark(
                 primary: primaryColor,
-                background: Color.fromARGB(255, 51, 51, 51),
+                surface: Color.fromARGB(255, 51, 51, 51),
               ),
-              dialogTheme: const DialogTheme(
+              dialogTheme: const DialogThemeData(
                 backgroundColor: darkCardColor,
               ),
               cardColor: darkCardColor,
@@ -112,7 +111,7 @@ class _MainState extends ConsumerState<Main> {
             chipTheme: const ChipThemeData(
               backgroundColor: Color.fromARGB(255, 207, 207, 207),
             ),
-            dialogTheme: const DialogTheme(
+            dialogTheme: const DialogThemeData(
               backgroundColor: cardColor,
             ),
             cardColor: cardColor,
