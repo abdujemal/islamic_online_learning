@@ -29,10 +29,10 @@ class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      final currentStreak = ref.read(currentStreakProvider);
-      streak = currentStreak!.streakNo;
-      lessonNum = currentStreak.streak.scores[0].afterLesson;
-      lessonsCompleted = currentStreak.streak.scores.length;
+      // final currentStreak = ref.read(currentStreakProvider);
+      // streak = currentStreak!.streakNo;
+      // lessonNum = currentStreak.streak.scores[0].afterLesson;
+      // lessonsCompleted = currentStreak.streak.scores.length;
       setState(() {});
     });
   }
@@ -117,14 +117,14 @@ class _IslamicStreakPageState extends ConsumerState<IslamicStreakPage> {
                           height: 55,
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => FeedbackScreen(
-                                    lessonNum: lessonNum,
-                                  ),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (_) => FeedbackScreen(
+                              //       lessonNum: lessonNum,
+                              //     ),
+                              //   ),
+                              // );
                             },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(

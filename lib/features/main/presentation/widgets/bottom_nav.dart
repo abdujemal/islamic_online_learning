@@ -47,16 +47,16 @@ class _BottomNavState extends ConsumerState<BottomNav> {
             icons.length,
             (index) => InkWell(
               onTap: () async {
-                if (index == 2) {
-                  final token = await getAccessToken();
-                  final user = ref.read(authNotifierProvider).user;
-                  if (token == null || user == null) {
-                    if (mounted) {
-                      toast("ይቅርታ አካውንት የሎትም!", ToastType.error, context);
-                    }
-                    return;
-                  }
-                }
+                // if (index == 2) {
+                  // final token = await getAccessToken();
+                  // final user = ref.read(authNotifierProvider).user;
+                  // if (token == null || user == null) {
+                  //   if (mounted) {
+                  //     toast("ይቅርታ አካውንት የሎትም!", ToastType.error, context);
+                  //   }
+                  //   return;
+                  // }
+                // }
                 if (!mounted) return;
                 widget.tabController.animateTo(index);
                 ref.read(menuIndexProvider.notifier).update((state) => index);

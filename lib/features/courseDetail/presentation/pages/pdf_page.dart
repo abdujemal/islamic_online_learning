@@ -12,7 +12,7 @@ import 'package:islamic_online_learning/features/courseDetail/presentation/widge
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/audio_bottom_view.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/finish_confirmation.dart';
 import 'package:islamic_online_learning/features/courseDetail/presentation/widgets/pdf_drawer.dart';
-import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
+// import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -98,9 +98,9 @@ class _PdfPageState extends ConsumerState<PdfPage> {
     }
     if (_.processingState == ProcessingState.completed) {
       if (!ref.context.mounted) return;
-      final lessonN = ref.read(lessonNotifierProvider.notifier);
-      // final lessonState = ref.read(lessonNotifierProvider);
-      await lessonN.showConfusionDialog(context);
+      // final lessonN = ref.read(lessonNotifierProvider.notifier);
+      // // final lessonState = ref.read(lessonNotifierProvider);
+      // await lessonN.showConfusionDialog(context);
 
       // if (response == 'yes') {
       //   // ✅ Open a form or navigate to confusion submission screen
@@ -140,7 +140,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
         }
         if (widget.isFromPro) {
           await PlaylistHelper.audioPlayer.stop();
-          ref.read(lessonNotifierProvider.notifier).removeCurrentLesson();
+          // ref.read(lessonNotifierProvider.notifier).removeCurrentLesson();
 
           // return true;
         }
@@ -524,7 +524,7 @@ class _PdfPageState extends ConsumerState<PdfPage> {
                         ),
                       ),
                       onTap: () {
-                        ref.read(lessonNotifierProvider.notifier).playLesson();
+                        // ref.read(lessonNotifierProvider.notifier).playLesson();
                       },
                     ),
                   const SizedBox(

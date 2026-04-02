@@ -18,12 +18,14 @@ import 'package:islamic_online_learning/features/auth/view/pages/account_tab.dar
 import 'package:islamic_online_learning/features/auth/view/pages/sign_in.dart';
 import 'package:islamic_online_learning/features/curriculum/view/controller/provider.dart';
 import 'package:islamic_online_learning/features/curriculum/view/pages/curriculum_tab.dart';
+import 'package:islamic_online_learning/features/curriculum/view/pages/intro_page.dart';
 // import 'package:islamic_online_learning/features/curriculum/view/pages/islamic_streak_page.dart';
 // import 'package:islamic_online_learning/features/groupChat/view/controller/provider.dart';
 // import 'package:islamic_online_learning/features/groupChat/view/pages/group_chat_page.dart';
 // import 'package:islamic_online_learning/features/groupChat/view/pages/group_chat_page.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/fav.dart';
 import 'package:islamic_online_learning/features/main/presentation/pages/home.dart';
+import 'package:islamic_online_learning/features/main/presentation/pages/started.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/bottom_nav.dart';
 import 'package:islamic_online_learning/features/main/presentation/state/provider.dart';
 import 'package:islamic_online_learning/features/main/presentation/widgets/main_drawer.dart';
@@ -327,9 +329,9 @@ class _MainPageState extends ConsumerState<MainPage>
       _tabController.animateTo(currentIndex);
     }
     final audioPlayer = PlaylistHelper.audioPlayer;
-    final curriculumState = ref.watch(assignedCoursesNotifierProvider);
-    final isDue = ref.watch(authNotifierProvider).isDue;
-    print("isDue: $isDue");
+    // final curriculumState = ref.watch(assignedCoursesNotifierProvider);
+    // final isDue = ref.watch(authNotifierProvider).isDue;
+    // print("isDue: $isDue");
     return WillPopScope(
       onWillPop: () async {
         if (_tabController.index != 0) {
@@ -380,126 +382,114 @@ class _MainPageState extends ConsumerState<MainPage>
               child: Scaffold(
                 bottomNavigationBar: BottomNav(_tabController),
                 appBar: AppBar(
-                  title: currentIndex != 1
-                      ? curriculumState.curriculum != null && currentIndex == 0
-                          ? Text(curriculumState.curriculum?.title ?? "")
-                          : Text("ዒልም ፈላጊ")
-                      : AnimatedSearchBar(
-                          height: 50,
-                          label: "ዒልም ፈላጊ",
-                          controller: _searchController,
-                          labelStyle: const TextStyle(fontSize: 16),
-                          searchStyle: TextStyle(
-                            color: ref.read(themeProvider) == ThemeMode.dark
-                                ? Colors.white
-                                : Colors.black,
-                          ),
-                          cursorColor: primaryColor,
-                          searchIcon: Padding(
-                            padding: const EdgeInsets.only(top: 5.0),
-                            child: Icon(
-                              key: _searchIconKey,
-                              Icons.search_rounded,
-                            ),
-                          ),
-                          textInputAction: TextInputAction.search,
-                          searchDecoration: const InputDecoration(
-                            hintText: 'ፈልግ...',
-                            alignLabelWithHint: true,
-                            fillColor: Colors.white,
-                            focusColor: Colors.white,
-                            hintStyle: TextStyle(
-                              color: Colors.white70,
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          onChanged: (value) {
-                            ref
-                                .read(queryProvider.notifier)
-                                .update((state) => value);
-                            if (ref.watch(menuIndexProvider) != 0) {
-                              ref
-                                  .read(menuIndexProvider.notifier)
-                                  .update((state) => 0);
-                              // tabController.animateTo(0);
-                            }
+                  title: AnimatedSearchBar(
+                    height: 50,
+                    label: "ዒልም ፈላጊ",
+                    controller: _searchController,
+                    labelStyle: const TextStyle(fontSize: 16),
+                    searchStyle: TextStyle(
+                      color: ref.read(themeProvider) == ThemeMode.dark
+                          ? Colors.white
+                          : Colors.black,
+                    ),
+                    cursorColor: primaryColor,
+                    searchIcon: Padding(
+                      padding: const EdgeInsets.only(top: 5.0),
+                      child: Icon(
+                        key: _searchIconKey,
+                        Icons.search_rounded,
+                      ),
+                    ),
+                    textInputAction: TextInputAction.search,
+                    searchDecoration: const InputDecoration(
+                      hintText: 'ፈልግ...',
+                      alignLabelWithHint: true,
+                      fillColor: Colors.white,
+                      focusColor: Colors.white,
+                      hintStyle: TextStyle(
+                        color: Colors.white70,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (value) {
+                      ref.read(queryProvider.notifier).update((state) => value);
+                      if (ref.watch(menuIndexProvider) != 0) {
+                        ref
+                            .read(menuIndexProvider.notifier)
+                            .update((state) => 0);
+                        // tabController.animateTo(0);
+                      }
 
-                            startSearchTimer(value);
-                          },
-                          onFieldSubmitted: (value) {
-                            ref
-                                .read(mainNotifierProvider.notifier)
-                                .searchCourses(value, 20);
-                          },
-                          onClose: () {
-                            ref.read(mainNotifierProvider.notifier).getCourses(
-                                  context: context,
-                                );
-                          },
-                        ),
+                      startSearchTimer(value);
+                    },
+                    onFieldSubmitted: (value) {
+                      ref
+                          .read(mainNotifierProvider.notifier)
+                          .searchCourses(value, 20);
+                    },
+                    onClose: () {
+                      ref.read(mainNotifierProvider.notifier).getCourses(
+                            context: context,
+                          );
+                    },
+                  ),
                   bottom: PreferredSize(
                       preferredSize: Size(
                         MediaQuery.of(context).size.width,
-                        showTopAudio
-                            ? isDue
-                                ? 80 + 40
-                                : 40
-                            : isDue
-                                ? 80
-                                : 0,
+                        showTopAudio ? 40 : 0,
                       ),
                       child: Column(
                         children: [
                           showTopAudio
                               ? CurrentAudioView(metaData as MediaItem)
                               : const SizedBox(),
-                          isDue
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                  ),
-                                  child: Container(
-                                    width: double.infinity,
-                                    margin: EdgeInsets.only(
-                                      right: 20,
-                                      left: 20,
-                                      top: 15,
-                                    ),
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        border: Border.all(
-                                          color: Colors.amber,
-                                        ),
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: Row(
-                                      children: [
-                                        Text("የክፍያ ጊዜ ደርሷል!"),
-                                        Spacer(),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => PricingPage(),
-                                              ),
-                                            );
-                                          },
-                                          child: Text("ክፈል"),
-                                        )
-                                        // InkWell(
-                                        //   onTap: () {},
-                                        //   child: Ink(
-                                        //     child: Text("Add Payment", col),
-                                        //   ),
-                                        // )
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : SizedBox()
+                          // isDue
+                          //     ? Container(
+                          //         decoration: BoxDecoration(
+                          //           color: Theme.of(context)
+                          //               .scaffoldBackgroundColor,
+                          //         ),
+                          //         child: Container(
+                          //           width: double.infinity,
+                          //           margin: EdgeInsets.only(
+                          //             right: 20,
+                          //             left: 20,
+                          //             top: 15,
+                          //           ),
+                          //           padding: EdgeInsets.all(10),
+                          //           decoration: BoxDecoration(
+                          //               color: Theme.of(context)
+                          //                   .scaffoldBackgroundColor,
+                          //               border: Border.all(
+                          //                 color: Colors.amber,
+                          //               ),
+                          //               borderRadius: BorderRadius.circular(5)),
+                          //           child: Row(
+                          //             children: [
+                          //               Text("የክፍያ ጊዜ ደርሷል!"),
+                          //               Spacer(),
+                          //               TextButton(
+                          //                 onPressed: () {
+                          //                   Navigator.push(
+                          //                     context,
+                          //                     MaterialPageRoute(
+                          //                       builder: (_) => PricingPage(),
+                          //                     ),
+                          //                   );
+                          //                 },
+                          //                 child: Text("ክፈል"),
+                          //               )
+                          //               // InkWell(
+                          //               //   onTap: () {},
+                          //               //   child: Ink(
+                          //               //     child: Text("Add Payment", col),
+                          //               //   ),
+                          //               // )
+                          //             ],
+                          //           ),
+                          //         ),
+                          //       )
+                          //     : SizedBox()
                         ],
                       )),
                   actions: [
@@ -553,95 +543,96 @@ class _MainPageState extends ConsumerState<MainPage>
                     //     }
                     //   },
                     // ),
-                    Consumer(builder: (context, ref, child) {
-                      final authState = ref.watch(authNotifierProvider);
-                      if (authState.user != null) {
-                        return SizedBox();
-                      }
-                      return TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SignIn(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'ይግቡ',
-                          style: TextStyle(
-                            color: Color(0xFF0E7A57),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      );
-                    }),
+                    // Consumer(builder: (context, ref, child) {
+                    //   final authState = ref.watch(authNotifierProvider);
+                    //   if (authState.user != null) {
+                    //     return SizedBox();
+                    //   }
+                    //   return
+                    //   TextButton(
+                    //     onPressed: () {
+                    //       Navigator.push(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //           builder: (context) => SignIn(),
+                    //         ),
+                    //       );
+                    //     },
+                    //     child: const Text(
+                    //       'ይግቡ',
+                    //       style: TextStyle(
+                    //         color: Color(0xFF0E7A57),
+                    //         fontWeight: FontWeight.w600,
+                    //       ),
+                    //     ),
+                    //   );
+                    // }),
 
-                    currentIndex != 1
-                        ? Consumer(builder: (context, ref, child) {
-                            final authState = ref.watch(authNotifierProvider);
-                            final notificationState =
-                                ref.watch(notificationNotifierProvider);
-                            final unreadNotifications =
-                                notificationState.unreadNotifications;
-                            if (authState.user != null) {
-                              return Stack(
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) => NotificationsPage()
+                    // currentIndex != 1
+                    //     ? Consumer(builder: (context, ref, child) {
+                    //         final authState = ref.watch(authNotifierProvider);
+                    //         final notificationState =
+                    //             ref.watch(notificationNotifierProvider);
+                    //         final unreadNotifications =
+                    //             notificationState.unreadNotifications;
+                    //         if (authState.user != null) {
+                    //           return Stack(
+                    //             children: [
+                    //               IconButton(
+                    //                 onPressed: () {
+                    //                   Navigator.push(
+                    //                     context,
+                    //                     MaterialPageRoute(
+                    //                         builder: (_) => NotificationsPage()
 
-                                            // IslamicStreakPage(
-                                            //   streak: 4,
-                                            //   lessonsCompleted: 10,
-                                            //   type: "Discussion",
-                                            // ),
-                                            ),
-                                      );
-                                    },
-                                    icon: Icon(
-                                      Icons.notifications_rounded,
-                                    ),
-                                  ),
-                                  if (unreadNotifications > 0)
-                                    Positioned(
-                                      right: 6,
-                                      bottom: 4,
-                                      child: Container(
-                                        padding: EdgeInsets.all(4),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: primaryColor,
-                                        ),
-                                        child: Text(
-                                          "$unreadNotifications",
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              );
-                            } else {
-                              return SizedBox();
-                            }
-                          })
-                        : IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => Fav(),
-                                ),
-                              );
-                            },
-                            icon: Icon(Icons.bookmark_rounded),
-                          ),
+                    //                         // IslamicStreakPage(
+                    //                         //   streak: 4,
+                    //                         //   lessonsCompleted: 10,
+                    //                         //   type: "Discussion",
+                    //                         // ),
+                    //                         ),
+                    //                   );
+                    //                 },
+                    //                 icon: Icon(
+                    //                   Icons.notifications_rounded,
+                    //                 ),
+                    //               ),
+                    //               if (unreadNotifications > 0)
+                    //                 Positioned(
+                    //                   right: 6,
+                    //                   bottom: 4,
+                    //                   child: Container(
+                    //                     padding: EdgeInsets.all(4),
+                    //                     decoration: BoxDecoration(
+                    //                       shape: BoxShape.circle,
+                    //                       color: primaryColor,
+                    //                     ),
+                    //                     child: Text(
+                    //                       "$unreadNotifications",
+                    //                       style: TextStyle(
+                    //                         fontSize: 10,
+                    //                         color: Colors.white,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ),
+                    //             ],
+                    //           );
+                    //         } else {
+                    //           return SizedBox();
+                    //         }
+                    //       })
+                    //     : IconButton(
+                    //         onPressed: () {
+                    //           Navigator.push(
+                    //             context,
+                    //             MaterialPageRoute(
+                    //               builder: (_) => Fav(),
+                    //             ),
+                    //           );
+                    //         },
+                    //         icon: Icon(Icons.bookmark_rounded),
+                    //       ),
                   ],
                   leading: Builder(builder: (context) {
                     return IconButton(
@@ -659,9 +650,9 @@ class _MainPageState extends ConsumerState<MainPage>
                     physics: NeverScrollableScrollPhysics(),
                     controller: _tabController,
                     children: [
-                      const CurriculumTab(),
+                      const IntroPage(),
                       const Home(),
-                      const AccountTab(),
+                      const Started(),
                     ],
                   ),
                 ),

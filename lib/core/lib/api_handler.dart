@@ -4,7 +4,7 @@ import "dart:io";
 import "package:connectivity_plus/connectivity_plus.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:flutter_secure_storage/flutter_secure_storage.dart";
+// import "package:flutter_secure_storage/flutter_secure_storage.dart";
 import "package:http/http.dart" as http;
 import "package:islamic_online_learning/core/constants.dart";
 import "package:islamic_online_learning/features/auth/view/controller/provider.dart";
@@ -12,7 +12,7 @@ import "package:islamic_online_learning/features/auth/view/pages/payment_due_pag
 // import "package:islamic_online_learning/features/curriculum/view/controller/provider.dart";
 import "package:islamic_online_learning/features/main/presentation/pages/main_page.dart";
 
-final storage = const FlutterSecureStorage();
+// final storage = const FlutterSecureStorage();
 
 Future<http.Response> customGetRequest(String url,
     {bool authorized = false}) async {
@@ -267,20 +267,21 @@ Future<http.StreamedResponse> customPostWithForm(
 }
 
 Future<String?> getAccessToken() async {
-  final token = await storage.read(key: 'access_token');
-  final refreshToken = await storage.read(key: "refresh_token");
+  final token = ""; //await storage.read(key: 'access_token');
+  final refreshToken = "";
+  // await storage.read(key: "refresh_token");
   print("token: $token");
   print("refreshToken: $refreshToken");
   return token;
 }
 
 Future<void> deleteTokens() async {
-  await storage.delete(key: "access_token");
-  await storage.delete(key: "refresh_token");
+  // await storage.delete(key: "access_token");
+  // await storage.delete(key: "refresh_token");
 }
 
 Future<void> logout(Ref ref, BuildContext context) async {
-  ref.read(authNotifierProvider.notifier).logout();
+  // ref.read(authNotifierProvider.notifier).logout();
   if (context.mounted) {
     Navigator.pushAndRemoveUntil(
         context, MaterialPageRoute(builder: (_) => MainPage()), (_) => false);
@@ -351,28 +352,28 @@ String getErrorMsg(String err, String fallback) {
 }
 
 Future<Map<String, dynamic>> refreshToken() async {
-  final refresh = await storage.read(key: 'refresh_token');
-  final phone = await storage.read(key: "phone");
-  if (refresh == null) return {'ok': false, 'error': 'no_refresh'};
-  final res = await customPostRequest(
-    refreshTokenApi,
-    {
-      "refreshToken": refresh,
-      "phone": phone,
-    },
-  );
-  if (res.statusCode == 200) {
-    final body = jsonDecode(res.body);
-    final data = body["data"];
-    if (data['ok'] == true &&
-        data['token'] != null &&
-        data['refreshToken'] != null) {
-      await storage.write(
-          key: 'access_token', value: "Bearer ${data['token']}");
-      await storage.write(key: 'refresh_token', value: data['refreshToken']);
-    }
-    return data;
-  } else {
+  // final refresh = await storage.read(key: 'refresh_token');
+  // final phone = await storage.read(key: "phone");
+  // if (refresh == null) return {'ok': false, 'error': 'no_refresh'};
+  // final res = await customPostRequest(
+  //   refreshTokenApi,
+  //   {
+  //     "refreshToken": refresh,
+  //     "phone": phone,
+  //   },
+  // );
+  // if (res.statusCode == 200) {
+  //   final body = jsonDecode(res.body);
+  //   final data = body["data"];
+  //   if (data['ok'] == true &&
+  //       data['token'] != null &&
+  //       data['refreshToken'] != null) {
+  //     await storage.write(
+  //         key: 'access_token', value: "Bearer ${data['token']}");
+  //     await storage.write(key: 'refresh_token', value: data['refreshToken']);
+  //   }
+  //   return data;
+  // } else {
+  // }
     return {"ok": false};
-  }
 }

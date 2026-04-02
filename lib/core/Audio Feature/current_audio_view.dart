@@ -68,25 +68,25 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
 
   @override
   Widget build(BuildContext context) {
-    final lessonState = ref.watch(lessonNotifierProvider);
+    // final lessonState = ref.watch(lessonNotifierProvider);
     return InkWell(
       onTap: () async {
-        if (lessonState.currentLesson == null &&
-            lessonState.currentCourse == null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (ctx) => CourseDetail(
-                keey: widget.keey,
-                val: widget.val,
-                cm: CourseModel.fromMap(
-                  widget.mediaItem.extras as Map,
-                  widget.mediaItem.extras!["courseId"],
-                ),
-              ),
-            ),
-          );
-        } else {
+        // if (lessonState.currentLesson == null &&
+        //     lessonState.currentCourse == null) {
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (ctx) => CourseDetail(
+        //         keey: widget.keey,
+        //         val: widget.val,
+        //         cm: CourseModel.fromMap(
+        //           widget.mediaItem.extras as Map,
+        //           widget.mediaItem.extras!["courseId"],
+        //         ),
+        //       ),
+        //     ),
+        //   );
+        // } else {
           // final courseModel = await DatabaseHelper()
           //     .getSingleCourse(lessonState.currentCourse!.course!.courseId);
           // if (courseModel == null) return;
@@ -102,7 +102,7 @@ class _CurrentAudioViewState extends ConsumerState<CurrentAudioView> {
           //     ),
           //   ),
           // );
-        }
+        // }
       },
       child: Ink(
         color: primaryColor,
